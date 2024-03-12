@@ -1,0 +1,22 @@
+PLA depletion lowers mortality, slows mortality
+fewer rats die, so fleas don't leave (so don't spread plague) - reduces R0
+how could selection encourage PLA depletion?  what else is going on to increase R0 even though PLA depletion decreases secondary inf?
+
+DJDE's verbal argument:
+
+* populaton size of rats depleted
+* when a given rat dies, fewer hosts
+* inverse density-dependence -- more fleas per host
+* more fleas -> increased prob of infection & mortality
+* less secondary transmission, but tertiary inf is higher
+
+Vietnam: intermediate phenotypes do exist (i.e., partially depleted rather than completely depleted)
+
+sub-structured populations
+selection for lower virulence in structured populations?
+
+Longer generation time -> advantage in late-stage epidemic
+
+collapse of rat host population -> jump to human-to-human pneumonic
+
+Hinnebusch/Stenseth -- lice *can* transmit plague in the lab?
