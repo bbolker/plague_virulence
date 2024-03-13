@@ -18,11 +18,11 @@ gradfun <- function(t, y, parms) {
     list(g)
 }
 
-p0 <- c(R01=2, R02=2, gamma1 = 2, gamma2 = 1)
+p0 <- c(R01=4, R02=2, gamma1 = 2, gamma2 = 1.5)
 y0 <- c(S = 1, I1 = 0.01, I2 = 0.01, R= 0)
 tvec <- seq(0, 20, by = 0.1)
 res1 <- ode(y0, times = tvec, func = gradfun, parms = p0)
-matplot(tvec, res1[,-1], type = "l", log = "y", ylim = c(1e-4, 1), type = "l")
+matplot(tvec, res1[,-1], log = "y", ylim = c(1e-4, 1), type = "l")
 
 res1T <- (res1
     |> as.data.frame()
