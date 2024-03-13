@@ -42,7 +42,8 @@ gg0 <- filter(res1T, var!="ratio") |> droplevels() |>
 gg1 <- filter(res1T, var=="ratio") |> droplevels() |>
     ggplot(aes(time, value)) +
            geom_line() +
-    labs(y="ratio I1/I2") +
+    labs(y="ratio I1/(I1+I2)") +
     geom_hline(yintercept =  0.5, lty = 2)
 
 gg0 + gg1
+ggsave("fastslow.png")
