@@ -307,3 +307,4 @@ TSWLatexianTemp*
 #
 *.Rout
 Rplots.pdf
+.Rhistory
