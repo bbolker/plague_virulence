@@ -1,5 +1,8 @@
 fastslow.pdf: fastslow.R
 	R CMD BATCH --vanilla fastslow.R
 
-abstract.html: abstract.md virulence.bib
+%.html: %.md virulence.bib
+	quarto render $<
+
+%.html: %.qmd virulence.bib
 	quarto render $<
