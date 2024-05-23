@@ -8,6 +8,16 @@ format:
     embed-resources: true
 ---
 
+<!-- https://github.com/quarto-dev/quarto-cli/discussions/7003 -->
+
+```{css}
+/*| echo: false */
+figcaption {
+  margin: auto;
+  text-align: center;
+}
+```
+
 $$
 \newcommand{\rzero}{{\cal R}_0}
 $$
@@ -22,17 +32,37 @@ Since we cannot come up with a plausible scenario where a lower-$\rzero$, lower-
 
 In a competitive patch occupancy model, the metapopulation-level outcome is determined by (1) extinction rates of both strains (in this case, the rate or probability per unit time of a subpopulation epidemic composed of one or both strains dying out); (2) colonization rates (the rate at which new epidemics are initiated by immigration of plague-infected rats or fleas from another subpopulation); and (3) what happens when a host population is simultaneously infected by both strains (i.e., coexistence or exclusion at the subpopulation level). 
 
-We would expect that the wild-type, with a higher $\rzero$ and $r$, will competitively displace the PLA-depleted strain (for simplicity, we assume that displacement occurs instantaneously[^3]). Therefore, it is impossible for the PLA-depleted strain to outcompete the wild type at the metapopulation level. Assuming that at least one strain is able to persist, the only possible outcomes are (1) the wild-type outcompetes the PLA-depleted strain; (2) the two strains coexist; (3) the PLA-depleted strain persists because the wild type is unable to persist even in the absence of the PLA-depleted strain.
+We would expect that the wild-type, with a higher $\rzero$ and $r$, will competitively displace the PLA-depleted strain at the subpopulation level (for simplicity, we assume that displacement occurs instantaneously[^3]). Therefore, it is impossible for the PLA-depleted strain to outcompete the wild type at the metapopulation level; the the PLA-depleted strain does not affect the wild-type's population dynamics at all. Assuming that at least one strain is able to persist, the only possible outcomes are (1) the wild-type outcompetes the PLA-depleted strain; (2) the two strains coexist; (3) the PLA-depleted strain persists because the wild type can't persist even in the absence of the PLA-depleted strain.
 
 We expect that the colonization (between-patch transmission) rate is similar for both strains (although a longer generation time could in principle give a rat infected with the PLA-depleted strain a slightly greater probability of dispersing between patches). This leaves us asking whether having a *lower* $\rzero$ at the within-patch level could provide a competitive advantage at the metapopulation level, through lowered extinction rates; this is an example of the "prudent predator" phenomenon where phenotypes that underexploit their resource can evolve in patchy environments [@bootsSmall1999; @claessenEvolution1995; @keelingReinterpreting2000b; @maySuperinfection1994a; @Pels+2002].
 
 In particular, we can use insights from a recent analysis of epidemic *burnout*, the phenomenon where a pathogen goes extinct during the first epidemic trough following its introduction to a population [@Pars+2024]. The probability of burnout depends primarily on $\rzero$ and on the ratio of infectious period (or generation interval) to host lifespan ($\varepsilon$). For plague in rats these parameters are *approximately* $\rzero \approx 1.5-3$ and $\varepsilon \approx 0.01$,[^4] which puts the persistence probability at approximately 1%. More importantly (because many epidemiological details could affect these order-of-magnitude estimates from a simple model), the $\rzero$ of wild-type plague puts it near the minimum persistence, such that the decreased $\rzero$ of the PLA-depleted strain could indeed drastically decrease its probability of extinction.
 
-```{r parsons-fig, echo = FALSE, fig.width = 7, fig.align = "center", fig.cap = "Figure 5 from @Pars+2024."}
+```{r parsons-fig, echo = FALSE, fig.width = 7, fig.align = "center"}
+#| fig.cap = "Figure 5 from @Pars+2024."
 knitr::include_graphics("parsons+.png")
 ```
 
 So here (after all that) is our working hypothesis: in the early stages of an epidemic, the rat population is large and spatially connected enough (colonization rates are high) to allow the persistence of the wild type at the population level, even though its probability of persisting through the first epidemic trough is very low (high extinction rates). The pandemic itself leads to a metapopulation-wide decrease in the density of the rat population and the connectedness of subpopulations[^5], leading to a decrease in colonization rates and extinction of the wild type. In contrast, the lower $\rzero$ of the PLA-depleted strain, which handicapped it in competing with the wild type strain in the early phase of the epidemic, lowers its local extinction rate sufficiently that it is able to persist at the metapopulation level even when colonization rates are low.
+
+## Some computations and quantification
+
+* I have no idea what a reasonable subpopulation size of rats would be. The computations in @Pars+2024 are all based (arbitrarily) on a population size of $N=10^6$. 
+   * a mark-recapture study by a pest control company [@Sanc2023] estimated 3 million rats in NYC in 2023 (mostly brown rats)
+   * presumably @KeelGill2000 have some population sizes we can use?
+   * @Yu+2022 give *global* palaeodemographic estimates for black rats, but I have no idea how census population size relates to effective population size ($N = 10 N_e$? $N = 10^4 N_e$?)
+   * I'm going to use $N=10^6$ for now.
+* We should be able to get a range of $\rzero$ estimates for *Y. pestis* (including from our own papers). I'm going to use $\rzero=2.5$ for wild-type and $\rzero=1.5$ for PLA-depleted (this is cheating a bit since I know that $\rzero=2.5$ is very close to the minimum persistence).
+* as a very rough guess at $\varepsilon$ I'm going to assume that the infected period is 1 week and rat lifespan is 2 years, so $1/104 \approx 0.01$. Could probably get better numbers.
+* we have no idea what colonization rates would be.
+
+```{r burnout-probs}
+library(burnout)
+options(digits = 3)
+(pw <- P1_prob(R0 = 2.5, epsilon = 0.01)) ## wild-type
+(pd <- P1_prob(R0 = 1.5, epsilon = 0.01)) ## PLA-depleted
+```
+so the PLA-depleted have approximately `r round(pd/pw)` times higher probability of persistence ...[^6]
 
 ## Levins-Culver analysis
 
@@ -49,25 +79,6 @@ $$
 * If wild type persists its equilibrium occupancy is $1 -e_w/c_w$.
 * If wild type persists depleted strain can coexist if $c_d (e_w/c_w) > e_d$.
 * If wild type goes extinct depleted strain can survive if $c_d > e_d$.
-
-## Some computations and quantification
-
-* I have no idea what a reasonable subpopulation size of rats would be. The computations in @Pars+2024 are all based (arbitrarily) on a population size of $N=10^6$. 
-   * a mark-recapture study by a pest control company estimated 3 million rats in NYC in 2023 [@Sanc2023] (mostly brown rats)
-   * presumably @KeelGill2000 have some population sizes we can use?
-   * @Yu+2022 give *global* palaeodemographic estimates for black rats, but I have no idea how census population size relates to effective population size ($N = 10 N_e$? $N = 10^4 N_e$?)
-   * I'm going to use $N=10^6$ for now.
-* We should be able to get a range of $\rzero$ estimates for *Y. pestis* (including from our own papers). I'm going to use $\rzero=2.5$ for wild-type and $\rzero=1.5$ for PLA-depleted (this is cheating a bit since I know that $\rzero=2.5$ is very close to the minimum persistence).
-* as a very rough guess at $\varepsilon$ I'm going to assume that the infected period is 1 week and rat lifespan is 2 years, so $1/104 \approx 0.01$. Could probably get better numbers.
-* we have no idea what colonization rates would be.
-
-```{r}
-library(burnout)
-options(digits = 3)
-(pw <- P1_prob(R0 = 2.5, epsilon = 0.01)) ## wild-type
-(pd <- P1_prob(R0 = 1.5, epsilon = 0.01)) ## PLA-depleted
-```
-so the PLA-depleted have approximately `r round(pd/pw)` times higher probability of persistence ...[^6]
 
 
 ---
