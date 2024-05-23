@@ -1,8 +1,8 @@
 ---
-title: "modeling abstract, next (last?) pass"
+title: "PLA-depletion evolutionary hypothesis based on modeling insights"
 date: today
 bibliography: "virulence.bib"
-author: David Earn, Ben Bolker, Jonathan Dushoff
+author: Ben Bolker, Jonathan Dushoff, David Earn
 format:
   html:
     embed-resources: true
@@ -14,7 +14,7 @@ $$
 
 What are some biologically and dynamically plausible explanations for the repeated evolution of PLA-depleted strains of *Y. pestis* in the late stages of pandemics?
 
-The epidemiogically relevant characteristics of PLA-depleted strains are that they are less likely to less likely to kill their rat hosts than the wild type [^1], and that they *may* take longer to kill them[^2]. While these changes might initially suggest that plague is evolving according to a classical transmission-virulence tradeoff [@Lens1988; @LensMay1994; @Cres+2016], the natural history of plague does not fit the standard tradeoff theory, which assumes that pathogens transmit over a significant fraction of their generation interval - so that a longer (slower) generation interval will correspond to a proportionally greater $\rzero$. In contrast, plague only transmits from one rat to another when the initial host dies and its fleas seek a new host (at least in the case of bubonic transmission), so the infectious period is only a brief moment at the end of the initial host's life. Since PLA-depleted strains also have lower case mortality, they have lower transmission potential (assuming equal flea populations and lower or equal rat-to-flea transmission probability), no lengthening of infectious period, and hence intrinsically lower $\rzero$.
+The epidemiogically relevant characteristics of PLA-depleted strains are that they are less likely to kill their rat hosts than the wild type [^1], and that they *may* take longer to kill them[^2]. While these changes might initially suggest that plague is evolving according to a classical transmission-virulence tradeoff [@Lens1988; @LensMay1994; @Cres+2016], the natural history of plague does not fit the standard tradeoff theory, which assumes that pathogens transmit over a significant fraction of their generation interval - so that a longer (slower) generation interval will correspond to a proportionally greater $\rzero$. In contrast, plague only transmits from one rat to another when the initial host dies and its fleas seek a new host (at least in the case of bubonic transmission), so the infectious period is only a brief moment at the end of the initial host's life. Since PLA-depleted strains also have lower case mortality, they have lower transmission potential (assuming equal flea populations and lower or equal rat-to-flea transmission probability), no lengthening of infectious period, and hence intrinsically lower $\rzero$.
 
 In general, pathogens with higher $\rzero$ are competitively dominant in an endemic setting; those with a higher growth rate $r$ (for the same $\rzero$, faster strains with a shorter generation interval have higher $r$) are competitively dominant in the early phase of an epidemic [@Fran1996]. Pathogens with *lower* $r$ dominate in the late phase of an epidemic, because they decline slower, but a high-$r$ strain will infect more total hosts over the course of an epidemic (assuming the epidemic starts with equal numbers of hosts infected with each strain).
 
@@ -28,7 +28,7 @@ We expect that the colonization (between-patch transmission) rate is similar for
 
 In particular, we can use insights from a recent analysis of epidemic *burnout*, the phenomenon where a pathogen goes extinct during the first epidemic trough following its introduction to a population [@Pars+2024]. The probability of burnout depends primarily on $\rzero$ and on the ratio of infectious period (or generation interval) to host lifespan ($\varepsilon$). For plague in rats these parameters are *approximately* $\rzero \approx 1.5-3$ and $\varepsilon \approx 0.01$,[^4] which puts the persistence probability at approximately 1%. More importantly (because many epidemiological details could affect these order-of-magnitude estimates from a simple model), the $\rzero$ of wild-type plague puts it near the minimum persistence, such that the decreased $\rzero$ of the PLA-depleted strain could indeed drastically decrease its probability of extinction.
 
-```{r parsons-fig, echo = FALSE, fig.width = 7, fig.align = "center"}
+```{r parsons-fig, echo = FALSE, fig.width = 7, fig.align = "center", fig.cap = "Figure 5 from @Pars+2024."}
 knitr::include_graphics("parsons+.png")
 ```
 
