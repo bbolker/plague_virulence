@@ -8,3 +8,7 @@ fastslow.pdf: fastslow.R
 ## abstract2.html: abstract2.qmd virulence.bib
 %.html: %.qmd virulence.bib
 	quarto render $<
+
+%.docx: %.qmd virulence.bib
+	quarto render $< --to docx
+
