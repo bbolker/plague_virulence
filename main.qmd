@@ -12,29 +12,18 @@ type---less likely to kill their rat hosts, and may take longer to
 kill them, one can reasonably imagine that selection for PLA depletion
 could be driven by a classical transmission-virulence tradeoff
 [@Lens1988; @LensMay1994; @Cres+2016].  However, the standard tradeoff
-theory assumes that pathogens transmit over a significant fraction of
-their generation interval, so that a longer generation interval will
-correspond to a proportionally greater basic reproduction number
+theory assumes that a longer generation interval will
+correspond to more opportunities to transmit, and thus a greater basic reproduction number
 (${\mathcal R}_0$).  In contrast, plague transmits from one rat to
 another primarily when the initial host dies and its fleas seek a new
 host (**REFS**), so the infectious period is typically only a brief
 moment at the end of the initial host's life, implying that increasing
 host survival time merely *slows* the epidemic (without affecting
 ${\mathcal R}_0$).  Moreover, since PLA-depleted strains have lower
-case mortality, they will actually cause *fewer* secondary infections
+fatality proportions, they will actually cause *fewer* secondary infections
 (hence have *lower* ${\mathcal R}_0$).
 
-It seems, therefore, that other mechanisms must be responsible for
-inducing selection for PLA depletion after the wild type is
-established.  As we we outline in SOM, there are two mechanisms that
-may be critical for the evolution of PLA depletion.  First, while less
-virulent and less transmissible strains are handicapped in competing
-with the wild type strain in the early phase of the epidemic, as the
-rat population is reduced in size, these "weaker" strains will be
-*less likely to go extinct during epidemic troughs*, inducing
-selective pressure favoring PLA-depletion.  Second, rats infected with
-strains that kill more slowly will be more likely to disperse while
-infected, enhancing overall persistence of the pathogen through
-colonization of uninfected areas.
+We suggest two other mechanisms that may instead be responsible for inducing selection for PLA depletion after the wild type is established.  First, while less virulent and less transmissible strains are handicapped in competing with the wild type strain in the early phase of the epidemic, as the rat population is reduced in size, these "weaker" strains will be
+*less likely to go extinct during epidemic troughs*.  Second, rats infected with strains that kill more slowly will be more likely to disperse while infected, enhancing pathogen persistence through colonization of uninfected areas. These mechanisms are discussed further in SOM.
 
 ## References
