@@ -7,7 +7,7 @@ author: Ben Bolker, Jonathan Dushoff, David Earn
 
 # Insights from mechanistic mathematical modelling
 
-Given that PLA-depleted strains are less likely than wild-type strains to kill their rat hosts, and may take longer to
+Given that PLA-depleted strains are less likely than wild-type strains to kill their rat hosts, and may take longer to kill them,
 one might think that selection for PLA depletion
 could be driven by a classical transmission-virulence tradeoff
 [@Lens1988; @LensMay1994; @Cres+2016].  However, the standard tradeoff
