@@ -1,20 +1,17 @@
 ---
 title: "analysis of injection experiments"
+format:
+  html:
+    embed-resources: true
 execute:
   echo: false
 ---
-
-I had a few questions about the survival analysis (specifically of the subcutaneous injection experiments, comparing plaWT with pla-depleted). I suspect the answer is that there's a little bit of data missing from Figure 5, but read on ...
 
 Text description from the current draft:
 
 > To mimic a bubonic infection, we subcutaneously inoculated mice with $2 \times 10^3$ bacteria of the Vietnamese isolates representing varying levels of pla gene depletion: pla-reduced strains IP1640H and IP1642H (~90% depletion), pla-intermediate strain IP1643H (heterogenous 0% and 90% depletion) and IP1638H strain (pla-WT), as well as of the Pla-D206A strain (producing a proteolytically inactive Pla). As expected, the Pla-D206A control strain displayed minimal lethality (7% mortality), while the pla-WT IP1638H killed 100% of the inoculated animals (Figure 5A, Table S27). Of note, both mortality and time-to-death induced by the pla-reduced IP1640H and IP1642H and pla-intermediate IP1643H isolates were proportional to their extent of pla depletion. Specifically, strains IP1640H and IP1642H resulted in only 85% mortality and on average took an additional 1.5 days to death when compared the intermediate strain IP1638H (Table S27). Infection with IP1643H resulted in 100% mortality and an additional 2 days to death when compared to the IP1638H.
 
-As far as I know you didn't send us (me, David, Jonathan) a version of the supplementary material that included Table S27, so I'm working from the data in Figure 5. The answers to my questions below might be in that table ...
-
-- Where are IP1640H, IP1643H in Figure 5? Shouldn't they be there?
-- Figure 5 shows that IP1642H had 11/14 = 79% mortality. Maybe IP1640H had 13/14 mortality leading to an overall rate of 24/28 = 85.7% mortality?
-- Similarly, the data shown in Figure 5A represent a difference of 0.85 days, not 1.5 (95% CI from 0.15 faster to 1.85 days slower for the pla-depleted strain). Maybe that's due to the data from the other strain?
+These statements now seem fine as long as we're rounding to half-days ... "proportional to" is a little bit strong.
 
 ```{r pkgs, echo = FALSE, message = FALSE}
 library(ggplot2)
@@ -24,6 +21,8 @@ library(coin)
 library(survminer)
 library(readxl)
 library(dplyr)
+## remotes::install_version("glmperm", version = "1.0-5")
+library(glmperm)
 ```
 
 ```{r dat, echo = FALSE}
@@ -55,7 +54,7 @@ dd4 <- read.csv("Sidhu_mort.csv")  |>
 
 ## time to death
 
-```{r fig5, echo = FALSE}
+```{r fig5, echo = FALSE, fig.width = 8}
 ## cvec <- c("dark olive green", "cadet blue", "gray", "red", "blue")
 cvec <- colorRampPalette(c("darkred", "gray"))(5)
 theme_set(theme_bw(base_size = 16))
@@ -69,41 +68,71 @@ ggplot(dd4, aes(x=strainx, y = dod, colour = strain, fill = strain)) +
     labs(y = "day of death")
 ```
 
-(The $y$-axis goes all the way to zero, as it should ...)
+(**FIXME**: adjust widths to avoid abutting 1642/D206A points ...) The $y$-axis goes all the way to zero, as it should ...)
 When we compare times to mortality ($t$-test) we are only considering animals that died. The expectation is that animals that survived 20 days probably recovered ...
 
+If we compare IP1638 (WT) to the *combination* of IP1640 and IP1642 ("depleted") then we get a difference of slightly *more* than 1.5 days ...
+
 ```{r t-test, echo = FALSE}
-dd2 <- subset(dd, startsWith(as.character(strain), "IP") & dod<20)
-tt1 <- t.test(dod ~ strain, data = dd2)
+dd2 <- (dd4
+    |> filter(strain %in% c("IP1638", "IP1640", "IP1642"))
+    |> mutate(cat = ifelse(strain == "IP1638", "WT", "depleted"))
+)
+tt1 <- t.test(dod ~ cat, data = subset(dd2, dod<20))
 print(tt1)
 ```
 
-The difference between means is only `r round(diff(tt1$estimate),2)` days (about 20-25% of the total).
+The difference between means is `r round(abs(diff(tt1$estimate)),2)` days.
+
+
+"strains IP1640H and IP1642H resulted in only 85% mortality" seems correct when we lump them (except should be 86% if we're rounding correctly ...)
+
+```{r}
+dd4 |> group_by(strain) |> summarise(mean_time = mean(dod[dod<20]))
+```
 
 ## case mortality
 
-How about differences in mortality? Two different ways to compute it. (P-values always
-$\approx 0.2 -- 0.3$.)
+How about differences in mortality? Let's continue with the same comparison.
 
 ```{r chisq-test, echo = FALSE}
+tab1 <- with(dd2, table(cat, dod == 20))
 set.seed(101)
-chisq.test(matrix(c(0, 14, 3, 11), 2, 2),
+chisq.test(tab1,
            simulate.p.value= TRUE, B = 50000)
 ```
 
 ---
 
 ```{r prop-test, echo = FALSE}
-prop.test(c(0,3), c(14, 14))
+surv <- dd2 |> group_by(cat) |> summarize(n = sum(dod == 20)) |> pull(n)
+tot <- dd2 |> count(cat) |> pull(n)
+prop.test(surv, tot)
 ```
+
+Significance of this comparison is slightly worse than before (since survival with IP1640 is a little lower than with IP 1642).
+
+What if we compare survival of all strains (not including Pla-D206A) ?
+
+```{r}
+dd5 <- subset(dd4, strain != "Pla-D206A")
+fit1 <- glm(as.numeric(dod==20) ~ strain, family = binomial, subset = (strain != "Pla-D206A"), data = dd5)
+fit0 <- update(fit1, . ~ 1)
+anova(fit1, fit0)
+```
+
+I don't really trust this anyway (we are really comparing the significance of (0, 0, 1, 3) / 14 ...). 
 
 ## survival curves
 
+The log-rank test based on the *combination* of IP1640 and IP1642 is highly significant ...
+
 ```{r confint}
-dd3 <- subset(dd, startsWith(as.character(strain), "IP"))
-logrank_test(Surv(dod, event) ~ strain, data = dd3,
-             distribution = "exact")
-ggsurvplot(survfit(Surv(dod, event) ~ strain, data = dd4), palette = cvec, conf.int = TRUE)
+logrank_test(Surv(dod, event) ~ factor(cat), data = dd2, distribution = "exact")
 ```
 
-It's interesting that the log-rank test gives a significant difference (even though neither time to death [for those that died] nor mortality rate was significantly different ...
+(Haven't figured out how to do the log-rank test with >2 groups yet ...)
+
+```{r confint2}
+ggsurvplot(survfit(Surv(dod, event) ~ strain, data = dd4), palette = cvec, conf.int = TRUE)
+```
