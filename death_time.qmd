@@ -22,6 +22,8 @@ library(ggbeeswarm)
 library(survival)
 library(coin)
 library(survminer)
+library(readxl)
+library(dplyr)
 ```
 
 ```{r dat, echo = FALSE}
@@ -34,14 +36,30 @@ dd <- data.frame(
 )
 dd$strain <- factor(dd$strain, levels = unique(dd$strain))
 dd$event <- ifelse(dd$dod==20, 0, 1) ## censoring
+
+if (FALSE) {
+    tvals <- read_excel("Sidhu_SOMTable_2024-0820.xlsx",
+                        sheet = "Table S32", skip = 1) |>
+        select(1:3) |>
+        setNames(c("strain", "dod", "gene_ratio"))
+    write.csv(tvals, file = "Sidhu_mort.csv", row.names = FALSE)
+}
+dd4 <- read.csv("Sidhu_mort.csv")  |>
+    mutate(across(strain, \(x) reorder(factor(x), gene_ratio,
+                                       decreasing = TRUE))) |>
+    arrange(strain) |>
+    mutate(strainx = sprintf("%s\n(%1.1f%% Pla)", strain, gene_ratio) |>
+               factor() |> forcats::fct_inorder()) |>
+    mutate(event = ifelse(dod==20, 0, 1)) ## censoring
 ```
 
 ## time to death
 
 ```{r fig5, echo = FALSE}
-cvec <- c("dark olive green", "cadet blue", "gray")
+## cvec <- c("dark olive green", "cadet blue", "gray", "red", "blue")
+cvec <- colorRampPalette(c("darkred", "gray"))(5)
 theme_set(theme_bw(base_size = 16))
-ggplot(dd, aes(x=strain, y = dod, colour = strain, fill = strain)) +
+ggplot(dd4, aes(x=strainx, y = dod, colour = strain, fill = strain)) +
     geom_beeswarm(aes(colour = strain), size = 4, cex = 2.5) +
     geom_boxplot(alpha = 0.2) + 
     expand_limits(y=0) +
@@ -85,7 +103,7 @@ prop.test(c(0,3), c(14, 14))
 dd3 <- subset(dd, startsWith(as.character(strain), "IP"))
 logrank_test(Surv(dod, event) ~ strain, data = dd3,
              distribution = "exact")
-ggsurvplot(survfit(Surv(dod, event) ~ strain, data = dd3), palette = cvec, conf.int = TRUE)
+ggsurvplot(survfit(Surv(dod, event) ~ strain, data = dd4), palette = cvec, conf.int = TRUE)
 ```
 
 It's interesting that the log-rank test gives a significant difference (even though neither time to death [for those that died] nor mortality rate was significantly different ...
