@@ -1,0 +1,91 @@
+---
+title: "analysis of injection experiments"
+execute:
+  echo: false
+---
+
+I had a few questions about the survival analysis (specifically of the subcutaneous injection experiments, comparing plaWT with pla-depleted). I suspect the answer is that there's a little bit of data missing from Figure 5, but read on ...
+
+Text description from the current draft:
+
+> To mimic a bubonic infection, we subcutaneously inoculated mice with $2 \times 10^3$ bacteria of the Vietnamese isolates representing varying levels of pla gene depletion: pla-reduced strains IP1640H and IP1642H (~90% depletion), pla-intermediate strain IP1643H (heterogenous 0% and 90% depletion) and IP1638H strain (pla-WT), as well as of the Pla-D206A strain (producing a proteolytically inactive Pla). As expected, the Pla-D206A control strain displayed minimal lethality (7% mortality), while the pla-WT IP1638H killed 100% of the inoculated animals (Figure 5A, Table S27). Of note, both mortality and time-to-death induced by the pla-reduced IP1640H and IP1642H and pla-intermediate IP1643H isolates were proportional to their extent of pla depletion. Specifically, strains IP1640H and IP1642H resulted in only 85% mortality and on average took an additional 1.5 days to death when compared the intermediate strain IP1638H (Table S27). Infection with IP1643H resulted in 100% mortality and an additional 2 days to death when compared to the IP1638H.
+
+As far as I know you didn't send us (me, David, Jonathan) a version of the supplementary material that included Table S27, so I'm working from the data in Figure 5. The answers to my questions below might be in that table ...
+
+- Where are IP1640H, IP1643H in Figure 5? Shouldn't they be there?
+- Figure 5 shows that IP1642H had 11/14 = 79% mortality. Maybe IP1640H had 13/14 mortality leading to an overall rate of 24/28 = 85.7% mortality?
+- Similarly, the data shown in Figure 5A represent a difference of 0.85 days, not 1.5 (95% CI from 0.15 faster to 1.85 days slower for the pla-depleted strain). Maybe that's due to the data from the other strain?
+
+```{r pkgs, echo = FALSE, message = FALSE}
+library(ggplot2)
+library(ggbeeswarm)
+library(survival)
+library(coin)
+library(survminer)
+```
+
+```{r dat, echo = FALSE}
+dd <- data.frame(
+    strain = rep(c("IP1638H", "IP1642H", "D206A-Pla-mut"),
+                 times = c(14,14,14)),
+    dod = c(rep(3:7, c(7,2,2,2,1)),
+            rep(c(4:7, 20), c(4,4,2,1,3)),
+			rep(c(6,20), c(1, 13)))
+)
+dd$strain <- factor(dd$strain, levels = unique(dd$strain))
+dd$event <- ifelse(dd$dod==20, 0, 1) ## censoring
+```
+
+## time to death
+
+```{r fig5, echo = FALSE}
+cvec <- c("dark olive green", "cadet blue", "gray")
+theme_set(theme_bw(base_size = 16))
+ggplot(dd, aes(x=strain, y = dod, colour = strain, fill = strain)) +
+    geom_beeswarm(aes(colour = strain), size = 4, cex = 2.5) +
+    geom_boxplot(alpha = 0.2) + 
+    expand_limits(y=0) +
+    scale_colour_manual(values = cvec) +
+    scale_fill_manual(values = cvec) +
+    theme(legend.position = "none") +
+    labs(y = "day of death")
+```
+
+(The $y$-axis goes all the way to zero, as it should ...)
+When we compare times to mortality ($t$-test) we are only considering animals that died. The expectation is that animals that survived 20 days probably recovered ...
+
+```{r t-test, echo = FALSE}
+dd2 <- subset(dd, startsWith(as.character(strain), "IP") & dod<20)
+tt1 <- t.test(dod ~ strain, data = dd2)
+print(tt1)
+```
+
+The difference between means is only `r round(diff(tt1$estimate),2)` days (about 20-25% of the total).
+
+## case mortality
+
+How about differences in mortality? Two different ways to compute it. (P-values always
+$\approx 0.2 -- 0.3$.)
+
+```{r chisq-test, echo = FALSE}
+set.seed(101)
+chisq.test(matrix(c(0, 14, 3, 11), 2, 2),
+           simulate.p.value= TRUE, B = 50000)
+```
+
+---
+
+```{r prop-test, echo = FALSE}
+prop.test(c(0,3), c(14, 14))
+```
+
+## survival curves
+
+```{r confint}
+dd3 <- subset(dd, startsWith(as.character(strain), "IP"))
+logrank_test(Surv(dod, event) ~ strain, data = dd3,
+             distribution = "exact")
+ggsurvplot(survfit(Surv(dod, event) ~ strain, data = dd3), palette = cvec, conf.int = TRUE)
+```
+
+It's interesting that the log-rank test gives a significant difference (even though neither time to death [for those that died] nor mortality rate was significantly different ...
