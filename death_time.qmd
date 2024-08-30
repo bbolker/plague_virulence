@@ -56,14 +56,12 @@ dd4 <- read.csv("Sidhu_mort.csv")  |>
 
 ```{r fig5, echo = FALSE, fig.width = 8}
 ## cvec <- c("dark olive green", "cadet blue", "gray", "red", "blue")
-cvec <- colorRampPalette(c("darkred", "gray"))(5)
+## cvec <- colorRampPalette(c("darkred", "gray"))(5)
 cvec0 <- c("#69BE44", "#49A5DF", "#D5D5D8")
 cvec1 <- c(cvec0[1],
            lighten(cvec0[2], c(-0.3, 0, 0.3)),
            cvec0[3])
 cvec <- cvec1
-plot(1:3, 1:3, pch  = 16, cex = 3, col = cvec0)
-plot(1:5, 1:5, pch  = 16, cex = 3, col = cvec)
 theme_set(theme_bw(base_size = 16))
 
 gg_ttd <- ggplot(dd4, aes(x=strainx, y = dod, colour = strain, fill = strain)) +
@@ -98,7 +96,7 @@ The difference between means is `r round(abs(diff(tt1$estimate)),2)` days.
 
 "strains IP1640H and IP1642H resulted in only 85% mortality" seems correct when we lump them (except should be 86% if we're rounding correctly ...)
 
-```{r}
+```{r summarize}
 dd4 |> group_by(strain) |> summarise(mean_time = mean(dod[dod<20]))
 ```
 
@@ -125,7 +123,7 @@ Significance of this comparison is slightly worse than before (since survival wi
 
 What if we compare survival of all strains (not including Pla-D206A) ?
 
-```{r}
+```{r comp-subset}
 dd5 <- subset(dd4, strain != "Pla-D206A")
 fit1 <- glm(as.numeric(dod==20) ~ strain, family = binomial, subset = (strain != "Pla-D206A"), data = dd5)
 fit0 <- update(fit1, . ~ 1)
@@ -145,5 +143,13 @@ logrank_test(Surv(dod, event) ~ factor(cat), data = dd2, distribution = "exact")
 (Haven't figured out how to do the log-rank test with >2 groups yet ...)
 
 ```{r confint2}
-ggsurvplot(survfit(Surv(dod, event) ~ strain, data = dd4), palette = cvec, conf.int = TRUE)
+gg_sp <- ggsurvplot(survfit(Surv(dod, event) ~ strain, data = dd4), palette = cvec, conf.int = TRUE, risk.table = FALSE)
+print(gg_sp)
+## https://github.com/kassambara/survminer/issues/152
+ggsave(
+    file = "sp.png",
+    plot = survminer:::.build_ggsurvplot(gg_sp),
+    width = 10)
+
+ggsave(print(gg_sp), file = "sp.png")
 ```
