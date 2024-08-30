@@ -15,7 +15,6 @@ These statements now seem fine as long as we're rounding to half-days ... "propo
 
 ```{r pkgs, echo = FALSE, message = FALSE}
 library(ggplot2)
-library(ggbeeswarm)
 library(survival)
 library(coin)
 library(survminer)
@@ -23,6 +22,7 @@ library(readxl)
 library(dplyr)
 ## remotes::install_version("glmperm", version = "1.0-5")
 library(glmperm)
+library(colorspace) ## lighten()
 ```
 
 ```{r dat, echo = FALSE}
@@ -57,18 +57,29 @@ dd4 <- read.csv("Sidhu_mort.csv")  |>
 ```{r fig5, echo = FALSE, fig.width = 8}
 ## cvec <- c("dark olive green", "cadet blue", "gray", "red", "blue")
 cvec <- colorRampPalette(c("darkred", "gray"))(5)
+cvec0 <- c("#69BE44", "#49A5DF", "#D5D5D8")
+cvec1 <- c(cvec0[1],
+           lighten(cvec0[2], c(-0.3, 0, 0.3)),
+           cvec0[3])
+cvec <- cvec1
+plot(1:3, 1:3, pch  = 16, cex = 3, col = cvec0)
+plot(1:5, 1:5, pch  = 16, cex = 3, col = cvec)
 theme_set(theme_bw(base_size = 16))
-ggplot(dd4, aes(x=strainx, y = dod, colour = strain, fill = strain)) +
-    geom_beeswarm(aes(colour = strain), size = 4, cex = 2.5) +
+
+gg_ttd <- ggplot(dd4, aes(x=strainx, y = dod, colour = strain, fill = strain)) +
+    geom_dotplot(binaxis="y", stackdir = "center", binwidth = 0.5) +
     geom_boxplot(alpha = 0.2) + 
     expand_limits(y=0) +
     scale_colour_manual(values = cvec) +
     scale_fill_manual(values = cvec) +
     theme(legend.position = "none") +
     labs(y = "day of death")
+
+print(gg_ttd)
+ggsave(gg_ttd, file = "ttd.png", width = 8)
+ggsave(gg_ttd, file = "ttd.pdf", width = 8)
 ```
 
-(**FIXME**: adjust widths to avoid abutting 1642/D206A points ...) The $y$-axis goes all the way to zero, as it should ...)
 When we compare times to mortality ($t$-test) we are only considering animals that died. The expectation is that animals that survived 20 days probably recovered ...
 
 If we compare IP1638 (WT) to the *combination* of IP1640 and IP1642 ("depleted") then we get a difference of slightly *more* than 1.5 days ...
