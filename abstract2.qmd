@@ -61,6 +61,7 @@ So here (after all that) is our working hypothesis: in the early stages of an ep
 * we have no idea what colonization rates would be.
 
 ```{r burnout-probs}
+## remotes::install_github("davidearn/burnout")
 library(burnout)
 options(digits = 3)
 (pw <- P1_prob(R0 = 2.5, epsilon = 0.01)) ## wild-type
