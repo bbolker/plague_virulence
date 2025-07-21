@@ -1,0 +1,6 @@
+#69BE44 Grass
+#E4F3DE Off white
+#49A5DF Sky blue
+#DEEDF9 Cloudy blue
+#D5D5D8 Silver
+#FAFAFC Pale grey

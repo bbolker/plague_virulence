@@ -1,0 +1,155 @@
+---
+title: "analysis of injection experiments"
+format:
+  html:
+    embed-resources: true
+execute:
+  echo: false
+---
+
+Text description from the current draft:
+
+> To mimic a bubonic infection, we subcutaneously inoculated mice with $2 \times 10^3$ bacteria of the Vietnamese isolates representing varying levels of pla gene depletion: pla-reduced strains IP1640H and IP1642H (~90% depletion), pla-intermediate strain IP1643H (heterogenous 0% and 90% depletion) and IP1638H strain (pla-WT), as well as of the Pla-D206A strain (producing a proteolytically inactive Pla). As expected, the Pla-D206A control strain displayed minimal lethality (7% mortality), while the pla-WT IP1638H killed 100% of the inoculated animals (Figure 5A, Table S27). Of note, both mortality and time-to-death induced by the pla-reduced IP1640H and IP1642H and pla-intermediate IP1643H isolates were proportional to their extent of pla depletion. Specifically, strains IP1640H and IP1642H resulted in only 85% mortality and on average took an additional 1.5 days to death when compared the intermediate strain IP1638H (Table S27). Infection with IP1643H resulted in 100% mortality and an additional 2 days to death when compared to the IP1638H.
+
+These statements now seem fine as long as we're rounding to half-days ... "proportional to" is a little bit strong.
+
+```{r pkgs, echo = FALSE, message = FALSE}
+library(ggplot2)
+library(survival)
+library(coin)
+library(survminer)
+library(readxl)
+library(dplyr)
+## remotes::install_version("glmperm", version = "1.0-5")
+library(glmperm)
+library(colorspace) ## lighten()
+```
+
+```{r dat, echo = FALSE}
+dd <- data.frame(
+    strain = rep(c("IP1638H", "IP1642H", "D206A-Pla-mut"),
+                 times = c(14,14,14)),
+    dod = c(rep(3:7, c(7,2,2,2,1)),
+            rep(c(4:7, 20), c(4,4,2,1,3)),
+			rep(c(6,20), c(1, 13)))
+)
+dd$strain <- factor(dd$strain, levels = unique(dd$strain))
+dd$event <- ifelse(dd$dod==20, 0, 1) ## censoring
+
+if (FALSE) {
+    tvals <- read_excel("Sidhu_SOMTable_2024-0820.xlsx",
+                        sheet = "Table S32", skip = 1) |>
+        select(1:3) |>
+        setNames(c("strain", "dod", "gene_ratio"))
+    write.csv(tvals, file = "Sidhu_mort.csv", row.names = FALSE)
+}
+dd4 <- read.csv("Sidhu_mort.csv")  |>
+    mutate(across(strain, \(x) reorder(factor(x), gene_ratio,
+                                       decreasing = TRUE))) |>
+    arrange(strain) |>
+    mutate(strainx = sprintf("%s\n(%1.1f%% Pla)", strain, gene_ratio) |>
+               factor() |> forcats::fct_inorder()) |>
+    mutate(event = ifelse(dod==20, 0, 1)) ## censoring
+```
+
+## time to death
+
+```{r fig5, echo = FALSE, fig.width = 8}
+## cvec <- c("dark olive green", "cadet blue", "gray", "red", "blue")
+## cvec <- colorRampPalette(c("darkred", "gray"))(5)
+cvec0 <- c("#69BE44", "#49A5DF", "#D5D5D8")
+cvec1 <- c(cvec0[1],
+           lighten(cvec0[2], c(-0.3, 0, 0.3)),
+           cvec0[3])
+cvec <- cvec1
+theme_set(theme_bw(base_size = 16))
+
+gg_ttd <- ggplot(dd4, aes(x=strainx, y = dod, colour = strain, fill = strain)) +
+    geom_dotplot(binaxis="y", stackdir = "center", binwidth = 0.5) +
+    geom_boxplot(alpha = 0.2) + 
+    expand_limits(y=0) +
+    scale_colour_manual(values = cvec) +
+    scale_fill_manual(values = cvec) +
+    theme(legend.position = "none") +
+    labs(y = "day of death")
+
+print(gg_ttd)
+ggsave(gg_ttd, file = "ttd.png", width = 8)
+ggsave(gg_ttd, file = "ttd.pdf", width = 8)
+```
+
+When we compare times to mortality ($t$-test) we are only considering animals that died. The expectation is that animals that survived 20 days probably recovered ...
+
+If we compare IP1638 (WT) to the *combination* of IP1640 and IP1642 ("depleted") then we get a difference of slightly *more* than 1.5 days ...
+
+```{r t-test, echo = FALSE}
+dd2 <- (dd4
+    |> filter(strain %in% c("IP1638", "IP1640", "IP1642"))
+    |> mutate(cat = ifelse(strain == "IP1638", "WT", "depleted"))
+)
+tt1 <- t.test(dod ~ cat, data = subset(dd2, dod<20))
+print(tt1)
+```
+
+The difference between means is `r round(abs(diff(tt1$estimate)),2)` days.
+
+
+"strains IP1640H and IP1642H resulted in only 85% mortality" seems correct when we lump them (except should be 86% if we're rounding correctly ...)
+
+```{r summarize}
+dd4 |> group_by(strain) |> summarise(mean_time = mean(dod[dod<20]))
+```
+
+## case mortality
+
+How about differences in mortality? Let's continue with the same comparison.
+
+```{r chisq-test, echo = FALSE}
+tab1 <- with(dd2, table(cat, dod == 20))
+set.seed(101)
+chisq.test(tab1,
+           simulate.p.value= TRUE, B = 50000)
+```
+
+---
+
+```{r prop-test, echo = FALSE}
+surv <- dd2 |> group_by(cat) |> summarize(n = sum(dod == 20)) |> pull(n)
+tot <- dd2 |> count(cat) |> pull(n)
+prop.test(surv, tot)
+```
+
+Significance of this comparison is slightly worse than before (since survival with IP1640 is a little lower than with IP 1642).
+
+What if we compare survival of all strains (not including Pla-D206A) ?
+
+```{r comp-subset}
+dd5 <- subset(dd4, strain != "Pla-D206A")
+fit1 <- glm(as.numeric(dod==20) ~ strain, family = binomial, subset = (strain != "Pla-D206A"), data = dd5)
+fit0 <- update(fit1, . ~ 1)
+anova(fit1, fit0)
+```
+
+I don't really trust this anyway (we are really comparing the significance of (0, 0, 1, 3) / 14 ...). 
+
+## survival curves
+
+The log-rank test based on the *combination* of IP1640 and IP1642 is highly significant ...
+
+```{r confint}
+logrank_test(Surv(dod, event) ~ factor(cat), data = dd2, distribution = "exact")
+```
+
+(Haven't figured out how to do the log-rank test with >2 groups yet ...)
+
+```{r confint2}
+gg_sp <- ggsurvplot(survfit(Surv(dod, event) ~ strain, data = dd4), palette = cvec, conf.int = TRUE, risk.table = FALSE)
+print(gg_sp)
+## https://github.com/kassambara/survminer/issues/152
+ggsave(
+    file = "sp.png",
+    plot = survminer:::.build_ggsurvplot(gg_sp),
+    width = 10)
+
+ggsave(print(gg_sp), file = "sp.png")
+```
