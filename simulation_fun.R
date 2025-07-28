@@ -9,7 +9,8 @@
 #' @param ks ?? for susc patches
 #' @param c0
 #' @param K  rat carrying capacity per patch
-#' @param N number of patches
+#' @param N number of patches (only affects discrete-extinction logic)
+#' @param starting conditions
 simfun <- function(tt  = 100,
                    B0 = 0.8,
                    r = 0.5,
@@ -20,7 +21,8 @@ simfun <- function(tt  = 100,
                    ks=0.01,
                    c0=0.2,
                    K=300,
-                   N = 1000) {
+                   N = 1000,
+                   start = c(0.01, K, K)) {
 
   if (!require("burnout")) stop("please install the 'burnout' package: ",
                                 "`remotes::install_github('davidearn/burnout')`")
@@ -28,11 +30,6 @@ simfun <- function(tt  = 100,
   ## Initialize parameters
   P <- NI <- NS <- rep(NA, tt)
 
-  ## Initial conditions
-  ## FIXME: don't hardcode?
-  P[1] = 0.01                  
-  NI[1] = 100
-  NS[1] = 100
 
 ### Simulation loop
   for (t in 1:(tt-1)) {
