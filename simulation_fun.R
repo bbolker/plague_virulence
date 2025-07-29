@@ -22,7 +22,7 @@ simfun <- function(tt  = 100,
                    c0=0.2,
                    K=300,
                    N = 1000,
-                   start = c(0.01, K, K)) {
+                   start = c(p=0.01, NS=K, NI=K)) {
 
   if (!require("burnout")) stop("please install the 'burnout' package: ",
                                 "`remotes::install_github('davidearn/burnout')`")
@@ -30,8 +30,11 @@ simfun <- function(tt  = 100,
   ## Initialize parameters
   P <- NI <- NS <- rep(NA, tt)
 
-
-### Simulation loop
+  P[1] <- start[["p"]]
+  NS[1] <- start[["NS"]]
+  NI[1] <- start[["NI"]]
+    
+  ## Simulation loop
   for (t in 1:(tt-1)) {
     ## Current state
     p = P[t]
@@ -50,10 +53,9 @@ simfun <- function(tt  = 100,
       ni=(p*ni+delta_p*ns)/(p+delta_p)
       p = p + delta_p 
 
-      c=min(c0,1/(1/p+1/(1-p)))
-      delta_N <- c*(ns-ni)
-      ni <- ni + delta_N/p
-      ns <- ns - delta_N/(1-p)
+      delta_N <- c0*(ns-ni)
+      ni <- ni + delta_N*(1-p)
+      ns <- ns - delta_N*p
       
       ##fizzle and burnout
       P1=P1_prob(R0,epsilon,k=1,N=ni)
