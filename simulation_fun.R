@@ -49,10 +49,11 @@ simfun <- function(tt  = 100,
     } else{
       ## migration and infection
       B=B0*(1-exp(-ki*ni))*(1-exp(-ks*ns))
-      delta_p=B*p*(1-p)
-      ni=(p*ni+delta_p*ns)/(p+delta_p)
+      delta_p=B*p*(1-p)                 ## infection of S patches
+      ni=(p*ni+delta_p*ns)/(p+delta_p)  ## ni changes because S patches convert to I
       p = p + delta_p 
 
+      ## host (rat) movement between patches
       delta_N <- c0*(ns-ni)
       ni <- ni + delta_N*(1-p)
       ns <- ns - delta_N*p
@@ -90,7 +91,12 @@ par(las=1)
 tinyplot(value ~ time | var, data = res_long, type = "l", log = "y")
 
 ## or more traditionally
-par(mfrow=c(1,2))
-plot(P ~ time, data = res, type = "l")
-matplot(res$time, res[c("NI", "NS")], col = c(2,4), type = "l", ylab = "pop density")
-legend("right", col = c(2,4), lty = 1:2, legend = c("NI", "NS"))
+plotfun2 <- function(res, ...) {
+  par(mfrow=c(1,2))
+  plot(P ~ time, data = res, type = "l", ...)
+  matplot(res$time, res[c("NI", "NS")], col = c(2,4), type = "l", ylab = "pop density", ...)
+  legend("right", col = c(2,4), lty = 1:2, legend = c("NI", "NS"))
+}
+
+res2 <- simfun(c0=1)
+plotfun2(res2, lwd = 2)
