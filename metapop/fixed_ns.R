@@ -74,13 +74,14 @@ getEE<-function(c0=0.2,
     
     P1=P1_prob(R0,epsilon,k=1,N=n+c0*(1-p)*(S-n))
     
-    eq1<-P1*(1+B0*(1-p))-1
+    #eq1<-P1*(B*(1-p)+1)-1
+    eq1<-P1*(p+(1-exp(-B0*p))*(1-p))-p
     eq2<-(1+r)*(1-z*D)*(n+c0*(1-p)*(S-n))-n
     
     return(c(eq1, eq2))
   }
   
-  x0 <- c(0,8)  
+  x0 <- c(1,8)  
   result <- nleqslv(x0, f)
   
   return(result$x)
@@ -122,7 +123,8 @@ simfun <- function(tt  = 100,
     
     ## host movement and infection between patches(caused by host movement)
     n <- n + c0*(S-n)*(1-p)            ## host (rat) movement between patches
-    p <- p + B0*p*(1-p)                 ##infection of S patches (constant B for simplicity)
+    #p <- p + B0*p*(1-p)                 ##infection of S patches (constant B for simplicity)
+    p <- p+(1-exp(-B0*p))*(1-p)           ##infection (hazard model)
     ## ignore ni change of n because S patches convert to I (combined with movement event for simplicity)
     
     ##epidemic:death of hosts and burnout 
@@ -195,5 +197,5 @@ plot_traj <- function(B0=0.8,R0=10,r=0.5,
           xlab = "p",
           ylab = "N",
           main = "Trajectories", ...)
-  }
+}
 plot_traj()
