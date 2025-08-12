@@ -20,12 +20,14 @@ Detailed results in [pdf](./fixedns.pdf), [source (zip file)](./fixedns.zip) and
 
 # Update
 
-Updates since last time:\
-- replaced original infection probability with hazard model\
-- discussed order of events (non-cyclic permutation makes slight difference)\
-- find a scenario where reducing death probability D makes originally stable DFE unstable
+Updates since last time:
 
-Some challenges now:\
-- stability of EE\
-- smaller R0 decreases persistence probability in our current model (that seems not to be what we expected)\
+- replaced original infection probability with hazard model
+- discussed order of events (non-cyclic permutation makes slight difference)
+- find a scenario where reducing death probability $D$ makes originally stable DFE unstable
+
+Some challenges now:
+
+- stability of EE
+- smaller $R_0$ decreases persistence probability in our current model (that seems not to be what we expected)
 - value of parameter?

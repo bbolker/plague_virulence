@@ -11,7 +11,7 @@
 #' @param K  rat carrying capacity per patch
 #' @param N number of patches (only affects discrete-extinction logic)
 #' @param starting conditions
-simfun <- function(tt  = 100,
+simfun <- function(tt = 100,
                    B0 = 0.8,
                    r = 0.5,
                    D = 0.5,
@@ -46,29 +46,29 @@ simfun <- function(tt  = 100,
       p=0
       ni=0
       break
-    } else{
-      ## migration and infection
-      B=B0*(1-exp(-ki*ni))*(1-exp(-ks*ns))
-      delta_p=B*p*(1-p)                 ## infection of S patches
-      ni=(p*ni+delta_p*ns)/(p+delta_p)  ## ni changes because S patches convert to I
-      p = p + delta_p 
-
-      ## host (rat) movement between patches
-      delta_N <- c0*(ns-ni)
-      ni <- ni + delta_N*(1-p)
-      ns <- ns - delta_N*p
-      
-      ##fizzle and burnout
-      P1=P1_prob(R0,epsilon,k=1,N=ni)
-      delta_p<-(1-P1)*p
-      ns<-((1-p)*ns+delta_p*ni)/(1-p+delta_p)
-      p <-p-delta_p
-      
-      ##epidemic
-      z=final_size(R0)
-      ni <- ni * (1 - z*D)  
     }
+
+    ## migration and infection
+    B=B0*(1-exp(-ki*ni))*(1-exp(-ks*ns))
+    delta_p=B*p*(1-p)                 ## infection of S patches
+    ni=(p*ni+delta_p*ns)/(p+delta_p)  ## ni changes because S patches convert to I
+    p = p + delta_p 
+
+    ## host (rat) movement between patches
+    delta_N <- c0*(ns-ni)
+    ni <- ni + delta_N*(1-p)
+    ns <- ns - delta_N*p
     
+    ##fizzle and burnout
+    P1 <- P1_prob(R0,epsilon,k=1,N=ni)
+    delta_p <- (1-P1)*p
+    ns <- ((1-p)*ns+delta_p*ni)/(1-p+delta_p) ## ns changes because I → S
+    p <- p-delta_p
+      
+    ##epidemic
+    z=final_size(R0)
+    ni <- ni * (1 - z*D)  
+
     ## birth
     ns=ns+r*ns*(1-ns/K)
     ni=ni+r*ni*(1-ni/K)
