@@ -10,3 +10,4 @@ h<-hist(res2,breaks=200,xlab="R0",freq=FALSE)
 max_idx <- which.max(h$counts)
 max_x <- h$mids[max_idx]
 #cat(max_idx,max_x, "\n")
+
