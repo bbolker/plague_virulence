@@ -22,12 +22,13 @@ Detailed results in [pdf](./fixedns.pdf), [source (zip file)](./fixedns.zip) and
 
 Updates since last time:
 
-- replaced original infection probability with hazard model
-- discussed order of events (non-cyclic permutation makes slight difference)
-- find a scenario where reducing death probability $D$ makes originally stable DFE unstable
+-   replaced original infection probability with hazard model
+-   discussed order of events (non-cyclic permutation makes slight difference)
+-   find a scenario where reducing death probability $D$ makes originally stable DFE unstable
+-   get an estimate of R0 (not very confident)
 
 Some challenges now:
 
-- stability of EE
-- smaller $R_0$ decreases persistence probability in our current model (that seems not to be what we expected)
-- value of parameter?
+-   stability of EE
+-   smaller $R_0$ decreases persistence probability in our current model (that seems not to be what we expected)
+-   estimation of other parameters ($B$,$c$,$r$ seems related to length of a time step, $S$ is related to patch size), and the "definition" of $\varepsilon$ (should that include fleas?)
