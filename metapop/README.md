@@ -2,9 +2,11 @@
 
 ## three dimensional model
 
-We have a discrete-time model keeping track of three state variables: fraction of infected patches $p$, average population density of infected patches $N_I$ and average population density of susceptible patches $N_S$.
+We have a discrete-time model keeping track of three state variables: fraction of infected patches $p$, average population density of infected patches $N_I$ and average population density of susceptible patches $N_S$. JD: This means we are neglecting variation in population density within each group; this is an assumption we need to return to.
 
 There are several events in each iteration that can change the state of the system: movement of hosts and infection of susceptible patches; death of infected hosts and burnout of infected patches; and logistic growth of hosts in both susceptible and infected patches.
+
+JD: I am also a bit worried about the implications of doing everything in turns in our discrete-time model. In particular, this implies that a within-patch epidemic that burns out at the most natural time cannot possibly transmit, which seems unlikely. The simplest alternative (although it may be too extreme) would be to make transmission for next season proportional to the size of the epidemic in a patch. This undercuts our mechanism substantially (because transmission would always increase with R0) – but it's an open question whether it completely eliminates the mechanism (because persistence in the patch could still decrease with R0). Instead of our current landscape reproductive number L0 = (1+B)p_1, we would have something like p_1 + p_nf*Z, where p_nf=1-1/R0 is the “non-fizzle” probability and Z is the final size. We could start by asking whether this is ever non-monotonic, which I think is not obvious. We could also think about assumptions somewhere between the current (no within-season transmission) and this simple alternative (perfect proportionality).
 
 Detailed description of the model in the documents: [pdf](./3d.pdf), [latex source (zip file)](./3d.zip) and [simulation code](./simulation_fun.R).
 
