@@ -1,12 +1,11 @@
+library(burnout)
+
 getDFE<-function(c0=0.5,
-                 S=1e6,
+                 S=1e2,
                  R0=3,
                  D=1,
                  r=0.5
 ) {
-  if (!require("burnout")) stop(
-    "please install the 'burnout' package: ",
-    "`remotes::install_github('davidearn/burnout')`")
   
   z=final_size(R0)
   N_DFE=c0*S/(1-(1+r)*(1-z*D)*(1-c0))
@@ -46,11 +45,11 @@ plot_P1_2d <- function(R0_range = c(1, 5), epsilon_range = c(1e-4, 0.02),
                  color.palette = terrain.colors)
 }
 
-plot_P1_2d()
+#plot_P1_2d()
 
-plot_P1_2d_logP1 <- function(R0_range = c(1, 5), epsilon_range = c(1e-4, 0.02),
+plot_P1_2d <- function(R0_range = c(1, 3), epsilon_range = c(1e-4, 0.03),
                              R0_steps = 100, epsilon_steps = 100) {
-  # create sequences
+  
   R0_vals <- seq(R0_range[1], R0_range[2], length.out = R0_steps)
   eps_vals <- seq(epsilon_range[1], epsilon_range[2], length.out = epsilon_steps)
   
@@ -59,19 +58,17 @@ plot_P1_2d_logP1 <- function(R0_range = c(1, 5), epsilon_range = c(1e-4, 0.02),
     P1_at_DFE(R0 = R0, epsilon = eps)
   }))
   
-  # take log10 of P1 for contour levels
+  # plot with filled.contour
   logP1_mat <- log10(P1_mat)
+  levels <- seq(-12, -1, by = 0.5)
   
-  # define contour levels (example as you suggested)
-  levels <- c(-12, -8, -4, -2, -1, log10(0.2), log10(0.5), log10(0.8))
-  
-  # plot filled contour using log10(P1)
-  filled.contour(R0_vals, eps_vals, logP1_mat,
+  filled.contour(eps_vals, R0_vals, t(logP1_mat),
                  levels = levels,
-                 xlab = "R0",
-                 ylab = "epsilon",
-                 main = "P1 with R0 and epsilon (log scale of P1)",
+                 xlab = "epsilon",
+                 ylab = "R0",
+                 main = "P1 with epsilon and R0",
                  color.palette = terrain.colors)
 }
 
-plot_P1_2d_logP1()
+plot_P1_2d()
+
