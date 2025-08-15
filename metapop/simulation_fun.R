@@ -198,7 +198,6 @@ simfun <- function(tt  = 300,
   data.frame(time = seq.int(tt), NI, NS, P)
 }
 
-
 res <- simfun()
 
 ## showing everything on one log plot works well
@@ -212,7 +211,14 @@ plotfun2 <- function(res, ...) {
   par(mfrow=c(1,2))
   plot(P ~ time, data = res, type = "l", ...)
   matplot(res$time, res[c("NI", "NS")], col = c(2,4), type = "l", ylab = "pop density", ...)
-  #legend("right", col = c(2,4), lty = 1:2, legend = c("NI", "NS"))
+  legend("right", col = c(2,4), lty = 1:2, legend = c("NI", "NS"))
 }
 
 plotfun2(res, lwd = 2)
+
+res3 <-  simfun(start = c(p=0.1, NS=300, NI=300))
+plotfun2(res3, lwd = 2)
+
+
+
+
