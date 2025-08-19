@@ -22,7 +22,7 @@ The equations are much less complicated than the three-dimensional one, and we g
 
 ## something about parameters
 
-The reference in file [parameters.md](./parameters.md) gives some estimation of bubonic R0 (around 1.5). The paper estimated R0 by two methods:
+The reference in file [parameters.md](./parameters/parameters.md) gives some estimation of bubonic R0 (around 1.5). The paper estimated R0 by two methods:
 
 -   using epidemic doubling time and the infectious period
 -   using SIR model assuming human-flea-human
@@ -39,7 +39,7 @@ Updates since last time:
 
 -   find a scenario where reducing death probability $D$ makes originally stable DFE unstable
 -   incorporated change of $N$ in [P1-R0 figure](./fixedns/P1atDFE.R) (looks similar to figure 5)
--   the scenario where decreasing $D$ destabilizes DFE with reasonable parameters It is a very narrow range for $R_0$ and $\varepsilon$ shown in [figure](./metapop/fixedns/matter-range.png) with other parameters fixed $c=0.5,S=300,B=10,r=0.5$, which also seems unlikely...Maybe test other parameters to see if this range can become wider?
+-   the scenario where decreasing $D$ destabilizes DFE with reasonable parameters It is a very narrow range for $R_0$ and $\varepsilon$ shown in [figure](./fixedns/matter-range.png) with other parameters fixed $c=0.5,S=300,B=10,r=0.5$, which also seems unlikely...Maybe test other parameters to see if this range can become wider?
 
 Some challenges now:
 
