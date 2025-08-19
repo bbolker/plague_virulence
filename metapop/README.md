@@ -6,7 +6,7 @@ We have a discrete-time model keeping track of three state variables: fraction o
 
 There are several events in each iteration that can change the state of the system: movement of hosts and infection of susceptible patches; death of infected hosts and burnout of infected patches; and logistic growth of hosts in both susceptible and infected patches.
 
-JD: I am also a bit worried about the implications of doing everything in turns in our discrete-time model. In particular, this implies that a within-patch epidemic that burns out at the most natural time cannot possibly transmit, which seems unlikely. The simplest alternative (although it may be too extreme) would be to make transmission for next season proportional to the size of the epidemic in a patch. This undercuts our mechanism substantially (because transmission would always increase with R0) – but it's an open question whether it completely eliminates the mechanism (because persistence in the patch could still decrease with R0). Instead of our current landscape reproductive number L0 = (1+B)p_1, we would have something like p_1 + p_nf*Z, where p_nf=1-1/R0 is the “non-fizzle” probability and Z is the final size. We could start by asking whether this is ever non-monotonic, which I think is not obvious. We could also think about assumptions somewhere between the current (no within-season transmission) and this simple alternative (perfect proportionality).
+JD: I am also a bit worried about the implications of doing everything in turns in our discrete-time model. In particular, this implies that a within-patch epidemic that burns out at the most natural time cannot possibly transmit, which seems unlikely. The simplest alternative (although it may be too extreme) would be to make transmission for next season proportional to the size of the epidemic in a patch. This undercuts our mechanism substantially (because transmission would always increase with R0) – but it's an open question whether it completely eliminates the mechanism (because persistence in the patch could still decrease with R0). Instead of our current landscape reproductive number L0 = (1+B)p_1, we would have something like p_1 + p_nf\*Z, where p_nf=1-1/R0 is the “non-fizzle” probability and Z is the final size. We could start by asking whether this is ever non-monotonic, which I think is not obvious. We could also think about assumptions somewhere between the current (no within-season transmission) and this simple alternative (perfect proportionality).
 
 Detailed description of the model in the documents: [pdf](./3d.pdf), [latex source (zip file)](./3d.zip) and [simulation code](./simulation_fun.R).
 
@@ -24,13 +24,16 @@ Detailed results in [pdf](./fixedns.pdf), [source (zip file)](./fixedns.zip) and
 
 Updates since last time:
 
--   replaced original infection probability with hazard model
--   discussed order of events (non-cyclic permutation makes slight difference)
 -   find a scenario where reducing death probability $D$ makes originally stable DFE unstable
--   get an estimate of R0 (not very confident)
+-   incorporated change of $N$ in [P1-R0 figure](./P1atDFE.R) (looks similar to figure 5)
 
 Some challenges now:
 
 -   stability of EE
--   smaller $R_0$ decreases persistence probability in our current model (that seems not to be what we expected)
+-   Parameters are not likely to be in the region where decreasing $R_0$ increases persistence
 -   estimation of other parameters ($B$,$c$,$r$ seems related to length of a time step, $S$ is related to patch size), and the "definition" of $\varepsilon$ (should that include fleas?)
+
+Current ideas:
+
+-   try to find a scenario where decreasing $D$ destabilizes DFE with parameters in reasonable range
+-   try some different models that enables infected patches infect other patches before they burn out. (For example, make transmission for next season proportional to the size of the epidemic in a patch, or burning-out patches always survive current iteration)
