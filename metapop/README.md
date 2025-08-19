@@ -20,6 +20,18 @@ The equations are much less complicated than the three-dimensional one, and we g
 
 [Detailed results](./fixedns)
 
+## something about parameters
+The reference in file [parameters.md](./parameters.md) gives some estimation of bubonic R0 (around 1.5). The paper estimated R0 by two methods:
+
+-   using epidemic doubling time and the infectious period
+-   using SIR model assuming human-flea-human
+
+They didn't mention rats in their models or data, so it might not be appropriate to say R0 is the same value for rats. 
+
+If we assume human cases are caused by spillover from rats and are proportional to rat cases, we can use the same formula $R_0=1+(D/T_d)ln2$ and say that epidemic doubling-time $T_d=3.714$ is the same for humans and rats, but the infectious period $D$ should be the infectious periods of rats instead of humans (for example, 8 days), then we get $R_0=2.5$ (instead of 1.5)
+
+This is close to the value $R_0=2.75$ we get by estimating from simplified ODEs considering spread between rats. I think this might be a more reasonable estimation although there is no reference giving this number...
+
 # Update
 
 Updates since last time:
