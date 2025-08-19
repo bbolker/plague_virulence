@@ -12,17 +12,31 @@ getDFE<-function(c0=0.5,
   return(N_DFE)}
 
 
-# P1_at_DFE<-function(R0=2,epsilon=0.01){
-#   N_DFE<-getDFE(R0=R0)
-#   P1<-P1_prob(R0,epsilon=epsilon,k=1,N=N_DFE)
-# }
+P1_at_DFE<-function(R0=2,epsilon=0.01){
+  N_DFE<-getDFE(R0=R0)
+  P1<-P1_prob(R0,epsilon=epsilon,k=1,N=N_DFE)
+}
 
 thresholdB<-function(R0=2,epsilon=0.01){
   N_DFE<-getDFE(R0=R0)
   P1<-P1_prob(R0,epsilon=epsilon,k=1,N=N_DFE)
-  B=1/P1
+  B=1/P1-1
 }
 
+
+n <- 101
+epsvec <- seq(1e-4, 0.03, length.out = n) ## warnings if eps=0
+R0vec <- seq(1, 2.5, length.out = n)
+grad_R0 <- persist <- matrix(NA, length(epsvec), length(R0vec))
+for (i in seq_along(epsvec)) {
+  for (j in seq_along(R0vec)) {
+    persist[i,j] <- P1_at_DFE(R0 = R0vec[j], eps = epsvec[i]) 
+  }
+}
+dR0 <- diff(R0vec)[1]
+for (j in 2:length(R0vec)) {
+  grad_R0[,j] <- (persist[,j]-persist[,j-1])/dR0
+}
 
 
 plot_P1 <- function(P_func=P1_at_DFE, x_start = 1, x_end = 5, step = 0.01) {
@@ -92,14 +106,20 @@ plot_B <- function(R0_range = c(1, 3), epsilon_range = c(1e-4, 0.03),
   
   # plot with filled.contour
   logP1_mat <- log10(P1_mat)
-  levels <- seq(-1, 12, by = 0.5)
+  levels <- c(-1,-0.5,0,0.5,1,2,4,8,16)
+  
   
   filled.contour(eps_vals, R0_vals, t(logP1_mat),
                  levels = levels,
                  xlab = "epsilon",
                  ylab = "R0",
-                 main = "threshold B with epsilon and R0",
-                 color.palette = terrain.colors)
+                 main = "threshold logB with epsilon and R0",
+                 color.palette = terrain.colors,
+                 key.axes = {
+                   axis(4, at = levels, labels = levels)
+                 })
 }
 
 plot_B()
+contour(epsvec, R0vec, grad_R0, level = 0, add = TRUE, col = 2, lwd = 2)
+
