@@ -5,7 +5,7 @@ library(burnout)
 n <- 101
 epsvec <- seq(1e-4, 0.02, length.out = n) ## warnings if eps=0
 R0vec <- seq(1, 2.5, length.out = n)
-grad_R0 <- persist <- matrix(NA, length(epsvec), length(R0vec))
+B<-grad_R0 <- persist <- matrix(NA, length(epsvec), length(R0vec))
 for (i in seq_along(epsvec)) {
    for (j in seq_along(R0vec)) {
      persist[i,j] <- P1_prob(R0 = R0vec[j], eps = epsvec[i]) ## uses N=10^6, I(0)=k=1
