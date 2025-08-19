@@ -21,12 +21,13 @@ The equations are much less complicated than the three-dimensional one, and we g
 [Detailed results](./fixedns)
 
 ## something about parameters
+
 The reference in file [parameters.md](./parameters.md) gives some estimation of bubonic R0 (around 1.5). The paper estimated R0 by two methods:
 
 -   using epidemic doubling time and the infectious period
 -   using SIR model assuming human-flea-human
 
-They didn't mention rats in their models or data, so it might not be appropriate to say R0 is the same value for rats. 
+They didn't mention rats in their models or data, so it might not be appropriate to say R0 is the same value for rats.
 
 If we assume human cases are caused by spillover from rats and are proportional to rat cases, we can use the same formula $R_0=1+(D/T_d)ln2$ and say that epidemic doubling-time $T_d=3.714$ is the same for humans and rats, but the infectious period $D$ should be the infectious periods of rats instead of humans (for example, 8 days), then we get $R_0=2.5$ (instead of 1.5)
 
@@ -38,14 +39,14 @@ Updates since last time:
 
 -   find a scenario where reducing death probability $D$ makes originally stable DFE unstable
 -   incorporated change of $N$ in [P1-R0 figure](./fixedns/P1atDFE.R) (looks similar to figure 5)
+-   the scenario where decreasing $D$ destabilizes DFE with reasonable parameters It is a very narrow range for $R_0$ and $\varepsilon$ shown in [figure](./metapop/fixedns/matter-range.png) with other parameters fixed $c=0.5,S=300,B=10,r=0.5$, which also seems unlikely...Maybe test other parameters to see if this range can become wider?
 
 Some challenges now:
 
 -   stability of EE
--   Parameters are not likely to be in the region where decreasing $R_0$ increases persistence
--   estimation of other parameters ($B$,$c$,$r$ seems related to length of a time step, $S$ is related to patch size), and the "definition" of $\varepsilon$ (should that include fleas?)
+-   estimation of other parameters, such as $B$,$c$,$r$,$S$ (Too many parameter to visualize...)
 
 Current ideas:
 
--   try to find a scenario where decreasing $D$ destabilizes DFE with parameters in reasonable range
--   try some different models that enables infected patches infect other patches before they burn out. (For example, make transmission for next season proportional to the size of the epidemic in a patch, or burning-out patches always survive current iteration)
+-   our original idea about decreasing $R_0$ might still work?
+-   try some different models that enables infected patches to infect other patches before they burn out. (For example, make transmission for next season proportional to the size of the epidemic in a patch, or burning-out patches always survive current iteration)
