@@ -1,7 +1,7 @@
 library(burnout)
 
 getDFE<-function(c0=0.5,
-                 S=1e2, ## smaller population makes the decreasing range larger
+                 S=1e6, ## smaller population makes the decreasing range larger
                  R0=3,
                  D=1,
                  r=0.5
