@@ -1,11 +1,10 @@
 library("burnout")
 
 # Parameter sets
-S_vals <- round(exp(seq(log(1e2), log(1e6), length.out = 5)))  # 5 values from 1e2 to 1e6
-B0_vals <- c(1,5,10,15,20)                          # 5 values from 1 to 20
+S_vals <- round(exp(seq(log(1e2), log(1e6), length.out = 5)))  
+B0_vals <- c(1,5,10,15,20)                         
 
-# Set 5x5 plotting layout
-par(mfrow=c(5,5), mar=c(3,3,2,1), oma=c(2,2,2,2))  # mar: inner margins, oma: outer margins
+par(mfrow=c(5,5), mar=c(3,3,2,1), oma=c(2,2,2,2))  
 
 n <- 101
 epsvec <- seq(1e-4, 0.2, length.out = n)
@@ -15,7 +14,7 @@ for (s in S_vals) {
   for (b in B0_vals) {
     
     # Current canPersist function with specific S and B0
-    canPersist_curr <- function(c0=0.5,
+    canPersist_curr <- function(c0=1,
                                 S=s,
                                 B0=b,
                                 R0=2.5,
@@ -47,3 +46,5 @@ for (s in S_vals) {
           xlab="epsilon", ylab="R0", main=paste0("S=",s,", B0=",b))
   }
 }
+
+mtext("c=1, r=0.5", side=1, outer=TRUE, line=0.5)

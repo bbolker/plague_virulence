@@ -98,7 +98,7 @@ getEE<-function(c0=0.5,
 }
 
 simfun <- function(tt  = 200,
-                   c0=0.5,
+                   c0=1,
                    S = 300,
                    B0 = 10,
                    R0 = 2.6,
