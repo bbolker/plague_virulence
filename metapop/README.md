@@ -41,23 +41,21 @@ This is close to the value $R_0=2.75$ we get by estimating from simplified ODEs 
 
 # Update
 
-Updates since 8.15:
+Updates since 15 Aug 2025:
 
+-   some ideas about estimating $R_0$ and $epsilon$
 -   incorporated change of $N$ in [P1-R0 figure](./fixedns/P1atDFE.R) (looks similar to figure 5)
 -   tried to find the scenario where decreasing $D$ destabilizes DFE with reasonable parameters. It is a very narrow range for $R_0$ and $\varepsilon$ shown in figures created by [script](./fixedns/more_matter-range.R) with other parameters fixed $c=0.5,S=300,B=10,r=0.5$, which also seems unlikely...
 
-Updates since 8.7 meeting
+Updates since 7 Aug 2025:
 
 -   Replace original infection probability $Bp(1-p)$ with hazard model $(1-e^{-Bp})(1-p)$
-
 -   discussed the order of events
-
 -   Next step: we should try to find a scenario where Pla-depletion strain (decreased R0 or D) is favored. The problem is whether reasonable parameters are in the range that our model can work.
 
-What we've get before 8.7
+What we've get before 7 Aug 2025 
 
 -   Two-dimensional model and parameter range
-
 -   condition for persistence: $L_0>1$ where $L_0=(1+B)P_1|_{N=\frac{cS}{1-(1+r)(1-zD)(1-c)}}$
 
 Some challenges now:
