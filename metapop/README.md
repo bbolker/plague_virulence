@@ -2,6 +2,8 @@
 
 ## three dimensional model
 
+JD: Please try to process my comments. If you agree, just take out my intials (and reword if that seems appropriate, or convenient). If we've discussed and move on, you can take out the whole comment (maybe changing things elsewhere if appropriate).
+
 We have a discrete-time model keeping track of three state variables: fraction of infected patches $p$, average population density of infected patches $N_I$ and average population density of susceptible patches $N_S$. JD: This means we are neglecting variation in population density within each group; this is an assumption we need to return to.
 
 There are several events in each iteration that can change the state of the system: movement of hosts and infection of susceptible patches; death of infected hosts and burnout of infected patches; and logistic growth of hosts in both susceptible and infected patches.
