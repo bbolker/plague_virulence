@@ -24,9 +24,13 @@ In previous models, burned-out patches are set to be susceptible in the next sea
 
 We can model this by assuming that the transmission for next season is proportional to the size of the epidemic in a patch.
 
-Instead of our current landscape reproductive number $L0 = (1+B)P_1$, we have $L_0=P_1 + aP_{nf}*Z$, where a is a scaling constant, $P_nf=1-1/R0$ is the “non-fizzle” probability and Z is the final size. 
+Instead of our current landscape reproductive number $L0 = (1+B)P_1$, we have $L_0=P_1 + azP_{nf}$, where a is a scaling constant, $P_{nf}=1-\frac{1}{R_0}$ is the “non-fizzle” probability and $z$ is the final size. $P_1$ is evaluated at $N=\frac{cS}{1-(1+r)(1-c)(1-zD)}$
 
 [Details in documents](./within_season_transmission)
+
+$P_1$ is non-monotonous with $R_0$, while $zP_{nf}$ is increasing with $R_0$, so there can be some region where $L_0$ can decrease with $R_0$, and we can find such scenario that decreasing $R_0$ destabilizes DFE and makes disease persist.
+
+$L_0$ is also increasing with $D$, so a lower death probability can also destabilize the DFE.
 
 ## something about parameters
 
