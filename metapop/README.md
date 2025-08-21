@@ -18,13 +18,15 @@ The equations are much less complicated than the three-dimensional one, and we g
 
 [Detailed results](./fixedns)
 
-## model 3 -- transmission proportional to size of within-patch epidemic
+## transmission proportional to size of within-patch epidemic
 
 In previous models, burned-out patches are set to be susceptible in the next season and have no chance to spread disease. But it is very likely that a patch with a large epidemic can infect other patches before it burns out.
 
-We can model this by assuming that the transmission for next season is proportional to the size of the epidemic in a patch. Instead of our current landscape reproductive number L0 = (1+B)p_1, we would have something like p_1 + p_nf\*Z, where p_nf=1-1/R0 is the “non-fizzle” probability and Z is the final size. We'll need to see whether this works out with reasonable parameters.
+We can model this by assuming that the transmission for next season is proportional to the size of the epidemic in a patch.
 
-## model 4 -- burning-out patches always survive current iteration
+Instead of our current landscape reproductive number $L0 = (1+B)P_1$, we have $L_0=P_1 + aP_{nf}*Z$, where a is a scaling constant, $P_nf=1-1/R0$ is the “non-fizzle” probability and Z is the final size. 
+
+[Details in documents](./within_season_transmission)
 
 ## something about parameters
 
@@ -53,7 +55,7 @@ Updates since 7 Aug 2025:
 -   discussed the order of events
 -   Next step: we should try to find a scenario where Pla-depletion strain (decreased R0 or D) is favored. The problem is whether reasonable parameters are in the range that our model can work.
 
-What we've get before 7 Aug 2025 
+What we've get before 7 Aug 2025
 
 -   Two-dimensional model and parameter range
 -   condition for persistence: $L_0>1$ where $L_0=(1+B)P_1|_{N=\frac{cS}{1-(1+r)(1-zD)(1-c)}}$
