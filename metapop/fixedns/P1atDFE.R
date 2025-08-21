@@ -22,6 +22,7 @@ grad_R0 <- persist <- matrix(NA, length(epsvec), length(R0vec))
 for (i in seq_along(epsvec)) {
   for (j in seq_along(R0vec)) {
     persist[i,j] <- P1_at_DFE(R0 = R0vec[j], eps = epsvec[i]) 
+    cat(" eps=", epsvec[i], " R0=", R0vec[j], " P1=", persist[i,j], "\n")
   }
 }
 dR0 <- diff(R0vec)[1]
