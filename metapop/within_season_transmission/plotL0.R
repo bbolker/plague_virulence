@@ -1,17 +1,17 @@
 library(burnout)
 
 L0<-function(c0=0.5,
-             S=1e6,
+             S=1e5,
              R0=3,
              D=1,
              r=0.5,
              epsilon=0.02,
-             a=1
+             a=0.3 #coloring everthing when setting a=0.5, but I don't know why
 ) {
   z=final_size(R0)
   N_DFE=c0*S/(1-(1+r)*(1-z*D)*(1-c0))
   P1<-P1_prob(R0,epsilon=epsilon,k=1,N=N_DFE)
-  return(P1+z*(1-1/R0))
+  return(P1+a*z*(1-1/R0))
 }
 
 

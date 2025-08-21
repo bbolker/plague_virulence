@@ -17,7 +17,7 @@ getDFE<-function(c0=0.2,
                  B0 = 0.5,
                  R0=10,
                  epsilon=0.05,
-                 D = 0.5,
+                 D = 1,
                  r = 0.5
 ) {
   if (!require("burnout")) stop(
@@ -109,7 +109,7 @@ getEE<-function(c0=0.2,
 simfun <- function(tt  = 300,
                    B0 = 0.5,
                    r = 0.5,
-                   D = 0.5,
+                   D = 1,
                    epsilon=0.05,
                    R0=10,
                    ki=0.01,
