@@ -16,6 +16,8 @@ In the two-dimensional model, we have only two state variables: fraction of infe
 
 The equations are much less complicated than the three-dimensional one, and we get everything analytically in this version. We have now got the disease free equilibrium (DFE), the endemic equilibrium (EE) and the threshold condition for the stability of DFE.
 
+condition for persistence is $L_0>1$ where $L_0$ is the landscape reproduction number: $L_0=(1+B)P_1|_{N=\frac{cS}{1-(1+r)(1-zD)(1-c)}}$
+
 [Detailed results](./fixedns)
 
 ## transmission proportional to size of within-patch epidemic
@@ -24,7 +26,7 @@ In previous models, burned-out patches are set to be susceptible in the next sea
 
 We can model this by assuming that the transmission for next season is proportional to the size of the epidemic in a patch.
 
-Instead of our current landscape reproductive number $L0 = (1+B)P_1$, we have $L_0=P_1 + azP_{nf}$, where a is a scaling constant, $P_{nf}=1-\frac{1}{R_0}$ is the “non-fizzle” probability and $z$ is the final size. $P_1$ is evaluated at $N=\frac{cS}{1-(1+r)(1-c)(1-zD)}$
+We have $L_0=P_1 + azP_{nf}$, where $a$ is a scaling constant, $P_{nf}=1-\frac{1}{R_0}$ is the “non-fizzle” probability and $z$ is the final size. $P_1$ is evaluated at $N=\frac{cS}{1-(1+r)(1-c)(1-zD)}$
 
 [Details in documents](./within_season_transmission)
 
@@ -32,9 +34,17 @@ $P_1$ is non-monotonous with $R_0$, while $zP_{nf}$ is increasing with $R_0$, so
 
 $L_0$ is also increasing with $D$, so a lower death probability can also destabilize the DFE.
 
+## keeping track of average population density of all patches
+
+In previous version $N_{DFE}$ is a function of many parameters (c,r,S,R0,D) and moving probability c might be difficult to estimate. And if a patch gets infected and then burns out, its population size should be $(1-zD)N$, but our assumption makes it suddenly go up immediately to S.
+
+To solve these we consider modeling average population density of all patches instead of infected patches only, so moving probability c is no longer necessary, and it’s changing continuously, which makes things easier and more reasonable.
+
+In this version we get $L_0=P_1|_{N=K} + B$ and persistence condition is $L_0>1$
+
 ## something about parameters
 
-The reference in file [parameters.md](./parameters/parameters.md) gives some estimation of bubonic R0 (around 1.5). The paper estimated R0 by two methods:
+The reference in file [parameters.md](./parameters/parameters.md) gives some estimation of bubonic plague R0 (around 1.5). The paper estimated R0 by two methods:
 
 -   using epidemic doubling time and the infectious period
 -   using SIR model assuming human-flea-human
@@ -67,7 +77,6 @@ What we've get before 7 Aug 2025
 Some challenges now:
 
 -   stability of EE
--   estimation of other parameters, such as $B$,$c$,$r$,$S$ (Too many parameter to visualize...)
 
 Current ideas:
 
@@ -77,6 +86,8 @@ Current ideas:
 
 # Points and assumptions we might need to return to
 
--   We are dealing with "average" population density in patches. This means that we are neglecting variation in population density within each group.(This seems fine in two-dimensional model but really strange in three-dimensional one)
+-   We are dealing with "average" population density in patches. This means that we are neglecting variation in population density within each group.
 -   We are assuming that the population density of susceptible patches is constant.
 -   We are taking use of burnout probability from a SIR model, while our model of bubonic plague is slightly different (spread by fleas/different birth-and-death process) so some parameters might have a different meaning
+-   We are assuming that $R_0$ is independent of host population size $N$ (frequency-dependent transmission). We might consider $R_0$ scaling linearly with $N$ (density-dependent transmission) or something between.
+-   We are assuming that a burned-out patch is susceptible in the next season as if it was never infected, and a patch that persists the first wave can still go extinct in the next wave like a newly infected patch.

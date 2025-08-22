@@ -1,4 +1,3 @@
-
 library(burnout)
 ## Figure 5 computations
 
