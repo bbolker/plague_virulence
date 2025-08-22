@@ -57,6 +57,10 @@ This is close to the value $R_0=2.75$ we get by estimating from simplified ODEs 
 
 # Update
 
+Update since 21 Aug 2025:
+
+-   A version keeping track of average population density of all patches.
+
 Updates since 15 Aug 2025:
 
 -   some ideas about estimating $R_0$ and $epsilon$
@@ -78,14 +82,9 @@ Some challenges now:
 
 -   stability of EE
 
-Current ideas:
-
--   our original idea about decreasing $R_0$ might still work?
--   Re-run the code for different c and r.
--   try some different models that enables infected patches to infect other patches before they burn out.
-
 # Points and assumptions we might need to return to
 
+-   We are assuming there is always only 1 initially infected individual
 -   We are dealing with "average" population density in patches. This means that we are neglecting variation in population density within each group.
 -   We are assuming that the population density of susceptible patches is constant.
 -   We are taking use of burnout probability from a SIR model, while our model of bubonic plague is slightly different (spread by fleas/different birth-and-death process) so some parameters might have a different meaning

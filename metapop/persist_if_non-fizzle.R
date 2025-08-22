@@ -7,7 +7,7 @@ R0vec <- seq(1, 2.5, length.out = n)
 B<-grad_R0 <- persist <- matrix(NA, length(epsvec), length(R0vec))
 for (i in seq_along(epsvec)) {
    for (j in seq_along(R0vec)) {
-     persist[i,j] <- P1_prob(R0 = R0vec[j], eps = epsvec[i],N=1e5)/not_fizzle_prob(R0=R0vec[j]) ## subject to N
+     persist[i,j] <- P1_prob(R0 = R0vec[j], eps = epsvec[i],N=1e4)/not_fizzle_prob(R0=R0vec[j]) ## subject to N
    }
 }
 dR0 <- diff(R0vec)[1]
