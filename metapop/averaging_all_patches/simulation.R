@@ -23,7 +23,7 @@ simfun <- function(tt  = 200,
   
   if (!require("burnout")) stop(
     "please install the 'burnout' package: ",
-    "`remotes::install_github('davidearn/burnout')`")
+    "remotes::install_github('davidearn/burnout')`")
   
   z=final_size(R0)
   if((1+r)*(1-z*D)>1){

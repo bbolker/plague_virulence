@@ -101,7 +101,7 @@ simfun <- function(tt  = 200,
                    c0=1,
                    S = 300,
                    B0 = 10,
-                   R0 = 2.6,
+                   R0 = 2.5,
                    epsilon=0.05,
                    D=0.85,
                    #D=1,
@@ -209,4 +209,4 @@ plot_traj <- function(
           ylab = "N",
           main = "Trajectories", ...)
 }
-#plot_traj()
+plot_traj()
