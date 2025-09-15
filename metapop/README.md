@@ -42,6 +42,12 @@ To solve these we consider modeling average population density of all patches in
 
 In this version we get $L_0=P_1|_{N=K} + B$ and persistence condition is $L_0>1$
 
+## Stochastic simulation
+
+In previous models we were all dealing with average population size, but this might not be very reasonable and leads to a jump discontinuity in population size when a patch gets infected.
+
+We want to do a simulation to see the more realistic situation.
+
 ## something about parameters
 
 The reference in file [parameters.md](./parameters/parameters.md) gives some estimation of bubonic plague R0 (around 1.5). The paper estimated R0 by two methods:
@@ -56,6 +62,10 @@ If we assume human cases are caused by spillover from rats and are proportional 
 This is close to the value $R_0=2.75$ we get by estimating from simplified ODEs considering spread between rats. I think this might be a more reasonable estimation although there is no reference giving this number...
 
 # Update
+
+Update since 11 Sep 2025:
+
+-   Equations for stochastic simulation
 
 Update since 21 Aug 2025:
 
