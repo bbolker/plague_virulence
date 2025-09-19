@@ -4,14 +4,14 @@ library(burnout)  # Assuming this package contains P1_prob and final_size functi
 # Function to simulate metapopulation dynamics with infection
 simulate_metapopulation <- function(
     n_patches = 100,           # Number of patches
-    n_years = 5,             # Number of years to simulate
-    K = 1e6,                 # Carrying capacity per patch
+    n_years = 50,             # Number of years to simulate
+    K = 1e5,                 # Carrying capacity per patch
     r = 0.5,                  # Growth rate
     c = 0.5,                  # Migration probability
-    alpha = 1,              # Scaling constant for infection probability
+    alpha = 5,              # Scaling constant for infection probability
     D = 1,                  # Disease-induced mortality
     R0 = 2,                   # Basic reproduction number
-    epsilon=0.05,             # infectious period 
+    epsilon=0.02,             # infectious period 
     initial_infected = 10,     # Number of initially infected patches
     initial_pop_ratio = 1   # Initial population as ratio of carrying capacity
 ) {
@@ -96,6 +96,7 @@ simulate_metapopulation <- function(
     
     # 4. Burnout process
     P_b <-burnout_prob(R0,epsilon,N=N[i,k,4])
+    cat("  Year:", k, "  Season: 4", "  Pb:", P_b, "\n")
     
     z <- final_size(R0)  # Final size of epidemic
     
