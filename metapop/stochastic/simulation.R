@@ -4,13 +4,13 @@ library(burnout)  # Assuming this package contains P1_prob and final_size functi
 # Function to simulate metapopulation dynamics with infection
 simulate_metapopulation <- function(
     n_patches = 100,           # Number of patches
-    n_years = 50,             # Number of years to simulate
-    K = 1e5,                 # Carrying capacity per patch
+    n_years = 100,             # Number of years to simulate
+    K = 1e6,                 # Carrying capacity per patch
     r = 0.5,                  # Growth rate
-    c = 0.5,                  # Migration probability
-    alpha = 5,              # Scaling constant for infection probability
+    c = 0.2,                  # Migration probability
+    alpha = 5e-5,              # Scaling constant for infection probability
     D = 1,                  # Disease-induced mortality
-    R0 = 2,                   # Basic reproduction number
+    R0 = 2.5,                   # basic reproduction number
     epsilon=0.02,             # infectious period 
     initial_infected = 10,     # Number of initially infected patches
     initial_pop_ratio = 1   # Initial population as ratio of carrying capacity
@@ -23,7 +23,7 @@ simulate_metapopulation <- function(
   I <- array(0, dim = c(n_patches, n_years, 5))
   
   # Initialize an array to store total deaths for each year
-  total_deaths <- numeric(n_years)
+  total_inf <- numeric(n_years)
   
   # Set initial conditions
   N[, 1, 1] <- initial_pop_ratio * K  # Initial population in all patches
@@ -60,7 +60,7 @@ simulate_metapopulation <- function(
       I[, k, 3] <- I[, k, 2]
     } else {
       # Calculate infection probability based on previous year's deaths
-      P_I <- min(1, alpha * total_deaths[k - 1] / (n_patches * K))
+      P_I <-1-exp(-alpha * c * total_inf[k - 1] / n_patches)  
       cat("  Year:", k, "  Season: 2", "  PI:", P_I, "\n")
       
       # Apply infection to susceptible patches
@@ -95,20 +95,21 @@ simulate_metapopulation <- function(
     cat("Year:", k, "Season: 4", "Infected Patches:", sum(I[, k, 4]), "\n")
     
     # 4. Burnout process
-    P_b <-burnout_prob(R0,epsilon,N=N[i,k,4])
-    cat("  Year:", k, "  Season: 4", "  Pb:", P_b, "\n")
     
     z <- final_size(R0)  # Final size of epidemic
     
-    current_year_deaths <- 0  # To store total deaths in the current year
+    current_year_inf <- 0  # To store total deaths in the current year
     for (i in 1:n_patches) {
       if (I[i, k, 4] == 1) {
         # Reduce population due to disease
-        deaths <- z * D * N[i, k, 4]
-        N[i, k, 5] <- N[i, k, 4] - deaths
-        current_year_deaths <- current_year_deaths + deaths
+        inf <- z * N[i, k, 4]
+        N[i, k, 5] <- N[i, k, 4] - inf * D
+        current_year_inf <- current_year_inf + inf
         
-        # Determine if infection persists after burnout
+        # Probability of burnout
+        P_b <-burnout_prob(R0,epsilon,N=N[i,k,4])
+        cat("  Year:", k, "  Season: 4", "  Population:", N[i, k, 4],"  Pb:", P_b, "\n")
+        
         I[i, k, 5] <- ifelse(runif(1) > P_b, 1, 0)
       } else {
         # No change in uninfected patches
@@ -119,8 +120,8 @@ simulate_metapopulation <- function(
     }
     cat("Year:", k, "Season: 5", "Infected Patches:", sum(I[, k, 5]), "\n","\n")
     
-    # Record total deaths for the current year
-    total_deaths[k] <- current_year_deaths
+    # Record total inf for the current year
+    total_inf[k] <- current_year_inf
     
     # Set initial conditions for next year
     if (k < n_years) {
@@ -129,7 +130,7 @@ simulate_metapopulation <- function(
     }
   }
   
-  return(list(N = N, I = I, total_deaths = total_deaths))
+  return(list(N = N, I = I, total_inf = total_inf))
 }
 
 # Function to plot simulation results
@@ -137,7 +138,7 @@ plot_simulation_results <- function(result, n_patches = 10) {
   # Extract results
   N <- result$N
   I <- result$I
-  total_deaths <- result$total_deaths
+  total_inf <- result$total_inf
   n_years <- dim(N)[2]
   
   # Calculate summary statistics
@@ -155,13 +156,13 @@ plot_simulation_results <- function(result, n_patches = 10) {
   plot(1:n_years, infected_patches, type = "l", col = "red", 
        main = "Number of Infected Patches", xlab = "Year", ylab = "Count")
   
-  # Plot total deaths
-  plot(1:n_years, total_deaths, type = "l", col = "purple",
-       main = "Total Deaths Over Time", xlab = "Year", ylab = "Deaths")
+  # Plot total number of infected hosts
+  plot(1:n_years, total_inf, type = "l", col = "purple",
+       main = "Total inf Over Time", xlab = "Year", ylab = "inf")
 }
 
 # Run simulation with default parameters
-set.seed(216) 
+set.seed(6) 
 result <- simulate_metapopulation()
 
 # Plot results

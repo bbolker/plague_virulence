@@ -66,6 +66,7 @@ This is close to the value $R_0=2.75$ we get by estimating from simplified ODEs 
 Update since 11 Sep 2025:
 
 -   Equations for stochastic simulation
+-   Hazard model and colonization in infection probability
 
 Update since 21 Aug 2025:
 
