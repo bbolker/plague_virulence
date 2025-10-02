@@ -108,7 +108,7 @@ simulate_metapopulation <- function(
         
         # Probability of burnout
         P_b <-burnout_prob(R0,epsilon,N=N[i,k,4])
-        cat("  Year:", k, "  Season: 4", "  Population:", N[i, k, 4],"  Pb:", P_b, "\n")
+        #cat("Patch:", i,"  Year:", k, "  Season: 4", "  Population:", N[i, k, 4],"  Pb:", P_b, "\n")
         
         I[i, k, 5] <- ifelse(runif(1) > P_b, 1, 0)
       } else {
@@ -161,9 +161,9 @@ plot_simulation_results <- function(result, n_patches = 10) {
        main = "Total inf Over Time", xlab = "Year", ylab = "inf")
 }
 
-# Run simulation with default parameters
-set.seed(6) 
-result <- simulate_metapopulation()
+# Run simulation
+set.seed(123) 
+result <- simulate_metapopulation(R0=2.5,alpha=5e-5,K=1e6,r=0.5,c=0.2,epsilon=0.02)
 
 # Plot results
 plot_simulation_results(result)

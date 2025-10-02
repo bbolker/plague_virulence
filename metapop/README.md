@@ -46,7 +46,7 @@ In this version we get $L_0=P_1|_{N=K} + B$ and persistence condition is $L_0>1$
 
 In previous models we were all dealing with average population size, but this might not be very reasonable and leads to a jump discontinuity in population size when a patch gets infected.
 
-We want to do a simulation to see the more realistic situation.
+We want to do a simulation to see the more realistic situation.[simulation](./stochastic)
 
 ## something about parameters
 
