@@ -1,10 +1,20 @@
 # Load required packages
 library(burnout)  # Assuming this package contains P1_prob and final_size functions
 
+# parameters
+params <- list(
+  R0 = 2.5,
+  alpha = 5e-5,
+  K = 1e6,
+  r = 0.5,
+  c = 0.2,
+  epsilon = 0.02
+)
+
 # Function to simulate metapopulation dynamics with infection
 simulate_metapopulation <- function(
     n_patches = 100,           # Number of patches
-    n_years = 100,             # Number of years to simulate
+    n_years = 1000,             # Number of years to simulate
     K = 1e6,                 # Carrying capacity per patch
     r = 0.5,                  # Growth rate
     c = 0.2,                  # Migration probability
@@ -35,7 +45,7 @@ simulate_metapopulation <- function(
   # Simulate over years
   for (k in 1:n_years) {
     
-    cat("Year:", k, "Season: 1", "Infected Patches:", sum(I[, k, 1]), "\n")
+    #cat("Year:", k, "Season: 1", "Infected Patches:", sum(I[, k, 1]), "\n")
     
     # Within each year, apply the four processes
     
@@ -45,7 +55,7 @@ simulate_metapopulation <- function(
       N[i, k, 2] <- N[i, k, 1] + r * N[i, k, 1] * (1 - N[i, k, 1] / K)
       I[i, k, 2] <- I[i, k, 1]  # Infection status doesn't change during growth
     }
-    cat("Year:", k, "Season: 2", "Infected Patches:", sum(I[, k, 2]), "\n")
+    #cat("Year:", k, "Season: 2", "Infected Patches:", sum(I[, k, 2]), "\n")
     
     # 2. Colonization process
     # 2.1 Population movement
@@ -61,7 +71,7 @@ simulate_metapopulation <- function(
     } else {
       # Calculate infection probability based on previous year's deaths
       P_I <-1-exp(-alpha * c * total_inf[k - 1] / n_patches)  
-      cat("  Year:", k, "  Season: 2", "  PI:", P_I, "\n")
+      #cat("  Year:", k, "  Season: 2", "  PI:", P_I, "\n")
       
       # Apply infection to susceptible patches
       for (i in 1:n_patches) {
@@ -74,11 +84,11 @@ simulate_metapopulation <- function(
         #cat("Patch:", i,"  Year:", k, "  Season: 2", "  Population:", N[i, k, 3], "  Status:",I[i,k,3],"  Status change:",I[i, k, 3]-I[i,k,2], "\n")
       }
     }
-    cat("Year:", k, "Season: 3", "Infected Patches:", sum(I[, k, 3]), "\n")
+    #cat("Year:", k, "Season: 3", "Infected Patches:", sum(I[, k, 3]), "\n")
     
     # 3. Fizzle process
     P_f <- 1 / R0  # Fizzle probability
-    cat("  Year:", k, "  Season: 3", "  Pf:", P_f, "\n")
+    #cat("  Year:", k, "  Season: 3", "  Pf:", P_f, "\n")
     for (i in 1:n_patches) {
       # Infection may fizzle out
       if (I[i, k, 3] == 1) {
@@ -92,7 +102,7 @@ simulate_metapopulation <- function(
       
       #cat("Patch:", i,"  Year:", k, "  Season: 3", "  Population:", N[i, k, 4], "  Status:",I[i,k,4],"  Status change:",I[i, k, 4]-I[i,k,3], "\n")
     }
-    cat("Year:", k, "Season: 4", "Infected Patches:", sum(I[, k, 4]), "\n")
+    #cat("Year:", k, "Season: 4", "Infected Patches:", sum(I[, k, 4]), "\n")
     
     # 4. Burnout process
     
@@ -118,7 +128,7 @@ simulate_metapopulation <- function(
       }
       #cat("Patch:", i,"  Year:", k, "  Season: 4","  Population:", N[i, k, 5], "  Status:",I[i,k,5],"  Status change:",I[i, k, 5]-I[i,k,4], "\n")
     }
-    cat("Year:", k, "Season: 5", "Infected Patches:", sum(I[, k, 5]), "\n","\n")
+    #cat("Year:", k, "Season: 5", "Infected Patches:", sum(I[, k, 5]), "\n","\n")
     
     # Record total inf for the current year
     total_inf[k] <- current_year_inf
@@ -133,37 +143,57 @@ simulate_metapopulation <- function(
   return(list(N = N, I = I, total_inf = total_inf))
 }
 
-# Function to plot simulation results
-plot_simulation_results <- function(result, n_patches = 10) {
-  # Extract results
-  N <- result$N
-  I <- result$I
-  total_inf <- result$total_inf
-  n_years <- dim(N)[2]
-  
-  # Calculate summary statistics
-  total_population <- apply(N[, , 1], 2, sum)
-  infected_patches <- apply(I[, , 1], 2, sum)
-  
-  # Create plots
-  par(mfrow = c(3, 1))
-  
-  # Plot total population
-  plot(1:n_years, total_population, type = "l", col = "blue", 
-       main = "Total Population Over Time", xlab = "Year", ylab = "Population Size")
-  
-  # Plot number of infected patches
-  plot(1:n_years, infected_patches, type = "l", col = "red", 
-       main = "Number of Infected Patches", xlab = "Year", ylab = "Count")
-  
-  # Plot total number of infected hosts
-  plot(1:n_years, total_inf, type = "l", col = "purple",
-       main = "Total inf Over Time", xlab = "Year", ylab = "inf")
-}
+# replicate
+set.seed(216)
+results <- replicate(20, {
+  simulate_metapopulation(
+    R0 = params$R0,
+    alpha = params$alpha,
+    K = params$K,
+    r = params$r,
+    c = params$c,
+    epsilon = params$epsilon
+  )
+}, simplify = FALSE)
 
-# Run simulation
-set.seed(123) 
-result <- simulate_metapopulation(R0=2.5,alpha=5e-5,K=1e6,r=0.5,c=0.2,epsilon=0.02)
+total_pops <- sapply(results, function(res) {
+  apply(res$N[, , 1], 2, sum)
+})
 
-# Plot results
-plot_simulation_results(result)
+infected_patches <- sapply(results, function(res) {
+  apply(res$I[, , 1], 2, sum)
+})
+
+total_inf <- sapply(results, function(res) {
+  res$total_inf
+})
+
+# plot
+par(mfrow = c(3, 1), mar = c(4, 4, 3, 1), oma = c(0, 0, 2, 0))
+
+# plot total population
+matplot(total_pops, type = "l", lty = 1, 
+        col = "grey",
+        main = "Total Population Over Time",
+        xlab = "Year", ylab = "Total Population")
+lines(rowMeans(total_pops), col = "blue", lwd = 3)
+
+# plot number of infected patches
+matplot(infected_patches, type = "l", lty = 1, 
+        col = "grey",
+        main = "Number of Infected Patches",
+        xlab = "Year", ylab = "Infected Patches")
+lines(rowMeans(infected_patches), col = "red", lwd = 3)
+
+# plot total infections
+matplot(total_inf, type = "l", lty = 1, 
+        col = "grey",
+        main = "Total Infections Over Time",
+        xlab = "Year", ylab = "Total Infections")
+lines(rowMeans(total_inf), col = "purple", lwd = 3)
+# show parameters
+mtext(sprintf("Parameters: R0=%.1f, α=%.0e, K=%.0e, r=%.1f, c=%.1f, ε=%.2f", 
+              params$R0, params$alpha, params$K, params$r, params$c, params$epsilon),
+      side = 3, line = 0, outer = TRUE, cex = 0.9)
+
+par(mfrow = c(1, 1))
