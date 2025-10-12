@@ -1,5 +1,5 @@
 # Load required packages
-library(burnout)  # Assuming this package contains P1_prob and final_size functions
+library(burnout)
 
 # parameters
 params <- list(
@@ -8,7 +8,8 @@ params <- list(
   K = 1e6,
   r = 0.5,
   c = 0.2,
-  epsilon = 0.02
+  epsilon = 0.02,
+  initial_infected = 10
 )
 
 # Function to simulate metapopulation dynamics with infection
@@ -152,7 +153,8 @@ results <- replicate(20, {
     K = params$K,
     r = params$r,
     c = params$c,
-    epsilon = params$epsilon
+    epsilon = params$epsilon,
+    initial_infected = params$initial_infected
   )
 }, simplify = FALSE)
 
@@ -192,8 +194,17 @@ matplot(total_inf, type = "l", lty = 1,
         xlab = "Year", ylab = "Total Infections")
 lines(rowMeans(total_inf), col = "purple", lwd = 3)
 # show parameters
-mtext(sprintf("Parameters: R0=%.1f, α=%.0e, K=%.0e, r=%.1f, c=%.1f, ε=%.2f", 
-              params$R0, params$alpha, params$K, params$r, params$c, params$epsilon),
+# show parameters
+mtext(sprintf("Parameters: R0=%.1f, α=%.0e, K=%.0e, r=%.1f, c=%.1f, ε=%.2f, initial_infected=%d", 
+              params$R0, params$alpha, params$K, params$r, params$c, params$epsilon, params$initial_infected),
       side = 3, line = 0, outer = TRUE, cex = 0.9)
-
 par(mfrow = c(1, 1))
+
+filename <- sprintf("figures/R0_%.1f_alpha_%.0e_K_%.0e_r_%.1f_c_%.1f_epsilon_%.2f_init_%d.pdf",
+                    params$R0, params$alpha, params$K, params$r, params$c, params$epsilon, params$initial_infected)
+
+# save
+dev.copy(pdf, file = filename, width = 8, height = 10)
+dev.off()
+
+cat("Figure saved to:", filename, "\n")
