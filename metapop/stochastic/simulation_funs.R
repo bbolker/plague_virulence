@@ -151,11 +151,29 @@ params0 <- list(n_patches = 100,
                 R0 = 2.5,
                 epsilon=0.02)
 
-mult_sim_mp <- function(nsim, params, verbose = FALSE) {
-  results <- replicate(nsim, {
-    if (verbose) cat(".")
-    do.call(simulate_metapopulation, params)
-  }, simplify = FALSE)
+mult_sim_mp <- function(nsim, params, verbose = FALSE,
+                        ncores = getOption("sim.ncores", 4),
+                        seed = 101) {
+  require("parallel", quietly = TRUE)
+  if (ncores>1) {
+    cl <- makeCluster(ncores)
+    clusterExport(cl, c("simulate_metapopulation"))
+    clusterExport(cl, c("params"), envir = environment())
+    clusterEvalQ(cl, "library(burnout)")
+    clusterSetRNGStream(cl, seed)
+    results <- parLapply(cl, 1:nsim,
+                         function(i) {
+                           if (verbose) cat(".")
+                           do.call(simulate_metapopulation, params)
+                         })
+    stopCluster(cl)
+    rm(cl)
+  } else {
+    results <- replicate(nsim, {
+      if (verbose) cat(".")
+      do.call(simulate_metapopulation, params)
+    }, simplify = FALSE)
+  }
   total_pops <- sapply(results, function(res) {
     apply(res$N[, , 1], 2, sum)
   })
@@ -166,10 +184,6 @@ mult_sim_mp <- function(nsim, params, verbose = FALSE) {
     res$total_inf
   })
   tibble::lst(total_pops, infected_patches, total_inf)
-}
-
-if (FALSE) {
-  mult_sim_mp(5, params0, verbose = TRUE)
 }
 
 ## TO DO:
