@@ -212,13 +212,13 @@ plotfun1 <-  function(x) {
     lines(rowMeans(x), col = meancol, lwd = 3)
   }
 
-  pfun(res$total_pops, main = "Total Population over Time", ylab = "Total Population",
+  pfun(x$total_pops, main = "Total Population over Time", ylab = "Total Population",
        meancol = "blue")
 
-  pfun(res$infected_patches, main = "Number of Infected Patches", ylab = "Infected Patches",
+  pfun(x$infected_patches, main = "Number of Infected Patches", ylab = "Infected Patches",
        meancol = "red")
 
-  pfun(res$total_inf, main = "Total Infections over Time", ylab = "Total Infections",
+  pfun(x$total_inf, main = "Total Infections over Time", ylab = "Total Infections",
        meancol = "purple")
   
   par(mfrow = c(1, 1))
