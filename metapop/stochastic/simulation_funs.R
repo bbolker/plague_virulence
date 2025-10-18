@@ -10,6 +10,7 @@
 #' @param epsilon infectious period (scaled to host generation time)
 #' @param initial_infected Number of initially infected patches         
 #' @param initial_pop_ratio Initial population as ratio of carrying capacity
+#' @return A list with 
 simulate_metapopulation <- function(
     n_patches = 100,       
     n_years = 1000,        
@@ -27,18 +28,20 @@ simulate_metapopulation <- function(
   # Initialize arrays to store population size and infection status
   # Dimensions: [patch, year, season]
   # Season: 1=beginning, 2=after growth, 3=after colonization, 4=after fizzle, 5=after burnout
-  N <- array(0, dim = c(n_patches, n_years, 5))
-  I <- array(0, dim = c(n_patches, n_years, 5))
+  dn <- list(patch = 1:n_patches, year = 1:n_years,
+             season = c("beginning", "after_growth", "after_colonization", "after_fizzle", "after_burnout"))
+  N <- array(0, dim = c(n_patches, n_years, 5), dimnames = dn)
+  I <- array(0, dim = c(n_patches, n_years, 5), dimnames = dn)
   
   # Initialize an array to store total deaths for each year
   total_inf <- numeric(n_years)
   
   # Set initial conditions
-  N[, 1, 1] <- initial_pop_ratio * K  # Initial population in all patches
+  N[, 1, "beginning"] <- initial_pop_ratio * K  # Initial population in all patches
   
   # Randomly select initial infected patches
   infected_patches <- sample(1:n_patches, initial_infected)
-  I[infected_patches, 1, 1] <- 1
+  I[infected_patches, 1, "beginning"] <- 1
   
   # Simulate over years
   for (k in 1:n_years) {
@@ -50,22 +53,22 @@ simulate_metapopulation <- function(
     # 1. Growth process
     for (i in 1:n_patches) {
       # Logistic growth
-      N[i, k, 2] <- N[i, k, 1] + r * N[i, k, 1] * (1 - N[i, k, 1] / K)
-      I[i, k, 2] <- I[i, k, 1]  # Infection status doesn't change during growth
+      N[i, k, "after_growth"] <- N[i, k, "beginning"] + r * N[i, k, "beginning"] * (1 - N[i, k, "beginning"] / K)
+      I[i, k, "after_growth"] <- I[i, k, "beginning"]  # Infection status doesn't change during growth
     }
     #cat("Year:", k, "Season: 2", "Infected Patches:", sum(I[, k, 2]), "\n")
     
     # 2. Colonization process
     # 2.1 Population movement
-    total_pop <- sum(N[, k, 2])
+    total_pop <- sum(N[, k, "after_growth"])
     for (i in 1:n_patches) {
-      N[i, k, 3] <- (1 - c) * N[i, k, 2] + c * total_pop / n_patches
+      N[i, k, "after_colonization"] <- (1 - c) * N[i, k, "after_growth"] + c * total_pop / n_patches
     }
     
     # 2.2 Infection spread
     if (k == 1) {
       # First year: infection status remains unchanged during colonization
-      I[, k, 3] <- I[, k, 2]
+      I[, k, "after_colonization"] <- I[, k, "after_growth"]
     } else {
       # Calculate infection probability based on previous year's deaths
       P_I <-1-exp(-alpha * c * total_inf[k - 1] / n_patches)  
@@ -73,10 +76,10 @@ simulate_metapopulation <- function(
       
       # Apply infection to susceptible patches
       for (i in 1:n_patches) {
-        if (I[i, k, 2] == 0) {  # If patch is susceptible
-          I[i, k, 3] <- ifelse(runif(1) < P_I, 1, 0)
+        if (I[i, k, "after_growth"] == 0) {  # If patch is susceptible
+          I[i, k, "after_colonization"] <- ifelse(runif(1) < P_I, 1, 0)
         } else {
-          I[i, k, 3] <- 1  # Already infected patches remain infected
+          I[i, k, "after_colonization"] <- 1  # Already infected patches remain infected
         }
         
         #cat("Patch:", i,"  Year:", k, "  Season: 2", "  Population:", N[i, k, 3], "  Status:",I[i,k,3],"  Status change:",I[i, k, 3]-I[i,k,2], "\n")
@@ -89,14 +92,14 @@ simulate_metapopulation <- function(
     #cat("  Year:", k, "  Season: 3", "  Pf:", P_f, "\n")
     for (i in 1:n_patches) {
       # Infection may fizzle out
-      if (I[i, k, 3] == 1) {
-        I[i, k, 4] <- ifelse(runif(1) > P_f, 1, 0)
+      if (I[i, k, "after_colonization"] == 1) {
+        I[i, k, "after_fizzle"] <- ifelse(runif(1) > P_f, 1, 0)
       } else {
-        I[i, k, 4] <- 0  # Uninfected patches remain uninfected
+        I[i, k, "after_fizzle"] <- 0  # Uninfected patches remain uninfected
       }
       
       # Population size doesn't change during fizzle
-      N[i, k, 4] <- N[i, k, 3]
+      N[i, k, "after_fizzle"] <- N[i, k, "after_colonization"]
       
       #cat("Patch:", i,"  Year:", k, "  Season: 3", "  Population:", N[i, k, 4], "  Status:",I[i,k,4],"  Status change:",I[i, k, 4]-I[i,k,3], "\n")
     }
@@ -108,21 +111,21 @@ simulate_metapopulation <- function(
     
     current_year_inf <- 0  # To store total deaths in the current year
     for (i in 1:n_patches) {
-      if (I[i, k, 4] == 1) {
+      if (I[i, k, "after_fizzle"] == 1) {
         # Reduce population due to disease
-        inf <- z * N[i, k, 4]
-        N[i, k, 5] <- N[i, k, 4] - inf * D
+        inf <- z * N[i, k, "after_fizzle"]
+        N[i, k, "after_burnout"] <- N[i, k, "after_fizzle"] - inf * D
         current_year_inf <- current_year_inf + inf
         
         # Probability of burnout
-        P_b <-burnout_prob(R0,epsilon,N=N[i,k,4])
+        P_b <-burnout_prob(R0,epsilon,N=N[i,k,"after_fizzle"])
         #cat("Patch:", i,"  Year:", k, "  Season: 4", "  Population:", N[i, k, 4],"  Pb:", P_b, "\n")
         
-        I[i, k, 5] <- ifelse(runif(1) > P_b, 1, 0)
+        I[i, k, "after_burnout"] <- ifelse(runif(1) > P_b, 1, 0)
       } else {
         # No change in uninfected patches
-        N[i, k, 5] <- N[i, k, 4]
-        I[i, k, 5] <- 0
+        N[i, k, "after_burnout"] <- N[i, k, "after_fizzle"]
+        I[i, k, "after_burnout"] <- 0
       }
       #cat("Patch:", i,"  Year:", k, "  Season: 4","  Population:", N[i, k, 5], "  Status:",I[i,k,5],"  Status change:",I[i, k, 5]-I[i,k,4], "\n")
     }
@@ -133,8 +136,8 @@ simulate_metapopulation <- function(
     
     # Set initial conditions for next year
     if (k < n_years) {
-      N[, k+1, 1] <- N[, k, 5]
-      I[, k+1, 1] <- I[, k, 5]
+      N[, k+1, 1] <- N[, k, "after_burnout"]
+      I[, k+1, 1] <- I[, k, "after_burnout"]
     }
   }
   
@@ -151,16 +154,24 @@ params0 <- list(n_patches = 100,
                 R0 = 2.5,
                 epsilon=0.02)
 
+#' multiple replicate simulations, same parameters
+#' @param nsim number of replicate simulations
+#' @param params parameter list
+#' @param verbose print progress info? (doesn't work for parallel sims)
+#' @param ncores number of parallel cores
+#' @param seed random-number seed
+#' @return 
+## FIXME: return disaggregated results?
 mult_sim_mp <- function(nsim, params, verbose = FALSE,
                         ncores = getOption("sim.ncores", 4),
-                        seed = 101) {
+                        seed = NULL) {
   require("parallel", quietly = TRUE)
   if (ncores>1) {
     cl <- makeCluster(ncores)
     clusterExport(cl, c("simulate_metapopulation"))
     clusterExport(cl, c("params"), envir = environment())
     clusterEvalQ(cl, "library(burnout)")
-    clusterSetRNGStream(cl, seed)
+    if (!is.null(seed)) clusterSetRNGStream(cl, seed)
     results <- parLapply(cl, 1:nsim,
                          function(i) {
                            if (verbose) cat(".")
@@ -191,3 +202,36 @@ mult_sim_mp <- function(nsim, params, verbose = FALSE,
 ##  progress bars?
 ##  different summaries?
 ##  speed: may be able to vectorize calculations ... ??
+
+plotfun1 <-  function(x) {
+  par(mfrow = c(3, 1), mar = c(4, 4, 3, 1), oma = c(0, 0, 2, 0))
+
+  pfun <- function(x, ...,  meancol = "blue") {
+    matplot(x, type = "l", lty = 1, col = "grey",
+            ..., xlab = "Year")
+    lines(rowMeans(x), col = meancol, lwd = 3)
+  }
+
+  pfun(res$total_pops, main = "Total Population over Time", ylab = "Total Population",
+       meancol = "blue")
+
+  pfun(res$infected_patches, main = "Number of Infected Patches", ylab = "Infected Patches",
+       meancol = "red")
+
+  pfun(res$total_inf, main = "Total Infections over Time", ylab = "Total Infections",
+       meancol = "purple")
+  
+  par(mfrow = c(1, 1))
+}
+
+
+## average last N steps of state variables
+sumfun1 <- function(x, nsteps = 100) {
+  nyr <- nrow(x[[1]])
+  yr_vec <- seq(nyr-nsteps, nyr)
+  sapply(x,
+         function(y) {
+           ## average across pops and years
+           mean(y[yr_vec,])
+         })
+}
