@@ -3,7 +3,7 @@ library(tidyverse)
 
 dd0 <- readRDS("sim_batch0.rds")
 dd <- readRDS("sim_batch1.rds")
-print(nrow(res))
+print(nrow(dd))
 
 pivfun <- function(x) {
   res <- tidyr::pivot_longer(x, contains("_"))
@@ -23,6 +23,6 @@ gg1 <- ggplot(dd_long, aes(R0, value, colour = alphavec_f)) +
   geom_smooth(method = "gam", formula = y ~ s(x, k = 15), method.args = list(method = "REML", gamma = 0.75)) + 
   facet_wrap(~ name, scale = "free")
 
-gg1 + geom_point(data = dd0_long, colour =  "black")
+gg1 + geom_point(data = dd0_long, colour =  "black", size = 3)
 
 ggsave("plot_batch1.pdf", width = 10, height = 5)

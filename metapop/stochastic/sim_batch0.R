@@ -1,4 +1,7 @@
 source("simulation_funs.R")
+library("dplyr")
+library("purrr")
+
 R0vec <- c(1.2,1.5,2.0,2.5,3)
 res <- list()
 for (i in seq_along(R0vec)) {
@@ -7,11 +10,13 @@ for (i in seq_along(R0vec)) {
   res[[i]] <- mult_sim_mp(nsim = 20, ncores = 10, params = params, seed = 100+i)
 }
 
+saveRDS(res, "sim_batch0_raw.rds")
+
 plotfun1(res[[3]])
 res2 <- (res
   |> map(sumfun1)
   |> setNames(R0vec)
-  |> dplyr::bind_rows(.id = "R0")
+  |> bind_rows(.id = "R0")
   |> mutate(across(R0, ~as.numeric(as.character(.))))
 )
 
