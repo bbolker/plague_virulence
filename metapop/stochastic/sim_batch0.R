@@ -7,12 +7,14 @@ res <- list()
 for (i in seq_along(R0vec)) {
   params <- params0
   params[["R0"]] <- R0vec[i]
-  res[[i]] <- mult_sim_mp(nsim = 20, ncores = 10, params = params, seed = 100+i)
+  res[[i]] <- mult_sim_mp(nsim = 20, ncores = 10, params = params, seed = 101+i)
+  saveRDS(res, "sim_batch0_raw.rds")
 }
 
-saveRDS(res, "sim_batch0_raw.rds")
 
+plotfun1(res[[1]])
 plotfun1(res[[3]])
+plotfun1(res[[5]])
 res2 <- (res
   |> map(sumfun1)
   |> setNames(R0vec)
