@@ -10,7 +10,8 @@
 #' @param epsilon infectious period (scaled to host generation time)
 #' @param initial_infected Number of initially infected patches         
 #' @param initial_pop_ratio Initial population as ratio of carrying capacity
-#' @return A list with 
+#' @return A list containing three matrices, each (n_years x n_patches):
+#' total_pops (total host population), infected_patches, total_inf
 simulate_metapopulation <- function(
     n_patches = 100,       
     n_years = 1000,        
@@ -225,13 +226,19 @@ plotfun1 <-  function(x) {
 }
 
 
-## average last N steps of state variables
+##' average last N steps of state variables
+##' @param x 'raw' sim output
 sumfun1 <- function(x, nsteps = 100) {
   nyr <- nrow(x[[1]])
   yr_vec <- seq(nyr-nsteps, nyr)
-  sapply(x,
-         function(y) {
-           ## average across pops and years
-           mean(y[yr_vec,])
-         })
+  ## average across pops and years
+  mfun <- function(y) mean(y[yr_vec,], na.rm = TRUE)
+  r1 <- sapply(x, mfun)
+  ## quasi-equilibrium version
+  ## replace values from extinct metapopulations (inf_patches == 0) with NA,
+  ##  compute mean with na.rm = TRUE (as above)
+  x_qe <- lapply(x, function(z) {z[x$infected_patches==0] <- NA; z})
+  r2 <- sapply(x_qe, mfun)
+  names(r2) <- paste0(names(r2), "_qe")
+  c(r1, r2)
 }

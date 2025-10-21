@@ -1,5 +1,6 @@
 source("simulation_funs.R")
-retry <- TRUE  
+retry <- TRUE
+ncores <- 20
 dd <- expand.grid(R0 = seq(1.2, 3, by = 0.1),
                   alphavec = 5*10^seq(-6,-3, by = 0.5))
 
@@ -15,7 +16,7 @@ for (i in start:nrow(dd)) {
   params <- params0
   params[["R0"]] <- dd$R0vec[i]
   params[["alpha"]] <- dd$alphavec[i]
-  res[[i]] <- mult_sim_mp(nsim = 120, ncores = 12, params = params, seed = 100 + i)
+  res[[i]] <- mult_sim_mp(nsim = 120, ncores = ncores, params = params, seed = 100 + i)
   cat(i, unlist(dd[i,]), sumfun1(res[[i]]), "\n")
   saveRDS(res, fn)
 }
