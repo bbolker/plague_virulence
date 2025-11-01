@@ -1,7 +1,7 @@
 source("simulation_funs.R")
 retry <- TRUE
 ncores <- 20
-dd <- expand.grid(R0 = seq(1.2, 3, by = 0.1),
+dd <- expand.grid(R0vec = seq(1.2, 3, by = 0.1),
                   alphavec = 5*10^seq(-6,-3, by = 0.5))
 
 fn <- "sim_batch1_raw.rds"
