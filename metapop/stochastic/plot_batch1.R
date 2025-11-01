@@ -1,8 +1,8 @@
 library(ggplot2); theme_set(theme_bw())
 library(tidyverse)
 
-dd0 <- readRDS("sim_batch0.rds")
-dd <- readRDS("sim_batch1.rds")
+dd0 <- readRDS("outputs/sim_batch0.rds")
+dd <- readRDS("outputs/sim_batch1.rds")
 print(nrow(dd))
 
 pivfun <- function(x) {
@@ -15,13 +15,15 @@ pivfun <- function(x) {
 }
 
 dd0_long <- pivfun(dd0)
-dd_long <- pivfun(dd)
+dd_long <- pivfun(dd) |> rename(R0 = "R0vec")
 
 gg1 <- ggplot(dd_long, aes(R0, value, colour = alphavec_f)) +
   geom_point() +
-  ## gamma = 0.75 allows slightly wigglier fits (loess is too wiggly for me)
-  geom_smooth(method = "gam", formula = y ~ s(x, k = 15), method.args = list(method = "REML", gamma = 0.75)) + 
-  facet_wrap(~ name, scale = "free")
+  ## GAM gives nicer plots than default loess smoothing, but fails in a few cases
+  ## (because quasi-eq doesn't leave enough points etc.)
+  geom_smooth(method = "gam", formula = y ~ s(x)) +
+  ## geom_smooth() +
+  facet_wrap(~ name, scale = "free", ncol = 2)
 
 gg1 + geom_point(data = dd0_long, colour =  "black", size = 3)
 

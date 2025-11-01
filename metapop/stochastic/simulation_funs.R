@@ -145,6 +145,7 @@ simulate_metapopulation <- function(
   return(list(N = N, I = I, total_inf = total_inf))
 }
 
+## default parameters
 params0 <- list(n_patches = 100,
                 n_years = 1000,
                 K = 1e6,
@@ -204,23 +205,39 @@ mult_sim_mp <- function(nsim, params, verbose = FALSE,
 ##  different summaries?
 ##  speed: may be able to vectorize calculations ... ??
 
-plotfun1 <-  function(x) {
+plotfun1 <-  function(res, quasi_eq = FALSE) {
+
+  main_labs <- c("Total Population over Time",
+                 "Number of Infected Patches",
+                 "Total infections over Time")
+
+  y_labs <- c("Total Population", "Infected Patches", "Total Infections")
+
+  col_vec <- c("blue", "red", "purple")
+
+  vars <- c("total_pops", "infected_patches", "total_inf")
+  
   par(mfrow = c(3, 1), mar = c(4, 4, 3, 1), oma = c(0, 0, 2, 0))
 
-  pfun <- function(x, ...,  meancol = "blue") {
+  pfun <- function(var, ...,  meancol = "blue") {
+    x <- res[[var]]
+    if (quasi_eq) {
+      x[res[["infected_patches"]] == 0] <- NA
+    }
     matplot(x, type = "l", lty = 1, col = "grey",
             ..., xlab = "Year")
-    lines(rowMeans(x), col = meancol, lwd = 3)
+    lines(rowMeans(x, na.rm = TRUE), col = meancol, lwd = 3)
   }
 
-  pfun(x$total_pops, main = "Total Population over Time", ylab = "Total Population",
-       meancol = "blue")
+  mapply(pfun, var = vars, main = main_labs, ylab = y_labs, meancol = col_vec)
+  ## pfun(x$total_pops, main = "Total Population over Time", ylab = "Total Population",
+  ##      meancol = "blue")
 
-  pfun(x$infected_patches, main = "Number of Infected Patches", ylab = "Infected Patches",
-       meancol = "red")
+  ## pfun(x$infected_patches, main = "Number of Infected Patches", ylab = "Infected Patches",
+  ##      meancol = "red")
 
-  pfun(x$total_inf, main = "Total Infections over Time", ylab = "Total Infections",
-       meancol = "purple")
+  ## pfun(x$total_inf, main = "Total Infections over Time", ylab = "Total Infections",
+  ##      meancol = "purple")
   
   par(mfrow = c(1, 1))
 }

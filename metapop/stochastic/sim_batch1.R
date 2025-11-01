@@ -1,26 +1,45 @@
 source("simulation_funs.R")
-retry <- TRUE
-ncores <- 20
+
+fn_raw <- "sim_batch1_raw.rds"
+fn_sum <- "sim_batch1.rds"
+
+retry <- TRUE  ## checkpoint/pick up from previous runs?
+ncores <- 16
+nsim <- 120
 dd <- expand.grid(R0vec = seq(1.2, 3, by = 0.1),
                   alphavec = 5*10^seq(-6,-3, by = 0.5))
 
-fn <- "sim_batch1_raw.rds"
+
 res <- list()
 start <- 1
-if (retry && file.exists(fn)) {
-  res <- readRDS(fn)
+if (retry && file.exists(fn_raw)) {
+  res <- readRDS(fn_raw)
   start <- length(res) + 1
 }
-cat("n R0 alpha total_pops inf_patch total_inf\n")
-for (i in start:nrow(dd)) {
-  params <- params0
-  params[["R0"]] <- dd$R0vec[i]
-  params[["alpha"]] <- dd$alphavec[i]
-  res[[i]] <- mult_sim_mp(nsim = 120, ncores = ncores, params = params, seed = 100 + i)
-  cat(i, unlist(dd[i,]), sumfun1(res[[i]]), "\n")
-  saveRDS(res, fn)
+
+if (start <= nrow(dd)) {
+
+  cat("n R0 alpha total_pops inf_patch total_inf\n")
+  for (i in start:nrow(dd)) {
+    params <- params0  ## default parameters, from simulation_funs.R
+    params[["R0"]] <- dd$R0vec[i]
+    params[["alpha"]] <- dd$alphavec[i]
+    ## cat(nsim, ncores, "\n")
+    ## print(params)
+    res[[i]] <- mult_sim_mp(nsim = nsim, ncores = ncores, params = params, seed = 100 + i)
+    cat(i, unlist(dd[i,]), sumfun1(res[[i]]), "\n")
+    saveRDS(res, fn_raw)
+  }
 }
 
+## summarize
 res <- lapply(res, sumfun1)
 dd <- data.frame(dd, do.call(rbind, res))
-saveRDS(dd, "sim_batch1.rds")
+
+## attach metadata as attributes
+attr(dd, "ncores") <- ncores
+attr(dd, "nsim") <- nsim
+attr(dd, "params0") <- params0
+
+saveRDS(dd, fn_sum)
+
