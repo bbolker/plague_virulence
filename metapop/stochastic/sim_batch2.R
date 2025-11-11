@@ -2,8 +2,8 @@
 
 source("simulation_funs.R")
 
-fn_raw <- "sim_batch2_raw.rds"
-fn_sum <- "sim_batch2.rds"
+fn_raw <- "sim_batch3_raw.rds"
+fn_sum <- "sim_batch3.rds"
 
 retry <- TRUE    ## checkpoint/pick up from previous runs?
 ncores <- 16
@@ -11,7 +11,7 @@ nsim <- 120
 
 
 R0vec <- seq(1.2, 3, by = 0.1)
-alphavec <- 5 * 10^seq(-6, -3, by = 0.5)
+alphavec <- 10^(-4:0)
 Kvec <- 10^(2:10)
 
 dd <- expand.grid(R0vec = R0vec,

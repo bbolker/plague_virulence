@@ -1,7 +1,7 @@
 library(ggplot2); theme_set(theme_bw())
 library(tidyverse)
 
-dd <- readRDS("outputs/sim_batch2.rds")
+dd <- readRDS("outputs/sim_batch3.rds")
 print(nrow(dd))
 
 pivfun <- function(x) {
@@ -15,7 +15,7 @@ pivfun <- function(x) {
 
 dd_long <- pivfun(dd) |> rename(R0 = "R0vec", K = "Kvec")
 
-out_dir <- "sim_batch2_plot"
+out_dir <- "sim_batch3_plot"
 dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
 # produce plot for each distinct K
@@ -32,7 +32,7 @@ for (k in Ks) {
   
   p <- gg1 + ggtitle(paste("K =", format(k, scientific = FALSE)))
   
-  fname <- file.path(out_dir, paste0("plot_batch2_K_", format(k, scientific = FALSE), ".pdf"))
+  fname <- file.path(out_dir, paste0("plot_batch3_K_", format(k, scientific = FALSE), ".pdf"))
   ggsave(fname, p, width = 10, height = 5)
   message("Saved: ", fname)
   
