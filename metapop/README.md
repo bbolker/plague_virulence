@@ -63,6 +63,12 @@ This is close to the value $R_0=2.75$ we get by estimating from simplified ODEs 
 
 # Update
 
+Update since October 2025:
+
+- Quasi-equilibrium
+- Simulations for stochastic model
+
+
 Update since 11 Sep 2025:
 
 -   Equations for stochastic simulation
