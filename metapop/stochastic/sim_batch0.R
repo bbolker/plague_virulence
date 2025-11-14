@@ -11,10 +11,6 @@ for (i in seq_along(R0vec)) {
   saveRDS(res, "sim_batch0_raw.rds")
 }
 
-
-plotfun1(res[[1]])
-plotfun1(res[[3]])
-plotfun1(res[[5]])
 res2 <- (res
   |> map(sumfun1)
   |> setNames(R0vec)
