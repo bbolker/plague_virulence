@@ -23,8 +23,11 @@ gg1 <- ggplot(dd_long, aes(R0, value, colour = alphavec_f)) +
   ## (because quasi-eq doesn't leave enough points etc.)
   geom_smooth(method = "gam", formula = y ~ s(x)) +
   ## geom_smooth() +
-  facet_wrap(~ name, scale = "free", ncol = 2)
+  facet_wrap(~ name, scale = "free", ncol = 2) +
+  scale_colour_discrete(name="alpha")
 
 gg1 + geom_point(data = dd0_long, colour =  "black", size = 3)
 
 ggsave("plot_batch1.pdf", width = 10, height = 5)
+
+gg1 + scale_y_log10()
