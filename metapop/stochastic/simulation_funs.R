@@ -51,6 +51,11 @@ simulate_metapopulation <- function(
     
     # Within each year, apply the four processes
     
+	 ## Yuyang, you should carefully explore which of these for loops
+	 ## can be simplified as vectors
+	 ## e.g., replace the for loop with
+	N[, k, "after_growth"] <- N[, k, "beginning"] + r * N[, k, "beginning"] * (1 - N[, k, "beginning"] / K)
+	I[, k, "after_growth"] <- I[, k, "beginning"]  # Infection status doesn't change during growth
     # 1. Growth process
     for (i in 1:n_patches) {
       # Logistic growth

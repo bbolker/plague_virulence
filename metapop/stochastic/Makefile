@@ -10,5 +10,8 @@ outputs/sim_batch1.rds: sim_batch1.R simulation_funs.R
 plot_batch1.pdf: outputs/sim_batch1.rds outputs/sim_batch0.rds simulation_funs.R plot_batch1.R
 	R CMD BATCH --vanilla plot_batch1.R
 
+plot_batch0.pdf: outputs/sim_batch0.rds simulation_funs.R plot_batch0.R
+	R CMD BATCH --vanilla plot_batch0.R
+
 clean:
 	rm *~ \#*
