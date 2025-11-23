@@ -51,94 +51,73 @@ simulate_metapopulation <- function(
     
     # Within each year, apply the four processes
     
-	 ## Yuyang, you should carefully explore which of these for loops
-	 ## can be simplified as vectors
-	 ## e.g., replace the for loop with
-	N[, k, "after_growth"] <- N[, k, "beginning"] + r * N[, k, "beginning"] * (1 - N[, k, "beginning"] / K)
-	I[, k, "after_growth"] <- I[, k, "beginning"]  # Infection status doesn't change during growth
     # 1. Growth process
-    for (i in 1:n_patches) {
-      # Logistic growth
-      N[i, k, "after_growth"] <- N[i, k, "beginning"] + r * N[i, k, "beginning"] * (1 - N[i, k, "beginning"] / K)
-      I[i, k, "after_growth"] <- I[i, k, "beginning"]  # Infection status doesn't change during growth
-    }
+    N[, k, "after_growth"] <- N[, k, "beginning"] + r * N[, k, "beginning"] * (1 - N[, k, "beginning"] / K)
+    I[, k, "after_growth"] <- I[, k, "beginning"]  # Infection status doesn't change during growth
     #cat("Year:", k, "Season: 2", "Infected Patches:", sum(I[, k, 2]), "\n")
     
     # 2. Colonization process
-    # 2.1 Population movement
+    
+    # 2.1 Population movement (vectorized)
     total_pop <- sum(N[, k, "after_growth"])
-    for (i in 1:n_patches) {
-      N[i, k, "after_colonization"] <- (1 - c) * N[i, k, "after_growth"] + c * total_pop / n_patches
-    }
+    N[, k, "after_colonization"] <- (1 - c) * N[, k, "after_growth"] + c * total_pop / n_patches
     
     # 2.2 Infection spread
     if (k == 1) {
-      # First year: infection status remains unchanged during colonization
-      I[, k, "after_colonization"] <- I[, k, "after_growth"]
+      I[, k, "after_colonization"] <- I[, k, "after_growth"]  # First year: infection status remains unchanged during colonization
     } else {
-      # Calculate infection probability based on previous year's deaths
-      P_I <-1-exp(-alpha * c * total_inf[k - 1] / n_patches)  
-      #cat("  Year:", k, "  Season: 2", "  PI:", P_I, "\n")
+      P_I <-1-exp(-alpha * c * total_inf[k - 1] / n_patches)  # Calculate infection probability based on previous year's deaths
       
-      # Apply infection to susceptible patches
-      for (i in 1:n_patches) {
-        if (I[i, k, "after_growth"] == 0) {  # If patch is susceptible
-          I[i, k, "after_colonization"] <- ifelse(runif(1) < P_I, 1, 0)
-        } else {
-          I[i, k, "after_colonization"] <- 1  # Already infected patches remain infected
-        }
-        
-        #cat("Patch:", i,"  Year:", k, "  Season: 2", "  Population:", N[i, k, 3], "  Status:",I[i,k,3],"  Status change:",I[i, k, 3]-I[i,k,2], "\n")
-      }
+      I[, k, "after_colonization"] <- I[, k, "after_growth"]
+      susceptible_mask <- I[, k, "after_growth"] == 0
+      I[susceptible_mask, k, "after_colonization"] <- rbinom(sum(susceptible_mask), 1, P_I)
+      
     }
     #cat("Year:", k, "Season: 3", "Infected Patches:", sum(I[, k, 3]), "\n")
     
     # 3. Fizzle process
     P_f <- 1 / R0  # Fizzle probability
-    #cat("  Year:", k, "  Season: 3", "  Pf:", P_f, "\n")
-    for (i in 1:n_patches) {
-      # Infection may fizzle out
-      if (I[i, k, "after_colonization"] == 1) {
-        I[i, k, "after_fizzle"] <- ifelse(runif(1) > P_f, 1, 0)
-      } else {
-        I[i, k, "after_fizzle"] <- 0  # Uninfected patches remain uninfected
-      }
-      
-      # Population size doesn't change during fizzle
-      N[i, k, "after_fizzle"] <- N[i, k, "after_colonization"]
-      
-      #cat("Patch:", i,"  Year:", k, "  Season: 3", "  Population:", N[i, k, 4], "  Status:",I[i,k,4],"  Status change:",I[i, k, 4]-I[i,k,3], "\n")
-    }
+    
+    # Population doesn't change during fizzle
+    N[, k, "after_fizzle"] <- N[, k, "after_colonization"]
+    
+    infected_mask <- I[, k, "after_colonization"] == 1
+    I[, k, "after_fizzle"] <- 0  # Initialize all as 0
+    I[infected_mask, k, "after_fizzle"] <- rbinom(sum(infected_mask), 1, 1 - P_f)
+    
     #cat("Year:", k, "Season: 4", "Infected Patches:", sum(I[, k, 4]), "\n")
     
     # 4. Burnout process
     
     z <- final_size(R0)  # Final size of epidemic
     
-    current_year_inf <- 0  # To store total deaths in the current year
-    for (i in 1:n_patches) {
-      if (I[i, k, "after_fizzle"] == 1) {
-        # Reduce population due to disease
-        inf <- z * N[i, k, "after_fizzle"]
-        N[i, k, "after_burnout"] <- N[i, k, "after_fizzle"] - inf * D
-        current_year_inf <- current_year_inf + inf
-        
-        # Probability of burnout
-        P_b <-burnout_prob(R0,epsilon,N=N[i,k,"after_fizzle"])
-        #cat("Patch:", i,"  Year:", k, "  Season: 4", "  Population:", N[i, k, 4],"  Pb:", P_b, "\n")
-        
-        I[i, k, "after_burnout"] <- ifelse(runif(1) > P_b, 1, 0)
-      } else {
-        # No change in uninfected patches
-        N[i, k, "after_burnout"] <- N[i, k, "after_fizzle"]
-        I[i, k, "after_burnout"] <- 0
-      }
-      #cat("Patch:", i,"  Year:", k, "  Season: 4","  Population:", N[i, k, 5], "  Status:",I[i,k,5],"  Status change:",I[i, k, 5]-I[i,k,4], "\n")
-    }
-    #cat("Year:", k, "Season: 5", "Infected Patches:", sum(I[, k, 5]), "\n","\n")
+    N[, k, "after_burnout"] <- N[, k, "after_fizzle"]
+    I[, k, "after_burnout"] <- 0
     
-    # Record total inf for the current year
-    total_inf[k] <- current_year_inf
+    infected_mask <- I[, k, "after_fizzle"] == 1
+    
+    # Process infected patches only
+    if (sum(infected_mask) > 0) {
+      # Calculate infections for infected patches only
+      inf_infected <- z * N[infected_mask, k, "after_fizzle"]
+      
+      # Reduce population due to disease
+      N[infected_mask, k, "after_burnout"] <- N[infected_mask, k, "after_fizzle"] - inf_infected * D
+      
+      # Record total infections for the current year
+      total_inf[k] <- sum(inf_infected)
+      
+      # Calculate burnout probabilities 
+      P_b_vec <- burnout_prob(R0, epsilon, N = N[infected_mask, k, "after_fizzle"])
+      
+      # Generate burnout outcomes
+      I[infected_mask, k, "after_burnout"] <- rbinom(sum(infected_mask), 1, 1 - P_b_vec)
+    } else {
+      # No infected patches
+      total_inf[k] <- 0
+    }
+    
+    #cat("Year:", k, "Season: 5", "Infected Patches:", sum(I[, k, 5]), "\n","\n")
     
     # Set initial conditions for next year
     if (k < n_years) {
@@ -168,7 +147,6 @@ params0 <- list(n_patches = 100,
 #' @param ncores number of parallel cores
 #' @param seed random-number seed
 #' @return 
-## FIXME: return disaggregated results?
 mult_sim_mp <- function(nsim, params, verbose = FALSE,
                         ncores = getOption("sim.ncores", 4),
                         seed = NULL) {
@@ -205,25 +183,23 @@ mult_sim_mp <- function(nsim, params, verbose = FALSE,
 }
 
 ## TO DO:
-##  parallelize?
 ##  progress bars?
 ##  different summaries?
-##  speed: may be able to vectorize calculations ... ??
 
 plotfun1 <-  function(res, quasi_eq = FALSE) {
-
+  
   main_labs <- c("Total Population over Time",
                  "Number of Infected Patches",
                  "Total infections over Time")
-
+  
   y_labs <- c("Total Population", "Infected Patches", "Total Infections")
-
+  
   col_vec <- c("blue", "red", "purple")
-
+  
   vars <- c("total_pops", "infected_patches", "total_inf")
   
   par(mfrow = c(3, 1), mar = c(4, 4, 3, 1), oma = c(0, 0, 2, 0))
-
+  
   pfun <- function(var, ...,  meancol = "blue") {
     x <- res[[var]]
     if (quasi_eq) {
@@ -233,14 +209,14 @@ plotfun1 <-  function(res, quasi_eq = FALSE) {
             ..., xlab = "Year")
     lines(rowMeans(x, na.rm = TRUE), col = meancol, lwd = 3)
   }
-
+  
   mapply(pfun, var = vars, main = main_labs, ylab = y_labs, meancol = col_vec)
   ## pfun(x$total_pops, main = "Total Population over Time", ylab = "Total Population",
   ##      meancol = "blue")
-
+  
   ## pfun(x$infected_patches, main = "Number of Infected Patches", ylab = "Infected Patches",
   ##      meancol = "red")
-
+  
   ## pfun(x$total_inf, main = "Total Infections over Time", ylab = "Total Infections",
   ##      meancol = "purple")
   
