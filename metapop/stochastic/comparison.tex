@@ -7,14 +7,15 @@
 \usepackage{comment}
 \begin{document}
 
-\section{Corresponding deterministic version}
+\section{two dimensional}
+\subsection{Corresponding deterministic version}
 We use average population density of all patches (including infected and susceptible ones) to replace stochastic events and keep other mechanisms unchanged. \\
 
 Order of events is \textbf{population growth $\to$ host movement and infection between patches $\to$ fizzle $\to$ burnout}. \\
 
 This is equivalent to \textbf{burnout $\to$ population growth $\to$ host movement and infection between patches $\to$ fizzle}.(And this will make equations more concise.)\\
 
-\subsection{Burnout}
+\subsubsection{Burnout}
 $$f_b:\begin{pmatrix}
     p\\N
 \end{pmatrix}
@@ -22,9 +23,9 @@ $$f_b:\begin{pmatrix}
     P_\textbf{nb}p\\
     (1-pzD)N
 \end{pmatrix}$$
-where $P_\textbf{nb}$ is the probability of not burning out conditioning on not fizzling. And number of infected rats is $np_0zN_0=npzN$, $z$ is the final size, $n$ is total number of patches, and we use $N_0$ and $p_0$ to denote initial $N$ and $p$ value at the beginning of the iteration. 
+where $P_\textbf{nb}=1-P_\textbf{b}$ is the probability of not burning out conditioning on not fizzling. And number of infected rats is $np_0zN_0=npzN$, $z$ is the final size, $n$ is total number of patches, and we use $N_0$ and $p_0$ to denote initial $N$ and $p$ value at the beginning of the iteration. 
 
-\subsection{Population growth}
+\subsubsection{Population growth}
 $$f_g:\begin{pmatrix}
     p\\N
 \end{pmatrix}
@@ -32,7 +33,7 @@ $$f_g:\begin{pmatrix}
     p\\
     N(1+r(1-\frac{N}{K}))
 \end{pmatrix}$$
-\subsection{Movement and infection}
+\subsubsection{Movement and infection}
 $$f_i:\begin{pmatrix}
     p\\N
 \end{pmatrix}
@@ -40,7 +41,7 @@ $$f_i:\begin{pmatrix}
     p+(1-\mathrm{e}^{-\alpha cnpzN_0})(1-p)\\
     N
 \end{pmatrix}$$
-\subsection{Fizzle}
+\subsubsection{Fizzle}
 $$f_f:\begin{pmatrix}
     p\\N
 \end{pmatrix}
@@ -48,9 +49,9 @@ $$f_f:\begin{pmatrix}
     P_\textbf{nf}p\\
     N
 \end{pmatrix}$$
-where $P_\textbf{nf}$ is the probability of not fizzling.
+where $P_\textbf{nf}=1-P_\textbf{f}$ is the probability of not fizzling.
 
-\subsection{Overall map}
+\subsubsection{Overall map}
 The overall map is $f=f_f \circ f_i \circ f_g \circ f_b$
 $$f:\begin{pmatrix}
     p\\N
@@ -68,10 +69,62 @@ $$J_{f}(0,K)=\begin{pmatrix}
 So the persisence threshold is
 $$L_0=  P_\textbf{nf}P_\textbf{nb}+\alpha cznK>1$$
 
-\section{Comparison with previous deterministic model}
+\subsection{Comparison with previous deterministic model}
 In our previous two dimensional deterministic model our threshold is
 $$L_0=  P_1+B>1$$ where $P_1=P_\textbf{nf}P_\textbf{nb}$ is persistence probability (neither fizzling nor burning out).\\
 
-$B$ and  $\alpha cznK$ are both constant, so the two deterministic versions are equivalent. However the range of R0 we want was very narrow in the deterministic version, indicating that difference in population density is crucial in explaining virulence evolution.
+$B$ and  $\alpha cznK$ are both constant, so the two deterministic versions are equivalent. However the range of $\mathcal{R}_0$ we want was very narrow in the deterministic version, indicating that difference in population density is crucial in explaining virulence evolution.
+
+\section{three dimensional}
+
+
+\subsection{Corresponding deterministic version}
+\subsubsection{Burnout}
+$$
+    f_b(p,N_I,N_S) =
+    \begin{pmatrix}
+        P_\textbf{nb}p \\
+        (1-zD)N_I\\
+        \dfrac{(1-zD)N_IP_\textbf{b}p+N_S(1-p)}{P_\textbf{b}p+1-p}
+    \end{pmatrix}
+$$
+\subsubsection{Population growth}
+$$
+    f_g(p,N_I,N_S) =
+    \begin{pmatrix}
+        p \\
+        N_I + rN_I\left(1 - \frac{N_I}{K} \right) \\
+        N_S + rN_S\left(1 - \frac{N_S}{K} \right)
+    \end{pmatrix}
+$$
+\subsubsection{Movement}
+$$
+    f_m(p,N_I,N_S) =
+    \begin{pmatrix}
+        p \\
+         N_I + c(1 - p)(N_S - N_I)\\
+        N_S - cp(N_S - N_I) 
+    \end{pmatrix} \\
+$$
+\subsubsection{Infection}
+$$
+    f_i(p,N_I,N_S) = 
+    \begin{pmatrix}
+        p + (1-\mathrm{e}^{-\alpha cnpzN_{I_0}})(1 - p) \\
+        \dfrac{pN_I + (1-\mathrm{e}^{-\alpha cnpzN_{I_0}})(1 - p)N_S}{p+(1-\mathrm{e}^{-\alpha cnpzN_{I_0}})(1-p)}\\
+        N_S 
+    \end{pmatrix} \\
+$$
+\subsubsection{Fizzle}
+$$
+    f_f(p,N_I,N_S) =
+    \begin{pmatrix}
+        P_\textbf{nf}p \\
+        N_I \\
+        \dfrac{(1 - p)N_S + P_\textbf{f}pN_I}{1 -p+ P_\textbf{f}p}
+    \end{pmatrix} \\
+$$
+\subsubsection{Overall map}
+$$f=f_f\circ f_i  \circ f_m \circ f_g \circ f_b$$
 
 \end{document}
