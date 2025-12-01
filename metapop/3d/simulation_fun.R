@@ -1,12 +1,10 @@
 ## avoid T, it's a built-in synonym for TRUE
 #' @param tt number of time steps
-#' @param B0 infection rate between patches
+#' @param alpha infection rate between patches
 #' @param r  growth rate of rat population
 #' @param D  death rate due to pathogen
 #' @param epsilon ratio of pathogen to host generation time
 #' @param R0 intrinsic reproductive number of pathogen
-#' @param ki ?? for infected patches
-#' @param ks ?? for susc patches
 #' @param c0
 #' @param K  rat carrying capacity per patch
 #' @param N number of patches (only affects discrete-extinction logic)
@@ -107,17 +105,15 @@ getEE<-function(c0=0.2,
 
 
 simfun <- function(tt  = 300,
-                   B0 = 0.5,
+                   alpha=5e-6,
                    r = 0.5,
                    D = 1,
                    epsilon=0.05,
                    R0=2.5,
-                   ki=0.01,
-                   ks=0.01,
-                   c0=0.2,
-                   K=300,
-                   N = 1000,
-                   start = c(p=0, NS=K, NI=K)) {
+                   c0=0.01,
+                   K=1e6,
+                   n = 100,
+                   start = c(p=0.01, NS=K, NI=K)) {
   
   if (!require("burnout")) stop("please install the 'burnout' package: ",
                                 "`remotes::install_github('davidearn/burnout')`")
@@ -144,50 +140,50 @@ simfun <- function(tt  = 300,
     # } else{
      if (p==0) {
       ## continuous version, derived from the limit when p approaches 0
-      
+
       ## host movement
       ni <- ni + c0*(ns-ni)
-      
+
       ## infection between patches
-      B=B0
+      B=1-exp(-alpha*c0*n*p*z*NI[t])
       ni<-(ni+B*ns)/(1+B)
-      
+
       ## epidemic
       ni <- ni * (1 - final_size(R0)*D)
-      
+
       ## logistic growth
       ni <- ni + r*ni*(1-ni/K)
       ns <- ns + r*ns*(1-ns/K)
       
     } else{
-      ## migration and infection
       
-      ## host (rat) movement between patches
+      ## burnout
+      Pb <- burnout_prob(R0,epsilon,N=ni)
+      z=final_size(R0)
+      ni=ni*(1-z*D)
+      ns=(ni*Pb*p+ns*(1-p))/(Pb*p+1-p)
+      p <- (1-Pb)*p
+      
+      ## birth
+      ns=ns+r*ns*(1-ns/K)
+      ni=ni+r*ni*(1-ni/K)
+      
+      ## host movement between patches
       delta_N <- c0*(ns-ni)
       ni <- ni + delta_N*(1-p)
       ns <- ns - delta_N*p
       
       ## infection between patches
-      #B=B0*(1-exp(-ki*ni))*(1-exp(-ks*ns))
-      B=B0
-      delta_p=B*p*(1-p)                 ## infection of S patches
-      ni=(ni+B*(1-p)*ns)/(1+B*(1-p))  ## ni changes because S patches convert to I
+      delta_p=(1-exp(-alpha*c0*n*p*z*NI[t]))*(1-p)    ## infection of S patches
+      ni=(p*ni+delta_p*ns)/(p+delta_p)  ## ni changes because S patches convert to I
       p = p + delta_p 
       
       
-      ##fizzle and burnout
-      P1=P1_prob(R0,epsilon,k=1,N=ni)
-      delta_p<-(1-P1)*p
-      ns<-((1-p)*ns+delta_p*ni)/(1-p+delta_p)
-      p <-p-delta_p
+      ##fizzle
+      Pf=1/R0
+      ns=((1-p)*ns+Pf*p*ni)/(1-p+Pf*p)
+      p=(1-Pf)*p
       
-      ##epidemic
-      z=final_size(R0)
-      ni <- ni * (1 - z*D)  
-      
-      ## birth
-      ns=ns+r*ns*(1-ns/K)
-      ni=ni+r*ni*(1-ni/K)
     }
     
     NI[t+1]=ni
@@ -198,7 +194,7 @@ simfun <- function(tt  = 300,
   data.frame(time = seq.int(tt), NI, NS, P)
 }
 
-res <- simfun()
+res <- simfun(R0=2.5)
 
 ## showing everything on one log plot works well
 library(tinyplot)
@@ -214,10 +210,8 @@ plotfun2 <- function(res, ...) {
   legend("right", col = c(2,4), lty = 1:2, legend = c("NI", "NS"))
 }
 
-plotfun2(res, lwd = 2)
+#plotfun2(res, lwd = 2)
 
-res3 <-  simfun(start = c(p=0.1, NS=300, NI=300))
-plotfun2(res3, lwd = 2)
 
 
 
