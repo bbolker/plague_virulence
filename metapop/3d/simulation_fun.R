@@ -10,13 +10,65 @@
 #' @param N number of patches (only affects discrete-extinction logic)
 #' @param starting conditions
 
-getDFE<-function(c0=0.2,
-                 K = 300,
-                 B0 = 0.5,
-                 R0=10,
-                 epsilon=0.05,
-                 D = 1,
-                 r = 0.5
+getDFE <- function(c0 = 0.01,
+                   K = 1e6,
+                   alpha = 5e-6,
+                   R0 = 2.5,
+                   epsilon = 0.05,
+                   D = 1,
+                   r = 0.5,
+                   n = 100
+) {
+  if (!require("burnout")) stop(
+    "please install the 'burnout' package: ",
+    "`remotes::install_github('davidearn/burnout')`")
+  
+  if (!require("rootSolve")) stop(
+    "Please install the 'rootSolve' package:\n",
+    "install.packages('rootSolve')")
+  
+  f <- function(x) {
+    ni <- x[1]
+    ns <- x[2]
+    
+    p <- 0
+    z <- final_size(R0)
+    
+    ## burnout
+    ni1 <- ni * (1 - z * D)
+    
+    ## logistic growth
+    ni2 <- ni1 + r * ni1 * (1 - ni1 / K)
+    ns1 <- ns + r * ns * (1 - ns / K)
+    
+    ## host movement
+    ni3 <- ni2 + c0 * (ns1 - ni2)
+    
+    ## infection between patches (with p=0)
+    B <- alpha * c0 * n * p * z * ni  # This equals 0 when p=0
+    ni4 <- (ni3 + B * ns1) / (1 + B)  # Simplifies to ni3 when B=0
+    
+    eq1 <- ni4 - ni
+    eq2 <- ns1 - ns
+    
+    return(c(eq1, eq2))
+  }
+  
+  x0 <- c(K * 0.5, K)  # Initial guess
+  result <- multiroot(f, x0)
+  
+  return(list(ni = result$root[1], ns = result$root[2], p = 0, 
+              convergence = result$estim.precis))
+}
+
+getEE <- function(c0 = 0.01,
+                  K = 1e6,
+                  alpha = 5e-6,
+                  R0 = 2.5,
+                  epsilon = 0.05,
+                  D = 1,
+                  r = 0.5,
+                  n = 100
 ) {
   if (!require("burnout")) stop(
     "please install the 'burnout' package: ",
@@ -27,82 +79,52 @@ getDFE<-function(c0=0.2,
     "install.packages('nleqslv')")
   
   f <- function(x) {
-    ni<-x
-    ni1 <- ni + c0*(K-ni)
-    B=B0
-    ni2<-(ni1+B*K)/(1+B)
-    ni3 <- ni2 * (1 - final_size(R0)*D)
-    ni4 <- ni3 + r*ni3*(1-ni3/K)
-    eq1<-ni4-ni
-    return(c(eq1))
+    p <- x[1]
+    ni <- x[2]
+    ns <- x[3]
+    
+    ## burnout
+    Pb <- burnout_prob(R0, epsilon, N = ni)
+    z <- final_size(R0)
+    ni1 <- ni * (1 - z * D)
+    ns1 <- (ni * Pb * p + ns * (1 - p)) / (Pb * p + 1 - p)
+    p1 <- (1 - Pb) * p
+    
+    ## logistic growth
+    ns2 <- ns1 + r * ns1 * (1 - ns1 / K)
+    ni2 <- ni1 + r * ni1 * (1 - ni1 / K)
+    p2 <- p1
+    
+    ## host movement
+    delta_N <- c0 * (ns2 - ni2)
+    ni3 <- ni2 + delta_N * (1 - p2)
+    ns3 <- ns2 - delta_N * p2
+    p3 <- p2
+    
+    ## infection between patches
+    delta_p <- (1 - exp(-alpha * c0 * n * p3 * z * ni)) * (1 - p3)
+    ni4 <- (p3 * ni3 + delta_p * ns3) / (p3 + delta_p)
+    p4 <- p3 + delta_p
+    
+    ## fizzle
+    Pf <- 1 / R0
+    ns5 <- ((1 - p4) * ns3 + Pf * p4 * ni4) / (1 - p4 + Pf * p4)
+    p5 <- (1 - Pf) * p4
+    ni5 <- ni4
+    
+    eq1 <- p5 - p
+    eq2 <- ni5 - ni
+    eq3 <- ns5 - ns
+    
+    return(c(eq1, eq2, eq3))
   }
   
-  x0 <- c(1)  
-  result <- nleqslv(x0, f)
+  x0 <- c(0.5, K * 0.5, K * 0.5)  # Initial guess: (p, ni, ns)
+  result <- multiroot(f, x0,positive = TRUE,maxiter = 1000)
   
-  return(result$x)
+  return(list(p = result$root[1], ni = result$root[2], ns = result$root[3],
+              convergence = result$estim.precis))
 }
-
-
-getEE<-function(c0=0.2,
-                K = 300,
-                B0 = 0.5,
-                R0=10,
-                epsilon=0.05,
-                D = 0.5,
-                r = 0.5
-) {
-  if (!require("burnout")) stop(
-    "please install the 'burnout' package: ",
-    "`remotes::install_github('davidearn/burnout')`")
-  
-  if (!require("nleqslv")) stop(
-    "Please install the 'nleqslv' package:\n",
-    "install.packages('nleqslv')")
-  
-  f <- function(x) {
-    p<-x[1]
-    ni<-x[2] 
-    ns<-x[3]
-    
-    delta_N <- c0*(ns-ni)
-    p1<-p
-    ni1 <- ni + delta_N*(1-p)
-    ns1 <- ns - delta_N*p
-    
-    B=B0
-    p2 = p1 + B*p1*(1-p1)  
-    ni2=(ni1+B*(1-p1)*ns1)/(1+B*(1-p1))
-    ns2<-ns1
-    
-    P1=P1_prob(R0,epsilon,k=1,N=ni2)
-    delta_p<-(1-P1)*p2
-    p3 <-p2-delta_p
-    ni3<-ni2
-    ns3<-((1-p2)*ns2+delta_p*ni2)/(1-p2+delta_p)
-    
-    z=final_size(R0)
-    p4<-p3
-    ni4 <- ni3 * (1 - z*D)  
-    ns4<-ns3
-    
-    ns5=ns4+r*ns4*(1-ns4/K)
-    ni5=ni4+r*ni4*(1-ni4/K)
-    p5<-p4
-    
-    eq1<-p5-p
-    eq2<-ni5-ni
-    eq3<-ns5-ns
-    
-    return(c(eq1, eq2,eq3))
-  }
-  
-  x0 <- c(0.2,100,200)  
-  result <- nleqslv(x0, f)
-  
-  return(result$x)
-}
-
 
 simfun <- function(tt  = 300,
                    alpha=5e-6,
@@ -141,19 +163,19 @@ simfun <- function(tt  = 300,
      if (p==0) {
       ## continuous version, derived from the limit when p approaches 0
 
+      ## burnout
+      ni <- ni * (1 - final_size(R0)*D)
+      
+      ## logistic growth
+      ni <- ni + r*ni*(1-ni/K)
+      ns <- ns + r*ns*(1-ns/K)
+       
       ## host movement
       ni <- ni + c0*(ns-ni)
 
       ## infection between patches
-      B=1-exp(-alpha*c0*n*p*z*NI[t])
+      B=alpha*c0*n*p*z*NI[t]
       ni<-(ni+B*ns)/(1+B)
-
-      ## epidemic
-      ni <- ni * (1 - final_size(R0)*D)
-
-      ## logistic growth
-      ni <- ni + r*ni*(1-ni/K)
-      ns <- ns + r*ns*(1-ns/K)
       
     } else{
       
@@ -211,6 +233,14 @@ plotfun2 <- function(res, ...) {
 }
 
 #plotfun2(res, lwd = 2)
+
+# Print equilibria with default parameters
+
+dfe <- getDFE()
+cat("DFE:  p =", dfe$p, ", NI =", dfe$ni, ", NS =", dfe$ns, "\n")
+
+ee <- getEE()
+cat("EE:   p =", ee$p, ", NI =", ee$ni, ", NS =", ee$ns, "\n")
 
 
 
