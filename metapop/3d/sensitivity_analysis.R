@@ -62,9 +62,9 @@ getEE <- function(c0 = 0.01,
     "please install the 'burnout' package: ",
     "`remotes::install_github('davidearn/burnout')`")
   
-  if (!require("nleqslv")) stop(
-    "Please install the 'nleqslv' package:\n",
-    "install.packages('nleqslv')")
+  if (!require("rootSolve")) stop(
+    "Please install the 'rootSolve' package:\n",
+    "install.packages('rootSolve')")
   
   f <- function(x) {
     p <- x[1]
@@ -107,24 +107,12 @@ getEE <- function(c0 = 0.01,
     return(c(eq1, eq2, eq3))
   }
   
-  x0 <- c(0.5, K * 0.5, K * 0.5)  
+  x0 <- c(0.8, 0.5*K , K)  
   result <- multiroot(f, x0,positive = TRUE)
 
   return(list(p = result$root[1], ni = result$root[2], ns = result$root[3],
               convergence = result$estim.precis))
 }
-
-# Plot EE p values vs R0
-valid_data <- ! is.na(results_R0$p_EE)
-R0_valid <- results_R0$R0[valid_data]
-p_EE_valid <- results_R0$p_EE[valid_data]
-
-plot(R0_valid, p_EE_valid, 
-     xlab = "R0", ylab = "p", 
-     main = "p vs R0",
-     pch = 19, col = "blue")
-lines(smooth.spline(R0_valid, p_EE_valid), col = "blue", lwd = 2)
-grid()
 
 # R0 sensitivity analysis 
 R0_values <- seq(1.0, 3.0, by = 0.1)
@@ -132,6 +120,8 @@ alpha_values <- 5* 10^seq(-6, -2, by = 0.5)
 
 # color palette for different alpha values
 colors <- rainbow(length(alpha_values))
+
+# pdf("sensitivity_analysis_plot.pdf", width = 10, height = 7)
 
 # Initialize plot
 plot(NULL, xlim = range(R0_values), ylim = c(0, 1),
@@ -143,6 +133,8 @@ grid()
 # Store results for legend 
 legend_labels <- list()
 legend_colors <- list()
+
+all_results <- list()
 
 # Loop through each alpha value
 for (j in seq_along(alpha_values)) {
@@ -162,6 +154,8 @@ for (j in seq_along(alpha_values)) {
       }
     }, error = function(e) cat("EE failed for R0 =", R0_values[i], "\n"))
   }
+  
+  all_results[[j]] <- results_R0
   
   # Plot valid data points 
   valid_data <- ! is.na(results_R0$p_EE)
@@ -187,8 +181,18 @@ for (j in seq_along(alpha_values)) {
 
 # Add legend 
 if (length(legend_labels) > 0) {
-  legend("topright", 
+  legend("topleft", 
          legend = unlist(legend_labels), 
          col = unlist(legend_colors), 
          lwd = 2, pch = 19, cex = 0.8, bg = "white")
 }
+
+
+#Save equilibrium value
+names(all_results) <- paste0("alpha_", formatC(alpha_values, format = "e", digits = 1))
+save(all_results, R0_values, alpha_values, 
+     file = "sensitivity_analysis_results.RData")
+cat("\n Data saved to: sensitivity_analysis_results.RData\n")
+
+# dev.off()
+# cat("Plot saved to: sensitivity_analysis_plot.pdf\n")
