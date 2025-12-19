@@ -3,7 +3,7 @@
 #' @param n_years Number of years to simulate                 
 #' @param K Carrying capacity per patch                    
 #' @param r Growth rate                                   
-#' @param c Migration probability                         
+#' @param c0 Migration probability                         
 #' @param alpha Scaling constant for infection probability   
 #' @param D Disease-induced mortality                       
 #' @param R0 basic reproduction number                   
@@ -17,7 +17,7 @@ simulate_metapopulation <- function(
     n_years = 1000,        
     K = 1e6,               
     r = 0.5,               
-    c = 0.2,               
+    c0 = 0.2,               
     alpha = 5e-5,          
     D = 1,                 
     R0 = 2.5,              
@@ -58,15 +58,15 @@ simulate_metapopulation <- function(
     
     # 2. Colonization process
     
-    # 2.1 Population movement (vectorized)
+    # 2.1 Population movement
     total_pop <- sum(N[, k, "after_growth"])
-    N[, k, "after_colonization"] <- (1 - c) * N[, k, "after_growth"] + c * total_pop / n_patches
+    N[, k, "after_colonization"] <- (1 - c0) * N[, k, "after_growth"] + c0 * total_pop / n_patches
     
     # 2.2 Infection spread
     if (k == 1) {
       I[, k, "after_colonization"] <- I[, k, "after_growth"]  # First year: infection status remains unchanged during colonization
     } else {
-      P_I <-1-exp(-alpha * c * total_inf[k - 1] / n_patches)  # Calculate infection probability based on previous year's deaths
+      P_I <-1-exp(-alpha * c0 * total_inf[k - 1] / n_patches)  # Calculate infection probability based on previous year's deaths
       
       I[, k, "after_colonization"] <- I[, k, "after_growth"]
       susceptible_mask <- I[, k, "after_growth"] == 0
@@ -134,7 +134,7 @@ params0 <- list(n_patches = 100,
                 n_years = 1000,
                 K = 1e6,
                 r = 0.5,
-                c = 0.2,
+                c0 = 0.2,
                 alpha = 5e-5,
                 D = 1,
                 R0 = 2.5,
