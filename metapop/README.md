@@ -1,4 +1,7 @@
-# overview of plague metapopulation model
+---
+title: "overview of plague metapopulation model"
+bibliography: "../virulence.bib"
+---
 
 ## three dimensional model
 
@@ -61,13 +64,63 @@ If we assume human cases are caused by spillover from rats and are proportional 
 
 This is close to the value $R_0=2.75$ we get by estimating from simplified ODEs considering spread between rats. I think this might be a more reasonable estimation although there is no reference giving this number...
 
-# Update
+## Thoughts about evolutionary models
+
+The existence of a peak in metapopulation occupancy for intermediate values of R0 is exciting, and suggestive that intermediate values of R0 might be an evolutionary optimum, but is far from proving it. (Maximizing (quasi)equilibrium density or metapopulation occupancy is a sufficient condition for evolutionary optimality in **some** simple ecological/epidemiological models, but you definitely can't take this property for granted.)
+
+One paper that briefly discusses eco-evolutionary models: Abrams 2001. “Modelling the Adaptive Dynamics of Traits Involved in Inter- and Intraspecific Interactions: An Assessment of Three Methods.” Ecology Letters 4 (2): 166–75. https://doi.org/10.1046/j.1461-0248.2001.00199.x 
+
+This is particularly tricky in our case because we make a lot of assumptions in collapsing the full system to a discrete-time occupancy model. Some questions:
+
+* in a mixed epidemic (starting from initial conditions $\{S, I_1(0), I_2(0), R\}$), where there are two parasite strains with (slightly) different $R_0$ values, what are (1) final sizes and (2) probabilities of burnout? (fizzle is easier, as these will be independent for each strain)
+* how do we model colonization of multiple strains? Since initial conditions will be important, the suggestion is that we pick *Poisson-distributed* numbers of colonists per strain (based on the total population size in infected patches and the colonization-proportion parameter) rather than a hazard-based
+* we would also need to pick some rule for starting conditions (number of infected individuals at the start of each season) for patches where infection persists (rather than assuming that infection resets to 1 starting individual every time)
+
+To construct a *pairwise invasibility plot*, we would need to measure the initial growth rate of a small number of strain 2 invading a monoculture of strain 1. More specifically, if the equilibrium of the strain 1 monoculture is $\{S_1^*, I_1^*, 0, R_1^*\}$ [where the zero denotes that strain 2 is absent], then we want to know the short-term growth rate of $I_2$ (where $R_{0,2} = R_{0,1} + \delta$ from a starting condition of $\{S_1^*, I_1^*, I_2^i, R_1^*\}$ where typically we assume $\delta \ll 1$ (small mutations) and $I_2^i \ll 1$ (small invading population). If we are doing a stochastic simulation we also need $\delta$, $I_2^i$ to be large _enough_ so that we can detect a signal and the chance of fizzling isn't too high.
+
+Doing this in a metapopulation context (1) means there are more possible ways to set up initial conditions (do we assume the invaders all start in a single patch, or are multiple patches invaded?) and (2) makes brute-force solutions harder (larger state space).
+
+We also have to make some assumptions about the two-strain infection process. The simplest case is that there is no coinfection and perfect cross-immunity and that the generation times are equal i.e. (in a single patch/well-mixed population, with $\gamma = 1$)
+
+$$
+\begin{split}
+\dot S & = \sum_j -R_{0,j} S I_j \\
+\dot I_j & = R_{0,j} S I_j - I_j \\
+\dot R & = \sum I_j
+\end{split}
+$$
+
+If we can't figure out a good way to get analytical solutions and/or approximations for the final-size and burnout probabilities in a two-strain model, we might be able to use `odin` to quickly spin up a discrete-time stochastic *tau-leaping* model for a single population: see [here](https://mrc-ide.github.io/odin/articles/discrete.html#stochastic-processes), [here](https://mrc-ide.github.io/odin/articles/discrete.html#stochastic-sir-model)
+
+* [example (complicated) multi-strain odin model](https://github.com/abhisheksena/covid_multi_strain/blob/main/inst/odin/covid_multi_strain.R)
+
+```{r}
+odin::odin("metapop/odin_twostrain0.R")
+```
+
+We might also be able to use that framework for the full stochastic metapop model (discrete-time measured in *epidemic periods* rather than some small Δt): it might well run faster than even a vectorized R-based simulator ...
+
+References (see `../virulence.bib`): @brannstromHitchhikersGuideAdaptive2013a; @diekmannBeginnersGuideAdaptive2002; @abramsModelling2001
+
+### To do (odin)
+
+* two-strain model is more or less working
+    * could be extended to arrays to run many replicates simultaneously/efficiently (see https://mrc-ide.github.io/odin/articles/discrete.html)
+	* is there a way to do early stopping/stop when extinct?
+	* is there a way to store/retrieve the compiled model? (Does it use some kind of caching/make rule anyway?)
+* how do we estimate burnout probs from stoch anyway? (How was this done for the burnout paper?) Need vital dynamics ...
+* most efficient form of solving the invasion problem would simulate a one-strain stoch model to quasi-equilibrium, then use the final state as the starting condition (+ a few invaders) to look at invasion/growth rate [could also simulate the two-strain model with strain 2 absent, which would be a little bit inefficient]
+* shouldn't need a stochastic model for final size(s) of two-strain epidemic, but: how do we get values if there's no closed form solution? A big lookup table? Gaussian process emulator?
+* more generally, how big a lookup table (or multi-dimensional emulator) do we need [what dimensions?] for final size, burnout ... ? Am I overcomplicating this?
+
+* true brute force would run the whole metapop model in (approx) continuous time, i.e. not breaking it up into epidemic episodes ...
+
+# Change log
 
 Update since October 2025:
 
 - Quasi-equilibrium
 - Simulations for stochastic model
-
 
 Update since 11 Sep 2025:
 
