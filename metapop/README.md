@@ -78,7 +78,7 @@ This is particularly tricky in our case because we make a lot of assumptions in 
 
 To construct a *pairwise invasibility plot*, we would need to measure the initial growth rate of a small number of strain 2 invading a monoculture of strain 1. More specifically, if the equilibrium of the strain 1 monoculture is $\{S_1^*, I_1^*, 0, R_1^*\}$ [where the zero denotes that strain 2 is absent], then we want to know the short-term growth rate of $I_2$ (where $R_{0,2} = R_{0,1} + \delta$ from a starting condition of $\{S_1^*, I_1^*, I_2^i, R_1^*\}$ where typically we assume $\delta \ll 1$ (small mutations) and $I_2^i \ll 1$ (small invading population). If we are doing a stochastic simulation we also need $\delta$, $I_2^i$ to be large _enough_ so that we can detect a signal and the chance of fizzling isn't too high.
 
-Doing this in a metapopulation context (1) means there are more possible ways to set up initial conditions (do we assume the invaders all start in a single patch, or are multiple patches invaded?) and (2) makes brute-force solutions harder (larger state space).
+Doing this in a metapopulation context (1) means there are more possible ways to set up initial conditions (do we assume the invaders all start in a single patch, or are multiple patches invaded?) and (2) makes brute-force solutions harder (larger state space). The invader is probably not *locally* rare when epidemics start ... ?
 
 We also have to make some assumptions about the two-strain infection process. The simplest case is that there is no coinfection and perfect cross-immunity and that the generation times are equal i.e. (in a single patch/well-mixed population, with $\gamma = 1$)
 
@@ -90,13 +90,11 @@ $$
 \end{split}
 $$
 
-If we can't figure out a good way to get analytical solutions and/or approximations for the final-size and burnout probabilities in a two-strain model, we might be able to use `odin` to quickly spin up a discrete-time stochastic *tau-leaping* model for a single population: see [here](https://mrc-ide.github.io/odin/articles/discrete.html#stochastic-processes), [here](https://mrc-ide.github.io/odin/articles/discrete.html#stochastic-sir-model)
+If we can't figure out a good way to get analytical solutions and/or approximations for the final-size and burnout probabilities in a two-strain model, we might be able to use `odin` to quickly spin up a discrete-time stochastic *tau-leaping* model for a single population: see [here](https://mrc-ide.github.io/odin/articles/discrete.html#stochastic-processes), [here](https://mrc-ide.github.io/odin/articles/discrete.html#stochastic-sir-model) (and `odin/` directory)
 
-* [example (complicated) multi-strain odin model](https://github.com/abhisheksena/covid_multi_strain/blob/main/inst/odin/covid_multi_strain.R)
+There are some details on simulations to estimate burnout probs in the appendices of the burnout paper; they use adaptive tau-leaping using `adaptivetau`. Adaptive time-stepping would be nice (but would be non-trivial to implement within odin!); however, having the C-transpiled code might make things sufficiently much faster (`adaptivetau` calls rate and transition functions coded in R) to compensate. Simulation output used in that paper is in a private GitHub repo `davidearn/fadeout-heuristic`, but I haven't quite disentangled how it gets used there ...
 
-```{r}
-odin::odin("metapop/odin_twostrain0.R")
-```
+Parsons, Todd L., Benjamin M. Bolker, Jonathan Dushoff, and David J. D. Earn. 2024. “The Probability of Epidemic Burnout in the Stochastic SIR Model with Vital Dynamics.” Proceedings of the National Academy of Sciences 121 (5): e2313708120. https://doi.org/10.1073/pnas.2313708120.
 
 We might also be able to use that framework for the full stochastic metapop model (discrete-time measured in *epidemic periods* rather than some small Δt): it might well run faster than even a vectorized R-based simulator ...
 
