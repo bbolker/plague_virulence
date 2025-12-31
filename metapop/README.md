@@ -110,7 +110,7 @@ References (see `../virulence.bib`): @brannstromHitchhikersGuideAdaptive2013a; @
 	* is there a way to store/retrieve the compiled model? (Does it use some kind of caching/make rule anyway?)
 * how do we estimate burnout probs from stoch anyway? (How was this done for the burnout paper?) Need vital dynamics ...
 * most efficient form of solving the invasion problem would simulate a one-strain stoch model to quasi-equilibrium, then use the final state as the starting condition (+ a few invaders) to look at invasion/growth rate [could also simulate the two-strain model with strain 2 absent, which would be a little bit inefficient]
-* shouldn't need a stochastic model for final size(s) of two-strain epidemic, but: how do we get values if there's no closed form solution? A big lookup table? Gaussian process emulator?
+* shouldn't need a stochastic model for final size(s) of two-strain epidemic, but: how do we get values if there's no closed form solution? A big lookup table? Gaussian process emulator?  (Is this actually solvable directly using some of the same methods as for the regular SIR, i.e. can we solve for the phase-space trajectory without knowing $t$?)
 * more generally, how big a lookup table (or multi-dimensional emulator) do we need [what dimensions?] for final size, burnout ... ? Am I overcomplicating this?
 
 * true brute force would run the whole metapop model in (approx) continuous time, i.e. not breaking it up into epidemic episodes ...
