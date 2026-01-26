@@ -9,7 +9,7 @@ update(R) <- R + sum(n_IR)
 ## Individual probabilities of transition:
 hazard_SI[] <- beta[i]*I[i]/N
 p_all <- -expm1(-sum(hazard_SI))
-p_SI[] <-  hazard_SI[i]/sum(hazard_SI)
+p_SI[] <- if(sum(hazard_SI)>0) hazard_SI[i]/sum(hazard_SI) else 1/nstrains ##prevent NA when p_all=0
 p_IR[] <- -expm1(-gamma[i]) ## 1 - exp(-gamma[i]) # I to R ## precompute?
 
 ## Draws from binomial distributions for numbers changing between

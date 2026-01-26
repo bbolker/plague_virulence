@@ -16,6 +16,6 @@ ext <- which(rowSums(is.na(res))==0 & res[,"I[1]"]+res[,"I[2]"] == 0)[1]
 res <- res[1:(ext-1),]
 
 pdf("odin_twostrain_run.Rout.pdf")
-matplot(res[,1], res[,-1], type = "l", log = "y")
+matplot(res[,1], res[,-1], type = "l", log = "y", lwd = 2.5, col = c(1,2,3,4), lty = 1)
 legend("right", legend = colnames(res)[-1], lty = 1, col = 1:4)
 dev.off()
