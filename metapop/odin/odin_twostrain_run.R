@@ -6,9 +6,13 @@ library(dde) ## not sure why we need this?
 ## stopifnot(all.equal(-expm1(-0.2), 1-exp(-0.2)))
 
 twostrain_generator <-odin::odin("./odin_twostrain0.R")
+
+N<- 10000
+I_ini<-c(5,2)
 x <- twostrain_generator$new(beta = c(0.2, 0.19),
                         gamma = c(0.1, 0.1),
-                        I_ini = c(5, 2))
+                        I_ini = I_ini,
+                        S_ini = N - sum(I_ini))
 
 set.seed(101)
 res <- x$run(0:1000)
