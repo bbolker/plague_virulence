@@ -155,10 +155,10 @@ mult_sim_mp <- function(nsim, params, verbose = FALSE,
     }, simplify = FALSE)
   }
   total_pops <- sapply(results, function(res) {
-    apply(res$N[, , 1], 2, sum)
+    apply(res$N[, , 1], 2, sum) 
   })
   infected_patches <- sapply(results, function(res) {
-    apply(res$I[, , 1], 2, sum)
+    apply(res$I[, , 3], 2, sum)   ##infection status after colonization
   })
   total_inf <- sapply(results, function(res) {
     res$total_inf
