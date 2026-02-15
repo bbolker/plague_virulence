@@ -23,70 +23,55 @@ simulate_metapopulation <- function(
     D = 1,
     R0 = 2.5,
     initial_inf_ratio = 0.1,
-    initial_pop_ratio = 1
+    initial_pop_ratio = 1,
+    early_stop = TRUE               
 ) {
   if (!require("burnout", quietly = TRUE)) stop("please install burnout package")
-
-  # Initialize arrays to store population size and infection status
-  # Dimensions: [patch, year, season]
+  
   dn <- list(patch = 1:n_patches, year = 1:n_years,
              season = c("beginning", "after_growth", "after_colonization", "after_fizzle", "after_burnout"))
   N <- array(0, dim = c(n_patches, n_years, 5), dimnames = dn)
   I <- array(0, dim = c(n_patches, n_years, 5), dimnames = dn)
-
-  # Initialize arrays
-  total_inf <- numeric(n_years)
-  S <- array(0, dim = c(n_patches, n_years))
   
-  # Set initial conditions
-  N[, 1, "beginning"] <- initial_pop_ratio * K  # Initial population in all patches
-
-  # Randomly select initial infected patches
+  total_inf <- rep(NA_real_, n_years)   
+  S <- array(NA_real_, dim = c(n_patches, n_years))  
+  extinct_year <- NA_integer_        
+  
+  N[, 1, "beginning"] <- initial_pop_ratio * K
+  
   infected_patches <- sample(1:n_patches, initial_inf_ratio * n_patches)
   I[infected_patches, 1, "beginning"] <- 1
-
-  # Precompute constants 
-  P_f <- 1 / R0          # fizzle probability for a single introduced infection
-  z <- final_size(R0)    # deterministic final size fraction used for all patches
-  g <- pmin(1, eta * c0) # propagule export probability: g = min(1, eta*c)
-
-  # Simulate over years 
+  
+  P_f <- 1 / R0
+  z <- final_size(R0)
+  g <- pmin(1, eta * c0)
+  
   for (k in 1:n_years) {
-
-    # 1. Growth process
-    N[, k, "after_growth"] <- N[, k, "beginning"] + r * N[, k, "beginning"] * (1 - N[, k, "beginning"] / K)
-    I[, k, "after_growth"] <- I[, k, "beginning"]  # Infection status doesn't change during growth
-    cat("Year", k, "N:", N[,k,"after_growth"], "\n")
     
-    # 2. Colonization process
-
-    # 2.1 Population movement
+    # 1. Growth
+    N[, k, "after_growth"] <- N[, k, "beginning"] + r * N[, k, "beginning"] * (1 - N[, k, "beginning"] / K)
+    I[, k, "after_growth"] <- I[, k, "beginning"]
+    
+    # 2. Colonization
     total_pop <- sum(N[, k, "after_growth"])
     N[, k, "after_colonization"] <- (1 - c0) * N[, k, "after_growth"] + c0 * total_pop / n_patches
-
-    # 2.2 Infection introductions
-    I[, k, "after_colonization"] <- I[, k, "after_growth"] 
-
+    
+    I[, k, "after_colonization"] <- I[, k, "after_growth"]
+    
     if (k > 1) {
-
-      # source strength from previous year
-      lambda_G <- ((1 - g) * S[,k-1] + (g / n_patches) * total_inf[k-1])
+      lambda_G <- ((1 - g) * S[, k-1] + (g / n_patches) * total_inf[k-1])
+      
       lambda_X <- kappa * lambda_G
       X_new <- rpois(n_patches, lambda = pmax(lambda_X, 0))
       I[, k, "after_colonization"] <- I[, k, "after_growth"] + X_new
-      cat("Year", k, "lambda_X:", lambda_X, "\n")
-      cat("Year", k, "I:", I[,k,"after_growth"], "\n")
     }
     
-
-    # 3. Fizzle process 
-    # Population doesn't change during fizzle
+    # 3. Fizzle
     N[, k, "after_fizzle"] <- N[, k, "after_colonization"]
-
-    m <- I[, k, "after_colonization"]  # number of introduced infected hosts (count)
-    P_est <- 1 - (P_f ^ m)             # establishment probability (m=0 -> 0)
-    I[, k, "after_fizzle"] <- rbinom(n_patches, 1, pmax(pmin(P_est, 1), 0)) #indicate fizzle or not (0 or 1)
-    cat("Year", k, "infection status:", I[,k,"after_fizzle"], "\n")
+    
+    m <- I[, k, "after_colonization"]
+    P_est <- 1 - (P_f ^ m)
+    I[, k, "after_fizzle"] <- rbinom(n_patches, 1, pmax(pmin(P_est, 1), 0))
     
     # 4. Major epidemic 
     N[, k, "after_burnout"] <- N[, k, "after_fizzle"]
@@ -94,19 +79,30 @@ simulate_metapopulation <- function(
     
     infected_patches <- I[, k, "after_fizzle"]
     S[, k] <- z * D * N[, k, "after_fizzle"] * infected_patches
-    cat("Year", k, "S:", S[,k], "\n")
+    N[, k, "after_burnout"] <- N[, k, "after_fizzle"] - S[, k]
+    total_inf[k] <- sum(S[, k])
     
-    N[, k, "after_burnout"] <- N[, k, "after_fizzle"] - S[,k]
-    total_inf[k] <- sum(S[,k])
+    # early stop if extinct
+    if (early_stop && sum(infected_patches) == 0) {
+      extinct_year <- k
+      
+      if (k < n_years) {
+        N[, (k+1):n_years, ] <- NA_real_
+        I[, (k+1):n_years, ] <- NA_real_
+        S[, (k+1):n_years] <- NA_real_
+        total_inf[(k+1):n_years] <- NA_real_
+      }
+      break
+    }
     
-    # Set initial conditions for next year
+    # Next year init
     if (k < n_years) {
-      N[, k+1, 1] <- N[, k, "after_burnout"]
-      I[, k+1, 1] <- I[, k, "after_burnout"] 
+      N[, k+1, "beginning"] <- N[, k, "after_burnout"]
+      I[, k+1, "beginning"] <- I[, k, "after_burnout"]
     }
   }
-
-  return(list(N = N, I = I,S=S, total_inf = total_inf))
+  
+  return(list(N = N, I = I, S = S, total_inf = total_inf, extinct_year = extinct_year))
 }
 
 ## default parameters 
@@ -137,9 +133,15 @@ mult_sim_mp <- function(nsim, params, verbose = FALSE,
   require("parallel", quietly = TRUE)
   if (ncores>1) {
     cl <- makeCluster(ncores)
+    lp <- .libPaths()
+    clusterExport(cl, "lp")
+    clusterEvalQ(cl, .libPaths(lp))
+    
     clusterExport(cl, c("simulate_metapopulation"))
     clusterExport(cl, c("params"), envir = environment())
-    clusterEvalQ(cl, "library(burnout)")
+    
+    clusterEvalQ(cl, quote(library(burnout)))
+    
     if (!is.null(seed)) clusterSetRNGStream(cl, seed)
     results <- parLapply(cl, 1:nsim,
                          function(i) {
