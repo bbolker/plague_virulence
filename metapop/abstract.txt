@@ -1,0 +1,56 @@
+
+Eco-evolutionary metapopulation dynamics of plague
+Number 677
+
+Benjamin Bolker1, Yuyang Zhang2, Jonathan Dushoff1, David J. D. Earn1
+
+1 McMaster University,2 University of Science and Technology of China
+
+Recent genomic analyses of ancient DNA show that bubonic plague
+(Yersinia pestis) has repeatedly evolved a mutation that reduces its
+virulence. Due to plague's transmission mode (spread by infected fleas
+leaving dying rats), this trait cannot be explained by the dominant
+virulence-transmission tradeoff theory. We propose a
+metapopulation-level, eco-evolutionary explanation. As rat populations
+become smaller and more fragmented over the course of a pandemic, a
+virulence-reducing trait that reduces the chance of local disease
+extinction at the end of an epidemic can become competitively superior,
+at the metapopulation level, to the full-virulence wild type. We use a
+combination of recent analytical results about local disease extinction
+('burnout') probability and stochastic simulations to show the
+plausibility of this mechanism for ecologically realistic parameter values.
+
+
+Recent genomic analyses of ancient DNA show that bubonic plague
+(Yersinia pestis) has repeatedly evolved a mutation that reduces its
+virulence. Due to plague's transmission mode this trait cannot be explained by the dominant
+virulence-transmission tradeoff theory, and seems difficult to explain
+based on standard single-population stochastic epidemic dynamics.
+We propose a metapopulation-level, eco-evolutionary explanation. As rat populations
+become smaller and more fragmented over the course of a pandemic, a
+virulence-reducing trait that reduces the chance of local disease
+extinction at the end of an epidemic can become competitively superior,
+at the metapopulation level, to the full-virulence wild type. We leverage
+recent analytical results about local disease extinction
+('burnout') probability to develop a patch-level stochastic model and
+use simulations to show the plausibility of this mechanism for ecologically realistic parameter values.
+  
+
+Des analyses génomiques récentes d'ADN ancien montrent que la peste
+bubonique (Yersinia pestis) a développé à plusieurs reprises une
+mutation réduisant sa virulence. Compte tenu du mode de transmission
+de la peste, ce trait ne peut être expliqué par la théorie dominante
+du compromis virulence-transmission, et semble difficile à expliquer
+par la dynamique stochastique épidémique standard d'une seule
+population.  Nous proposons une explication éco-évolutive à l'échelle
+de la métapopulation. À mesure que les populations de rats deviennent
+plus petites et plus fragmentées au cours d'une pandémie, un trait
+réduisant la virulence et diminuant la probabilité d'extinction locale
+de la maladie à la fin d'une épidémie peut devenir compétitifment
+supérieur, à l'échelle de la métapopulation, au type sauvage à
+virulence maximale. Nous exploitons des résultats analytiques récents
+concernant la probabilité d'extinction locale de la maladie (ou «
+burnout ») pour développer un modèle stochastique à l'échelle de la
+parcelle et utilisons des simulations pour démontrer la plausibilité
+de ce mécanisme pour des valeurs de paramètres écologiquement
+réalistes.
