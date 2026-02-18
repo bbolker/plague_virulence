@@ -11,7 +11,7 @@
 #' @param initial_infected Number of initially infected patches
 #' @param initial_pop_ratio Initial population as ratio of carrying capacity
 #' @return A list containing arrays:
-#' N (n_patches x n_years x 5), I (n_patches x n_years x 5), total_inf (n_years)
+#' N (n_patches x n_years x 4), I (n_patches x n_years x 4), total_inf (n_years)
 simulate_metapopulation <- function(
     n_patches = 100,
     n_years = 20,
@@ -28,61 +28,65 @@ simulate_metapopulation <- function(
 ) {
   if (!require("burnout", quietly = TRUE)) stop("please install burnout package")
   
-  dn <- list(patch = 1:n_patches, year = 1:n_years,
-             season = c("beginning", "after_growth", "after_colonization", "after_fizzle", "after_burnout"))
-  N <- array(0, dim = c(n_patches, n_years, 5), dimnames = dn)
-  I <- array(0, dim = c(n_patches, n_years, 5), dimnames = dn)
+  # Stages: 1 = beginning of year
+  #         2 = after growth
+  #         3 = after colonization (host movement) + infection introduction + fizzle
+  #         4 = after major epidemic (end of year)
+  
+  N <- array(0, dim = c(n_patches, n_years, 4))
+  I <- array(0, dim = c(n_patches, n_years, 4))
   
   total_inf <- rep(NA_real_, n_years)   
   S <- array(NA_real_, dim = c(n_patches, n_years))  
   extinct_year <- NA_integer_        
   
-  N[, 1, "beginning"] <- initial_pop_ratio * K
+  # Initial conditions
+  N[, 1, 1] <- initial_pop_ratio * K
   
-  infected_patches <- sample(1:n_patches, initial_inf_ratio * n_patches)
-  I[infected_patches, 1, "beginning"] <- 1
+  infected_patches_init <- sample(1:n_patches, initial_inf_ratio * n_patches)
+  I[infected_patches_init, 1, 1] <- 1
   
+  # Derived parameters
   P_f <- 1 / R0
   z <- final_size(R0)
   g <- pmin(1, eta * c0)
   
   for (k in 1:n_years) {
     
-    # 1. Growth
-    N[, k, "after_growth"] <- N[, k, "beginning"] + r * N[, k, "beginning"] * (1 - N[, k, "beginning"] / K)
-    I[, k, "after_growth"] <- I[, k, "beginning"]
+    # Stage 1 -> 2: Growth
+    N_begin <- N[, k, 1]
+    N_after_growth <- N_begin + r * N_begin * (1 - N_begin / K)
+    N[, k, 2] <- N_after_growth
+    I[, k, 2] <- I[, k, 1]
     
-    # 2. Colonization
-    total_pop <- sum(N[, k, "after_growth"])
-    N[, k, "after_colonization"] <- (1 - c0) * N[, k, "after_growth"] + c0 * total_pop / n_patches
+    # Stage 2 -> 3: Colonization + infection introduction + fizzle
+    total_pop <- sum(N_after_growth)
+    N_after_col <- (1 - c0) * N_after_growth + c0 * total_pop / n_patches
+    N[, k, 3] <- N_after_col
     
-    I[, k, "after_colonization"] <- I[, k, "after_growth"]
-    
+    # Compute infection establishment probability (after fizzle)
     if (k > 1) {
-      lambda_G <- ((1 - g) * S[, k-1] + (g / n_patches) * total_inf[k-1])
-      
+      # Propagule pressure from previous year
+      lambda_G <- (1 - g) * S[, k-1] + (g / n_patches) * total_inf[k-1]
       lambda_X <- kappa * lambda_G
-      X_new <- rpois(n_patches, lambda = pmax(lambda_X, 0))
-      I[, k, "after_colonization"] <- I[, k, "after_growth"] + X_new
+      P_establish <- 1 - exp(-lambda_X * (1 - P_f))
+      P_establish <- pmax(0, pmin(1, P_establish))
+      I_establish <- rbinom(n_patches, 1, P_establish)
+      I[, k, 3] <- I_establish
+    } else {
+      I[, k, 3] <- I[, k, 2]
     }
     
-    # 3. Fizzle
-    N[, k, "after_fizzle"] <- N[, k, "after_colonization"]
+    # Stage 3 -> 4: Major epidemic
+    infected_patches <- I[, k, 3]
+    S[, k] <- z * D * N_after_col * infected_patches
+    N_after_burnout <- N_after_col - S[, k]
+    N[, k, 4] <- N_after_burnout
+    I[, k, 4] <- 0
     
-    m <- I[, k, "after_colonization"]
-    P_est <- 1 - (P_f ^ m)
-    I[, k, "after_fizzle"] <- rbinom(n_patches, 1, pmax(pmin(P_est, 1), 0))
-    
-    # 4. Major epidemic 
-    N[, k, "after_burnout"] <- N[, k, "after_fizzle"]
-    I[, k, "after_burnout"] <- 0
-    
-    infected_patches <- I[, k, "after_fizzle"]
-    S[, k] <- z * D * N[, k, "after_fizzle"] * infected_patches
-    N[, k, "after_burnout"] <- N[, k, "after_fizzle"] - S[, k]
     total_inf[k] <- sum(S[, k])
     
-    # early stop if extinct
+    # Early stop if extinct
     if (early_stop && sum(infected_patches) == 0) {
       extinct_year <- k
       
@@ -95,10 +99,10 @@ simulate_metapopulation <- function(
       break
     }
     
-    # Next year init
+    # Next year init (stage 4 of year k becomes stage 1 of year k+1)
     if (k < n_years) {
-      N[, k+1, "beginning"] <- N[, k, "after_burnout"]
-      I[, k+1, "beginning"] <- I[, k, "after_burnout"]
+      N[, k+1, 1] <- N_after_burnout
+      I[, k+1, 1] <- 0
     }
   }
   
@@ -111,11 +115,11 @@ params0 <- list(
   n_years = 1000,
   K = 1e6,
   r = 0.5,
-  c0 = 0.2,
-  eta = 1,
-  kappa = 1e-5,
+  c0 = 0.25,
+  eta = 0.25,
+  kappa = 1e-4,
   D = 1,
-  R0 = 2.5,
+  R0 = 2,
   initial_inf_ratio = 0.1,
   initial_pop_ratio = 1
 )
@@ -133,8 +137,10 @@ mult_sim_mp <- function(nsim, params, verbose = FALSE,
   require("parallel", quietly = TRUE)
   if (ncores>1) {
     cl <- makeCluster(ncores)
+    
+    # Sync library paths to workers
     lp <- .libPaths()
-    clusterExport(cl, "lp")
+    clusterExport(cl, "lp", envir = environment())
     clusterEvalQ(cl, .libPaths(lp))
     
     clusterExport(cl, c("simulate_metapopulation"))
@@ -156,64 +162,69 @@ mult_sim_mp <- function(nsim, params, verbose = FALSE,
       do.call(simulate_metapopulation, params)
     }, simplify = FALSE)
   }
+  
   total_pops <- sapply(results, function(res) {
-    apply(res$N[, , 1], 2, sum) 
+    apply(res$N[, , 1], 2, sum, na.rm = TRUE)
   })
   infected_patches <- sapply(results, function(res) {
-    apply(res$I[, , 3], 2, sum)   ##infection status after colonization
+    apply(res$I[, , 3], 2, sum, na.rm = TRUE) 
   })
   total_inf <- sapply(results, function(res) {
     res$total_inf
   })
-  tibble::lst(total_pops, infected_patches, total_inf)
+  extinct_years <- sapply(results, function(res) {
+    ifelse(is.na(res$extinct_year), Inf, res$extinct_year)
+  })
+  
+  list(total_pops = total_pops, 
+       infected_patches = infected_patches, 
+       total_inf = total_inf)
 }
 
 ## TO DO:
 ##  progress bars?
 ##  different summaries?
 
-plotfun1 <-  function(res, quasi_eq = FALSE) {
-
-  main_labs <- c("Total Population over Time",
-                 "Number of Infected Patches",
-                 "Total infections over Time")
-
-  y_labs <- c("Total Population", "Infected Patches", "Total Infections")
-
-  col_vec <- c("blue", "red", "purple")
-
-  vars <- c("total_pops", "infected_patches", "total_inf")
-
-  par(mfrow = c(3, 1), mar = c(4, 4, 3, 1), oma = c(0, 0, 2, 0))
-
-  pfun <- function(var, ...,  meancol = "blue") {
-    x <- res[[var]]
-    if (quasi_eq) {
-      x[res[["infected_patches"]] == 0] <- NA
+##' Summarize persistence and quasi-equilibrium metrics
+##' @param x 'raw' sim output from mult_sim_mp()
+##' @param nsteps number of final steps to average for quasi-equilibrium (default 100)
+sumfun <- function(x, nsteps = 100) {
+  
+  nyr <- nrow(x[[1]])  
+  nsim <- ncol(x[[1]])
+  
+  extinct_years <- apply(x$infected_patches, 2, function(col) {
+    extinct_idx <- which(col == 0 | is.na(col))
+    if (length(extinct_idx) > 0) {
+      return(extinct_idx[1])  
+    } else {
+      return(NA_integer_)  
     }
-    matplot(x, type = "l", lty = 1, col = "grey",
-            ..., xlab = "Year")
-    lines(rowMeans(x, na.rm = TRUE), col = meancol, lwd = 3)
-  }
-
-  mapply(pfun, var = vars, main = main_labs, ylab = y_labs, meancol = col_vec)
-
-  par(mfrow = c(1, 1))
-}
-
-##' average last N steps of state variables
-##' @param x 'raw' sim output
-sumfun1 <- function(x, nsteps = 100) {
-  nyr <- nrow(x[[1]])
-  yr_vec <- seq(nyr-nsteps, nyr)
-  ## average across pops and years
-  mfun <- function(y) mean(y[yr_vec,], na.rm = TRUE)
-  r1 <- sapply(x, mfun)
-  ## quasi-equilibrium version
-  ## replace values from extinct metapopulations (inf_patches == 0) with NA,
-  ##  compute mean with na.rm = TRUE (as above)
-  x_qe <- lapply(x, function(z) {z[x$infected_patches==0] <- NA; z})
-  r2 <- sapply(x_qe, mfun)
-  names(r2) <- paste0(names(r2), "_qe")
-  c(r1, r2)
+  })
+  
+  n_extinct <- sum(!is.na(extinct_years))
+  n_persist <- sum(is.na(extinct_years))
+  
+  extinction_rate <- n_extinct / nsim
+  mean_extinct_time <- mean(extinct_years, na.rm = TRUE) #extincted patches only
+  
+  yr_vec <- seq(max(1, nyr - nsteps + 1), nyr) 
+  
+  matrix_vars <- c("total_pops", "infected_patches", "total_inf")
+  
+  qe_means <- sapply(matrix_vars, function(var_name) {
+    y <- x[[var_name]]
+    y[x$infected_patches == 0 | is.na(x$infected_patches)] <- NA
+   
+    mean(y[yr_vec, ], na.rm = TRUE)
+  })
+  
+  
+  c(
+    mean_extinct_time = mean_extinct_time,
+    extinction_rate = extinction_rate,
+    n_extinct = n_extinct,
+    n_persist = n_persist,
+    qe_means
+  )
 }
