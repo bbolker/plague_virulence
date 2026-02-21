@@ -10,7 +10,7 @@ ncores <- 16
 nsim <- 120
 
 dd <- expand.grid(
-  R0vec = seq(1.2, 3.0, by = 0.2),
+  R0vec = seq(1.1, 3.0, by = 0.1),
   kappavec = 10^seq(-6, -3, by = 0.5),
   etavec = c(0.25, 0.5, 0.75, 1.0),
   c0vec = c(0.25, 0.5, 0.75, 1.0),
