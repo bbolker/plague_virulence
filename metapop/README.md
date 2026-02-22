@@ -114,6 +114,9 @@ References (see `../virulence.bib`): @brannstromHitchhikersGuideAdaptive2013a; @
 * true brute force would run the whole metapop model in (approx) continuous time, i.e. not breaking it up into epidemic episodes ...
 
 # Change log
+Update since Feb 2026:
+
+- Poisson number of infections
 
 Update since October 2025:
 
