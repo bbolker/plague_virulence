@@ -1,7 +1,3 @@
----
-title: "Poisson initial infections & flea-dependent transmission (stochastic metapopulation model)"
----
-
 # Overview
 
 This subdirectory contains an updated stochastic metapopulation implementation that modifies two key assumptions used in earlier versions of the model:
@@ -34,25 +30,25 @@ There are still parameter regimes where **lower R0 can favor epidemic persistenc
 
 ## Derivations
 
-- Single-strain stochastic model derivation:  
-  - [`single_strain.tex`](./single_strain.tex)
-- Deterministic / invasion-condition notes (simplified analytical insight):  
-  - [`deterministic_invasion_condition.tex`](./deterministic_invasion_condition.tex)
+-   Single-strain stochastic model derivation:
+    -   [`single_strain.pdf`](./single_strain.pdf)
+-   Deterministic / invasion-condition notes (simplified analytical insight):
+    -   [`deterministic_invasion_condition.pdf`](./deterministic_invasion_condition.pdf)
 
 ## Simulation scripts
 
-- Core simulation functions (Poisson introduction):  
-  - [`simulation_funs.R`](./simulation_funs.R)
-- Parameter sweep / batch simulation driver:  
-  - [`sim.R`](./sim.R)
-- Plotting/report script for batch outputs:  
-  - [`plot.R`](./plot.R)
+-   Core simulation functions (Poisson introductions):
+    -   [`simulation_funs.R`](./simulation_funs.R)
+-   Parameter sweep / batch simulation driver:
+    -   [`sim.R`](./sim.R)
+-   Plotting/report script for batch outputs:
+    -   [`plot.R`](./plot.R)
 
 ## Outputs
 
-- Batch summary table (RDS):  
-  - [`outputs/sim.rds`](./outputs/sim.rds)
-- Raw replicate results (per parameter combination):  
-  - [`outputs/raw/`](./outputs/raw/)
-- Plots:  
-  - [`outputs/plot.pdf`](./outputs/plot.pdf)
+-   Batch summary table:
+    -   [`outputs/sim.rds`](./outputs/sim.rds)
+-   Raw replicate results (per parameter combination):
+    -   [`outputs/raw/`](./outputs/raw/)
+-   Plots:
+    -   [`outputs/plot.pdf`](./outputs/plot.pdf)
