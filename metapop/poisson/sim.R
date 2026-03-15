@@ -7,19 +7,19 @@ fn_sum <- "outputs/sim.rds"
 
 retry <- TRUE
 ncores <- 16
-nsim <- 120
+nsim <- 200
 
 dd <- expand.grid(
   R0vec = seq(1.1, 3.0, by = 0.1),
-  kappavec = 10^seq(-6, -3, by = 0.5),
-  etavec = c(0.25, 0.5, 0.75, 1.0),
-  c0vec = c(0.25, 0.5, 0.75, 1.0),
-  rvec = c(0.25, 0.5, 0.75, 1.0)
+  alphavec = 10^seq(-6, -3, by = 0.5),  
+  rhovec = seq(2 , 10 , by=2),       
+  c0vec = c(0.2),
+  rvec = c(0.5)
 )
 
 f_ith <- function(i) file.path("outputs/raw", sprintf("res_%05d.rds", i))
 
-cat("n R0 kappa eta c0 r mean_extinct_time extinction_rate n_extinct n_persist total_pops infected_patches total_inf\n")
+cat("n R0 alpha rho c0 r mean_extinct_time extinction_rate n_extinct n_persist total_pops infected_patches total_inf\n")
 
 for (i in 1:nrow(dd)) {
   
@@ -27,8 +27,8 @@ for (i in 1:nrow(dd)) {
   
   params <- params0
   params[["R0"]] <- dd$R0vec[i]
-  params[["kappa"]] <- dd$kappavec[i]
-  params[["eta"]] <- dd$etavec[i]
+  params[["alpha"]] <- dd$alphavec[i]
+  params[["rho"]] <- dd$rhovec[i]
   params[["c0"]] <- dd$c0vec[i]
   params[["r"]] <- dd$rvec[i]
   
