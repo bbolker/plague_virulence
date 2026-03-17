@@ -12,7 +12,7 @@ test_params <- list(
   rho = 3,
   alpha = 5e-6,
   D = 1,
-  R0 = 1.5,
+  R0 = 2.5,
   early_stop = FALSE 
 )
 

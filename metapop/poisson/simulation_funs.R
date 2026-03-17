@@ -80,17 +80,14 @@ simulate_metapopulation <- function(
       # 4. Total expected propagules present in each patch after colonization
       Lambda_i <- lambda_R + sum(lambda_E) / n_patches
       
-      # 5. Infection probability
-      lambda_est <- alpha * Lambda_i
-      P_establish <- 1 - exp(-lambda_est * (1 - P_f))
-      P_establish <- pmax(0, pmin(1, P_establish))
-      
-      # Determine established infections
-      I_establish <- rbinom(n_patches, 1, P_establish)
-      I[, k, 3] <- I_establish
+      # 5. Infection establishment (Poisson thinning accounts for fizzle)
+      lambda_thinned <- alpha * Lambda_i * max(0, 1 - P_f)
+      a <- rpois(n_patches, lambda_thinned)
+      I[, k, 3] <- as.numeric(a > 0)
     } else {
       I[, k, 3] <- I[, k, 2]
     }
+    
     
     # Stage 3 -> 4: Major epidemic
     infected_patches <- I[, k, 3]
