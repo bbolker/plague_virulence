@@ -6,7 +6,7 @@ print(nrow(dd))
 
 plot_vars <- c(
   "extinction_rate", "mean_extinct_time",
-  "infected_patches", "total_inf"
+  "infected_patches", "total_inf", "total_pops"
 )
 
 dd_long <- dd %>%
@@ -14,7 +14,8 @@ dd_long <- dd %>%
          extinction_rate_1, extinction_rate_2,
          mean_extinct_time_1, mean_extinct_time_2,
          infected_patches_1, infected_patches_2,
-         total_inf_1, total_inf_2) %>%
+         total_inf_1, total_inf_2,
+         total_pops_1, total_pops_2) %>%
   pivot_longer(
     cols = matches("_1$|_2$"),
     names_to = c("metric", "strain"),
@@ -49,16 +50,16 @@ for (i in 1:nrow(param_combos)) {
                    mean_extinct_time = "Mean Extinction Time",
                    extinction_rate = "Extinction Rate",
                    infected_patches = "Infected Patches (quasi-eq)",
-                   total_inf = "Total Infections (quasi-eq)"
+                   total_inf = "Total Infections (quasi-eq)",
+                   total_pops = "Total Population (quasi-eq)"
                  ))) +
       scale_colour_manual(values = c("Resident" = "blue", "Invader" = "red")) +
       labs(
         subtitle = paste0("alpha = ", signif(a, 2),
                           " | rho = ", param_combos$rhovec[i],
                           ", c0 = ", param_combos$c0vec[i],
-                          ", r = ", param_combos$rvec[i],
-                          " | Invader R0 = Resident R0 - 0.2"),
-        x = "Resident R0",
+                          ", r = ", param_combos$rvec[i]),
+        x = "R0 (Resident base)",
         y = "Value"
       ) +
       theme(legend.position = "bottom")

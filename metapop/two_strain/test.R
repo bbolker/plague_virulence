@@ -2,10 +2,10 @@
 library(burnout) 
 source("sim_fun.R")
 
-# 2. Parameters for testing
+# 2. Set specific scenario for testing
 test_params <- list(
   n_patches = 100,
-  n_years = 500,         
+  n_years = 2000,    
   K = 1e6,
   r = 0.5,
   c0 = 0.2,              
