@@ -27,10 +27,10 @@ simulate_metapopulation_2strain <- function(
     alpha = 5e-6,   
     D = 1,
     R01 = 2.0,     
-    R02 = 1.9,    
+    R02 = 1.8,    
     invade_year = 100,      
     initial_inf_ratio_1 = 0.1, 
-    initial_inf_ratio_2 = 0.02, 
+    initial_inf_ratio_2 = 0.05, 
     initial_pop_ratio = 1,
     early_stop = FALSE      
 ) {

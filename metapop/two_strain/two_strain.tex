@@ -1,0 +1,94 @@
+\documentclass[11pt,a4paper]{article}
+
+% Required packages for math symbols and formatting
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{dsfont} % For the indicator function \mathds{1}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{hyperref}
+
+\title{Two-Strain Invasion Model }
+
+\begin{document}
+
+\maketitle
+
+\section{Two-Strain Competition and Invasion Model}
+
+To investigate the evolutionary dynamics of virulence ($R_0$), we extend the single-strain metapopulation framework to a two-strain competition model. We consider a resident strain (Strain 1) and an invading strain (Strain 2) with basic reproduction numbers $R_{01}$ and $R_{02}$, respectively. To isolate the selection pressure acting purely on $R_0$, we assume both strains share the same per-flea infectivity, i.e., $\alpha_1 = \alpha_2 = \alpha$.
+
+\subsection{Mixed Flea Pool and Cross-Patch Transport}
+
+Let $S_{1,j}^{(k-1)}$ and $S_{2,j}^{(k-1)}$ be the number of hosts in patch $j$ that died from Strain 1 and Strain 2 in the previous year, respectively. The total number of infectious carcasses (and thereby the source of the environmental flea pool) in patch $j$ is:
+\begin{equation}
+S_j^{(k-1)} = S_{1,j}^{(k-1)} + S_{2,j}^{(k-1)}.
+\end{equation}
+
+The proportions of the two strains in the local environmental flea pool are strictly determined by their respective death tolls:
+\begin{equation}
+q_{1,j} = \frac{S_{1,j}^{(k-1)}}{S_j^{(k-1)}}, \qquad q_{2,j} = \frac{S_{2,j}^{(k-1)}}{S_j^{(k-1)}}.
+\end{equation}
+(If $S_j^{(k-1)} = 0$, we define $q_{1,j} = q_{2,j} = 0$).
+
+Limited by the physical carrying capacity of migrating hosts, the expected total number of fleas exported from patch $j$ ($E_j^{(k)}$) and retained locally ($R_j^{(k)}$) are:
+\begin{equation}
+E_j^{(k)} = \min\!\left( \nu S_j^{(k-1)},\, \rho c_0 N_j^{(k,1)} \right),
+\end{equation}
+\begin{equation}
+R_j^{(k)} = \nu S_j^{(k-1)} - E_j^{(k)}.
+\end{equation}
+
+Consequently, the absolute number of fleas carrying strain $m \in \{1, 2\}$ that successfully arrive at the target patch $i$ from both local retention and the global network is:
+\begin{equation}
+F_{m,i}^{(k)} = q_{m,i} R_i^{(k)} + \frac{1}{n}\sum_{j=1}^n q_{m,j} E_j^{(k)}.
+\end{equation}
+
+\subsection{Poisson Colonization and Initial Seeds}
+
+Following the derivation of the per-host infection probability in the single-strain model, the expected number of infectious propagules arriving at patch $i$ for each strain is proportional to the local flea pool and the per-flea infectivity $\alpha$. However, to model the successful establishment of independent lineages (Galton-Watson processes), we must account for stochastic extinction (fizzle). 
+
+The probability that an initial infection escapes stochastic extinction in a supercritical branching process is $1 - 1/R_0$. Applying Poisson thinning, the effective expected number of \emph{successfully established} initial seeds for each strain is:
+\begin{equation}
+\lambda_{1,i}^{(k)} = \alpha F_{1,i}^{(k)} \left(1 - \frac{1}{R_{01}}\right), \qquad \lambda_{2,i}^{(k)} = \alpha F_{2,i}^{(k)} \left(1 - \frac{1}{R_{02}}\right).
+\end{equation}
+
+Since the initial per-host infection probability is small ($\pi \ll 1$), the colonization of the two strains can be modeled as independent Poisson sampling processes based on these thinned rates. This directly yields the integer number of successfully established initial seeds, $a_i^{(k)}$ and $b_i^{(k)}$, which will serve as the foundational lineages for the within-patch competition:
+\begin{equation}
+a_i^{(k)} \sim \mathrm{Poisson}\!\left(\lambda_{1,i}^{(k)}\right), \qquad b_i^{(k)} \sim \mathrm{Poisson}\!\left(\lambda_{2,i}^{(k)}\right).
+\end{equation}
+
+\subsection{Within-Patch Outbreak and Competition}
+
+To facilitate efficient numerical simulation across the metapopulation, we formulate the patch-level outbreak logic using indicator functions. We define the establishment indicator for each strain as:
+\begin{equation}
+I_{1,i}^{(k)} = \mathds{1}_{\left\{a_i^{(k)} > 0\right\}}, \qquad I_{2,i}^{(k)} = \mathds{1}_{\left\{b_i^{(k)} > 0\right\}}.
+\end{equation}
+And the indicator for any outbreak occurring in the patch:
+\begin{equation}
+I_{\mathrm{any},i}^{(k)} = \mathds{1}_{\left\{a_i^{(k)} + b_i^{(k)} > 0\right\}}.
+\end{equation}
+
+When evaluating the macroscopic epidemic trajectory, the effective basic reproduction number in patch $i$ depends on which strains successfully established. We assign $\bar{R}_0 = (R_{01} + R_{02})/2$ for co-infections:
+\begin{equation}
+R_{\mathrm{eff},i}^{(k)} = R_{01} I_{1,i}^{(k)} \left(1 - I_{2,i}^{(k)}\right) + R_{02} \left(1 - I_{1,i}^{(k)}\right) I_{2,i}^{(k)} + \bar{R}_0 I_{1,i}^{(k)} I_{2,i}^{(k)}.
+\end{equation}
+
+Let $z(R_0)$ denote the final epidemic size (as a proportion of the population), given by the non-zero root of $1 - z = \exp(-R_0 z)$. The total number of dead hosts in patch $i$ can be computed concisely as:
+\begin{equation}
+Z_i^{(k)} = I_{\mathrm{any},i}^{(k)} \cdot z\!\left(R_{\mathrm{eff},i}^{(k)}\right) N_i^{(k,2)}.
+\end{equation}
+
+During the early exponential growth phase, the strains behave as independent Galton-Watson branching processes. When the local host capacity is exhausted, the total available ecological niche ($Z_i^{(k)}$) is strictly partitioned proportionally to their initial seed sizes. This proportional allocation gracefully resolves both single-strain dynamics (where the fraction evaluates to $1$) and co-infection competition:
+\begin{equation}
+S_{1,i}^{(k)} = Z_i^{(k)} \frac{a_i^{(k)}}{a_i^{(k)} + b_i^{(k)}}, \qquad
+S_{2,i}^{(k)} = Z_i^{(k)} \frac{b_i^{(k)}}{a_i^{(k)} + b_i^{(k)}},
+\end{equation}
+with the standard convention that if $a_i^{(k)} + b_i^{(k)} = 0$, both allocations evaluate to $0$.
+
+\subsection{Host Ecological Update}
+
+Host population dynamics are blind to the specific strain causing mortality. The total death toll in patch $i$ is updated as $S_i^{(k)} = S_{1,i}^{(k)} + S_{2,i}^{(k)}$. The surviving population $N_i^{(k,2)} - S_i^{(k)}$ then undergoes standard logistic growth to produce the initial host population $N_i^{(k+1,1)}$ for the following year.
+
+\end{document}
