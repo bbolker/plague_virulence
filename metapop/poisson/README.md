@@ -1,13 +1,8 @@
-# Overview
+## Overview
 
-This subdirectory contains an updated stochastic metapopulation implementation that modifies two key assumptions used in earlier versions of the model:
+This is a stochastic metapopulation model to ask when **lower** $R_0$ can lead to **more spread and longer persistence** of plague across patches.
 
-1.  **Initial number of infected hosts per newly infected patch**
-    -   **Old version:** every newly infected patch starts with exactly **1** infected host.
-    -   **New version:** the number of initially infected hosts is **Poisson-distributed**
-2.  **Burnout / establishment mechanism**
-    -   **Old version:** used a burnout probability (assume some infected rats live until next epidemic season)
-    -   **New version:** assume all infected hosts die and infected fleas introduce the next wave
+The key mechanism is: **between‑patch transmission depends on healthy hosts moving while carrying infected fleas**. Strong within‑patch epidemics (caused by higher $R_0$) kill more hosts, leaving fewer healthy movers, which can reduce export and reseeding.
 
 # simulation outputs
 
