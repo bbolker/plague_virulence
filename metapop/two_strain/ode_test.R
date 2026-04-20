@@ -50,3 +50,6 @@ system.time(
 (nrow(parvals)/100*1.25)/60
 
 res <- apply(parvals, 1, intfun)
+
+
+## now compare with Yuyang's approximations ((R01+R02)/2 final size, ??)
