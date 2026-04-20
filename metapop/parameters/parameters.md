@@ -12,6 +12,7 @@ Here is a table summarizing estimates of the intrinsic reproductive number (R₀
 | Mitchell & Kribs (2017) – Methodological comparison | No specific R₀ for plague; discusses methods for calculating R₀ in periodic epidemic systems | Not applicable | Not applicable | [Springer Bulletin of Mathematical Biology](https://link.springer.com/article/10.1007/s11538-017-0309-y) [3](https://link.springer.com/article/10.1007/s11538-017-0309-y) |
 
 ### Notes:
+
 - The most direct estimate of R₀ for bubonic plague comes from the 2015 outbreak in Zambia, with values ranging from 1.56 to 1.93 [1](https://journals.plos.org/plosntds/article?id=10.1371/journal.pntd.0008811).
 - Generation time is not consistently reported in these studies, but the Zambia study infers it from epidemic doubling time and infectious period.
 - Other sources focus on mathematical methods for estimating R₀ in vector-borne diseases, which may be applicable to plague but do not provide plague-specific values.

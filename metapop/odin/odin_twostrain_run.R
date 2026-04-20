@@ -1,5 +1,5 @@
 library(odin)
-library(dde) ## not sure why we need this?
+## library(dde) ## not sure why we need this?
 
 ## test expm1
 ## -expm1(-x) = 1-exp(-x)
