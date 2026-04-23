@@ -1,6 +1,10 @@
 library(deSolve)
 library(dplyr)
 library(purrr)
+library(future)
+library(progressr)
+library(furrr)
+plan(multicore, workers = 8)
 
 ## FIXME: use odin, integrate on log scale, etc. ...
 ## this is probably good enough
@@ -31,7 +35,7 @@ intfun <- function(allparms, last_only = TRUE) {
   })
 }
 
-dd <- intfun(list(R01 = 2, R02 = 1.5, I10 = 0.01, I20 = 0.02), last.only = FALSE)
+dd <- intfun(list(R01 = 2, R02 = 1.5, I10 = 0.01, I20 = 0.02), last_only = FALSE)
 par(las = 1)
 matplot(dd[,1], dd[,-1], type = "l", log = "y", xlab = "", ylim = c(1e-6, 10))
 
@@ -49,7 +53,18 @@ system.time(
 ## 3.2 minutes?
 (nrow(parvals)/100*1.25)/60
 
-res <- apply(parvals, 1, intfun)
+nn <- nrow(parvals)
+res <- with_progress({
+  p <- progressor(steps = nn)
+  future_map(seq(nn),
+             function(i) {
+               p()
+               intfun(parvals[i,])
+             })
+}) |>
+  do.call(what = "rbind")
 
 
+res2 <- cbind(parvals, res)
+saveRDS(res2, file = "outputs_2strain/finalsize.rds")
 ## now compare with Yuyang's approximations ((R01+R02)/2 final size, ??)
