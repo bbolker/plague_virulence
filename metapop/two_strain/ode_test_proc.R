@@ -75,6 +75,9 @@ fit1R <- lm(mk_form(vars, rawpoly = TRUE), data = dd4)
 fit2 <- lm(mk_form(vars, resp = "logit_finalsize"), data = dd4)
 fit2R <- lm(mk_form(vars, rawpoly = TRUE, resp = "logit_finalsize"), data = dd4)
 
+print(summary(fit1)$adj.r.squared)
+print(summary(fit2)$adj.r.squared)
+
 stopifnot(all.equal(summary(fit1)$adj.r.squared, summary(fit1R)$adj.r.squared))
 cc1R <- coef(fit1R)
 names(cc1R) <- stringr::str_extract(names(cc1R), "(.Intercept.|([0-2]\\.){3}[0-2])")
