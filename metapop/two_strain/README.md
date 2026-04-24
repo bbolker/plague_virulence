@@ -50,3 +50,6 @@ To indicate the invasion capability of the invader and construct PIP, we use the
     -   [`sim_pip.R`](./sim_pip.R)
 -   PIP plotting:
     -   [`plot_pip.R`](./plot_pip.R)
+-   Exploring two-strain ODE outcomes:
+    - run ODEs, [`ode_test.R`](./ode_test.R)
+    - compare approximations, [`ode_test_proc.R`](./ode_test_proc.R)
