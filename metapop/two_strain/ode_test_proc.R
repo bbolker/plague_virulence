@@ -9,6 +9,7 @@ finalsize <- function(R0) {
   1+1/R0*lambert_W0(-R0*exp(-R0))
 }
 
+## Yuyang:
 ## I’m just using (R01+R02)/2 to calculate the final size in of the patch and partitioning the final death toll proportionally based on their initial number.
 
 dd2 <- (dd

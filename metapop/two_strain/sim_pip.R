@@ -8,7 +8,7 @@ fn_sum <- "outputs_pip/sim_pip_alpha_rho.rds"
 
 retry <- TRUE
 ncores <- 16
-nsim <- 200
+nsim <- 2000
 
 # Define full parameter grid for PIPs across different alpha and rho values
 dd <- expand.grid(

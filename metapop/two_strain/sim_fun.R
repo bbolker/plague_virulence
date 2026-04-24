@@ -42,7 +42,7 @@ simulate_metapopulation_2strain <- function(
     idx <- R0_vec > 1
     if(any(idx)) {
       # Apply final_size to each valid R0 entry
-      res[idx] <- sapply(R0_vec[idx], final_size)
+      res[idx] <- sapply(R0_vec[idx], burnout::final_size)
     }
     return(res)
   }
