@@ -1,3 +1,4 @@
+options(repos = (CRAN = "https://cloud.r-project.org"))
 pkgs <- c("gsl", "tidyverse", "ggrastr", "biscale", "cowplot",
           "deSolve", "future", "progressr", "furrr")
 i1 <- installed.packages()

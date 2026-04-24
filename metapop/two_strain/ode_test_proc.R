@@ -14,11 +14,14 @@ finalsize <- function(R0) {
 
 dd2 <- (dd
   |> as_tibble()
+  ## don't bother with I2tot (or yy analogue), determined by
+  ## finalsize + I1tot
+  |> select(-I2tot)
   |>   mutate(
          finalsize  = 1 -S,
          finalsize_yy = finalsize((R01+R02)/2),
-         I1tot_yy = finalsize_yy*I10/(I10+I20),
-         I2tot_yy = finalsize_yy*I20/(I10+I20))
+         I1tot_yy = finalsize_yy*I10/(I10+I20)
+  )
 )
 
 simpars <- names(dd)[1:4]
@@ -40,7 +43,9 @@ gg0 <- ggplot(dd3, aes(sim, approx)) +
 
 gg1 <- gg0 + rasterise(geom_point(aes(colour = R01))) 
 
-print(gg1)
+## no longer care about this, the one with a bivariate colour
+## scheme is nicer
+## print(gg1)
 
 bi_data <- bi_class(dd3, x = R01, y = R02, style = "quantile", dim = 3)
 
@@ -58,7 +63,7 @@ ggdraw() +
    draw_plot(gg_legend, x = 0.8, y=0.1, 0.2, 0.2)
 
 dd4 <- mutate(dd2,
-              logit_ratio = qlogis(I1tot/(I1tot+I2tot)),
+              logit_ratio = qlogis(I1tot/finalsize),
               logit_finalsize = qlogis(finalsize))
 
 vars <- c("R01", "R02","log(I10)","log(I20)")

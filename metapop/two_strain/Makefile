@@ -22,5 +22,8 @@ sim_fun.Rout: sim_fun.R
 outputs_pip/sim_pip_alpha_rho.rds: sim_pip.R sim_fun.Rout
 	$(R) $<
 
+pkgs: get_pkgs.R
+	$(R) $<
+
 clean:
 	rm *~ \#*
