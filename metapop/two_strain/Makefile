@@ -7,6 +7,9 @@ outputs/%.rds:
 	$(R) $<
 	mv $(notdir $(basename $@))*.rds outputs
 
+outputs_2strain/plot_2strain_points.pdf:
+	$(R) plot_2strain.R
+
 outputs_2strain/finalsize.rds: ode_test.R
 	$(R) $<
 

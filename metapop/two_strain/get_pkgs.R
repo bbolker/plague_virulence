@@ -6,3 +6,4 @@ pkgs <- setdiff(pkgs, rownames(i1))
 if (length(pkgs)>0) {
   install.packages(pkgs)
 }
+remotes::install_github("davidearn/burnout")

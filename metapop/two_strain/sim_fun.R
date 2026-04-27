@@ -58,7 +58,8 @@ simulate_metapopulation_2strain <- function(
   
   # Initial Setup: Seed Resident Strain (Strain 1)
   N[, 1, 1] <- initial_pop_ratio * K
-  infected_init_1 <- sample(1:n_patches, initial_inf_ratio_1 * n_patches)
+  infected_init_1 <- sample(1:n_patches,
+                            size = max(1, initial_inf_ratio_1 * n_patches))
   z_init <- burnout::final_size(R01)
   S1[infected_init_1, 1] <- z_init * D * N[infected_init_1, 1, 1]
   I1[infected_init_1, 1] <- 1 

@@ -15,3 +15,6 @@
    * change in share of co-infected patches (decrease, bad)
  Can we find a sensible way to combine these?
 * check PIP summaries again before running ...
+* tests
+* profiling?
+* named dimensions in sim_fun.R
