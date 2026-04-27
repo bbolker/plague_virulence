@@ -46,6 +46,12 @@ simulate_metapopulation_2strain <- function(
     }
     return(res)
   }
+
+  ## FIXME: compute final sizes *once* for strain-1-only (R01),
+  ## strain-2-only (R02), coinfected patches (either YY approximation
+  ## or approximation derived from polynomial regression)
+
+  ## FIXME: named dimnames for N, I, S, etc.
   
   # Initialize recording structures
   N <- array(0, dim = c(n_patches, n_years, 4)) # Total host population across 4 stages
