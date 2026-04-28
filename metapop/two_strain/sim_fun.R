@@ -47,31 +47,15 @@ simulate_metapopulation_2strain <- function(
   if (!is.null(seed)) set.seed(seed)
   coinf_approx <- match.arg(coinf_approx)
 
+  ## compute final sizes *once* for strain-1-only (R01),
+  ## strain-2-only (R02), coinfected patches (either YY approximation
+  ## or approximation derived from polynomial regression)
   z_vec <- c(burnout::final_size(R01),
              burnout::final_size(R02),
              ## only needed for "YY" approximation
              burnout::final_size((R01+R02)/2))
-
-
-  # Vectorized helper for the Final Size Equation (1 - z = exp(-R0 * z))
-  z_func_vec <- function(R0_vec) {
-    res <- numeric(length(R0_vec))
-    idx <- R0_vec > 1
-    if(any(idx)) {
-      # Apply final_size to each valid R0 entry
-      res[idx] <- sapply(R0_vec[idx], burnout::final_size)
-    }
-    return(res)
-  }
-
-  ## FIXME: compute final sizes *once* for strain-1-only (R01),
-  ## strain-2-only (R02), coinfected patches (either YY approximation
-  ## or approximation derived from polynomial regression)
-
-  ## FIXME: named dimnames for N, I, S, etc.
   
   ## Initialize recording structures
-
   ## Total host population across 4 stages
   dn0 <- list(patch = seq.int(n_patches), year = seq.int(n_years))
   N <- array(0, dim = c(n_patches, n_years, 4),
@@ -85,7 +69,11 @@ simulate_metapopulation_2strain <- function(
   total_inf1 <- rep(0, n_years) # Global infection count Strain 1
   total_inf2 <- rep(0, n_years) # Global infection count Strain 2
 
-  Z_total <- rep(NA_real_, n_patches)
+  ## coinfection outcomes
+  coinf_res <- matrix(NA_real_,
+                      ncol = 2,
+                      nrow = n_patches,
+                      dimnames = list(NULL, c("finalsize", "I1frac")))
 
   # Initial Setup: Seed Resident Strain (Strain 1)
   N[, 1, "begin"] <- initial_pop_ratio * K
@@ -103,16 +91,16 @@ simulate_metapopulation_2strain <- function(
     
     # --- Stage 1 -> 2: Host Growth ---
     # Retrieve previous year-end population (Stage 4)
-    N_prev_end <- if(k == 2) N[, 1, 1] - S1[, 1] else N[, k-1, 4]
+    N_prev_end <- if(k == 2) N[, 1, "begin"] - S1[, 1] else N[, k-1, "end"]
     
     # Logistic growth formula
     N_after_growth <- N_prev_end + r * N_prev_end * (1 - N_prev_end / K)
-    N[, k, 2] <- N_after_growth
+    N[, k, "after_growth"] <- N_after_growth
     
     # --- Stage 2 -> 3: Host Migration (Colonization) ---
     pop_total_network <- sum(N_after_growth)
     N_after_col <- (1 - c0) * N_after_growth + c0 * (pop_total_network / n_patches)
-    N[, k, 3] <- N_after_col
+    N[, k, "after_colonization"] <- N_after_col
     
     # --- Transmission Dynamics: Force of Infection ---
     S_last_total <- S1[, k-1] + S2[, k-1]
@@ -147,43 +135,40 @@ simulate_metapopulation_2strain <- function(
     
     I1[, k] <- as.numeric(ind1)
     I2[, k] <- as.numeric(ind2)
+
+    coinf_res[ind1 & !ind2, "finalsize"] <- z_vec[1]
+    coinf_res[ind2 & !ind1, "finalsize"] <- z_vec[2]
+    coinf_res[ind1 & !ind2, "I1frac"] <- 1
+    coinf_res[ind2 & !ind1, "I1frac"] <- 0
     
-    if (coinf_approx == "polyfit") {
-      coinf <- which(ind1 & ind2)
-      if (length(coinf) > 0) {
+    coinf <- which(ind1 & ind2)
+    n_coinf <- length(coinf)
+    if (n_coinf > 0) {
+      if (coinf_approx == "polyfit") {
         coinf_res <- sapply(coinf,
                             \(i) pred_outcomes_poly(R01, R02, a[i]/N_after_col[i], b[i]/N_after_col[i]))
+      } else {  ## approx "YY"
+        # Partition Z based on initial seed ratios (Galton-Watson allocation)
+        ## will use ifelse() below to avoid 0/0 outcomes
+        coinf_res <- cbind(rep(z_vec[3], n_coinf), a/(a+b))
       }
     }
-    browser()
-
-    # Calculate total death toll Z using vectorized final size
-    Z_total[ind1 & !ind2] <- z_vec[1] * D * N_after_col
-    Z_total[ind2 & !ind1] <- z_vec[2] * D * N_after_col
-    if (coinf_approx == "YY") {
-      Z_total[ind1 &  ind2] <- z_vec[3] * D * N_after_col
-    } else {
-      Z_total[ind1 &  ind2] <- coinf_res[,1] * D * N_after_col
-    }
       
-    # Partition Z based on initial seed ratios (Galton-Watson allocation)
     # denom is (a + b); we only divide when ind_any is TRUE to avoid 0/0
 
-    if (coinf_approx == "YY") {
-      S1[, k] <- ifelse(ind_any, Z_total * a / denom, 0)
-      S2[, k] <- ifelse(ind_any, Z_total * b / denom, 0)
-    } else {
-      stop("not implemented")
-    }
+    ## FIXME: still assumes D=1
+    Z_total <- coinf_res[,"finalsize"] * D * N_after_col  
+    S1[, k] <- ifelse(ind_any, Z_total * coinf_res[,"I1frac"], 0)
+    S2[, k] <- ifelse(ind_any, Z_total * (1-coinf_res[,"I1frac"]), 0)
     
     # Update end-of-year surviving population
-    N[, k, 4] <- N_after_col - (S1[, k] + S2[, k])
+    N[, k, "end"] <- N_after_col - (S1[, k] + S2[, k])
     
     # Record global time-series statistics
     total_inf1[k] <- sum(S1[, k])
     total_inf2[k] <- sum(S2[, k])
     
-    if (k < n_years) N[, k+1, 1] <- N[, k, 4]
+    if (k < n_years) N[, k+1, "begin"] <- N[, k, "end"]
     
     # Survival check: exit if both strains disappear after invasion starts
     if (early_stop && sum(ind_any) == 0 && k > invade_year) break
@@ -236,7 +221,7 @@ mult_sim_2strain <- function(nsim, params, verbose = FALSE,
     patches2   = sapply(results, function(res) colSums(res$I2)),
     total_inf1 = sapply(results, function(res) res$total_inf1),
     total_inf2 = sapply(results, function(res) res$total_inf2),
-    total_pops = sapply(results, function(res) colSums(res$N[, , 1])) # Get total host pop
+    total_pops = sapply(results, function(res) colSums(res$N[, , "begin"])) # Get total host pop
   )
 }
 

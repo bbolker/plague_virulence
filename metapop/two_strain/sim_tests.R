@@ -2,7 +2,6 @@ library("tinytest")
 using("tinysnapshot")
 
 source("sim_fun.R")
-debug(simulate_metapopulation_2strain)
 sim1 <- simulate_metapopulation_2strain(n_patches = 2,
                                 n_years  = 10,
                                 R01 = 4, R02 = 4,
