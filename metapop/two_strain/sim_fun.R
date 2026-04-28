@@ -88,7 +88,7 @@ simulate_metapopulation_2strain <- function(
   b <- rep(0, n_patches)
   
   for (k in 2:n_years) {
-    
+
     # --- Stage 1 -> 2: Host Growth ---
     # Retrieve previous year-end population (Stage 4)
     N_prev_end <- if(k == 2) N[, 1, "begin"] - S1[, 1] else N[, k-1, "end"]
@@ -150,7 +150,7 @@ simulate_metapopulation_2strain <- function(
       } else {  ## approx "YY"
         # Partition Z based on initial seed ratios (Galton-Watson allocation)
         ## will use ifelse() below to avoid 0/0 outcomes
-        coinf_res <- cbind(rep(z_vec[3], n_coinf), a/(a+b))
+        coinf_res[] <- cbind(rep(z_vec[3], n_coinf), a/(a+b))
       }
     }
       

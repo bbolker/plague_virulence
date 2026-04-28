@@ -19,6 +19,9 @@ ode_test_proc.Rout: ode_test_proc.R
 polyfit.rda: ode_test_proc.R
 	$(R) $<
 
+two_strain_test.pdf: two_strain_test.R sim_fun.R
+	$(R) $<
+
 two_strain.pdf: two_strain.tex
 	texi2dvi -p $<
 
