@@ -145,7 +145,7 @@ simulate_metapopulation_2strain <- function(
     n_coinf <- length(coinf)
     if (n_coinf > 0) {
       if (coinf_approx == "polyfit") {
-        coinf_res <- sapply(coinf,
+        coinf_res[] <- sapply(coinf,
                             \(i) pred_outcomes_poly(R01, R02, a[i]/N_after_col[i], b[i]/N_after_col[i]))
       } else {  ## approx "YY"
         # Partition Z based on initial seed ratios (Galton-Watson allocation)

@@ -14,7 +14,8 @@ test_params <- list(
   R02 = 1.8,            
   invade_year = 100,     
   initial_inf_ratio_1 = 0.1,
-  initial_inf_ratio_2 = 0.05
+  initial_inf_ratio_2 = 0.05,
+  coinf_approx = "polyfit"
 )
 
 nsim <- 50
