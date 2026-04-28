@@ -53,12 +53,18 @@ simulate_metapopulation_2strain <- function(
 
   ## FIXME: named dimnames for N, I, S, etc.
   
-  # Initialize recording structures
-  N <- array(0, dim = c(n_patches, n_years, 4)) # Total host population across 4 stages
-  I1 <- matrix(0, nrow = n_patches, ncol = n_years) # Indicator for Strain 1
-  I2 <- matrix(0, nrow = n_patches, ncol = n_years) # Indicator for Strain 2
-  S1 <- matrix(0, nrow = n_patches, ncol = n_years) # Deaths from Strain 1
-  S2 <- matrix(0, nrow = n_patches, ncol = n_years) # Deaths from Strain 2
+  ## Initialize recording structures
+
+  ## Total host population across 4 stages
+  dn0 <- list(patch = seq.int(n_patches), year = seq.int(n_years))
+  N <- array(0, dim = c(n_patches, n_years, 4),
+             dimnames = c(dn0, list(stage = c("begin", "after_growth", "after_colonization", "end"))))
+
+  smat <- function() matrix(0, nrow = n_patches, ncol = n_years, dimnames = dn0)
+  I1 <- smat()  # Indicator for Strain 1
+  I2 <- smat()  # Indicator for Strain 2
+  S1 <- smat()  # Deaths from Strain 1
+  S2 <- smat() # Deaths from Strain 2
   total_inf1 <- rep(0, n_years) # Global infection count Strain 1
   total_inf2 <- rep(0, n_years) # Global infection count Strain 2
   
