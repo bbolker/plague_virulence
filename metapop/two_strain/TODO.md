@@ -1,3 +1,14 @@
+##### 2026 Apr 28 (Tue)
+
+Consider replacing min(a, b) in (3) with ab/(a+b) -- there may also be a hazard-like way to do this (ie., to replace the min).
+
+We have three possible mechanisms by which milder strain cn compete:
+* burnout
+* density-dependent R0
+* density-dependent colonization:
+	* size of flea pool
+	* carriage by emigrants
+
 ## 24 April
 
 * understand full pipeline
