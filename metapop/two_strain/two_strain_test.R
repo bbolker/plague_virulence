@@ -1,6 +1,9 @@
 library(burnout) 
 source("sim_fun.R")
 
+## if profiling
+## Rprof()
+
 test_params <- list(
   n_patches = 100,
   n_years = 500,    
