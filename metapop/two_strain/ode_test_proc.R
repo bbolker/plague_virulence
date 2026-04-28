@@ -41,17 +41,17 @@ mk_form <- function(vars, rawpoly = FALSE, resp = "logit_ratio") {
               response = resp)
 }
 
-fit1 <- lm(mk_form(vars), data = dd4)
+ode_polyfit_ratio <- lm(mk_form(vars), data = dd4)
 fit1R <- lm(mk_form(vars, rawpoly = TRUE), data = dd4)
 
-fit2 <- lm(mk_form(vars, resp = "logit_finalsize"), data = dd4)
+ode_polyfit_finalsize <- lm(mk_form(vars, resp = "logit_finalsize"), data = dd4)
 fit2R <- lm(mk_form(vars, rawpoly = TRUE, resp = "logit_finalsize"), data = dd4)
 
-print(summary(fit1)$adj.r.squared)
-print(summary(fit2)$adj.r.squared)
+print(summary(ode_polyfit_ratio)$adj.r.squared)
+print(summary(ode_polyfit_finalsize)$adj.r.squared)
 
 ## raw and orthogonal polynomials give same result
-stopifnot(all.equal(summary(fit1)$adj.r.squared, summary(fit1R)$adj.r.squared))
+stopifnot(all.equal(summary(ode_polyfit_ratio)$adj.r.squared, summary(fit1R)$adj.r.squared))
 cc1R <- coef(fit1R)
 names(cc1R) <- stringr::str_extract(names(cc1R), "(.Intercept.|([0-2]\\.){3}[0-2])")
 
@@ -65,8 +65,8 @@ cc1R[abs(cc1R)>0.2]
 
 ## add poly-regression predictions
 dd3 <- dd2 |>
-  mutate(finalsize_poly = plogis(predict(fit2, newdata = dd2)),
-         I1tot_poly = finalsize_poly*plogis(predict(fit1, newdata = dd2))
+  mutate(finalsize_poly = plogis(predict(ode_polyfit_finalsize, newdata = dd2)),
+         I1tot_poly = finalsize_poly*plogis(predict(ode_polyfit_ratio, newdata = dd2))
          ) |>
   rename(I1tot_sim = "I1tot", finalsize_sim = "finalsize")
 
@@ -127,16 +127,29 @@ print(gg4)
 ## phenomenological but could work ... ??
 
 #' generate predicted outcomes from existing polynomial fits
+#' @param R01 R0 of first strain
+#' @param R02 R0 of second strain
+#' @param I10 initial pop fraction of infected strain 1
+#' @param I20 ditto, strain 2
+#' @return a vector with the final size (total number infected) and fraction of strain 1
 #' @examples
 #' pred_outcomes_poly(1.2, 1.3, 0.1, 0.08)
 pred_outcomes_poly <- function(R01, R02, I10, I20) {
-  nd <- data.frame(R01, R02, I10, I20)
+  ## R01 > R02 in regression data, so want to enforce that order
+  ##  in prediction
+  ## finalsize is order-independent
+  switch_order <- (R01 < R02)
+  nd <- if (switch_order) {
+          data.frame(R01=R02, R02=R01, I10=I20, I20=I10)
+        } else {
+          data.frame(R01, R02, I10, I20)
+        }
   pfun <- function(f) unname(plogis(predict(f, newdata = nd)))
-  finalsize <- pfun(fit2)
-  I1tot <- finalsize*pfun(fit1)
-  I2tot <- finalsize-I1tot
-  unlist(tibble::lst(finalsize, I1tot, I2tot))
+  finalsize <- pfun(ode_polyfit_finalsize)
+  I1frac <- pfun(ode_polyfit_ratio)
+  if (switch_order) I1frac <- 1-I1frac
+  unlist(tibble::lst(finalsize, I1frac))
 }
 
-saveRDS(pred_outcomes_poly, file = "polyfit.rds")
+save(pred_outcomes_poly, ode_polyfit_finalsize, ode_polyfit_ratio, file = "polyfit.rda")
 

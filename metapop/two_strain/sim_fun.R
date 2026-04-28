@@ -1,3 +1,8 @@
+if (!file.exists("polyfit.rda")) {
+  stop("please `make polyfit.rda`")
+}
+load("polyfit.rda")
+
 #' Two-Strain Metapopulation Simulation with Vectorized Logic
 #' @param n_patches Number of patches in the metapopulation
 #' @param n_years Number of years to simulate
@@ -15,6 +20,8 @@
 #' @param initial_inf_ratio_2 Proportion of patches to seed Strain 2 during invasion
 #' @param initial_pop_ratio Initial population as ratio of K
 #' @param early_stop If TRUE, stops simulation when both strains are extinct
+#' @param seed random-number seed
+#' @param coinf_approx approximation to use for coinfection dynamics
 #' @return A list containing N (Host dynamics), I (Indicators), S (Mortality), and Total Infection counts
 simulate_metapopulation_2strain <- function(
     n_patches = 100,
@@ -32,10 +39,20 @@ simulate_metapopulation_2strain <- function(
     initial_inf_ratio_1 = 0.1, 
     initial_inf_ratio_2 = 0.05, 
     initial_pop_ratio = 1,
-    early_stop = FALSE      
+    early_stop = FALSE,
+    seed = NULL,
+    coinf_approx = c("yy", "polyfit")
 ) {
   if (!require("burnout", quietly = TRUE)) stop("Please install the 'burnout' package")
-  
+  if (!is.null(seed)) set.seed(seed)
+  coinf_approx <- match.arg(coinf_approx)
+
+  z_vec <- c(burnout::final_size(R01),
+             burnout::final_size(R02),
+             ## only needed for "YY" approximation
+             burnout::final_size((R01+R02)/2))
+
+
   # Vectorized helper for the Final Size Equation (1 - z = exp(-R0 * z))
   z_func_vec <- function(R0_vec) {
     res <- numeric(length(R0_vec))
@@ -67,18 +84,20 @@ simulate_metapopulation_2strain <- function(
   S2 <- smat() # Deaths from Strain 2
   total_inf1 <- rep(0, n_years) # Global infection count Strain 1
   total_inf2 <- rep(0, n_years) # Global infection count Strain 2
-  
+
+  Z_total <- rep(NA_real_, n_patches)
+
   # Initial Setup: Seed Resident Strain (Strain 1)
-  N[, 1, 1] <- initial_pop_ratio * K
+  N[, 1, "begin"] <- initial_pop_ratio * K
   infected_init_1 <- sample(1:n_patches,
                             size = max(1, initial_inf_ratio_1 * n_patches))
-  z_init <- burnout::final_size(R01)
-  S1[infected_init_1, 1] <- z_init * D * N[infected_init_1, 1, 1]
+  z_init <- z_vec[1]
+  S1[infected_init_1, 1] <- z_init * D * N[infected_init_1, 1, "begin"]
   I1[infected_init_1, 1] <- 1 
   total_inf1[1] <- sum(S1[, 1])
   
-  # Arithmetic mean of R0 for co-infection scenarios
-  R0_mean <- (R01 + R02) / 2
+  ## pre-invasion colonization of strain 2
+  b <- rep(0, n_patches)
   
   for (k in 2:n_years) {
     
@@ -112,35 +131,50 @@ simulate_metapopulation_2strain <- function(
     
     # Poisson sampling for initial infection seeds (a and b)
     a <- rpois(n_patches, lambda1)
-    b <- rpois(n_patches, lambda2)
+    if (k >= invade_year) b <- rpois(n_patches, lambda2)
     
     # --- Invasion Event: Introduction of Strain 2 ---
     if (k == invade_year) {
-      invade_idx <- sample(1:n_patches, initial_inf_ratio_2 * n_patches)
+      invade_idx <- sample(1:n_patches, max(1, initial_inf_ratio_2 * n_patches))
       b[invade_idx] <- b[invade_idx] + 1 # Force establishment in selected patches
     }
-    # Zero out Strain 2 if it's before the invasion year
-    if (k < invade_year) b <- rep(0, n_patches)
     
     # --- Stage 3 -> 4: Epidemic Outbreak & Resource Partitioning ---
     ind1 <- a > 0 # Indicator for successful establishment
     ind2 <- b > 0
     ind_any <- (a + b) > 0
+    denom <- a + b
     
     I1[, k] <- as.numeric(ind1)
     I2[, k] <- as.numeric(ind2)
     
-    # Assign Effective R0 based on establishment indicators
-    R_eff <- R01 * (ind1 & !ind2) + R02 * (!ind1 & ind2) + R0_mean * (ind1 & ind2)
-    
+    if (coinf_approx == "polyfit") {
+      coinf <- which(ind1 & ind2)
+      if (length(coinf) > 0) {
+        coinf_res <- sapply(coinf,
+                            \(i) pred_outcomes_poly(R01, R02, a[i]/N_after_col[i], b[i]/N_after_col[i]))
+      }
+    }
+    browser()
+
     # Calculate total death toll Z using vectorized final size
-    Z_total <- ind_any * z_func_vec(R_eff) * D * N_after_col
-    
+    Z_total[ind1 & !ind2] <- z_vec[1] * D * N_after_col
+    Z_total[ind2 & !ind1] <- z_vec[2] * D * N_after_col
+    if (coinf_approx == "YY") {
+      Z_total[ind1 &  ind2] <- z_vec[3] * D * N_after_col
+    } else {
+      Z_total[ind1 &  ind2] <- coinf_res[,1] * D * N_after_col
+    }
+      
     # Partition Z based on initial seed ratios (Galton-Watson allocation)
     # denom is (a + b); we only divide when ind_any is TRUE to avoid 0/0
-    denom <- a + b
-    S1[, k] <- ifelse(ind_any, Z_total * a / denom, 0)
-    S2[, k] <- ifelse(ind_any, Z_total * b / denom, 0)
+
+    if (coinf_approx == "YY") {
+      S1[, k] <- ifelse(ind_any, Z_total * a / denom, 0)
+      S2[, k] <- ifelse(ind_any, Z_total * b / denom, 0)
+    } else {
+      stop("not implemented")
+    }
     
     # Update end-of-year surviving population
     N[, k, 4] <- N_after_col - (S1[, k] + S2[, k])
