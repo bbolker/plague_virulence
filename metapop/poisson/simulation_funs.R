@@ -1,3 +1,6 @@
+#' 'min-like' function that approaches a, b smoothly as the other increases
+phi_minfun <- function(a, b) a*(1-exp(-b/a))
+
 #' Function to simulate metapopulation dynamics with infection(poisson number version)
 #' @param n_patches Number of patches
 #' @param n_years Number of years to simulate
@@ -34,19 +37,24 @@ simulate_metapopulation <- function(
   #         2 = after growth
   #         3 = after colonization (host movement) + infection introduction + fizzle
   #         4 = after major epidemic (end of year)
-  
-  N <- array(0, dim = c(n_patches, n_years, 4))
-  I <- array(0, dim = c(n_patches, n_years, 4))
+
+  dn0 <- list(patch = seq.int(n_patches), year = seq.int(n_years))
+  stage_names <- c("begin", "after_growth", "after_colonization", "end")
+  N <- array(0, dim = c(n_patches, n_years, 4),
+             dimnames = c(dn0, list(stage = stage_names)))
+
+  I <- array(0, dim = c(n_patches, n_years, 4),
+             dimnames = c(dn0, list(stage = stage_names)))
   
   total_inf <- rep(NA_real_, n_years)   
-  S <- array(NA_real_, dim = c(n_patches, n_years))  
+  S <- array(NA_real_, dim = c(n_patches, n_years), dimnames = dn0)
   extinct_year <- NA_integer_        
   
   # Initial conditions
-  N[, 1, 1] <- initial_pop_ratio * K
+  N[, 1, "begin"] <- initial_pop_ratio * K
   
   infected_patches_init <- sample(1:n_patches, initial_inf_ratio * n_patches)
-  I[infected_patches_init, 1, 1] <- 1
+  I[infected_patches_init, 1, "begin"] <- 1
   
   # Derived parameters
   P_f <- 1 / R0
@@ -55,15 +63,15 @@ simulate_metapopulation <- function(
   for (k in 1:n_years) {
     
     # Stage 1 -> 2: Growth
-    N_begin <- N[, k, 1]
+    N_begin <- N[, k, "begin"]
     N_after_growth <- N_begin + r * N_begin * (1 - N_begin / K)
-    N[, k, 2] <- N_after_growth
-    I[, k, 2] <- I[, k, 1]
+    N[, k, "after_growth"] <- N_after_growth
+    I[, k, "after_growth"] <- I[, k, "begin"]
     
     # Stage 2 -> 3: Colonization + infection introduction + fizzle
     total_pop <- sum(N_after_growth)
     N_after_col <- (1 - c0) * N_after_growth + c0 * total_pop / n_patches
-    N[, k, 3] <- N_after_col
+    N[, k, "after_colonization"] <- N_after_col
     
     # Compute infection establishment probability (after fizzle)
     if (k > 1) {
@@ -74,7 +82,7 @@ simulate_metapopulation <- function(
       rho_cN <- rho * c0 * N_after_growth
       
       # 3. Calculate expected exported and retained propagules (Vectorized)
-      lambda_E <- pmin(nu_S, rho_cN) 
+      lambda_E <- phi_minfun(nu_S, rho_cN) 
       lambda_R <- nu_S - lambda_E
       
       # 4. Total expected propagules present in each patch after colonization
@@ -83,18 +91,18 @@ simulate_metapopulation <- function(
       # 5. Infection establishment (Poisson thinning accounts for fizzle)
       lambda_thinned <- alpha * Lambda_i * max(0, 1 - P_f)
       a <- rpois(n_patches, lambda_thinned)
-      I[, k, 3] <- as.numeric(a > 0)
+      I[, k, "after_colonization"] <- as.numeric(a > 0)
     } else {
-      I[, k, 3] <- I[, k, 2]
+      I[, k, "after_colonization"] <- I[, k, "after_growth"]
     }
     
     
     # Stage 3 -> 4: Major epidemic
-    infected_patches <- I[, k, 3]
+    infected_patches <- I[, k, "after_colonization"]
     S[, k] <- z * D * N_after_col * infected_patches
     N_after_burnout <- N_after_col - S[, k]
-    N[, k, 4] <- N_after_burnout
-    I[, k, 4] <- 0
+    N[, k, "end"] <- N_after_burnout
+    I[, k, "end"] <- 0
     
     total_inf[k] <- sum(S[, k])
     
@@ -113,8 +121,8 @@ simulate_metapopulation <- function(
     
     # Next year init (stage 4 of year k becomes stage 1 of year k+1)
     if (k < n_years) {
-      N[, k+1, 1] <- N_after_burnout
-      I[, k+1, 1] <- 0
+      N[, k+1, "begin"] <- N_after_burnout
+      I[, k+1, "begin"] <- 0
     }
   }
   
@@ -149,7 +157,7 @@ mult_sim_mp <- function(nsim, params, verbose = FALSE,
     clusterExport(cl, "lp", envir = environment())
     clusterEvalQ(cl, .libPaths(lp))
     
-    clusterExport(cl, c("simulate_metapopulation"))
+    clusterExport(cl, c("simulate_metapopulation", "phi_minfun"))
     clusterExport(cl, c("params"), envir = environment())
     
     clusterEvalQ(cl, quote(library(burnout)))
@@ -170,10 +178,10 @@ mult_sim_mp <- function(nsim, params, verbose = FALSE,
   }
   
   total_pops <- sapply(results, function(res) {
-    apply(res$N[, , 1], 2, sum, na.rm = TRUE)
+    apply(res$N[, , "begin"], 2, sum, na.rm = TRUE)
   })
   infected_patches <- sapply(results, function(res) {
-    apply(res$I[, , 3], 2, sum, na.rm = TRUE) 
+    apply(res$I[, , "after_colonization"], 2, sum, na.rm = TRUE) 
   })
   total_inf <- sapply(results, function(res) {
     res$total_inf
@@ -213,7 +221,7 @@ sumfun <- function(x, nsteps = 100) {
   
   qe_means <- sapply(matrix_vars, function(var_name) {
     y <- x[[var_name]]
-    y[x$infected_patches == 0 | is.na(x$infected_patches)] <- NA
+    y[x$infected_patches == 0 | is.na(x$infected_patches)] <- NA_real_
     
     mean(y[yr_vec, ], na.rm = TRUE)
   })

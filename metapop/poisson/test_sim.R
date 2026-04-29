@@ -16,6 +16,9 @@ test_params <- list(
   early_stop = FALSE 
 )
 
+## Run single sim
+do.call(simulate_metapopulation, test_params)
+
 # Run multiple stochastic simulations
 nsim_test <- 100
 cat(sprintf("Running %d simulations...\n", nsim_test))

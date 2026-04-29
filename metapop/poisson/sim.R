@@ -6,8 +6,8 @@ dir.create("outputs/raw", showWarnings = FALSE, recursive = TRUE)
 fn_sum <- "outputs/sim.rds"
 
 retry <- TRUE
-ncores <- 16
-nsim <- 200
+ncores <- 26
+nsim <- 2000
 
 dd <- expand.grid(
   R0vec = seq(1.1, 3.0, by = 0.1),
