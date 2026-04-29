@@ -1,0 +1,40 @@
+## colonization limitation
+
+Some consideration of colonization limitation, specifically between-patch transmission of infection. Such transmission is (we imagine) *jointly* limited by the number of infectious fleas, and the number of places available in emigrating rats.
+
+We will say the number of fleas ($F$) is proportional to the total number of disease-induced host deaths in a given epidemic period, while the number of places in emigrating rats ($R$) is proportional to the number of emigrating rats. Yuyang originally wrote the realized transmission as $\textrm{min}(R,F)$.
+
+How do we think about this? Per capita success of emigrating fleas is a saturating exponential of the rat/flea ratio ...
+
+We should instead consider $t(F,R) = F \left(1 - \exp(-R/F)\right)$. This has the desired properties:
+
+* $t(0,R) = t(F,0) = 0$
+* $\lim_{F\to\infty} t(F,R) = R$
+* $\lim_{R\to\infty} t(F,R) = F$
+* derivatives with respect to $F$ and $R$ are always positive (as long as $F, R > 0$)
+
+It's a little bit hard to get my head around the fact that this is *asymmetric*
+
+```{r curve}
+library(emdbook)
+cc <- curve3d(F*(1-exp(-R/F)), varnames = c("F", "R"),
+        to = c(50, 50), sys3d = "image", n = 60)
+```
+It's certainly not *very* asymmetric ...
+
+
+```{r}
+matplot(cbind(cc$z[,2], cc$z[2,]), type = "l")
+```
+
+
+```{r}
+matplot(cbind(cc$z[,50], cc$z[50,]), type = "l")
+```
+
+Compare with min:
+
+```{r}
+cc2 <- curve3d(min(F,R), varnames = c("F", "R"),
+        to = c(50, 50), sys3d = "image", n = 60)
+```
