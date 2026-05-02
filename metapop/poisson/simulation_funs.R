@@ -29,7 +29,8 @@ simulate_metapopulation <- function(
     R0 = 2,
     initial_inf_ratio = 0.1,
     initial_pop_ratio = 1,
-    early_stop = TRUE               
+    early_stop = TRUE,
+    fixed_pop = FALSE
 ) {
   if (!require("burnout", quietly = TRUE)) stop("please install burnout package")
   
@@ -101,7 +102,7 @@ simulate_metapopulation <- function(
     infected_patches <- I[, k, "after_colonization"]
     S[, k] <- z * D * N_after_col * infected_patches
     N_after_burnout <- N_after_col - S[, k]
-    N[, k, "end"] <- N_after_burnout
+    N[, k, "end"] <- if (!fixed_pop) N_after_burnout else N_after_col
     I[, k, "end"] <- 0
     
     total_inf[k] <- sum(S[, k])
@@ -121,7 +122,7 @@ simulate_metapopulation <- function(
     
     # Next year init (stage 4 of year k becomes stage 1 of year k+1)
     if (k < n_years) {
-      N[, k+1, "begin"] <- N_after_burnout
+      N[, k+1, "begin"] <- N[, k, "end"]
       I[, k+1, "begin"] <- 0
     }
   }
@@ -148,7 +149,10 @@ params0 <- list(
 #' multiple replicate simulations
 mult_sim_mp <- function(nsim, params, verbose = FALSE,
                         ncores = getOption("sim.ncores", 4),
-                        seed = NULL) {
+                        seed = NULL, ...) {
+
+  params <- c(params, list(...))
+  
   require("parallel", quietly = TRUE)
   if (ncores>1) {
     cl <- makeCluster(ncores)
