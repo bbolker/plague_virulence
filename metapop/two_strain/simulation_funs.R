@@ -1,7 +1,7 @@
 if (!file.exists("polyfit.rda")) {
   stop("please `make polyfit.rda`")
 }
-load("polyfit.rda")
+polyfit_objs <- load("polyfit.rda")
 
 #' Two-Strain Metapopulation Simulation with Vectorized Logic
 #' @param n_patches Number of patches in the metapopulation
@@ -202,6 +202,7 @@ mult_sim_2strain <- function(nsim, params, verbose = FALSE,
   if (ncores > 1) {
     cl <- makeCluster(ncores)
     lp <- .libPaths()
+    clusterExport(cl, polyfit_objs)
     clusterExport(cl, "lp", envir = environment())
     clusterEvalQ(cl, .libPaths(lp))
     clusterExport(cl, c("simulate_metapopulation_2strain", "params"), envir = environment())
