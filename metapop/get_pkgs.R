@@ -1,7 +1,20 @@
 options(repos = (CRAN = "https://cloud.r-project.org"))
-pkgs <- c("gsl", "tidyverse", "ggrastr", "biscale", "cowplot",
-          "deSolve", "future", "progressr", "furrr",
-          "tinytest", "tinysnapshot","optparse")
+pkgs <- c(
+  "biscale"
+ , "colorspace"
+ , "cowplot"
+ , "deSolve"
+ , "furrr"
+ , "future"
+ , "ggrastr"
+ , "gsl"
+ , "optparse"
+ , "progressr"
+ , "tidyverse"
+ , "tinysnapshot"
+ , "tinytest"
+)
+
 i1 <- installed.packages()
 pkgs <- setdiff(pkgs, rownames(i1))
 if (length(pkgs)>0) {

@@ -3,6 +3,25 @@ title: "speculative modeling of plague virulence evolution"
 bibliography: virulence.bib
 ---
 
+## overview
+
+This repo is highly organic, reflecting evolution from a collection of ideas about how to *verbally* explain the evolution of attenuated virulence noted by Sidhu *et al* 2025, to a series of models trying to instantiate and explore those verbal models. A lot of this builds on Parsons *et al* 2025 on "burnout" probabilities.
+
+* the documents in the head directory of the repo (`abstract2.qmd`, `main.qmd`, `notes_*`) are discussion of the verbal model; `virulence.bib` is a collection of useful references on evolution of virulence and math models of plague.
+* `metapop` represents our attempts to develop analytical (Levins-style) and stochastic-simulation models of the metapopulation dynamics. For the single-species Levins-style model, we considered both 2-dimensional (proportion of patches infected, average patch population size) and 3-D (average pop size for both susceptible and infectious patches) model.
+   * `fixedns`: 2D model?
+   * `3d`: 3-D Levins (single-species) model
+   * `stochastic`: initial attempt at stochastic (single-species) model
+   * `poisson`: stochastic model with a different mechanism; consider Poisson colonization rates
+   * `two_strain`: stochastic 2-strain metapop model
+   * `odin`: single-patch stochastic epidemic model written in [odin](https://mrc-ide.github.io/odin/)
+   * `parameters`: discussion of parameter ranges/estimation
+
+Parsons, Todd L., Benjamin M. Bolker, Jonathan Dushoff, and David J. D. Earn. 2024. “The Probability of Epidemic Burnout in the Stochastic SIR Model with Vital Dynamics.” Proceedings of the National Academy of Sciences 121 (5): e2313708120. https://doi.org/10.1073/pnas.2313708120.
+
+Sidhu, Ravneet Kaur, Guillem Mas Fiol, Pierre Lê-Bury, et al. 2025. “Attenuation of Virulence in Yersinia Pestis across Three Plague Pandemics.” Science 388 (6750): eadt3880. https://doi.org/10.1126/science.adt3880.
+
+
 ## general thoughts/brain dump
 
 The observed pattern is that an avirulent strain appears to emerge

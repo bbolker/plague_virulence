@@ -1,10 +1,23 @@
+#!/usr/bin/env Rscript
+library(optparse)
+op.parser <- OptionParser(prog="sim_onestrain_poisson",
+                          option_list = list(
+                            make_option(c("-i", "--input"), "store",
+                                        help = "input data file",
+                                        default = "outputs/sim.rds"),
+                            make_option(c("-o", "--output"), "store",
+                                        help = "output plot file",
+                                        default = "outputs/poisson_plot_alt.pdf"))
+                          )
+                            
+opt <- parse_args(op.parser)
+
 library(tidyverse); theme_set(theme_bw())
 zmargin <- theme(panel.spacing = grid::unit(0, "lines"))
 library(colorspace)
 library(cowplot)
 
-dd <- readRDS("outputs/sim.rds")
-stopifnot(nrow(dd) == 700)
+dd <- readRDS(opt$input)
 
 plot_vars <- c("extinction_rate", "mean_extinct_time",
                "total_pops", "infected_patches", "total_inf")
@@ -87,7 +100,7 @@ for (i in 1:(length(plot_list)-1)) {
 ## cleanup: no y-axis labels (should apply upstream ...)
 plot_list <- lapply(plot_list, \(x) (x + labs(y="")))
 
-pdf("poisson_plot_alt.pdf", width = 20, height = 10)
+pdf(opt$output, width = 20, height = 10)
 suppressWarnings(
   plot_grid(plotlist = plot_list)
 )
