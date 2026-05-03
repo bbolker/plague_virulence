@@ -29,7 +29,7 @@ simulation_funs.Rout: simulation_funs.R
 	$(R) $<
 
 outputs_pip/sim_pip_alpha_rho.rds: sim_pip.R simulation_funs.R
-	./sim_pip.R --cores 26 --nsim 2000
+	./sim_pip.R --cores 26 --nsim 2000 >sim_pip.Rout
 
 test:
 	Rscript --vanilla -e "tinytest::run_test_file('sim_tests.R')"

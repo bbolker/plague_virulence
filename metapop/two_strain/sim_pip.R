@@ -25,11 +25,12 @@ nsim <- opt$nsim
 # Define full parameter grid for PIPs across different alpha and rho values
 dd <- expand.grid(
   R01vec = seq(1.1, 3.0, by = 0.1)
-  , R02vec = seq(1.1, 3.0, by = 0.1)
-  , alphavec = c(1e-5, 5e-5, 1e-4)
-  , rhovec = c(2, 6, 8)
-  , c0vec = c(0.2)
-  , rvec = c(0.5)
+, R02vec = seq(1.1, 3.0, by = 0.1)
+  ## next two are intentionally out of order, to put the 'most interesting' alpha/rho values first
+, alphavec = c(5e-5, 1e-5, 1e-4)
+, rhovec = c(6, 2, 8)
+, c0vec = c(0.2)
+, rvec = c(0.5)
 )
 
 f_ith <- function(i) file.path("outputs_pip/raw", sprintf("res_%05d.rds", i))
