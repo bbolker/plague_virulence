@@ -17,14 +17,15 @@ pars0 <- list(
   initial_inf_ratio_2 = 0.05
 )
 
-source("sim_fun.R")
+source("simulation_funs.R")
 sim1 <- simulate_metapopulation_2strain(n_patches = 2,
                                 n_years  = 10,
                                 R01 = 4, R02 = 4,
                                 alpha = 3.2e-4,
                                 rho = 8,
                                 r = 0.5,
-                                seed = 101)
+                                seed = 101,
+                                coinf_approx = "yy")
 expect_snapshot_print(sim1, label = "sim1")
 
 ## FIXME: more basic sims (e.g. single strain, very high R0, should persist

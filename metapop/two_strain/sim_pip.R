@@ -1,23 +1,35 @@
-source("sim_fun.R")
+#!/usr/bin/env Rscript
+library(optparse)
+op.parser <- OptionParser(prog="sim_twostrain_poisson",
+                          option_list = list(
+                            make_option(c("-o", "--output"), "store", help = "output file name", default = "outputs_pip/sim_pip_alpha_rho.rds"),
+                            make_option(c("-f", "--fixedpop"), "store_true", help="fix population size", default = FALSE),
+                            make_option(c("-c", "--ncores"), "store", help="number of cores", default = 4L),
+                            make_option(c("-n", "--nsim"), "store", help="number of simulations", default = 200L),
+                            make_option(c("-r", "--rerun_existing"), "store_true", help="rerun sims for which output already exists", default = FALSE)
+                          )
+                          )
+opt <- parse_args(op.parser)
+
+source("simulation_funs.R")
 
 # Create directories for PIP results
 dir.create("outputs_pip", showWarnings = FALSE, recursive = TRUE)
 dir.create("outputs_pip/raw", showWarnings = FALSE, recursive = TRUE)
 
-fn_sum <- "outputs_pip/sim_pip_alpha_rho.rds"
+fn_sum <- opt$output
 
-retry <- TRUE
-ncores <- 16
-nsim <- 2000
+ncores <- opt$ncores
+nsim <- opt$nsim
 
 # Define full parameter grid for PIPs across different alpha and rho values
 dd <- expand.grid(
-  R01vec = seq(1.1, 3.0, by = 0.1),
-  R02vec = seq(1.1, 3.0, by = 0.1),
-  alphavec = c(1e-5, 5e-5, 1e-4),
-  rhovec = c(2, 4, 6),
-  c0vec = c(0.2),
-  rvec = c(0.5)
+  R01vec = seq(1.1, 3.0, by = 0.1)
+  , R02vec = seq(1.1, 3.0, by = 0.1)
+  , alphavec = c(1e-5, 5e-5, 1e-4)
+  , rhovec = c(2, 6, 8)
+  , c0vec = c(0.2)
+  , rvec = c(0.5)
 )
 
 f_ith <- function(i) file.path("outputs_pip/raw", sprintf("res_%05d.rds", i))
@@ -26,8 +38,8 @@ cat(sprintf("Starting Multi-PIP sweep with %d combinations...\n", nrow(dd)))
 flush.console()
 
 for (i in 1:nrow(dd)) {
-  
-  if (retry && file.exists(f_ith(i))) next
+
+  if (!opt$rerun_existing && file.exists(f_ith(i))) next
   
   params <- params0_2strain 
   

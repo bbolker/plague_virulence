@@ -62,9 +62,24 @@ plot_fun <- function(focal_metric = "extinction_rate", add_smooth = FALSE, limit
                            ## restrict to 'interesting' cases
                            log10alpha>=(-5.5),
                            log10alpha<=(-3.5))
+
+  rho_labs <- function(values) {
+    lapply(labels, function(values) {
+      browser()
+      values <- paste0("list(",
+                       sprintf("rho: %s", values),
+                       ")")
+      lapply(values, function(expr) c(parse(text = expr)))
+    })
+  }
+  
   gg1 <- gg0 + dd2 +
     geom_line() +
-    facet_grid(log10alpha~rhovec, labeller = label_both) +
+    facet_grid(log10alpha~rhovec,
+               ## https://stackoverflow.com/a/74698645/190277`
+               labeller = labeller(
+                 rhovec = as_labeller(~paste0("rho: ", .x), label_parsed),
+                 log10alpha = as_labeller(~paste0("log[10](alpha): ", .x), label_parsed))) +
     scale_y_continuous(limits = limits,
                        oob = scales::squish) +
     labs(title = title) +
@@ -91,6 +106,8 @@ for (i in 1:nrow(design)) {
   plot_list[[design$focal_metric[i]]] <-
     do.call(plot_fun, design[i,])
 }
+
+if (FALSE) do.call(plot_fun, design[1,])
 
 ## cleanup: colour legend only on last plot
 for (i in 1:(length(plot_list)-1)) {

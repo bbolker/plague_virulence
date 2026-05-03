@@ -41,7 +41,7 @@ simulate_metapopulation_2strain <- function(
     initial_pop_ratio = 1,
     early_stop = FALSE,
     seed = NULL,
-    coinf_approx = c("yy", "polyfit")
+    coinf_approx = c("polyfit", "yy")
 ) {
   if (!require("burnout", quietly = TRUE)) stop("Please install the 'burnout' package")
   if (!is.null(seed)) set.seed(seed)
