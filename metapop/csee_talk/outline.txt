@@ -1,0 +1,28 @@
+
+(15 minutes)
+
+plague basics/natural history/epidemiology
+(3 pandemics, rat-flea transmission, etc.)
+
+Sidhu et al results
+
+tradeoff theory and why it doesn't work
+
+what else could be going on? metapop
+
+(metapop in plague -- Keeling and Gilligan -- and
+in virulence evolution -- Boots, etc etc)
+
+pop-independent
+burnout theory
+
+pop-dependent
+colonization restriction
+R0
+
+model description
+
+single-strain results
+
+two-strain/PIP results
+
