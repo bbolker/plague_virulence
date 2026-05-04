@@ -1,9 +1,22 @@
-## FIXME: add optparse stuff to make inputs/outputs flexible
+#!/usr/bin/env Rscript
+library(optparse)
+op.parser <- OptionParser(prog="assemble_sim_pip",
+                          option_list = list(
+                            make_option(c("-i", "--input"), "store",
+                                        help = "input data dir",
+                                        default = "outputs_pip/raw/"),
+                            make_option(c("-o", "--output"), "store",
+                                        help = "output plot file",
+                                        default = "outputs_pip/sim_pip_alpha_rho.rds")))
+
+opt <- parse_args(op.parser)
+fn_sum <- opt$output
 
 source("simulation_funs.R")
-fn_sum <- "outputs_pip/sim_pip_alpha_rho_tmp.rds"
-dd <- readRDS("sim_pip_design.rds")
-f_ith <- function(i) file.path("outputs_pip/raw", sprintf("res_%05d.rds", i))
+
+dd <- readRDS("sim_pip_design.rds") ## FIXME: make flexible
+f_ith <- function(i) file.path(opt$input, sprintf("res_%05d.rds", i))
+
 ## Summarize results
 res_list <- vector("list", nrow(dd))
 for (i in 1:nrow(dd)) {

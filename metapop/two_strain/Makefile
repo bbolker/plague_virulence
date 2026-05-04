@@ -28,11 +28,14 @@ two_strain.pdf: two_strain.tex
 simulation_funs.Rout: simulation_funs.R
 	$(R) $<
 
-outputs_pip/sim_pip_alpha_rho.rds: sim_pip.R simulation_funs.R
+sim_pip.Rout: sim_pip.R simulation_funs.R
 	./sim_pip.R --cores 26 --nsim 200 >sim_pip.Rout
 
-test:
-	Rscript --vanilla -e "tinytest::run_test_file('sim_tests.R')"
+outputs_pip/sim_pip_alpha_rho.rds: sim_pip.Rout
+	./assemble_pip.R >assemble_pip.Rout
+
+outputs_pip/pip_hybrid.pdf: outputs_pip/sim_pip_alpha_rho.rds plot_pip.R
+	./plot_pip.R >plot_pip.Rout
 
 pkgs: get_pkgs.R
 	$(R) $<

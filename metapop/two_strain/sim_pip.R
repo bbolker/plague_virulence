@@ -32,6 +32,7 @@ dd <- expand.grid(
 , c0vec = c(0.2)
 , rvec = c(0.5)
 )
+dd$run <- seq(nrow(dd)) ## in case we re-order dd later
 
 attr(dd, "ncores") <- ncores
 attr(dd, "nsim") <- nsim

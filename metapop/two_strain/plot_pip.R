@@ -4,16 +4,15 @@ op.parser <- OptionParser(prog="plot_pip",
                           option_list = list(
                             make_option(c("-i", "--input"), "store",
                                         help = "input data file",
-                                        default = "outputs/sim_pip_alpha_rho.rds"),
+                                        default = "outputs_pip/sim_pip_alpha_rho.rds"),
                             make_option(c("-o", "--output"), "store",
                                         help = "output plot file",
                                         default = "outputs_pip/pip_hybrid.pdf"))
                           )
 
-opt$input <- "outputs_pip/sim_pip_alpha_rho_tmp.rds"
+opt <- parse_args(op.parser)
 library(ggplot2)
-fn_sum <- opt$input
-dd_out <- readRDS(fn_sum)
+dd_out <- readRDS(opt$input)
 
 invade_start <- 100
 max_duration <- 400
@@ -30,10 +29,7 @@ params_grid <- unique(dd_out[, c("alphavec", "rhovec")])
 output_pdf <- opt$output
 
 ## FIXME: optionally facet instead?
-plot_fun <- function(i) {
-  cur_alpha <- params_grid$alphavec[i]
-  cur_rho <- params_grid$rhovec[i]
-  sub_dat <- subset(dd_out, alphavec == cur_alpha & rhovec == cur_rho)
+plot_fun <- function(sub_dat, facet = FALSE, title = NULL) {
   p <- ggplot(sub_dat, aes(x = R01vec, y = R02vec, fill = hybrid_metric)) +
     geom_tile() +
     geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "white", alpha = 0.7) +
@@ -61,7 +57,7 @@ plot_fun <- function(i) {
     scale_y_continuous(expand = c(0,0)) +
     theme_bw() +
     labs(
-      title = sprintf("PIP: alpha = %e, rho = %.1f", cur_alpha, cur_rho),
+      title = title,
       x = "Resident R0",
       y = "Invader R0",
       fill = "Invasion capability"
@@ -73,16 +69,26 @@ plot_fun <- function(i) {
       legend.text = element_text(size = 7),
       panel.grid = element_blank()
     )
+
+  if (facet) {
+    p <- p + facet_grid(alphavec ~ rhovec, labeller = label_both)
+  }
   return(p)
 }
 
-plot_fun(4)
-plot_fun(5)
-pdf(output_pdf, width = 8.5, height = 10)
+plot_fun(dd_out, facet = TRUE)
+ggsave(output_pdf, width = 8.5, height = 10)
 
-for (i in 1:nrow(params_grid)) {
-  print(plot_fun(i))
+## alternative approach
+if (FALSE) {
+  pdf(output_pdf, width = 8.5, height = 10)
+  for (i in 1:nrow(params_grid)) {
+    cur_alpha <- params_grid$alphavec[i]
+    cur_rho <- params_grid$rhovec[i]
+    title <- sprintf("PIP: alpha = %e, rho = %.1f", cur_alpha, cur_rho)
+    sub_dat <- subset(dd_out, alphavec == cur_alpha & rhovec == cur_rho)
+    print(plot_fun(sub_dat, title = title))
+  }
+  invisible(dev.off())
+  cat("PIP PDF with log-time scale saved to:", output_pdf, "\n")
 }
-
-invisible(dev.off())
-cat("PIP PDF with log-time scale saved to:", output_pdf, "\n")
