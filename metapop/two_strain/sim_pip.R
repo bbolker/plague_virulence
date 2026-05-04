@@ -33,6 +33,11 @@ dd <- expand.grid(
 , rvec = c(0.5)
 )
 
+attr(dd, "ncores") <- ncores
+attr(dd, "nsim") <- nsim
+attr(dd, "params0") <- params0_2strain
+
+saveRDS(dd, "sim_pip_design.rds")
 f_ith <- function(i) file.path("outputs_pip/raw", sprintf("res_%05d.rds", i))
 
 cat(sprintf("Starting Multi-PIP sweep with %d combinations...\n", nrow(dd)))

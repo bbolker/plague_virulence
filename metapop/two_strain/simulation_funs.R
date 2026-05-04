@@ -265,7 +265,8 @@ sumfun_2strain <- function(x, nsteps = 100, invade_year = 100) {
   total_pops_1 <- mean(x$total_pops[yr_vec, ], na.rm = TRUE)
   total_pops_2 <- total_pops_1
   
-  # Return fully standardized names
+  ## Return fully standardized names
+  ## FIXME:: could use unlist(tibble::lst(...)) to get self-naming vector
   c(
     extinction_rate_1 = extinction_rate_1,
     extinction_rate_2 = extinction_rate_2,

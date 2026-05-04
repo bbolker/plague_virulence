@@ -1,6 +1,18 @@
-library(ggplot2)
+#!/usr/bin/env Rscript
+library(optparse)
+op.parser <- OptionParser(prog="plot_pip",
+                          option_list = list(
+                            make_option(c("-i", "--input"), "store",
+                                        help = "input data file",
+                                        default = "outputs/sim_pip_alpha_rho.rds"),
+                            make_option(c("-o", "--output"), "store",
+                                        help = "output plot file",
+                                        default = "outputs_pip/pip_hybrid.pdf"))
+                          )
 
-fn_sum <- "outputs_pip/sim_pip_alpha_rho.rds"
+opt$input <- "outputs_pip/sim_pip_alpha_rho_tmp.rds"
+library(ggplot2)
+fn_sum <- opt$input
 dd_out <- readRDS(fn_sum)
 
 invade_start <- 100
@@ -15,16 +27,13 @@ dd_out$hybrid_metric <- ifelse(
 )
 
 params_grid <- unique(dd_out[, c("alphavec", "rhovec")])
-output_pdf <- "outputs_pip/pip_hybrid.pdf"
+output_pdf <- opt$output
 
-pdf(output_pdf, width = 8.5, height = 10)
-
-for (i in 1:nrow(params_grid)) {
+## FIXME: optionally facet instead?
+plot_fun <- function(i) {
   cur_alpha <- params_grid$alphavec[i]
   cur_rho <- params_grid$rhovec[i]
-  
   sub_dat <- subset(dd_out, alphavec == cur_alpha & rhovec == cur_rho)
-  
   p <- ggplot(sub_dat, aes(x = R01vec, y = R02vec, fill = hybrid_metric)) +
     geom_tile() +
     geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "white", alpha = 0.7) +
@@ -47,7 +56,9 @@ for (i in 1:nrow(params_grid)) {
         "50% ", 
         "\n100% (persistence probability)\n"
       )
-    ) + 
+    ) +
+    scale_x_continuous(expand = c(0,0)) +
+    scale_y_continuous(expand = c(0,0)) +
     theme_bw() +
     labs(
       title = sprintf("PIP: alpha = %e, rho = %.1f", cur_alpha, cur_rho),
@@ -62,8 +73,15 @@ for (i in 1:nrow(params_grid)) {
       legend.text = element_text(size = 7),
       panel.grid = element_blank()
     )
-  
-  print(p)
+  return(p)
+}
+
+plot_fun(4)
+plot_fun(5)
+pdf(output_pdf, width = 8.5, height = 10)
+
+for (i in 1:nrow(params_grid)) {
+  print(plot_fun(i))
 }
 
 invisible(dev.off())
