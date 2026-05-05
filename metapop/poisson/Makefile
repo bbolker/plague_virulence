@@ -12,6 +12,10 @@ outputs/poisson_plot_alt.pdf: outputs/sim.rds plot_alt.R
 outputs/poisson_plot_alt_fixed.pdf: outputs/sim_fixed.rds plot_alt.R
 	./plot_alt.R -i outputs/sim_fixed.rds -o $@
 
+## outputs/sim_fixed.ppa.pdf:
+outputs/%.ppa.pdf: plot_alt.R outputs/%.rds
+	./$< -i outputs/$*.rds -o $@
+
 332:
 	git commit -am "Meeting with Ben"
 	git pull
