@@ -46,7 +46,8 @@ qp_smooth <- geom_smooth(method = "gam",
 
 ## use log10-alpha (prettier for non-integer values)
 gg0 <- ggplot(dd_long,
-              aes(R0vec, value, colour = log10alpha, group = log10alpha)) +
+              ## aes(R0vec, value, colour = log10alpha, group = log10alpha)) +
+              aes(R0vec, value, group = log10alpha)) +
   geom_point() +
   # use guide_legend rather than guide_colourbar since we have discrete values anyway
   scale_color_continuous_sequential(palette = "Heat",
