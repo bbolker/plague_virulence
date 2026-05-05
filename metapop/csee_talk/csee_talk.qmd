@@ -34,12 +34,35 @@ in virulence evolution -- Boots, etc etc)
 * pop-independent (burnout theory)
 * pop-dependent: colonization restriction; dens-dep $\rzero$
 
-## model description
+## model description (1)
+
+* simplification!
+* analytical (Levins-style) models
+* stochastic models
+
+## model description (2)
+
+* **growth**:
+* **epidemic**:
+* **colonization**:
+* **?**
+
+## model parameters
+
+* $\rzero$ (*within-patch*)
+* $\rho$: rat "carrying capacity"
+* $c$: colonization rate
+* $\alpha$: 
+* $r$, $K$: host demography
+* (number of metapopulation patches)
 
 ## single-strain results
 
 ## two-strain/PIP results
 
+## conclusions
+
+## open questions (lots!)
 
 
 

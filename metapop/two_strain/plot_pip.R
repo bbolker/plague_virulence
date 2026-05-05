@@ -31,7 +31,7 @@ output_pdf <- opt$output
 ## FIXME: optionally facet instead?
 plot_fun <- function(sub_dat, facet = FALSE, title = NULL) {
   p <- ggplot(sub_dat, aes(x = R01vec, y = R02vec, fill = hybrid_metric)) +
-    geom_tile() +
+    geom_raster() +
     geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "white", alpha = 0.7) +
     scale_fill_viridis_c(
       option = "magma",
