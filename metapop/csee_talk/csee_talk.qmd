@@ -1,0 +1,45 @@
+---
+title: "Evolution of plague virulence"
+format: revealjs
+---
+
+## the question
+
+What (eco-)evolutionary dynamics drove the repeated evolution of reduced virulence in *Yersinia pestis* in multiple pandemics?
+
+## plague basics
+
+* vector-borne bacterial disease of rodents
+    * rats and fleas
+* spillover into human populations
+    * human-to-human (or human-vector-human) transmission possible, but unusual
+* history:
+    * originated Bronze Age, $\approx$ 5-6 KYBP
+    * three **pandemics**: 540-750 AD, 1347-18th c., 1850-20th c.
+
+
+## Sidhu et al results
+
+## tradeoff theory and why it doesn't work
+
+## what else could be going on? metapop
+
+(metapop in plague -- Keeling and Gilligan -- and
+in virulence evolution -- Boots, etc etc)
+
+## hypotheses
+
+\newcommand{\rzero}{{\cal R}_0}
+
+* pop-independent (burnout theory)
+* pop-dependent: colonization restriction; dens-dep $\rzero$
+
+## model description
+
+## single-strain results
+
+## two-strain/PIP results
+
+
+
+
