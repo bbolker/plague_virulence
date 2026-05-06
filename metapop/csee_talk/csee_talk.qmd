@@ -1,8 +1,20 @@
 ---
 title: "Evolution of plague virulence"
-format: revealjs
+bibliography: ../../virulence.bib
+format:
+  revealjs:
+    embed-resources: true
+revealjs-plugins:
+  - editable
+filters:
+  - editable    
 ---
 
+<!-- https://emilhvitfeldt.github.io/quarto-revealjs-editable/
+  quarto add emilhvitfeldt/quarto-revealjs-editable
+  https://emilhvitfeldt.github.io/quarto-revealjs-editable/getting-started.html
+  -->
+  
 ## the question
 
 What (eco-)evolutionary dynamics drove the repeated evolution of reduced virulence in *Yersinia pestis* in multiple pandemics?
@@ -17,8 +29,15 @@ What (eco-)evolutionary dynamics drove the repeated evolution of reduced virulen
     * originated Bronze Age, $\approx$ 5-6 KYBP
     * three **pandemics**: 540-750 AD, 1347-18th c., 1850-20th c.
 
+## observation [@sidhuAttenuationVirulenceYersinia2025]
 
-## Sidhu et al results
+::: {.editable}
+* in each pandemic, *Y. pestis* evolved a lower-virulence phenotype ...
+* via copy-number reduction of a plasmid-encoded virulence *pla* gene
+* in experiments, *pla* depletion reduces mouse mortality from bubonic *Y. pestis*
+:::
+
+![](pix/pla_phylogeny_pand2.png){.editable}
 
 ## tradeoff theory and why it doesn't work
 
@@ -64,5 +83,4 @@ in virulence evolution -- Boots, etc etc)
 
 ## open questions (lots!)
 
-
-
+## References
