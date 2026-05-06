@@ -48,6 +48,12 @@ What (eco-)evolutionary dynamics drove the repeated evolution of reduced virulen
   https://emilhvitfeldt.github.io/quarto-revealjs-editable/getting-started.html
   -->
 
+## acknowledgements
+
+* **Yuyang Zhang**, Jonathan Dushoff, David Earn
+* Ravneet Sidhu, Hendrik Poinar (ancient DNA work)
+* NSERC ($$$)
+
 ## plague basics
 
 * vector-borne bacterial disease of rodents
@@ -72,7 +78,7 @@ What (eco-)evolutionary dynamics drove the repeated evolution of reduced virulen
 * mouse injections with varying levels of *Pla* depletion 
 * infection mortality decreases, survival time increases
 
-```{r echo = FALSE}
+```{r sidhu-mort,echo = FALSE}
 dd4 <- read.csv("Sidhu_mort.csv")  |>
     mutate(across(strain, \(x) reorder(factor(x), gene_ratio,
                                        decreasing = TRUE))) |>
@@ -99,7 +105,7 @@ gg_ttd <- ggplot(dd4, aes(x=strainx, y = dod, colour = strain, fill = strain)) +
 print(gg_ttd)
 ```
 
-## tradeoff theory and why it doesn't work
+## tradeoff theory and why it doesn't work here
 
 ::: {.editable}
 * classical **tradeoff theory**: $\rzero \propto$ transmissibility ($\textrm{time}^{-1}$) × infectious period
@@ -160,6 +166,6 @@ discrete-time ($\approx$ annual?), stochastic metapopulation model
 
 ## conclusions
 
-## open questions (lots!)
+## caveats and open questions (lots!)
 
 ## References {.refs}
