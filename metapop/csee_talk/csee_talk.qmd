@@ -28,7 +28,7 @@ library(colorspace) ## lighten()
    font-size: 14px;
 }
 .tiny {
-   font-size: 8px;
+   font-size: 10px;
 }
 
 h2 { 
@@ -68,7 +68,7 @@ What (eco-)evolutionary dynamics drove the repeated evolution of reduced virulen
     * human-to-human (or human-vector-human) transmission possible, but unusual
 * history:
     * originated Bronze Age, $\approx$ 5-6 KYBP
-    * three **pandemics**: 540-750 AD, 1347-18th c., 1850-20th c.
+    * three **pandemics**: 540-750 AD, 1347-18th c. ("the Black Death"), 1850-1960
 
 ## the inspiration 
 
@@ -106,7 +106,7 @@ gg_ttd <- ggplot(dd4, aes(x=strainx, y = dod, colour = strain, fill = strain)) +
     scale_colour_manual(values = cvec) +
     scale_fill_manual(values = cvec) +
     theme(legend.position = "none") +
-    labs(y = "day of death")
+    labs(y = "day of death", x = "strain")
 
 print(gg_ttd)
 ```
@@ -133,7 +133,7 @@ $\rzero \propto$ transmissibility ($\textrm{time}^{-1}$) × infectious period
    * for virulence evolution (@bootsSmall1999, many others)
 * lower local (**within-patch**) $\rzero$ could be evolutionarily advantageous
 
-## graphical abstract
+## the story as a cartoon
 
 ![](pix/sidhu_graphical_abstract.png){.absolute width=1050px height=557px left=0px top=89px}
 
@@ -141,13 +141,13 @@ $\rzero \propto$ transmissibility ($\textrm{time}^{-1}$) × infectious period
 
 * **burnout** [@Pars+2024]: probability of local, stochastic disease extinction is highest at $\rzero \approx 2$
 * **colonization limitation**: lower $\rzero$ → more surviving hosts → more colonization
-* **density-dependent $\rzero$**: lower $\rzero$ → more surviving hosts → **larger** epidemics (???)
+* **density-dependent $\rzero$**: lower $\rzero$ → more surviving hosts → higher probability of local outbreak (?)
 
 ## models
 
 * extremely simplified
 * discrete-time, one epidemic per time step ($\approx$ annual)
-    * analytical patch occupancy models
+    * analytical patch-occupancy models
 	* stochastic metapopulation model
 
 ## model steps
@@ -156,7 +156,6 @@ $\rzero \propto$ transmissibility ($\textrm{time}^{-1}$) × infectious period
 * **host colonization**: rat movement among patches
 * **epidemic initiation**
    * \# infected fleas per patch $\propto$ total epidemic size
-   * infected flease distributed across patches
    * between-patch transmission depends on available rats and fleas
    * (Poisson) infected fleas per patch spark new epidemic
 * **epidemic size**: epidemic either "fizzles" or follows standard dynamics
@@ -187,7 +186,7 @@ $\rzero \propto$ transmissibility ($\textrm{time}^{-1}$) × infectious period
 
 ## caveats/next steps/open questions
 
-* effects of *Pla* depletion alternative hosts: **sylvatic cycle**
+* effects of *Pla* depletion on alternative hosts: **sylvatic cycle**
 * parameter values very uncertain  
 (what do we really know about 6th century rat/flea ecology?)
 * calibrate metapopulation dynamics based on geography?
