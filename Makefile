@@ -13,4 +13,3 @@ fastslow.pdf: fastslow.R
 
 %.docx: %.qmd virulence.bib
 	quarto render $< --to docx
-
