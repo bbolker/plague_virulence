@@ -1,11 +1,58 @@
 ---
 title: "Evolution of plague virulence"
-format: revealjs
+bibliography: ../../virulence.bib
+format:
+  revealjs:
+    embed-resources: true
+    slide-number: true
+    preview-links: auto
+revealjs-plugins:
+  - editable
+filters:
+  - editable
+csl: reflist2.csl
 ---
 
 ## the question
 
+```{r setup, echo = FALSE, include = FALSE}
+library(tidyverse); theme_set(theme_bw())
+library(colorspace) ## lighten()
+```
+
+<!-- .refs is style for reference page (small text) -->
+<style>
+.refs {
+   font-size: 14px;
+}
+h2 { 
+ color: #3399ff;		
+}
+h3 { 
+ color: #3399ff;		
+}
+.title-slide {
+   background-color: #55bbff;
+}
+<!-- https://stackoverflow.com/questions/50378349/force-column-break-in-rmarkdown-ioslides-columns-2-layout -->
+.forceBreak { -webkit-column-break-after: always; break-after: column; }
+</style>
+
+\newcommand{\rzero}{{\cal R}_0}
+
+
 What (eco-)evolutionary dynamics drove the repeated evolution of reduced virulence in *Yersinia pestis* in multiple pandemics?
+
+<!-- https://emilhvitfeldt.github.io/quarto-revealjs-editable/
+  quarto add emilhvitfeldt/quarto-revealjs-editable
+  https://emilhvitfeldt.github.io/quarto-revealjs-editable/getting-started.html
+  -->
+
+## acknowledgements
+
+* **Yuyang Zhang**, Jonathan Dushoff, David Earn
+* Ravneet Sidhu, Hendrik Poinar (ancient DNA work)
+* NSERC ($$$)
 
 ## plague basics
 
@@ -17,22 +64,72 @@ What (eco-)evolutionary dynamics drove the repeated evolution of reduced virulen
     * originated Bronze Age, $\approx$ 5-6 KYBP
     * three **pandemics**: 540-750 AD, 1347-18th c., 1850-20th c.
 
+## observation [@sidhuAttenuationVirulenceYersinia2025]
 
-## Sidhu et al results
+::: {.editable}
+* in each pandemic, *Y. pestis* evolved a lower-virulence phenotype ...
+* via copy-number reduction of a plasmid-encoded virulence *Pla* gene
+:::
 
-## tradeoff theory and why it doesn't work
+![](pix/pla_phylogeny_pand2.png){.editable}
 
-## what else could be going on? metapop
+## experimental mortality data
 
-(metapop in plague -- Keeling and Gilligan -- and
-in virulence evolution -- Boots, etc etc)
+* mouse injections with varying levels of *Pla* depletion 
+* infection mortality decreases, survival time increases
 
-## hypotheses
+```{r sidhu-mort,echo = FALSE}
+dd4 <- read.csv("Sidhu_mort.csv")  |>
+    mutate(across(strain, \(x) reorder(factor(x), gene_ratio,
+                                       decreasing = TRUE))) |>
+    arrange(strain) |>
+    mutate(strainx = sprintf("%s\n(%1.1f%% Pla)", strain, gene_ratio) |>
+               factor() |> forcats::fct_inorder()) |>
+    mutate(event = ifelse(dod==20, 0, 1)) ## censoring
+cvec0 <- c("#69BE44", "#49A5DF", "#D5D5D8")
+cvec1 <- c(cvec0[1],
+           lighten(cvec0[2], c(-0.3, 0, 0.3)),
+           cvec0[3])
+cvec <- cvec1
+theme_set(theme_bw(base_size = 16))
 
-\newcommand{\rzero}{{\cal R}_0}
+gg_ttd <- ggplot(dd4, aes(x=strainx, y = dod, colour = strain, fill = strain)) +
+    geom_dotplot(binaxis="y", stackdir = "center", binwidth = 0.5) +
+    geom_boxplot(alpha = 0.2) + 
+    expand_limits(y=0) +
+    scale_colour_manual(values = cvec) +
+    scale_fill_manual(values = cvec) +
+    theme(legend.position = "none") +
+    labs(y = "day of death")
 
-* pop-independent (burnout theory)
-* pop-dependent: colonization restriction; dens-dep $\rzero$
+print(gg_ttd)
+```
+
+## tradeoff theory and why it doesn't work here
+
+::: {.editable}
+* classical **tradeoff theory**: $\rzero \propto$ transmissibility ($\textrm{time}^{-1}$) × infectious period
+* assumes transmission is continuous
+* but fleas move/transmission occurs **at host death**
+* → *Pla* depletion **lowers** $\rzero$
+:::
+
+![](pix/lenski_date.png){.editable}
+![](pix/lenski_hdr.png){.editable}
+![](pix/lenski_text.png){.editable}
+
+## what else is going on?
+
+* metapopulation dynamics
+   * for plague persistence [@KeelGill2000b]
+   * for virulence evolution [@bootsSmall1999]
+* lower local (**within-patch**) $\rzero$ could be evolutionarily advantageous
+
+## metapopulation mechanisms
+
+* **burnout** [@Pars+2024]: probability of disease extinction is maximal at $\rzero \approx 2$
+* **colonization limitation**: lower $\rzero$ → more surviving hosts → more colonization
+* **density-dependent $\rzero$**: lower $\rzero$ → more surviving hosts → **larger** epidemics (???)
 
 ## model description (1)
 
@@ -42,27 +139,33 @@ in virulence evolution -- Boots, etc etc)
 
 ## model description (2)
 
-* **growth**:
-* **epidemic**:
-* **colonization**:
-* **?**
+discrete-time ($\approx$ annual?), stochastic metapopulation model
 
+* **growth**: logistic growth of hosts
+* **host colonization**: redistribution of hosts among patches
+* **epidemic initiation**
+   * \# infected fleas from each patch $\propto$ total epidemic size
+   * distributed locally and across patches
+   * between-patch transmission depends on available rats and fleas
+   * Poisson-distributed number of fleas per patch sparks new epidemic
+* **epidemic size**: epidemic may "fizzle" or follow standard dynamics
+   
 ## model parameters
 
-* $\rzero$ (*within-patch*)
-* $\rho$: rat "carrying capacity"
-* $c$: colonization rate
-* $\alpha$: 
+* $\rzero$ (**within-patch**)
+* $\rho$: rat "carrying capacity" for fleas
+* $c$: rat colonization probability
+* $\alpha$: transmission efficiency (per infected flea)
 * $r$, $K$: host demography
 * (number of metapopulation patches)
 
 ## single-strain results
 
+
 ## two-strain/PIP results
 
 ## conclusions
 
-## open questions (lots!)
+## caveats and open questions (lots!)
 
-
-
+## References {.refs}
