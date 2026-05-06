@@ -10,14 +10,22 @@ filters:
   - editable    
 ---
 
+## the question
+
+```{r setup, echo = FALSE, include = FALSE}
+library(tidyverse); theme_set(theme_bw())
+library(colorspace) ## lighten()
+```
+
+\newcommand{\rzero}{{\cal R}_0}
+
+
+What (eco-)evolutionary dynamics drove the repeated evolution of reduced virulence in *Yersinia pestis* in multiple pandemics?
+
 <!-- https://emilhvitfeldt.github.io/quarto-revealjs-editable/
   quarto add emilhvitfeldt/quarto-revealjs-editable
   https://emilhvitfeldt.github.io/quarto-revealjs-editable/getting-started.html
   -->
-  
-## the question
-
-What (eco-)evolutionary dynamics drove the repeated evolution of reduced virulence in *Yersinia pestis* in multiple pandemics?
 
 ## plague basics
 
@@ -33,25 +41,71 @@ What (eco-)evolutionary dynamics drove the repeated evolution of reduced virulen
 
 ::: {.editable}
 * in each pandemic, *Y. pestis* evolved a lower-virulence phenotype ...
-* via copy-number reduction of a plasmid-encoded virulence *pla* gene
-* in experiments, *pla* depletion reduces mouse mortality from bubonic *Y. pestis*
+* via copy-number reduction of a plasmid-encoded virulence *Pla* gene
 :::
 
 ![](pix/pla_phylogeny_pand2.png){.editable}
 
+## experimental mortality data
+
+* mouse injections with varying levels of *Pla* depletion 
+* infection mortality decreases, survival time increases
+
+```{r echo = FALSE}
+dd4 <- read.csv("Sidhu_mort.csv")  |>
+    mutate(across(strain, \(x) reorder(factor(x), gene_ratio,
+                                       decreasing = TRUE))) |>
+    arrange(strain) |>
+    mutate(strainx = sprintf("%s\n(%1.1f%% Pla)", strain, gene_ratio) |>
+               factor() |> forcats::fct_inorder()) |>
+    mutate(event = ifelse(dod==20, 0, 1)) ## censoring
+cvec0 <- c("#69BE44", "#49A5DF", "#D5D5D8")
+cvec1 <- c(cvec0[1],
+           lighten(cvec0[2], c(-0.3, 0, 0.3)),
+           cvec0[3])
+cvec <- cvec1
+theme_set(theme_bw(base_size = 16))
+
+gg_ttd <- ggplot(dd4, aes(x=strainx, y = dod, colour = strain, fill = strain)) +
+    geom_dotplot(binaxis="y", stackdir = "center", binwidth = 0.5) +
+    geom_boxplot(alpha = 0.2) + 
+    expand_limits(y=0) +
+    scale_colour_manual(values = cvec) +
+    scale_fill_manual(values = cvec) +
+    theme(legend.position = "none") +
+    labs(y = "day of death")
+
+print(gg_ttd)
+```
+
 ## tradeoff theory and why it doesn't work
 
-## what else could be going on? metapop
+::: {.editable}
+* classical **tradeoff theory**: $\rzero \propto$ transmissibility ($\textrm{time}^{-1}$) × infectious period
+* assumes transmission is continuous
+* but fleas move/transmission occurs **at host death**
+* → *Pla* depletion **lowers** $\rzero$
+:::
 
-(metapop in plague -- Keeling and Gilligan -- and
-in virulence evolution -- Boots, etc etc)
+![](pix/lenski_date.png){.editable}
+![](pix/lenski_hdr.png){.editable}
+![](pix/lenski_text.png){.editable}
 
-## hypotheses
+## what else is going on?
 
-\newcommand{\rzero}{{\cal R}_0}
+* metapopulation dynamics
+   * for plague persistence [@KeelGill2000b]
+   * for virulence evolution [@bootsSmall1999]
+* lower local (**within-patch**) $\rzero$ could be evolutionarily advantageous
 
-* pop-independent (burnout theory)
-* pop-dependent: colonization restriction; dens-dep $\rzero$
+##
+
+
+## metapopulation mechanisms
+
+* **burnout** [@Pars+2024]: probability of disease extinction is maximal at $\rzero \approx 2$
+* **colonization limitation**: lower $\rzero$ → more surviving hosts → more colonization
+* **density-dependent $\rzero$**: lower $\rzero$ → more surviving hosts → **larger** epidemics (???)
 
 ## model description (1)
 
@@ -61,21 +115,28 @@ in virulence evolution -- Boots, etc etc)
 
 ## model description (2)
 
-* **growth**:
-* **epidemic**:
-* **colonization**:
-* **?**
+discrete-time ($\approx$ annual?), stochastic metapopulation model
 
+* **growth**: logistic growth of hosts
+* **host colonization**: redistribution of hosts among patches
+* **epidemic initiation**
+   * # of infected fleas from each patch $\propto$ total epidemic size
+   * distributed locally and across patches
+   * between-patch transmission depends on available rats and fleas
+   * Poisson-distributed number of fleas per patch sparks new epidemic
+* **epidemic size**: epidemic may "fizzle" or follow standard dynamics
+   
 ## model parameters
 
-* $\rzero$ (*within-patch*)
-* $\rho$: rat "carrying capacity"
-* $c$: colonization rate
-* $\alpha$: 
+* $\rzero$ (**within-patch**)
+* $\rho$: rat "carrying capacity" for fleas
+* $c$: rat colonization probability
+* $\alpha$: transmission efficiency (per infected flea)
 * $r$, $K$: host demography
 * (number of metapopulation patches)
 
 ## single-strain results
+
 
 ## two-strain/PIP results
 
