@@ -1,9 +1,6 @@
 ## To do
 
-* look up instructions for uploading!
-* play with figure/text placement (revealjs)
-* results figures !!
-* conclusions ...
+* look up instructions for uploading! https://dashboard.fourwaves.com/participant/my-submissions
 * burnout figure (as extra)?
-* figure from Sidhu et al graphical abstract
-* acknowledgements
+* clean up plots
+

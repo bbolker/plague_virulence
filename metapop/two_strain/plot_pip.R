@@ -76,6 +76,14 @@ plot_fun <- function(sub_dat, facet = FALSE, title = NULL) {
   return(p)
 }
 
+if (FALSE) {
+  ## for CSEE talk
+  plot_fun(dd_out |> filter(rhovec == 6),
+           facet = FALSE) + facet_grid(. ~ alphavec,
+                                     labeller = label_both)
+  ggsave("pip.png", width = 10, height = 6)
+}
+
 plot_fun(dd_out, facet = TRUE)
 ggsave(output_pdf, width = 8.5, height = 10)
 

@@ -7,7 +7,23 @@ op.parser <- OptionParser(prog="sim_onestrain_poisson",
                                         default = "outputs/sim.rds"),
                             make_option(c("-o", "--output"), "store",
                                         help = "output plot file",
-                                        default = "outputs/poisson_plot_alt.pdf"))
+                                        default = "outputs/poisson_plot_alt.pdf"),
+                            make_option(c("-s", "--smooth"), "store",
+                                        help = "smoother type (options: 'none', 'loess', 'line')",
+                                        default = "loess"),
+                            make_option(c("-w", "--width"), "store",
+                                        help = "plot width",
+                                        default = 20),
+                            make_option(c("--height"), "store",
+                                        help = "plot height",
+                                        default = 10),
+                            make_option(c("--bw", "store_false"),
+                                        help = "black and white plot",
+                                        default = FALSE),
+                            make_option(c("--which", "store",
+                                          help = "plots to create (default = NA)",
+                                          default = NA_integer_))
+                          )
                           )
                             
 opt <- parse_args(op.parser)
@@ -17,7 +33,7 @@ zmargin <- theme(panel.spacing = grid::unit(0, "lines"))
 library(colorspace)
 library(cowplot)
 
-dd <- readRDS(opt$input)
+dd <- readRDS(opt$input) ##  |> na.omit()
 
 plot_vars <- c("extinction_rate", "mean_extinct_time",
                "total_pops", "infected_patches", "total_inf")
@@ -32,7 +48,8 @@ dd_long <- dd |>
     log10alpha = round(log10(alphavec),1),
     alphavec_f = factor(alphavec, levels = unique(alphavec),
                         labels = signif(unique(alphavec), 2))
-  )
+  ) |>
+  na.omit()
 
 ## quasi-binomial smooth (slow)
 qb_smooth <- geom_smooth(method = "gam",
@@ -44,15 +61,23 @@ qp_smooth <- geom_smooth(method = "gam",
                          method.args = list(family = quasipoisson),
                          alpha = 0.2)
 
+## heat_hcl args
+## (n, h = c(0, 90), c. = c(100, 30), l = c(50, 90), power = c(1/5, 
+##     1), gamma = NULL, fixup = TRUE, alpha = 1, ...) 
+
+hpal <-   scale_color_continuous_sequential(
+  l1 = 50, l2 = 70, h1 = 0, h2 = 90, c1 = 100, c2 = 30,
+  guide = guide_legend())
+  # use guide_legend rather than guide_colourbar since we have discrete values anyway
+
 ## use log10-alpha (prettier for non-integer values)
 gg0 <- ggplot(dd_long,
               ## aes(R0vec, value, colour = log10alpha, group = log10alpha)) +
               aes(R0vec, value, group = log10alpha)) +
   geom_point() +
-  # use guide_legend rather than guide_colourbar since we have discrete values anyway
-  scale_color_continuous_sequential(palette = "Heat",
-                                    guide = guide_legend())
+  hpal 
 
+if (!opt$bw) gg0 <- gg0 + aes(colour = log10alpha)
 ## if we did want a reversed colour bar (to match facet ordering top-to-bottom:
 ##  guide_colorbar(reverse=TRUE)
 ## https://aosmith.rbind.io/2018/01/19/reversing-the-order-of-a-ggplot2-legend/
@@ -75,7 +100,6 @@ plot_fun <- function(focal_metric = "extinction_rate", add_smooth = FALSE, limit
   }
   
   gg1 <- gg0 + dd2 +
-    geom_line() +
     facet_grid(log10alpha~rhovec,
                ## https://stackoverflow.com/a/74698645/190277`
                labeller = labeller(
@@ -83,12 +107,20 @@ plot_fun <- function(focal_metric = "extinction_rate", add_smooth = FALSE, limit
                  log10alpha = as_labeller(~paste0("log[10](alpha): ", .x), label_parsed))) +
     scale_y_continuous(limits = limits,
                        oob = scales::squish) +
-    labs(title = title) +
+    labs(title = title, x = expression(R[0])) +
     zmargin
 
+  if (opt$smooth != "line") {
+    gg1 <- gg1 + geom_line()
+  }
+
   if (add_smooth) {
-    ## https://stackoverflow.com/a/46285325/190277
-    gg1 <- gg1 + stat_smooth(geom = "line", lty = 2, alpha = 0.5, se = FALSE)
+    if (opt$smooth == "loess") {
+      ## https://stackoverflow.com/a/46285325/190277
+      gg1 <- gg1 + stat_smooth(geom = "line", lty = 2, alpha = 0.5, se = FALSE)
+    } else if (opt$smooth == "line") {
+      gg1 <- gg1 + geom_line(lty = 2, alpha = 0.5)
+    }
   }
   return(gg1)
   
@@ -103,7 +135,9 @@ design <- tribble(
   "total_inf", TRUE, "Total Infections (x 1e6; quasi-eq)")
 
 plot_list <- list()
-for (i in 1:nrow(design)) {
+which_plots <- if (is.na(opt$which)) 1:nrow(design) else opt$which
+nplots <- length(which_plots)
+for (i in which_plots) {
   plot_list[[design$focal_metric[i]]] <-
     do.call(plot_fun, design[i,])
 }
@@ -111,15 +145,21 @@ for (i in 1:nrow(design)) {
 if (FALSE) do.call(plot_fun, design[1,])
 
 ## cleanup: colour legend only on last plot
-for (i in 1:(length(plot_list)-1)) {
-  plot_list[[i]] <- plot_list[[i]] + guides(color = "none")
+
+if (nplots > 1) {
+  for (i in 1:(nplots-1)) {
+    plot_list[[i]] <- plot_list[[i]] + guides(color = "none")
+  }
 }
 
 ## cleanup: no y-axis labels (should apply upstream ...)
 plot_list <- lapply(plot_list, \(x) (x + labs(y="")))
 
-pdf(opt$output, width = 20, height = 10)
-suppressWarnings(
-  plot_grid(plotlist = plot_list)
-)
+pdf(opt$output, width = opt$width, height = opt$height)
+if (length(opt$which) > 1) {
+  suppressWarnings(
+    plot_grid(plotlist = plot_list)
+  )} else {
+    print(plot_list[[1]])
+  }
 dev.off()

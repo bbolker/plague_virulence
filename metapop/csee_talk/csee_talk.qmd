@@ -1,16 +1,18 @@
 ---
-title: "Evolution of plague virulence"
+title: "Eco-evolutionary dynamics of plague virulence"
 bibliography: ../../virulence.bib
 format:
   revealjs:
     embed-resources: true
     slide-number: true
     preview-links: auto
-revealjs-plugins:
-  - editable
-filters:
-  - editable
+# revealjs-plugins:
+#    - editable
+# filters:
+#    - editable
 csl: reflist2.csl
+nocite: |
+  @Lens1988
 ---
 
 ## the question
@@ -25,6 +27,10 @@ library(colorspace) ## lighten()
 .refs {
    font-size: 14px;
 }
+.tiny {
+   font-size: 8px;
+}
+
 h2 { 
  color: #3399ff;		
 }
@@ -50,7 +56,7 @@ What (eco-)evolutionary dynamics drove the repeated evolution of reduced virulen
 
 ## acknowledgements
 
-* **Yuyang Zhang**, Jonathan Dushoff, David Earn
+* **Yuyang Zhang** (張雨陽), Jonathan Dushoff, David Earn
 * Ravneet Sidhu, Hendrik Poinar (ancient DNA work)
 * NSERC ($$$)
 
@@ -64,14 +70,14 @@ What (eco-)evolutionary dynamics drove the repeated evolution of reduced virulen
     * originated Bronze Age, $\approx$ 5-6 KYBP
     * three **pandemics**: 540-750 AD, 1347-18th c., 1850-20th c.
 
-## observation [@sidhuAttenuationVirulenceYersinia2025]
+## the inspiration 
 
-::: {.editable}
-* in each pandemic, *Y. pestis* evolved a lower-virulence phenotype ...
-* via copy-number reduction of a plasmid-encoded virulence *Pla* gene
+::: {.absolute width=701px height=636px left=-258px top=125px}
+* @sidhuAttenuationVirulenceYersinia2025 showed that *Y. pestis* **repeatedly** evolved a lower-virulence phenotype, in each pandemic
+* via copy-number reduction of a plasmid-encoded virulence gene (*Pla*)
 :::
 
-![](pix/pla_phylogeny_pand2.png){.editable}
+![](pix/pla_phylogeny_pand2.png){.absolute width=776.1px height=537.2px left=515.2px top=74.3px style="transform: rotate(-0.1deg);"}
 
 ## experimental mortality data
 
@@ -105,67 +111,104 @@ gg_ttd <- ggplot(dd4, aes(x=strainx, y = dod, colour = strain, fill = strain)) +
 print(gg_ttd)
 ```
 
-## tradeoff theory and why it doesn't work here
+## tradeoff theory doesn't work here
 
-::: {.editable}
-* classical **tradeoff theory**: $\rzero \propto$ transmissibility ($\textrm{time}^{-1}$) × infectious period
-* assumes transmission is continuous
-* but fleas move/transmission occurs **at host death**
-* → *Pla* depletion **lowers** $\rzero$
+::: {.absolute width=820.6px height=520px left=-257.6px top=161px}
+* classical **tradeoff theory**:  
+$\rzero \propto$ transmissibility ($\textrm{time}^{-1}$) × infectious period
+* assumes transmission occurs continuously
+* but fleas move/transmission occurs **at host death** (!)
+* → *Pla* depletion uniformly **lowers** $\rzero$  
+(and growth rate $r$)
 :::
 
-![](pix/lenski_date.png){.editable}
-![](pix/lenski_hdr.png){.editable}
-![](pix/lenski_text.png){.editable}
+![](pix/lenski_date.png){.absolute width=373px height=63px left=634.9px top=51.6px}
+![](pix/lenski_hdr.png){.absolute width=413.3px height=96.8px left=620px top=101.9px}
+![](pix/lenski_text.png){.absolute width=434.8px height=480.8px left=608.7px top=205.4px}
 
-## what else is going on?
+## then how can this work?
 
 * metapopulation dynamics
    * for plague persistence [@KeelGill2000b]
-   * for virulence evolution [@bootsSmall1999]
+   * for virulence evolution (@bootsSmall1999, many others)
 * lower local (**within-patch**) $\rzero$ could be evolutionarily advantageous
+
+## graphical abstract
+
+![](pix/sidhu_graphical_abstract.png){.absolute width=1050px height=557px left=0px top=89px}
 
 ## metapopulation mechanisms
 
-* **burnout** [@Pars+2024]: probability of disease extinction is maximal at $\rzero \approx 2$
+* **burnout** [@Pars+2024]: probability of local, stochastic disease extinction is highest at $\rzero \approx 2$
 * **colonization limitation**: lower $\rzero$ → more surviving hosts → more colonization
 * **density-dependent $\rzero$**: lower $\rzero$ → more surviving hosts → **larger** epidemics (???)
 
-## model description (1)
+## models
 
-* simplification!
-* analytical (Levins-style) models
-* stochastic models
+* extremely simplified
+* discrete-time, one epidemic per time step ($\approx$ annual)
+    * analytical patch occupancy models
+	* stochastic metapopulation model
 
-## model description (2)
+## model steps
 
-discrete-time ($\approx$ annual?), stochastic metapopulation model
-
-* **growth**: logistic growth of hosts
-* **host colonization**: redistribution of hosts among patches
+* **growth**: logistic growth of rat population
+* **host colonization**: rat movement among patches
 * **epidemic initiation**
-   * \# infected fleas from each patch $\propto$ total epidemic size
-   * distributed locally and across patches
+   * \# infected fleas per patch $\propto$ total epidemic size
+   * infected flease distributed across patches
    * between-patch transmission depends on available rats and fleas
-   * Poisson-distributed number of fleas per patch sparks new epidemic
-* **epidemic size**: epidemic may "fizzle" or follow standard dynamics
+   * (Poisson) infected fleas per patch spark new epidemic
+* **epidemic size**: epidemic either "fizzles" or follows standard dynamics
    
 ## model parameters
 
-* $\rzero$ (**within-patch**)
-* $\rho$: rat "carrying capacity" for fleas
-* $c$: rat colonization probability
+* $\rzero$ (**within-patch**)  
+[captures effects of *Pla* depletion]
+* $\rho$, $c$: rat "carrying capacity" for fleas, colonization probability
 * $\alpha$: transmission efficiency (per infected flea)
 * $r$, $K$: host demography
 * (number of metapopulation patches)
 
 ## single-strain results
 
+![](pix/poisson_ext.png){.absolute width=839px height=687px left=0px top=89px}
 
-## two-strain/PIP results
+## two strains (pairwise invasion plots)
+
+![](pix/pip.png){.absolute width=1111px height=755px left=0px top=64px}
 
 ## conclusions
 
-## caveats and open questions (lots!)
+* metapopulation extinction occurs for intermediate $\rzero$
+* depends on colonization (and demographic?) parameters
+* a metapopulation explanation of virulence evolution seems plausible
+* multiple, potentially interacting mechanisms
+
+## caveats/next steps/open questions
+
+* effects of *Pla* depletion alternative hosts: **sylvatic cycle**
+* parameter values very uncertain  
+(what do we really know about 6th century rat/flea ecology?)
+* calibrate metapopulation dynamics based on geography?
+
+![](pix/black_death_spread.png){.absolute width=459px height=307px left=125px top=372px}
+
+:::: {.absolute width=1035px height=52px left=-42px top=709px}
+::: {.tiny}
+Flappiefh - Own work from: Natural Earth ; @cesanaOriginEarlySpread2017
+::::
+:::
 
 ## References {.refs}
+
+::: {#refs}
+:::
+
+## burnout probability
+
+![](pix/parsons_burnout.png){.absolute width=778px height=711px left=0px top=59px}
+
+## single-strain quasi-equilibrium
+
+![](pix/poisson_qepop.png){.absolute width=815px height=705px left=0px top=89px}
