@@ -4,10 +4,13 @@ bibliography: ../../virulence.bib
 format:
   revealjs:
     embed-resources: true
+    slide-number: true
+    preview-links: auto
 revealjs-plugins:
   - editable
 filters:
-  - editable    
+  - editable
+csl: reflist2.csl
 ---
 
 ## the question
@@ -16,6 +19,24 @@ filters:
 library(tidyverse); theme_set(theme_bw())
 library(colorspace) ## lighten()
 ```
+
+<!-- .refs is style for reference page (small text) -->
+<style>
+.refs {
+   font-size: 14px;
+}
+h2 { 
+ color: #3399ff;		
+}
+h3 { 
+ color: #3399ff;		
+}
+.title-slide {
+   background-color: #55bbff;
+}
+<!-- https://stackoverflow.com/questions/50378349/force-column-break-in-rmarkdown-ioslides-columns-2-layout -->
+.forceBreak { -webkit-column-break-after: always; break-after: column; }
+</style>
 
 \newcommand{\rzero}{{\cal R}_0}
 
@@ -98,9 +119,6 @@ print(gg_ttd)
    * for virulence evolution [@bootsSmall1999]
 * lower local (**within-patch**) $\rzero$ could be evolutionarily advantageous
 
-##
-
-
 ## metapopulation mechanisms
 
 * **burnout** [@Pars+2024]: probability of disease extinction is maximal at $\rzero \approx 2$
@@ -120,7 +138,7 @@ discrete-time ($\approx$ annual?), stochastic metapopulation model
 * **growth**: logistic growth of hosts
 * **host colonization**: redistribution of hosts among patches
 * **epidemic initiation**
-   * # of infected fleas from each patch $\propto$ total epidemic size
+   * \# infected fleas from each patch $\propto$ total epidemic size
    * distributed locally and across patches
    * between-patch transmission depends on available rats and fleas
    * Poisson-distributed number of fleas per patch sparks new epidemic
@@ -144,4 +162,4 @@ discrete-time ($\approx$ annual?), stochastic metapopulation model
 
 ## open questions (lots!)
 
-## References
+## References {.refs}
