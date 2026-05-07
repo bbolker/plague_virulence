@@ -1,3 +1,6 @@
+#' 'min-like' function that approaches a, b smoothly as the other increases
+phi_minfun <- function(a, b) a*(1-exp(-b/a))
+
 if (!file.exists("polyfit.rda")) {
   stop("please `make polyfit.rda`")
 }
@@ -110,7 +113,7 @@ simulate_metapopulation_2strain <- function(
     q2 <- ifelse(S_last_total > 0, S2[, k-1] / S_last_total, 0)
     
     # Calculate Transport Bottleneck (Min function for fleas vs migration capacity)
-    E_total <- pmin(nu * S_last_total, rho * c0 * N_after_growth)
+    E_total <- phi_minfun(nu * S_last_total, rho * c0 * N_after_growth)
     R_total <- nu * S_last_total - E_total # Retained fleas
     
     # Force of Infection 
@@ -205,7 +208,7 @@ mult_sim_2strain <- function(nsim, params, verbose = FALSE,
     clusterExport(cl, polyfit_objs)
     clusterExport(cl, "lp", envir = environment())
     clusterEvalQ(cl, .libPaths(lp))
-    clusterExport(cl, c("simulate_metapopulation_2strain", "params"), envir = environment())
+    clusterExport(cl, c("simulate_metapopulation_2strain", "params", "phi_minfun"), envir = environment())
     clusterEvalQ(cl, library(burnout))
     if (!is.null(seed)) clusterSetRNGStream(cl, seed)
     
