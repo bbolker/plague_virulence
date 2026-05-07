@@ -1,10 +1,6 @@
 ## To do
 
-### 2 May 2026
-
-* slides for CSEE (!) (due May 6)
-    * results slides
-    * eye candy?
+* update CSEE slides?
 * tweak poisson/sim.R; allow sim prefix
 * allow burnout in poisson sim?
 * implement density-dependent R0?
