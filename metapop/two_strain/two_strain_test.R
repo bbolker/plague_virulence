@@ -1,5 +1,5 @@
 library(burnout) 
-source("sim_fun.R")
+source("simulation_funs.R")
 
 ## if profiling
 ## Rprof()

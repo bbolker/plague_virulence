@@ -61,8 +61,9 @@ simulate_metapopulation_2strain <- function(
   ## Initialize recording structures
   ## Total host population across 4 stages
   dn0 <- list(patch = seq.int(n_patches), year = seq.int(n_years))
-  N <- array(0, dim = c(n_patches, n_years, 4),
-             dimnames = c(dn0, list(stage = c("begin", "after_growth", "after_colonization", "end"))))
+  dnames <- c("begin", "after_growth", "after_colonization", "end")
+  N <- array(0, dim = c(n_patches, n_years, length(dnames)),
+             dimnames = c(dn0, list(stage = dnames)))
 
   smat <- function() matrix(0, nrow = n_patches, ncol = n_years, dimnames = dn0)
   I1 <- smat()  # Indicator for Strain 1
