@@ -8,14 +8,15 @@ if (!requireNamespace("gsl", quietly = TRUE)) {
 source("two_strain_burnout.R")
 
 ans <- two_strain_wave_burnout(
-  R01 = 2.0,
-  R02 = 2.2,
+  R01 = 2.2,
+  R02 = 1.8,
   epsilon = 0.01,
   N = 1e6,
   k1 = 1,
   k2 = 1,
   dt = 0.01,
-  t_max = 200
+  t_max = 200,
+  n_x=4000L
 )
 
 cat("\nTwo-strain burnout summary\n")
