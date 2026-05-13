@@ -58,7 +58,7 @@ simulate_metapopulation <- function(
   I[infected_patches_init, 1, "begin"] <- 1
   
   # Derived parameters
-  P_f <- 1 / R0
+  P_fizzle <- 1 / R0
   z <- final_size(R0)
   
   for (k in 1:n_years) {
@@ -90,10 +90,11 @@ simulate_metapopulation <- function(
       Lambda_i <- lambda_R + sum(lambda_E) / n_patches
       
       # 5. Infection establishment (Poisson thinning accounts for fizzle)
-      lambda_thinned <- alpha * Lambda_i * max(0, 1 - P_f)
+      lambda_thinned <- alpha * Lambda_i * max(0, 1 - P_fizzle)
       a <- rpois(n_patches, lambda_thinned)
       I[, k, "after_colonization"] <- as.numeric(a > 0)
     } else {
+      ## First year: infection status remains unchanged during colonization
       I[, k, "after_colonization"] <- I[, k, "after_growth"]
     }
     

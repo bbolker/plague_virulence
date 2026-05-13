@@ -13,5 +13,8 @@ plot_batch1.pdf: outputs/sim_batch1.rds outputs/sim_batch0.rds simulation_funs.R
 plot_batch0.pdf: outputs/sim_batch0.rds simulation_funs.R plot_batch0.R
 	R CMD BATCH --vanilla plot_batch0.R
 
+plot_batch2.pdf: outputs/sim_batch1.rds outputs/sim_batch0.rds ../poisson/plot_alt.R
+	../poisson/plot_alt.R --which 1 -i outputs/sim_batch0.rds -o $@
+
 clean:
 	rm *~ \#*

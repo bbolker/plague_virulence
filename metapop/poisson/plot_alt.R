@@ -36,12 +36,13 @@ library(cowplot)
 dd <- readRDS(opt$input) ##  |> na.omit()
 
 plot_vars <- c("extinction_rate", "mean_extinct_time",
-               "total_pops", "infected_patches", "total_inf")
+               "total_pops", "infected_patches", "total_inf", "total_pops_qe")
 
+id_vars <- c("R0vec", "alphavec", "rhovec", "c0vec", "rvec")
 dd_long <- dd |>
   mutate(across(c(total_pops, total_inf), ~ . / 1e6)) |>
-  select(R0vec, alphavec, rhovec, c0vec, rvec, all_of(plot_vars)) |>
-  pivot_longer(cols = all_of(plot_vars),
+  select(any_of(id_vars), any_of(plot_vars)) |>
+  pivot_longer(cols = any_of(plot_vars),
                names_to = "metric") |>
   mutate(
     metric = factor(metric, levels = plot_vars),
@@ -89,9 +90,20 @@ plot_fun <- function(focal_metric = "extinction_rate", add_smooth = FALSE, limit
                            log10alpha>=(-5.5),
                            log10alpha<=(-3.5))
 
+  if ("rhovec" %in% names(dd2)) {
+    my_facet <- facet_grid(log10alpha~rhovec,
+                           ## https://stackoverflow.com/a/74698645/190277`
+                           labeller = labeller(
+                             rhovec = as_labeller(~paste0("rho: ", .x), label_parsed),
+                             log10alpha = as_labeller(~paste0("log[10](alpha): ", .x), label_parsed)))
+  } else {
+    my_facet <- facet_wrap(~log10alpha,
+                           labeller = labeller(
+                             log10alpha = as_labeller(~paste0("log[10](alpha): ", .x), label_parsed)))
+  }
+
   rho_labs <- function(values) {
     lapply(labels, function(values) {
-      browser()
       values <- paste0("list(",
                        sprintf("rho: %s", values),
                        ")")
@@ -100,11 +112,7 @@ plot_fun <- function(focal_metric = "extinction_rate", add_smooth = FALSE, limit
   }
   
   gg1 <- gg0 + dd2 +
-    facet_grid(log10alpha~rhovec,
-               ## https://stackoverflow.com/a/74698645/190277`
-               labeller = labeller(
-                 rhovec = as_labeller(~paste0("rho: ", .x), label_parsed),
-                 log10alpha = as_labeller(~paste0("log[10](alpha): ", .x), label_parsed))) +
+    my_facet +
     scale_y_continuous(limits = limits,
                        oob = scales::squish) +
     labs(title = title, x = expression(R[0])) +
@@ -131,9 +139,11 @@ design <- tribble(
   "mean_extinct_time", FALSE, "Mean Extinction Time",
   "extinction_rate", FALSE, "Extinction Rate",
   "total_pops", TRUE,  "Total host population (x 1e6; quasi-eq)",
+  "total_pops_qe", TRUE,  "Total host population (x 1e6; quasi-eq)",
   "infected_patches", TRUE, "Infected patches (quasi-eq)",
   "total_inf", TRUE, "Total Infections (x 1e6; quasi-eq)")
 
+design <- filter(design, focal_metric %in% unique(dd_long$metric))
 plot_list <- list()
 which_plots <- if (is.na(opt$which)) 1:nrow(design) else opt$which
 nplots <- length(which_plots)
