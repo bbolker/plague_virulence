@@ -7,9 +7,9 @@ format:
     slide-number: true
     preview-links: auto
 # revealjs-plugins:
-#    - editable
+#     - editable
 # filters:
-#   - editable
+#    - editable
 csl: reflist2.csl
 nocite: |
   @Lens1988
@@ -173,7 +173,7 @@ print(gg_ttd)
    * \# infected fleas per patch $\propto$ total epidemic size
    * between-patch transmission depends on available rats and fleas
    * (Poisson) infected fleas per patch spark new epidemic
-* **epidemic size**: epidemic either "fizzles" or follows standard dynamics
+* **epidemic size**: epidemic either "fizzles" or follows standard dynamics; possibility of burnout
    
 ## model parameters
 
@@ -184,13 +184,13 @@ print(gg_ttd)
 * $r$, $K$: host demography
 * (number of metapopulation patches)
 
-## single-strain results (burnout mechanism)
+## single-strain model (burnout)
 
-![](pix/burnout_sum.png)
+![](pix/burnout_sum.png){.absolute width=775px height=598.3px left=0px top=89px}
 
-## single-strain results (colonization limitation)
+## single-strain model (colonization)
 
-![](pix/poisson_ext.png){.absolute width=839px height=687px left=0px top=89px}
+![](pix/poisson_ext.png){.absolute width=775.2px height=599.8px left=0px top=89px}
 
 ## two strains (pairwise invasion plots)
 
