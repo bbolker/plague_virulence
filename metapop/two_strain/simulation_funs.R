@@ -194,40 +194,61 @@ simulate_metapopulation_2strain <- function(
 #' @param verbose Print progress
 #' @param ncores Number of cores
 #' @param seed Master random seed
+#' @param use_cpp Use the C++ simulator (default TRUE); set FALSE for the pure-R version
 mult_sim_2strain <- function(nsim, params, verbose = FALSE,
                              ncores = getOption("sim.ncores", 4),
-                             seed = NULL) {
+                             seed = NULL,
+                             use_cpp = TRUE) {
   require("parallel", quietly = TRUE)
-  
+
+  ## Use a string so do.call() resolves the function in the worker's global env
+  ## rather than from a serialised closure, which avoids environment issues.
+  sim_fun_name <- if (use_cpp) "simulate_metapopulation_2strain_cpp"
+                  else         "simulate_metapopulation_2strain"
+
   wrapper_fun <- function(i) {
     if (verbose) cat(".")
-    do.call(simulate_metapopulation_2strain, params)
+    do.call(sim_fun_name, params)
   }
-  
+
   if (ncores > 1) {
     cl <- makeCluster(ncores)
     lp <- .libPaths()
-    clusterExport(cl, polyfit_objs)
     clusterExport(cl, "lp", envir = environment())
     clusterEvalQ(cl, .libPaths(lp))
-    clusterExport(cl, c("simulate_metapopulation_2strain", "params", "phi_minfun"), envir = environment())
     clusterEvalQ(cl, library(burnout))
+
+    if (use_cpp) {
+      ## Compile the C++ on every worker.  normalizePath gives an absolute path
+      ## so workers don't need a matching working directory.
+      cpp_path <- normalizePath("sim_2strain.cpp")
+      clusterExport(cl, "cpp_path", envir = environment())
+      clusterEvalQ(cl, Rcpp::sourceCpp(cpp_path))
+      ## Ship the R wrapper and the polynomial coefficients it depends on.
+      clusterExport(cl, c("rawcoef_ratio", "rawcoef_finalsize",
+                           "simulate_metapopulation_2strain_cpp"))
+      clusterExport(cl, "params", envir = environment())
+    } else {
+      clusterExport(cl, polyfit_objs)
+      clusterExport(cl, c("simulate_metapopulation_2strain", "phi_minfun", "params"),
+                    envir = environment())
+    }
+
     if (!is.null(seed)) clusterSetRNGStream(cl, seed)
-    
     results <- parLapply(cl, 1:nsim, wrapper_fun)
     stopCluster(cl)
   } else {
     if (!is.null(seed)) set.seed(seed)
     results <- replicate(nsim, wrapper_fun(1), simplify = FALSE)
   }
-  
+
   # Extract components into lists/matrices
   list(
     patches1   = sapply(results, function(res) colSums(res$I1)),
     patches2   = sapply(results, function(res) colSums(res$I2)),
     total_inf1 = sapply(results, function(res) res$total_inf1),
     total_inf2 = sapply(results, function(res) res$total_inf2),
-    total_pops = sapply(results, function(res) colSums(res$N[, , "begin"])) # Get total host pop
+    total_pops = sapply(results, function(res) colSums(res$N[, , "begin"]))
   )
 }
 

@@ -6,7 +6,8 @@ op.parser <- OptionParser(prog="sim_twostrain_poisson",
                             make_option(c("-f", "--fixedpop"), "store_true", help="fix population size", default = FALSE),
                             make_option(c("-c", "--ncores"), "store", help="number of cores", default = 4L),
                             make_option(c("-n", "--nsim"), "store", help="number of simulations", default = 200L),
-                            make_option(c("-r", "--rerun_existing"), "store_true", help="rerun sims for which output already exists", default = FALSE)
+                            make_option(c("-r", "--rerun_existing"), "store_true", help="rerun sims for which output already exists", default = FALSE),
+                            make_option("--use_r", "store_true", help="use pure-R simulator instead of C++ (slower)", default = FALSE)
                           )
                           )
 opt <- parse_args(op.parser)
@@ -58,7 +59,8 @@ for (i in 1:nrow(dd)) {
   params[["r"]] <- dd$rvec[i]
   
   one <- mult_sim_2strain(nsim = nsim, ncores = ncores,
-                          params = params, seed = 100 + i)
+                          params = params, seed = 100 + i,
+                          use_cpp = !opt$use_r)
   
   # Atomic write to prevent file corruption
   tmp <- paste0(f_ith(i), ".tmp")
