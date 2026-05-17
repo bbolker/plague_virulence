@@ -1,0 +1,405 @@
+
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{microtype}
+\usepackage{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.65em}
+\allowdisplaybreaks
+
+\begin{document}
+
+Let \(N\) be the population size. Let \(\tau\) be dimensionless time measured in units of the mean infectious period. Let \(x(\tau)\) be the susceptible fraction, \(y_1(\tau)\) the infected fraction of strain 1, and \(y_2(\tau)\) the infected fraction of strain 2. Let \(\varepsilon\) be the demographic timescale parameter. Let \(\mathcal R_{0,1}\) and \(\mathcal R_{0,2}\) be the basic reproduction numbers of strain 1 and strain 2.
+
+The deterministic two-strain system is
+\[
+\frac{dx}{d\tau}
+=
+\varepsilon(1-x)-\mathcal R_{0,1}xy_1-\mathcal R_{0,2}xy_2,
+\]
+\[
+\frac{dy_1}{d\tau}
+=
+(\mathcal R_{0,1}x-1)y_1,
+\]
+\[
+\frac{dy_2}{d\tau}
+=
+(\mathcal R_{0,2}x-1)y_2.
+\]
+where
+\[
+\mathcal R_{0,1}>1,
+\qquad
+\mathcal R_{0,2}>1.
+\]
+
+The strain-specific boundary-layer thresholds are defined by
+\[
+y_1^\star
+=
+\varepsilon\left(1-\frac{1}{\mathcal R_{0,1}}\right),
+\]
+\[
+y_2^\star
+=
+\varepsilon\left(1-\frac{1}{\mathcal R_{0,2}}\right).
+\]
+
+Assume strain 1 enters its boundary layer before strain 2. The opposite case is obtained by interchanging the labels 1 and 2.
+
+Let \(\tau_1\) be the time at which strain 1 enters its boundary layer on the declining side of the epidemic wave. Define
+\[
+x_a=x(\tau_1),
+\]
+\[
+y_1(\tau_1)=y_1^\star,
+\]
+\[
+y_{2,a}=y_2(\tau_1).
+\]
+By assumption, strain 2 has not yet entered its own boundary layer at this time, so
+\[
+y_{2,a}>y_2^\star.
+\]
+The number of strain-1 infectives at this boundary-layer entrance is
+\[
+m_1=Ny_1^\star.
+\]
+
+Define local time after strain 1 enters its boundary layer by
+\[
+s=\tau-\tau_1.
+\]
+Thus, at \(s=0\),
+\[
+x(0)=x_a,
+\]
+\[
+y_2(0)=y_{2,a}.
+\]
+
+During the first stage, strain 1 is rare while strain 2 remains in the deterministic regime. We approximate strain 1 by a branching process and strain 2 by a deterministic trajectory. In this stage we ignore the feedback of strain 1 on the susceptible pool, and compared with the strain-2 transmission term, $\varepsilon(1-x)$ can be ignored during this phase. Thus the resident strain-2 trajectory is approximated by
+\[
+\frac{dx}{ds}
+=
+-\mathcal R_{0,2}xy_2,
+\]
+\[
+\frac{dy_2}{ds}
+=
+(\mathcal R_{0,2}x-1)y_2.
+\]
+
+By the chain rule,
+\[
+\frac{dy_2}{dx}
+=
+\frac{dy_2/ds}{dx/ds}.
+\]
+Substituting the two equations above gives
+\[
+\frac{dy_2}{dx}
+=
+\frac{(\mathcal R_{0,2}x-1)y_2}{-\mathcal R_{0,2}xy_2}.
+\]
+Cancelling \(y_2\),
+\[
+\frac{dy_2}{dx}
+=
+-1+\frac{1}{\mathcal R_{0,2}x}.
+\]
+Integrating from \((x_a,y_{2,a})\) to \((x,y_2(x))\), using \(u\) as the integration variable,
+\[
+y_2(x)-y_{2,a}
+=
+\int_{x_a}^{x}
+\left(-1+\frac{1}{\mathcal R_{0,2}u}\right)du.
+\]
+Therefore
+\[
+y_2(x)
+=
+y_{2,a}+x_a-x+\frac{1}{\mathcal R_{0,2}}\ln\frac{x}{x_a}.
+\]
+
+Let \(x_b\) be the susceptible fraction at which strain 2 enters its boundary layer. It is determined by
+\[
+y_2(x_b)=y_2^\star.
+\]
+Substituting the expression for \(y_2(x)\),
+\[
+y_{2,a}+x_a-x_b+\frac{1}{\mathcal R_{0,2}}\ln\frac{x_b}{x_a}
+=
+y_2^\star.
+\]
+Define
+\[
+C_2=y_{2,a}+x_a-y_2^\star.
+\]
+Then \(x_b\) satisfies
+\[
+x_b-\frac{1}{\mathcal R_{0,2}}\ln\frac{x_b}{x_a}
+=
+C_2.
+\]
+Equivalently, using the principal branch \(W_0\) of the Lambert \(W\) function,
+\[
+x_b
+=
+-\frac{1}{\mathcal R_{0,2}}
+W_0
+\left(
+-\mathcal R_{0,2}x_a\exp(-\mathcal R_{0,2}C_2)
+\right).
+\]
+At this point, strain 2 has
+\[
+m_2=Ny_2^\star
+\]
+infectives.
+
+We now describe the distribution of strain 1 at the time strain 2 enters its boundary layer. Let \(Z_1(s)\) be the number of strain-1 infectives during the first stage. Since strain 1 is rare, we approximate \(Z_1(s)\) by a time-inhomogeneous linear birth-death process. At local time \(s\), the per capita birth rate of strain 1 is
+\[
+b_1(s)=\mathcal R_{0,1}x(s),
+\]
+and the per capita death rate is
+\[
+d_1(s)=1.
+\]
+
+For a process starting from one strain-1 infective, define the probability generating function
+\[
+G_1(s;z)
+=
+\mathbb E[z^{Z_1(s)}\mid Z_1(0)=1],
+\]
+where \(z\) is the generating-function variable.
+
+For a time-inhomogeneous linear birth-death process with per capita birth rate \(b(s)\) and death rate \(d(s)\), the probability generating function satisfies the backward equation
+\[
+\frac{\partial G}{\partial s}
+=
+b(s)G^2-[b(s)+d(s)]G+d(s),
+\]
+with initial condition
+\[
+G(0;z)=z.
+\]
+In our case,
+\[
+\frac{\partial G_1}{\partial s}
+=
+\mathcal R_{0,1}x(s)G_1^2
+-
+[\mathcal R_{0,1}x(s)+1]G_1
++
+1,
+\]
+with
+\[
+G_1(0;z)=z.
+\]
+
+This is the Riccati equation. Define the cumulative net growth
+\[
+H_1(s)
+=
+\int_0^s[\mathcal R_{0,1}x(u)-1]du,
+\]
+where \(u\) is an integration variable. Define 
+\[
+A_1(s)
+=
+\int_0^s \mathcal R_{0,1}x(v)\exp(H_1(v))dv,
+\]
+where \(v\) is an integration variable. Then the solution of the Riccati equation is
+\[
+G_1(s;z)
+=
+1-
+\frac{\exp(H_1(s))(1-z)}
+{1+(1-z)A_1(s)}.
+\]
+
+We now rewrite these quantities in terms of \(x\), avoiding the need to compute the time at which strain 2 enters its boundary layer. From
+\[
+\frac{dx}{ds}
+=
+-\mathcal R_{0,2}xy_2(x),
+\]
+we have
+\[
+ds
+=
+-\frac{dx}{\mathcal R_{0,2}x y_2(x)}.
+\]
+When the system moves from \(x_a\) to a smaller value \(u\), define
+\[
+\widehat H_1(u)
+=
+\int_u^{x_a}
+\frac{\mathcal R_{0,1}v-1}
+{\mathcal R_{0,2}v\,y_2(v)}
+\,dv,
+\]
+where \(v\) is an integration variable. In particular,
+\[
+\widehat H_1(x_b)
+=
+\int_{x_b}^{x_a}
+\frac{\mathcal R_{0,1}v-1}
+{\mathcal R_{0,2}v\,y_2(v)}
+\,dv.
+\]
+And define
+\[
+\widehat A_1
+=
+\int_{x_b}^{x_a}
+\frac{\mathcal R_{0,1}}
+{\mathcal R_{0,2}y_2(u)}
+\exp(\widehat H_1(u))
+\,du,
+\]
+where \(u\) is an integration variable.
+
+Therefore, from one strain-1 infective at \(x=x_a\), the probability generating function for the number of strain-1 infectives when strain 2 enters its boundary layer is
+\[
+G_1^{1\mid 2}(z)
+=
+1-
+\frac{\exp(\widehat H_1(x_b))(1-z)}
+{1+(1-z)\widehat A_1}.
+\]
+The superscript \(1\mid 2\) indicates that strain 1 is rare while strain 2 is resident.
+
+If there are \(m_1\) strain-1 infectives when strain 1 first enters its boundary layer, the branching property gives the total generating function
+\[
+\left[G_1^{1\mid 2}(z)\right]^{m_1}.
+\]
+
+Now consider the second stage where both strains are in their boundary layers. Let \(r\) be local time starting from the moment strain 2 enters its boundary layer. At \(r=0\),
+\[
+x(0)=x_b.
+\]
+In this common boundary layer, both strains are rare. We ignore the feedback of infections on the susceptible pool, so susceptible recovery is dominated by demographic replenishment only:
+\[
+\frac{dx}{dr}
+=
+\varepsilon(1-x).
+\]
+Solving this equation gives
+\[
+x(r)
+=
+1-(1-x_b)\exp(-\varepsilon r).
+\]
+
+In the common boundary layer, the two strains are approximated as conditionally independent birth-death processes in the same externally determined susceptible environment \(x(r)\). For strain \(i\), where \(i=1,2\), the per capita birth rate is
+\[
+b_i^C(r)=\mathcal R_{0,i}x(r),
+\]
+and the per capita death rate is
+\[
+d_i^C(r)=1.
+\]
+The superscript \(C\) denotes the common boundary layer.
+
+Define the cumulative net growth for strain \(i\) in the common boundary layer by
+\[
+H_i^C(r)
+=
+\int_0^r[\mathcal R_{0,i}x(u)-1]du.
+\]
+Since
+\[
+x(u)=1-(1-x_b)\exp(-\varepsilon u),
+\]
+we obtain
+\[
+H_i^C(r)
+=
+(\mathcal R_{0,i}-1)r
+-
+\frac{\mathcal R_{0,i}(1-x_b)}{\varepsilon}
+(1-\exp(-\varepsilon r)).
+\]
+And define 
+\[
+A_i^C(r)
+=
+\int_0^r
+\mathcal R_{0,i}x(v)\exp(H_i^C(v))dv.
+\]
+The probability generating function at time \(r\) is
+\[
+G_i^C(r;z)
+=
+1-
+\frac{\exp(H_i^C(r))(1-z)}
+{1+(1-z)A_i^C(r)}.
+\]
+Therefore the eventual extinction probability for one strain-\(i\) infective in the common boundary layer is
+\[
+q_i^C
+=
+\lim_{r\to\infty}G_i^C(r;0).
+\]
+Equivalently,
+\[
+q_i^C
+=
+1-
+\lim_{r\to\infty}
+\frac{\exp(H_i^C(r))}
+{1+A_i^C(r)}.
+\]
+
+Then we can get the burnout probability for strain 2. Strain 2 enters its boundary layer with
+\[
+m_2=Ny_2^\star
+\]
+infectives. Each infective lineage has eventual extinction probability \(q_2^C\). Hence
+\[
+Q_2
+=
+(q_2^C)^{m_2}.
+\]
+
+For strain-1, if there are \(n\) strain-1 infectives at that moment, the probability that all of them eventually go extinct in the common boundary layer is
+\[
+(q_1^C)^n.
+\]
+Here \(n\) is the random variable \(Z_1(x_b)\).  We take the expectation
+\[
+\mathbb E[(q_1^C)^{Z_1(x_b)}].
+\]
+By the definition of a probability generating function, this is
+\[
+G_1^{1\mid 2}(q_1^C)
+\]
+for a single initial strain-1 infective at \(x=x_a\). Since strain 1 enters its boundary layer with \(m_1\) infectives, the strain-1 burnout probability for the whole wave is
+\[
+Q_1
+=
+\left[G_1^{1\mid 2}(q_1^C)\right]^{m_1}.
+\]
+
+Thus the one-wave burnout probabilities under the two-boundary approximation are
+\[
+Q_1
+=
+\left[G_1^{1\mid 2}(q_1^C)\right]^{m_1},
+\]
+\[
+Q_2
+=
+(q_2^C)^{m_2}.
+\]
+
+
+\end{document}

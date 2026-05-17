@@ -7,7 +7,7 @@ format:
     slide-number: true
     preview-links: auto
 # revealjs-plugins:
-#    - editable
+#     - editable
 # filters:
 #    - editable
 csl: reflist2.csl
@@ -20,6 +20,7 @@ nocite: |
 ```{r setup, echo = FALSE, include = FALSE}
 library(tidyverse); theme_set(theme_bw())
 library(colorspace) ## lighten()
+library(kableExtra)
 ```
 
 <!-- .refs is style for reference page (small text) -->
@@ -72,12 +73,12 @@ What (eco-)evolutionary dynamics drove the repeated evolution of reduced virulen
 
 ## the inspiration 
 
-::: {.absolute width=701px height=636px left=-258px top=125px}
-* @sidhuAttenuationVirulenceYersinia2025 showed that *Y. pestis* **repeatedly** evolved a lower-virulence phenotype, in each pandemic
-* via copy-number reduction of a plasmid-encoded virulence gene (*Pla*)
+::: {.absolute width=645.5px height=415px left=-94px top=164px}
+* @sidhuAttenuationVirulenceYersinia2025: *Y. pestis* **repeatedly** evolved a lower-virulence phenotype, in each pandemic
+* ... via copy-number reduction of a plasmid-encoded virulence gene (*Pla*)
 :::
 
-![](pix/pla_phylogeny_pand2.png){.absolute width=776.1px height=537.2px left=515.2px top=74.3px style="transform: rotate(-0.1deg);"}
+![](pix/pla_phylogeny_pand2.png){.absolute width=581.5px height=410px left=601px top=82px}
 
 ## experimental mortality data
 
@@ -111,20 +112,30 @@ gg_ttd <- ggplot(dd4, aes(x=strainx, y = dod, colour = strain, fill = strain)) +
 print(gg_ttd)
 ```
 
-## tradeoff theory doesn't work here
+## classical tradeoff theory
 
-::: {.absolute width=820.6px height=520px left=-257.6px top=161px}
+::: {.absolute width=542px height=395px left=0px top=151px}
+* $\rzero \propto$ transmissibility ($\textrm{time}^{-1}$) × infectious period
+* infectious period $\propto$ 1/virulence
+* transmissibility is an increasing, decelerating function of virulence
+* $\to$ $\rzero$, $r$ maximum at *intermediate* virulence
+:::
+
+![](pix/tradeoff3.png){.absolute width=698px height=528px left=573px top=121px}
+
+## tradeoff theory for plague
+
+![](pix/lenski_date.png){.absolute width=373px height=63px left=335px top=97px}
+![](pix/lenski_hdr.png){.absolute width=407px height=105px left=-73px top=80px}
+![](pix/lenski_text.png){.absolute width=575px height=549px left=-1px top=196px}
+
+## tradeoff theory doesn't work here!
+
 * classical **tradeoff theory**:  
-$\rzero \propto$ transmissibility ($\textrm{time}^{-1}$) × infectious period
 * assumes transmission occurs continuously
 * but fleas move/transmission occurs **at host death** (!)
 * → *Pla* depletion uniformly **lowers** $\rzero$  
 (and growth rate $r$)
-:::
-
-![](pix/lenski_date.png){.absolute width=373px height=63px left=634.9px top=51.6px}
-![](pix/lenski_hdr.png){.absolute width=413.3px height=96.8px left=620px top=101.9px}
-![](pix/lenski_text.png){.absolute width=434.8px height=480.8px left=608.7px top=205.4px}
 
 ## then how can this work?
 
@@ -143,6 +154,10 @@ $\rzero \propto$ transmissibility ($\textrm{time}^{-1}$) × infectious period
 * **colonization limitation**: lower $\rzero$ → more surviving hosts → more colonization
 * **density-dependent $\rzero$**: lower $\rzero$ → more surviving hosts → higher probability of local outbreak (?)
 
+## burnout probability
+
+![](pix/parsons_burnout.png){.absolute width=778px height=711px left=0px top=59px}
+
 ## models
 
 * extremely simplified
@@ -158,7 +173,7 @@ $\rzero \propto$ transmissibility ($\textrm{time}^{-1}$) × infectious period
    * \# infected fleas per patch $\propto$ total epidemic size
    * between-patch transmission depends on available rats and fleas
    * (Poisson) infected fleas per patch spark new epidemic
-* **epidemic size**: epidemic either "fizzles" or follows standard dynamics
+* **epidemic size**: epidemic either "fizzles" or follows standard dynamics; possibility of burnout
    
 ## model parameters
 
@@ -169,9 +184,13 @@ $\rzero \propto$ transmissibility ($\textrm{time}^{-1}$) × infectious period
 * $r$, $K$: host demography
 * (number of metapopulation patches)
 
-## single-strain results
+## single-strain model (burnout)
 
-![](pix/poisson_ext.png){.absolute width=839px height=687px left=0px top=89px}
+![](pix/burnout_sum.png){.absolute width=775px height=598.3px left=0px top=89px}
+
+## single-strain model (colonization)
+
+![](pix/poisson_ext.png){.absolute width=775.2px height=599.8px left=0px top=89px}
 
 ## two strains (pairwise invasion plots)
 
@@ -204,10 +223,21 @@ Flappiefh - Own work from: Natural Earth ; @cesanaOriginEarlySpread2017
 ::: {#refs}
 :::
 
-## burnout probability
-
-![](pix/parsons_burnout.png){.absolute width=778px height=711px left=0px top=59px}
-
 ## single-strain quasi-equilibrium
 
 ![](pix/poisson_qepop.png){.absolute width=815px height=705px left=0px top=89px}
+
+## parameters
+
+```{r param-tab, echo =FALSE, output = 'asis'}
+dd <- read_csv("../parameters/parameters.csv") |>
+  filter(type == "param") |>
+  select(Symbol, Definition, Value, minval, maxval) |>
+  ## mutate(across(c(Value, minval, maxval), expSup)) |>
+  mutate(Value = ifelse(is.na(minval), Value,
+                        sprintf("%s - %s", minval, maxval))) |>
+  select(-c(minval, maxval))
+
+kbl(dd, format = "html", escape = FALSE) |>
+  column_spec(2, width = "5in")
+```

@@ -73,6 +73,7 @@ hpal <-   scale_color_continuous_sequential(
   guide = guide_legend())
   # use guide_legend rather than guide_colourbar since we have discrete values anyway
 
+
 ## use log10-alpha (prettier for non-integer values)
 gg0 <- ggplot(dd_long,
               ## aes(R0vec, value, colour = log10alpha, group = log10alpha)) +
@@ -85,94 +86,12 @@ if (!opt$bw) gg0 <- gg0 + aes(colour = log10alpha)
 ##  guide_colorbar(reverse=TRUE)
 ## https://aosmith.rbind.io/2018/01/19/reversing-the-order-of-a-ggplot2-legend/
 
-plot_fun <- function(focal_metric = "extinction_rate", add_smooth = FALSE, limits = c(0, NA),
-                     log10alpha_limits = c(-5.5, -3.5),
-                     title = focal_metric) {
-  dd2 <- dd_long |> filter(metric  == focal_metric,
-                           ## restrict to 'interesting' cases
-                           log10alpha>=log10alpha_limits[1],
-                           log10alpha<=log10alpha_limits[2])
 
-  if ("rhovec" %in% names(dd2)) {
-    my_facet <- facet_grid(log10alpha~rhovec,
-                           ## https://stackoverflow.com/a/74698645/190277`
-                           labeller = labeller(
-                             rhovec = as_labeller(~paste0("rho: ", .x), label_parsed),
-                             log10alpha = as_labeller(~paste0("log[10](alpha): ", .x), label_parsed)))
-  } else {
-    my_facet <- facet_wrap(~log10alpha,
-                           labeller = labeller(
-                             log10alpha = as_labeller(~paste0("log[10](alpha): ", .x), label_parsed)))
-  }
+gg0 + geom_line() + facet_grid(metric ~ log10alpha, scale = "free",
+                               labeller = label_both) +
+  zmargin +
+    theme(strip.text.y = element_text(angle = 0)) +
+    guides(color = "none") +
+    labs(x = expression(R[0]))
 
-  rho_labs <- function(values) {
-    lapply(labels, function(values) {
-      values <- paste0("list(",
-                       sprintf("rho: %s", values),
-                       ")")
-      lapply(values, function(expr) c(parse(text = expr)))
-    })
-  }
-  
-  gg1 <- gg0 + dd2 +
-    my_facet +
-    scale_y_continuous(limits = limits,
-                       oob = scales::squish) +
-    labs(title = title, x = expression(R[0])) +
-    zmargin
-
-  if (opt$smooth != "line") {
-    gg1 <- gg1 + geom_line()
-  }
-
-  if (add_smooth) {
-    if (opt$smooth == "loess") {
-      ## https://stackoverflow.com/a/46285325/190277
-      gg1 <- gg1 + stat_smooth(geom = "line", lty = 2, alpha = 0.5, se = FALSE)
-    } else if (opt$smooth == "line") {
-      gg1 <- gg1 + geom_line(lty = 2, alpha = 0.5)
-    }
-  }
-  return(gg1)
-  
-}
-
-design <- tribble(
-  ~ focal_metric, ~add_smooth, ~title,
-  "mean_extinct_time", FALSE, "Mean Extinction Time",
-  "extinction_rate", FALSE, "Extinction Rate",
-  "total_pops", TRUE,  "Total host population (x 1e6; quasi-eq)",
-  "total_pops_qe", TRUE,  "Total host population (x 1e6; quasi-eq)",
-  "infected_patches", TRUE, "Infected patches (quasi-eq)",
-  "total_inf", TRUE, "Total Infections (x 1e6; quasi-eq)")
-
-design <- filter(design, focal_metric %in% unique(dd_long$metric))
-plot_list <- list()
-which_plots <- if (is.na(opt$which)) 1:nrow(design) else opt$which
-nplots <- length(which_plots)
-for (i in which_plots) {
-  plot_list[[design$focal_metric[i]]] <-
-    do.call(plot_fun, c(design[i,], list(log10alpha_limits = c(-Inf, Inf))))
-}
-
-if (FALSE) do.call(plot_fun, design[1,])
-
-## cleanup: colour legend only on last plot
-
-if (nplots > 1) {
-  for (i in 1:(nplots-1)) {
-    plot_list[[i]] <- plot_list[[i]] + guides(color = "none")
-  }
-}
-
-## cleanup: no y-axis labels (should apply upstream ...)
-plot_list <- lapply(plot_list, \(x) (x + labs(y="")))
-
-pdf(opt$output, width = opt$width, height = opt$height)
-if (length(opt$which) > 1) {
-  suppressWarnings(
-    plot_grid(plotlist = plot_list)
-  )} else {
-    print(plot_list[[1]])
-  }
-dev.off()
+ggsave("burnout_sum.png", width = 10, height = 8)
