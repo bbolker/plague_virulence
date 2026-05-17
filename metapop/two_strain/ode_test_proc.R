@@ -151,5 +151,10 @@ pred_outcomes_poly <- function(R01, R02, I10, I20) {
   unlist(tibble::lst(finalsize, I1frac))
 }
 
-save(pred_outcomes_poly, ode_polyfit_finalsize, ode_polyfit_ratio, file = "polyfit.rda")
+## raw-polynomial coefficients for C++ use (same predictions, avoids orthogonal basis)
+rawcoef_ratio     <- coef(fit1R)   # logit(I1 fraction), variables: R01, R02, log(I10), log(I20)
+rawcoef_finalsize <- coef(fit2R)   # logit(final size),  same variables
+
+save(pred_outcomes_poly, ode_polyfit_finalsize, ode_polyfit_ratio,
+     rawcoef_ratio, rawcoef_finalsize, file = "polyfit.rda")
 

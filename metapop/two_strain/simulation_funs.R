@@ -6,6 +6,8 @@ if (!file.exists("polyfit.rda")) {
 }
 polyfit_objs <- load("polyfit.rda")
 
+Rcpp::sourceCpp("sim_2strain.cpp")
+
 #' Two-Strain Metapopulation Simulation with Vectorized Logic
 #' @param n_patches Number of patches in the metapopulation
 #' @param n_years Number of years to simulate
@@ -148,12 +150,11 @@ simulate_metapopulation_2strain <- function(
     n_coinf <- length(coinf)
     if (n_coinf > 0) {
       if (coinf_approx == "polyfit") {
-        coinf_res[] <- sapply(coinf,
-                            \(i) pred_outcomes_poly(R01, R02, a[i]/N_after_col[i], b[i]/N_after_col[i]))
+        coinf_res[coinf, ] <- t(sapply(coinf,
+                            \(i) pred_outcomes_poly(R01, R02, a[i]/N_after_col[i], b[i]/N_after_col[i])))
       } else {  ## approx "YY"
-        # Partition Z based on initial seed ratios (Galton-Watson allocation)
-        ## will use ifelse() below to avoid 0/0 outcomes
-        coinf_res[] <- cbind(rep(z_vec[3], n_coinf), a/(a+b))
+        coinf_res[coinf, "finalsize"] <- z_vec[3]
+        coinf_res[coinf, "I1frac"]    <- a[coinf] / (a[coinf] + b[coinf])
       }
     }
       
@@ -282,6 +283,66 @@ sumfun_2strain <- function(x, nsteps = 100, invade_year = 100) {
     total_inf_1 = total_inf_1,
     total_inf_2 = total_inf_2
   )
+}
+
+## C++-backed version of simulate_metapopulation_2strain().
+## Identical interface and output structure; delegates the simulation loop to
+## sim_metapop_2strain_cpp() via Rcpp.  Requires polyfit.rda (regenerate with
+## `make polyfit.rda` or by sourcing ode_test_proc.R) so that rawcoef_ratio and
+## rawcoef_finalsize are available.
+simulate_metapopulation_2strain_cpp <- function(
+    n_patches = 100,
+    n_years = 500,
+    K = 1e6,
+    r = 0.5,
+    c0 = 0.2,
+    nu = 5,
+    rho = 3,
+    alpha = 5e-6,
+    D = 1,
+    R01 = 2.0,
+    R02 = 1.8,
+    invade_year = 100,
+    initial_inf_ratio_1 = 0.1,
+    initial_inf_ratio_2 = 0.05,
+    initial_pop_ratio = 1,
+    early_stop = FALSE,
+    seed = NULL,
+    coinf_approx = c("polyfit", "yy")
+) {
+  if (!require("burnout", quietly = TRUE)) stop("Please install the 'burnout' package")
+  if (!is.null(seed)) set.seed(seed)
+  coinf_approx <- match.arg(coinf_approx)
+
+  z_vec <- c(burnout::final_size(R01),
+             burnout::final_size(R02),
+             burnout::final_size((R01 + R02) / 2))
+
+  res <- sim_metapop_2strain_cpp(
+    n_patches = n_patches, n_years = n_years,
+    K = K, r = r, c0 = c0, nu = nu, rho = rho,
+    alpha = alpha, D = D, R01 = R01, R02 = R02,
+    invade_year = invade_year,
+    initial_inf_ratio_1 = initial_inf_ratio_1,
+    initial_inf_ratio_2 = initial_inf_ratio_2,
+    initial_pop_ratio = initial_pop_ratio,
+    early_stop = early_stop,
+    z_vec = z_vec,
+    coef_finalsize = rawcoef_finalsize,
+    coef_ratio = rawcoef_ratio,
+    coinf_approx = coinf_approx
+  )
+
+  ## Restore dimnames for drop-in compatibility with the pure-R version
+  dn0 <- list(patch = seq.int(n_patches), year = seq.int(n_years))
+  dimnames(res$N)  <- c(dn0, list(stage = c("begin", "after_growth",
+                                             "after_colonization", "end")))
+  dimnames(res$I1) <- dn0
+  dimnames(res$I2) <- dn0
+  dimnames(res$S1) <- dn0
+  dimnames(res$S2) <- dn0
+
+  res
 }
 
 ## Default parameters for the two-strain model
