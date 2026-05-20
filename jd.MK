@@ -15,6 +15,7 @@ Ignore += extras.mk
 
 Ignore += *.pdf
 Ignore += *.docx
+Ignore += *.html
 Ignore += *_files/
 
 ######################################################################
@@ -55,6 +56,7 @@ makestuff:
 -include makestuff/os.mk
 
 -include makestuff/texj.mk
+-include makestuff/pipeR.mk
 
 -include makestuff/git.mk
 -include makestuff/visual.mk
