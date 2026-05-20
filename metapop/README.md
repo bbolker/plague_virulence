@@ -12,11 +12,12 @@ Trying to tell a good biological story behind our assumptions: the idea that fle
 Could imagine a model where rats travel with fleas throughout the “season” but don't spark new outbreaks until next season. Patches that are uninfected this season are susceptible to these new outbreaks, but patches that just burned out are not (this could be done explicitly, or could emerge from susceptible tracking, since R_eff < 1 implies that fizzle probability is 1).
 * Note that this would require mass-action – we may need this anyway for consistency!
 
-In this case, the main tradeoff driver is going to be burnout probabilities, and so we have to think about how to calculate those – right now using an ODE calculation to get to a boundary layer. Could use pre-calculated patch probabilities, e.g.:  two_strain_burnout_probability/output/heatmap_strain1_persistence.pdf
+In this case, the main tradeoff driver is going to be burnout probabilities, and so we have to think about how to calculate those – right now using an ODE calculation to get to a boundary layer. Could use pre-calculated patch probabilities, e.g.:  `two_strain_burnout_probability/output/heatmap_strain1_persistence.pdf`
 
-#### Another alternative
+#### Other alternatives
 
-Drop the synchrony and just have parallel ODEs. Active outbreaks can spark outbreaks among “neighbors”.
+* Drop the synchrony and just have parallel ODEs. Active outbreaks can spark outbreaks among “neighbors”. In order to do this we would run deterministic SIR ODEs in every patch, running the models (using `lsodar`) until any current epidemic reached its first (?) trough (i.e., stop when `r*N/(1-N/K) - beta*S*I == 0`); at that time, determine whether the patch goes extinct (not sure how this works for a two-strain model: do we just do the branching-process calculation at this point?). Patches where one or both strains are extinct re-ignite with a probability depending on the force of infection coming from other patches. (Given that this force of infection will be continuously varying in time, the root-finding exercise for finding extinction times might be too complicated; we might fall back on a (small-Δt) discrete-time model where we do (1) branching-process exinction-probability calculations in extant patches if prevalence (or incidence?) is below a threshold; (2) re-ignition (fizzle) probability calculations in extinct patches based on current between-patch FOI; (3) deterministic SIR + logistic-growth updates otherwise
+* a purely deterministic, extinction-free metapopulation model where every patch gets continuous-time FOI from within and between patches (can this work at all?)
 
 #### More biology
 
