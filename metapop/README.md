@@ -3,6 +3,29 @@ title: "overview of plague metapopulation model"
 bibliography: "../virulence.bib"
 ---
 
+## 2026 May 20 (Wed)
+
+Trying to tell a good biological story behind our assumptions: the idea that fleas accumulate over the season but need to be carried by surviving rats seems troublesome.
+
+#### New synchrony model
+
+Could imagine a model where rats travel with fleas throughout the “season” but don't spark new outbreaks until next season. Patches that are uninfected this season are susceptible to these new outbreaks, but patches that just burned out are not (this could be done explicitly, or could emerge from susceptible tracking, since R_eff < 1 implies that fizzle probability is 1).
+* Note that this would require mass-action – we may need this anyway for consistency!
+
+In this case, the main tradeoff driver is going to be burnout probabilities, and so we have to think about how to calculate those – right now using an ODE calculation to get to a boundary layer. Could use pre-calculated patch probabilities, e.g.:  two_strain_burnout_probability/output/heatmap_strain1_persistence.pdf
+
+#### Another alternative
+
+Drop the synchrony and just have parallel ODEs. Active outbreaks can spark outbreaks among “neighbors”.
+
+#### More biology
+
+We should look at [Keeling and Gilligan metapopulation plague](https://pubmed.ncbi.nlm.nih.gov/11057668/)
+
+So a big problem that we haven't really been thinking about much is
+that population sizes are changing dramatically and we should be more focused on functional response to that. Yes, by doing the Parson stuff we are effectively assuming mass action. which seems like a non-terrible assumption, but definitely kind of extreme when population sizes are changing dramatically. Not clear if there's any way around it, but it's definitely at least something to write down.
+
+Ben points out that with pla-depletion we might eventually have recovery after all – do we expect these rats to have some amount of immunity??
 
 
 ## three dimensional model
