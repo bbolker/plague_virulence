@@ -13,3 +13,11 @@ fastslow.pdf: fastslow.R
 
 %.docx: %.qmd virulence.bib
 	quarto render $< --to docx
+
+# Optional features (add your own MK file, or use someone else's)
+-include extras.mk
+## jd.extras: jd.MK
+%.extras: %.MK
+	/bin/ln -fs $< extras.mk
+
+
