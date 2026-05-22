@@ -26,13 +26,16 @@ p_SI[] <- if(sum(hazard_SI)>0) hazard_SI[i]/sum(hazard_SI) else 1/nstrains ##pre
 ## (seems easier than figuring out how to code a vector
 ##   [prob(no infection), prob(I1), prob(I2), ...])
 
-tot_incidence <- rbinom(S, p_all)
-n_SI[] <- rmultinom(tot_incidence, p_SI)
+
+tot_incidence <- if (stochastic) rbinom(S, p_all) else S*p_all
+det_incidence[] <- tot_incidence*p_SI[i]
+stoch_incidence[] <- rmultinom(tot_incidence, p_SI)
+n_SI[] <- if (stochastic)  stoch_incidence[i] else det_incidence[i]
 
 ## Vital dynamics (births/deaths): this is hokey
 ## (use constant births and logistic deaths instead?)
 delta_log <- r*S*(1-S/K)
-pop_change <- if (delta_log < 0)  -rbinom(S, -delta_log/S)  else rpois(delta_log)
+pop_change <- if (stochastic) delta_log else (if (delta_log < 0)  -rbinom(S, -delta_log/S) else rpois(delta_log))
 
 ## Initial states:
 initial(S) <- S_ini
@@ -46,6 +49,7 @@ I_ini[] <- user()
 S_ini <- user()
 r <- user(0.0)  ## growth rate
 K <- user(0.0)  ## carrying capacity
+stochastic <- user(1)
 
 dim(I) <- nstrains
 dim(p_SI) <- nstrains
@@ -53,4 +57,5 @@ dim(hazard_SI) <- nstrains
 dim(n_SI) <- nstrains
 dim(I_ini) <- nstrains
 dim(beta) <- nstrains
-
+dim(stoch_incidence) <- nstrains
+dim(det_incidence) <- nstrains
