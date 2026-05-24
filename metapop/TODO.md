@@ -1,7 +1,6 @@
 ## To do
 
-* reorganize/clean up the mess
-   * makestuff/shellpipes?
+* makestuff/shellpipes?
 * summary info:
     * n occupied, quasi-eq, etc.
     * YZ PIP invasion characteristics
@@ -10,10 +9,9 @@
 * 1 30x30 PIP array (200 sims per parameter set) should take about 10 hours in serial -- 
 * job array/META runs on Nibi?
 * profiling macpan2 runner
-* basic tests
+* set up tinytest machinery for basic tests
 * lay out/test mechanisms: dens-indep R0, fixed N, extinction-independent ... ?
 * invasibility equations
-* rename/clean up
 * better stochastic (+/-) dynamics (cleaner, avoid clamping in macpan2)
 
 ## old
