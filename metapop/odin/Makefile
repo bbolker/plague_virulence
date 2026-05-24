@@ -11,10 +11,13 @@ vim_session:
 
 ## -include makestuff/perl.def
 
-###
+######################################################################
 
+compare_platforms.Rout: compare_platforms.R
+	$(pipeR)
 
-
+tests.Rout: tests.R
+	$(pipeR)
 
 ######################################################################
 
