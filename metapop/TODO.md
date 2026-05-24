@@ -5,6 +5,7 @@
     * YZ PIP invasion characteristics
 * single-strain runs	
 * run PIPs
+* profiling macpan2 runner
 * basic tests
 * lay out/test mechanisms: dens-indep R0, fixed N, extinction-independent ... ?
 * invasibility equations
