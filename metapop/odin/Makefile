@@ -1,15 +1,11 @@
-## This is [project.Makefile] …
+## This is plague_virulence/metapop/odin
 
-## This section is for Dushoff-style vim-setup and vim targeting
-## You can delete it if you don't want it
 current: target
 -include target.mk
 Ignore = target.mk
 
 vim_session:
 	bash -ic "vmt"
-
-## -include makestuff/perl.def
 
 ######################################################################
 
