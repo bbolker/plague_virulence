@@ -43,7 +43,9 @@ foi[] <- alpha*sum(I[,i])/n_patch
 immig[,] <- rpois(foi[j])
 
 ## seed strain 2 at step == strain2_delay
-I2_seed[] <- if (step == strain2_delay) I_ini[i,2] else 0
+## separate scalar indicator from array equation to avoid odin if/step/array interaction
+I2_active <- if (step == strain2_delay) 1.0 else 0.0
+I2_seed[] <- I_ini[i,2] * I2_active
   
 ## Initial states:
 initial(S[]) <- S_ini[i]
@@ -59,7 +61,7 @@ beta[] <- user()
 I_ini[,] <- user()
 S_ini[] <- user()
 alpha <- user(1e-5) ## between-patch transmission
-strain2_delay <- user(0) ## steps before strain 2 is seeded
+strain2_delay <- user(0L) ## steps before strain 2 is seeded (integer: compared to step)
 r[] <- user()   ## growth rate (per patch)
 K[] <- user()   ## carrying capacity (per patch)
 

@@ -9,50 +9,49 @@ suppressPackageStartupMessages({
 })
 options(macpan2_verbose = FALSE)
 
-source(here::here("metapop/odin", "discrete_odin.R"))
-source(here::here("metapop/odin", "discrete_macpan2.R"))
-source(here::here("metapop/odin", "discrete_pureR.R"))
+platforms <- c("odin", "macpan2", "pureR")
+for (p in platforms)  {
+  source(here::here("metapop/odin", sprintf("discrete_%s.R", p)))
+}
+
+## FIXME: set up basic S3 class structure to avoid all the mget() nonsense
+
 
 ## -- timings -------------------------------------------------------------------
 cat("=== Timings (nt=1000, n_patch=100) ===\n")
 set.seed(42)
-t_odin_setup    <- system.time(sim_odin <- make_simulator_odin())
-t_odin_traj     <- system.time(res_odin <- run_simulator_odin(sim_odin))
-t_macpan2_setup <- system.time(sim_macpan2 <- make_simulator_macpan2(seed = 42))
-t_macpan2_traj  <- system.time(res_macpan2 <- run_simulator_macpan2(sim_macpan2))
-t_pureR         <- system.time(res_pureR   <- run_simulator_pureR(seed = 42))
+make_funs <- mget(sprintf("make_simulator_%s", platforms))
+t_setup <- list()
+sim_list <- list()
+for (i in seq_along(make_funs)) {
+  t_setup[[platforms[[i]]]] <- system.time(sim_list[[platforms[[i]]]] <- make_funs[[i]]())
+}
+t_traj <- list()
+traj_list <- list()
+for (p in platforms) {
+  run_fun <- get(sprintf("run_simulator_%s", p))
+  t_traj[[p]] <- system.time(traj_list[[p]] <- run_fun(sim_list[[p]]))
+}
 
-cat(sprintf("odin    (setup):   %.2f s\n", t_odin_setup["elapsed"]))
-cat(sprintf("odin    (traj):    %.2f s\n", t_odin_traj["elapsed"]))
-cat(sprintf("macpan2 (setup):   %.2f s\n", t_macpan2_setup["elapsed"]))
-cat(sprintf("macpan2 (traj):    %.2f s\n", t_macpan2_traj["elapsed"]))
-cat(sprintf("pureR   (total):   %.2f s\n", t_pureR["elapsed"]))
+sapply(t_traj, \(x) x[["elapsed"]])
+sapply(t_setup, \(x) x[["elapsed"]])
 
 ## -- convert to common long format ---------------------------------------------
-long_odin    <- conv_odin(res_odin)
-long_macpan2 <- conv_macpan2(res_macpan2)
-long_pureR   <- res_pureR  ## already in long format
+conv_list <- list()
+for (p in platforms) {
+  conv_list[[p]] <- get(sprintf("conv_%s", p))(traj_list[[p]])
+}
 
-## -- summaries: mean over patches at each time step ---------------------------
-means_from <- function(df) df |>
-  group_by(step, state) |>
-  summarise(mean_val = mean(value, na.rm = TRUE), .groups = "drop")
+## mean across patches
+mean_df <- conv_list |>
+  bind_rows(.id = "platform") |>
+  summarise(mean_val = mean(value, na.rm = TRUE),
+            .by = c(platform, step, state))
 
-odin_means    <- means_from(long_odin)
-macpan2_means <- means_from(long_macpan2)
-pureR_means   <- means_from(long_pureR)
+## grand mean
+mean_df |> summarise(across(mean_val, .fns = c(mean = mean, sd = sd), .names = "grand_{.fn}"),
+                     .by = c(platform, state))
 
-fmt <- function(df) df |>
-  group_by(state) |>
-  summarise(grand_mean = round(mean(mean_val), 1),
-            grand_sd   = round(sd(mean_val),   1))
-
-cat("\n=== Grand mean +/- sd of patch-mean trajectory (all steps) ===\n")
-cat("odin:\n");    print(fmt(odin_means))
-cat("macpan2:\n"); print(fmt(macpan2_means))
-cat("pureR:\n");   print(fmt(pureR_means))
-
-cat("\n=== Patch mean at final time step ===\n")
-cat("odin:\n");    print(odin_means    |> filter(step == max(step)))
-cat("macpan2:\n"); print(macpan2_means |> filter(step == max(step)))
-cat("pureR:\n");   print(pureR_means   |> filter(step == max(step)))
+## last value
+mean_df |> summarise(across(mean_val, ~tail(., 1)),
+                     .by = c(platform, state))

@@ -7,6 +7,8 @@ set.seed(101)
 run <- run_simulator_odin(mod)
 out <- conv_odin(run) |> dplyr::arrange(step, patch, state)
 
+run[nrow(run),]
+
 library(ggplot2)
 gg1 <- ggplot(out, aes(step, value, colour = state)) +
   geom_line(aes(group = interaction(state, patch)))  +

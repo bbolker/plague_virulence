@@ -42,7 +42,10 @@ make_simulator_odin <- function(
 
 run_simulator_odin <- function(x) {
   nt <- attr(x, "nt")
-  x$run(seq.int(nt))
+  ## run from step 0 so step==0 fires during the first transition;
+  ## drop the initial-conditions row (step 0) to match other platforms
+  res <- x$run(seq(0, nt))
+  res[-1, , drop = FALSE]
 }
 
 conv_odin <- function(x, format = c("long", "wide")) {
