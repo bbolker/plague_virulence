@@ -28,7 +28,7 @@ make_simulator_pureR <- function(
   
   if (n_strain != 2) stop("only n_strain = 2 is supported")
 
-  if (strain2_delay != 0) stop("strain2_delay not yet implemented for macpan2")
+  if (strain2_delay != 0) stop("strain2_delay not yet implemented for pureR")
   K_vec   <- rep(K, length.out = n_patch)
   r_vec   <- rep(r, length.out = n_patch)
   I_init2 <- rep(I_init, length.out = 2)
@@ -123,4 +123,4 @@ if (do_test) {
   ggsave(filename = "pureR_twostrain_run_patch.png", plot = gg1)
 }
 
-conv_pureR <- identity
+conv_pureR <- as_tibble
