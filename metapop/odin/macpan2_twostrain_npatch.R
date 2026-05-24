@@ -2,17 +2,21 @@ library(macpan2)
 library(ggplot2)
 library(dplyr)
 
+##' Build a macpan2 simulator for the two-strain n-patch model.
+##' Simulator creation is separated from trajectory generation so the two
+##' steps can be timed independently.
+##'
 ##' @param beta_vec length-2 vector of per-capita transmission rates
 ##' @param K carrying capacity (scalar or vector of length n_patch)
 ##' @param r host growth rate per disease generation (ditto)
 ##' @param n_patch number of patches
-##' @param n_strain number of strains [only 2 supported; use beta_vec=c(b,0) for 1-strain]
+##' @param n_strain number of strains [only 2 supported]
 ##' @param nt time steps
 ##' @param alpha between-patch transmission probability
-##' @param I_init mean initial infected per patch drawn from Poisson (length 1 or 2)
-##' @param seed PRNG seed
-##' @return long-format data frame with columns step, state, patch, value
-run_twostrain_macpan2 <- function(
+##' @param I_init mean initial infected per patch (Poisson draw, length 1 or 2)
+##' @param seed PRNG seed (used for initial condition draws in R)
+##' @return a macpan2 simulator object
+make_simulator_macpan2 <- function(
   beta_vec  = c(1.5, 2.5),
   K         = 1e4,
   r         = 0.125,
@@ -35,8 +39,8 @@ run_twostrain_macpan2 <- function(
                   nrow = n_patch, ncol = n_strain, byrow = TRUE)
   S_ini <- K_vec - rowSums(I_ini)
 
-  simple_sims(
-    iteration_exprs = list(
+  spec <- mp_tmb_model_spec(
+    during = list(
       ## per-capita hazard: n_patch x 2; beta (1x2) and K (n_patch x 1) broadcast
       hazard        ~ I * beta / K,
       sum_hazard    ~ row_sums(hazard),
@@ -60,8 +64,7 @@ run_twostrain_macpan2 <- function(
       S             ~ S - tot_incidence + pop_change,
       I             ~ n_SI + immig
     ),
-    time_steps = nt,
-    mats = list(
+    default = list(
       ## state variables
       S             = S_ini,
       I             = I_ini,
@@ -74,7 +77,7 @@ run_twostrain_macpan2 <- function(
       ones          = ones,
       tiny          = matrix(1e-20),
       strain1_sel   = matrix(c(1, 0), nrow = 1),   # 1 x 2: extracts strain 1 column
-      ## intermediates: must be in mats; all returned by simple_sims, filtered below
+      ## intermediates (pre-allocated)
       hazard        = matrix(0, n_patch, 2),
       sum_hazard    = matrix(0, n_patch, 1),
       p_all         = matrix(0, n_patch, 1),
@@ -87,14 +90,24 @@ run_twostrain_macpan2 <- function(
       foi           = matrix(0, 1, 2),
       immig         = matrix(0, n_patch, 2)
     )
-  ) |>
+  )
+
+  ## outputs = c("S","I") means only state variables are returned by mp_trajectory(),
+  ## not all intermediates (unlike simple_sims which returns everything)
+  mp_simulator(spec, time_steps = nt, outputs = c("S", "I"))
+}
+
+##' Reshape mp_trajectory() output to the long format used by odin/pureR versions
+conv_macpan2 <- function(traj) {
+  traj |>
     filter(matrix %in% c("S", "I")) |>
     rename(step = time, patch = row, state = matrix) |>
     mutate(state = if_else(state == "I", paste0("I", col + 1L), state)) |>
     select(step, state, patch, value)
 }
 
-run1 <- run_twostrain_macpan2(seed = 101)
+sim1 <- make_simulator_macpan2(seed = 101)
+run1 <- conv_macpan2(mp_trajectory(sim1))
 
 gg1 <- ggplot(run1, aes(step, value, colour = state)) +
   geom_line(aes(group = interaction(state, patch))) +

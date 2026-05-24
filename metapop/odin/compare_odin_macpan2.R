@@ -1,6 +1,7 @@
-## Compare odin and macpan2 implementations of the two-strain n-patch model.
+## Compare odin, macpan2, and pureR implementations of the two-strain n-patch model.
 ## Tests summary statistics (mean patch trajectories) rather than exact equality
 ## due to RNG differences between engines.
+## For macpan2, simulator creation and trajectory generation are timed separately.
 
 suppressPackageStartupMessages({
   library(odin); library(dde); library(tidyr); library(dplyr)
@@ -46,12 +47,14 @@ source(here::here("metapop/odin", "pureR_twostrain_npatch.R"))
 
 ## -- timings -------------------------------------------------------------------
 cat("=== Timings (nt=1000, n_patch=100) ===\n")
-t_odin    <- system.time(res_odin    <- run_odin(seed = 42))
-t_macpan2 <- system.time(res_macpan2 <- run_twostrain_macpan2(seed = 42))
-t_pureR   <- system.time(res_pureR   <- run_twostrain_pureR(seed = 42))
-cat(sprintf("odin:    %.2f s\n", t_odin["elapsed"]))
-cat(sprintf("macpan2: %.2f s\n", t_macpan2["elapsed"]))
-cat(sprintf("pureR:   %.2f s\n", t_pureR["elapsed"]))
+t_odin           <- system.time(res_odin    <- run_odin(seed = 42))
+t_macpan2_setup  <- system.time(sim_macpan2 <- make_simulator_macpan2(seed = 42))
+t_macpan2_traj   <- system.time(res_macpan2 <- conv_macpan2(mp_trajectory(sim_macpan2)))
+t_pureR          <- system.time(res_pureR   <- run_twostrain_pureR(seed = 42))
+cat(sprintf("odin:              %.2f s\n", t_odin["elapsed"]))
+cat(sprintf("macpan2 (setup):   %.2f s\n", t_macpan2_setup["elapsed"]))
+cat(sprintf("macpan2 (traj):    %.2f s\n", t_macpan2_traj["elapsed"]))
+cat(sprintf("pureR:             %.2f s\n", t_pureR["elapsed"]))
 
 ## -- summaries: mean over patches at each time step ---------------------------
 means_from <- function(df) df |>
@@ -59,7 +62,7 @@ means_from <- function(df) df |>
   summarise(mean_val = mean(value, na.rm=TRUE), .groups="drop")
 
 odin_means    <- conv_fun(res_odin) |> means_from()
-macpan2_means <- res_macpan2       |> means_from()
+macpan2_means <- res_macpan2 |> means_from()
 pureR_means   <- res_pureR         |> means_from()
 
 fmt <- function(df) df |>
