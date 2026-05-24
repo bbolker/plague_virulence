@@ -31,73 +31,66 @@ run_twostrain_macpan2 <- function(
   I_init2 <- rep(I_init, length.out = 2)
 
   if (!is.null(seed)) set.seed(seed)
-  I1_ini  <- matrix(rpois(n_patch, I_init2[1]), ncol = 1)
-  I2_ini  <- matrix(rpois(n_patch, I_init2[2]), ncol = 1)
-  S_ini   <- K_vec - I1_ini - I2_ini
+  I_ini <- matrix(rpois(n_strain * n_patch, lambda = I_init2),
+                  nrow = n_patch, ncol = n_strain, byrow = TRUE)
+  S_ini <- K_vec - rowSums(I_ini)
 
   simple_sims(
     iteration_exprs = list(
-      ## per-capita hazard of infection by each strain (mass action / K)
-      hazard1     ~ beta1 * I1 / K,
-      hazard2     ~ beta2 * I2 / K,
-      sum_hazard  ~ hazard1 + hazard2,
+      ## per-capita hazard: n_patch x 2; beta (1x2) and K (n_patch x 1) broadcast
+      hazard        ~ I * beta / K,
+      sum_hazard    ~ row_sums(hazard),
       ## total infection probability (complement of survival probability)
-      p_all       ~ 1 - exp(-sum_hazard),
+      p_all         ~ 1 - exp(-sum_hazard),
       ## fraction of new infections that are strain 1; tiny avoids 0/0 when both absent
-      p_SI1       ~ hazard1 / (sum_hazard + tiny),
+      p_SI1         ~ row_sums(hazard * strain1_sel) / (sum_hazard + tiny),
       ## draw new infections then allocate between strains (sequential binomial)
       tot_incidence ~ rbinom(S, p_all),
-      n_SI1       ~ rbinom(tot_incidence, p_SI1),
-      n_SI2       ~ tot_incidence - n_SI1,
+      n_SI1         ~ rbinom(tot_incidence, p_SI1),
+      ## build n_SI as n_patch x 2
+      n_SI          ~ cbind(n_SI1, tot_incidence - n_SI1),
       ## logistic vital dynamics; clamp() prevents rpois() receiving negative argument
       ## when S > K (deaths in that regime are not modelled)
-      delta_log   ~ r * S * (1 - S / K),
-      pop_change  ~ rpois(clamp(delta_log)),
-      ## colonization: strain-specific mean rate averaged over all patches,
-      ## then n_patch independent Poisson draws (same rate for every patch)
-      foi1        ~ (alpha / n_patch_s) * sum(I1),
-      foi2        ~ (alpha / n_patch_s) * sum(I2),
-      immig1      ~ rpois(foi1 * ones),
-      immig2      ~ rpois(foi2 * ones),
+      delta_log     ~ r * S * (1 - S / K),
+      pop_change    ~ rpois(clamp(delta_log)),
+      ## colonization: foi is 1x2 (col_sums); ones %*% foi broadcasts to n_patch x 2
+      foi           ~ (alpha / n_patch_s) * col_sums(I),
+      immig         ~ rpois(ones %*% foi),
       ## state updates
-      S           ~ S  - tot_incidence + pop_change,
-      I1          ~ n_SI1 + immig1,
-      I2          ~ n_SI2 + immig2
+      S             ~ S - tot_incidence + pop_change,
+      I             ~ n_SI + immig
     ),
     time_steps = nt,
     mats = list(
       ## state variables
       S             = S_ini,
-      I1            = I1_ini,
-      I2            = I2_ini,
+      I             = I_ini,
       ## parameters
-      beta1         = matrix(beta_vec[1]),
-      beta2         = matrix(beta_vec[2]),
+      beta          = matrix(beta_vec, nrow = 1),   # 1 x 2
       K             = K_vec,
       r             = r_vec,
       alpha         = matrix(alpha),
       n_patch_s     = matrix(n_patch),
       ones          = ones,
       tiny          = matrix(1e-20),
+      strain1_sel   = matrix(c(1, 0), nrow = 1),   # 1 x 2: extracts strain 1 column
       ## intermediates: must be in mats; all returned by simple_sims, filtered below
-      hazard1       = matrix(0, n_patch, 1),
-      hazard2       = matrix(0, n_patch, 1),
+      hazard        = matrix(0, n_patch, 2),
       sum_hazard    = matrix(0, n_patch, 1),
       p_all         = matrix(0, n_patch, 1),
       p_SI1         = matrix(0, n_patch, 1),
       tot_incidence = matrix(0, n_patch, 1),
       n_SI1         = matrix(0, n_patch, 1),
-      n_SI2         = matrix(0, n_patch, 1),
+      n_SI          = matrix(0, n_patch, 2),
       delta_log     = matrix(0, n_patch, 1),
       pop_change    = matrix(0, n_patch, 1),
-      foi1          = matrix(0),
-      foi2          = matrix(0),
-      immig1        = matrix(0, n_patch, 1),
-      immig2        = matrix(0, n_patch, 1)
+      foi           = matrix(0, 1, 2),
+      immig         = matrix(0, n_patch, 2)
     )
   ) |>
-    filter(matrix %in% c("S", "I1", "I2")) |>
+    filter(matrix %in% c("S", "I")) |>
     rename(step = time, patch = row, state = matrix) |>
+    mutate(state = if_else(state == "I", paste0("I", col), state)) |>
     select(step, state, patch, value)
 }
 
