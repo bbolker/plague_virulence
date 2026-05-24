@@ -6,10 +6,10 @@
 * single-strain runs	
 * run PIPs
 * basic tests
-* port odin to metapop via Claude?
 * lay out/test mechanisms: dens-indep R0, fixed N, extinction-independent ... ?
 * invasibility equations
 * rename/clean up
+* better stochastic (+/-) dynamics (cleaner, avoid clamping in macpan2)
 
 ## old
 
