@@ -9,7 +9,8 @@ suppressPackageStartupMessages({
 options(macpan2_verbose = FALSE)
 
 ## -- odin setup ----------------------------------------------------------------
-gen_odin <- odin::odin(here::here("metapop/odin", "odin_twostrain_npatch.R"))
+odin_file <- here::here("metapop/odin", "odin_twostrain_npatch.R")
+gen_odin  <- odin::odin(odin_file)
 
 run_odin <- function(beta_vec=c(1.5,2.5), K=1e4, r=0.125, n_patch=100,
                      n_strain=2, nt=1000, alpha=1e-3, I_init=10, seed=NULL) {

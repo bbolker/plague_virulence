@@ -90,7 +90,7 @@ run_twostrain_macpan2 <- function(
   ) |>
     filter(matrix %in% c("S", "I")) |>
     rename(step = time, patch = row, state = matrix) |>
-    mutate(state = if_else(state == "I", paste0("I", col), state)) |>
+    mutate(state = if_else(state == "I", paste0("I", col + 1L), state)) |>
     select(step, state, patch, value)
 }
 
