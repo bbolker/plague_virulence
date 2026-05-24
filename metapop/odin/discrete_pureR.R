@@ -1,6 +1,7 @@
 library(ggplot2)
 do_test <- FALSE
 
+
 ##' @param beta_vec length-2 vector of per-capita transmission rates
 ##' @param K carrying capacity (scalar or vector of length n_patch)
 ##' @param r host growth rate per disease generation (ditto)
@@ -11,7 +12,7 @@ do_test <- FALSE
 ##' @param I_init mean initial infected per patch (Poisson draw, length 1 or 2)
 ##' @param seed PRNG seed
 ##' @return long-format data frame with columns step, state, patch, value
-run_discrete_pureR <- function(
+run_simulator_pureR <- function(
   beta_vec  = c(1.5, 2.5),
   K         = 1e4,
   r         = 0.125,
@@ -36,8 +37,8 @@ run_discrete_pureR <- function(
   S <- K_vec - rowSums(I)
 
   ## pre-allocate output storage
-  S_out <- matrix(0, nrow = nt, ncol = n_patch)
-  I_out <- array(0,  dim = c(nt, n_patch, n_strain))
+  S_out <- matrix(NA_real_, nrow = nt, ncol = n_patch)
+  I_out <- array(NA_real_,  dim = c(nt, n_patch, n_strain))
 
   for (t in seq_len(nt)) {
     ## hazard: n_patch x 2; sweep beta over columns, K over rows
@@ -89,8 +90,10 @@ run_discrete_pureR <- function(
   I_long$step  <- as.integer(I_long$step)
   I_long$patch <- as.integer(I_long$patch)
 
-  rbind(S_long[, c("step", "state", "patch", "value")],
+  ret <- rbind(S_long[, c("step", "state", "patch", "value")],
         I_long[, c("step", "state", "patch", "value")])
+
+  dplyr::as_tibble(ret)
 }
 
 if (do_test) {

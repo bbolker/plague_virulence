@@ -28,6 +28,8 @@ make_simulator_macpan2 <- function(
   seed      = NULL
 ) {
 
+  n_strain <- 2 ## hard-coded
+  
   if (strain2_delay != 0) stop("strain2_delay not yet implemented for macpan2")
   K_vec   <- matrix(rep(K, length.out = n_patch), ncol = 1)
   r_vec   <- matrix(rep(r, length.out = n_patch), ncol = 1)
@@ -104,10 +106,12 @@ run_simulator_macpan2 <- function(x) {
 ##' Reshape mp_trajectory() output to the long format used by odin/pureR versions
 conv_macpan2 <- function(traj) {
   traj |>
-    filter(matrix %in% c("S", "I")) |>
-    rename(step = time, patch = row, state = matrix) |>
-    mutate(state = if_else(state == "I", paste0("I", col + 1L), state)) |>
-    select(step, state, patch, value)
+    dplyr::as_tibble() |> 
+    dplyr::filter(matrix %in% c("S", "I")) |>
+    dplyr::rename(step = time, patch = row, state = matrix) |>
+    ## account for zero-indexing of matrices
+    dplyr::mutate(state = if_else(state == "I", paste0("I", col + 1L), state)) |>
+    dplyr::select(step, state, patch, value)
 }
 
 if (FALSE) {

@@ -76,22 +76,22 @@ run_twostrain <- function(beta_vec = c(1.5, 2.5),
 
 sim_to_long <- function(x) {
   ret <- as.data.frame.table(x[,!colnames(x) %in% "step"]) |>
-    as_tibble() |>
-    transmute(step = as.numeric(Var1), ## grab factor levels
-              state = case_when(
+    dplyr::as_tibble() |>
+    dplyr::transmute(step = as.numeric(Var1), ## grab factor levels
+              state = dplyr::case_when(
                 grepl("^S", Var2) ~ gsub("\\[", ".", gsub("\\]", "", Var2)),
                 grepl("^I", Var2) ~ gsub("\\[([0-9]+),([0-9]+)\\]", "\\2.\\1", Var2)),
               value = Freq) |>
-    mutate(patch = as.numeric(sub(".*\\.", "", state)),
+    dplyr::mutate(patch = as.numeric(sub(".*\\.", "", state)),
            state = sub("\\..*", "", state)) |>
-    arrange(step, patch)
+    dplyr::arrange(step, patch)
   return(ret)
 }
 
 sim_to_sum <- function(x, return_type = c("long", "wide")) {
   return_type <- match.arg(return_type)
   ## total population sizes over time
-  total_pops <- rowSums(x)
+  total_pops <- rowSums(x),
   i1 <- x[, grepl(",1\\]", colnames(x))]
   i2 <- x[, grepl(",2\\]", colnames(x))]
   infected_patches <- cbind(I1 = rowSums(i1 > 0),
