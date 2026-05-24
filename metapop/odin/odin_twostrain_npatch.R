@@ -39,8 +39,6 @@ pop_change[] <- if (delta_log[i] < 0) -rbinom(S[i], -delta_log[i]/S[i]) else rpo
 
 ## colonization
 foi[] <- alpha*sum(I[,i])/n_patch
-## ?? does this do as intended, i.e. pick a separate Poisson deviate
-## with a strain-specific mean for each patch?
 immig[,] <- rpois(foi[j])
   
 ## Initial states:
@@ -48,15 +46,16 @@ initial(S[]) <- S_ini[i]
 initial(I[,]) <- I_ini[i,j]
 
 ## User defined parameters - default in parentheses:
-
-n_patch <- user()
+n_patch <- user(100)
 nstrains <- 2
-alpha <- user() ## emigration probability
+
+## FIXME: add vector-valued defaults? (need to assign and then put into user(), functions not allowed)
 beta[] <- user()
 I_ini[,] <- user()
 S_ini[] <- user()
-r[] <- user(0.0)   ## growth rate (per patch)
-K[] <- user(0.0)   ## carrying capacity (per patch)
+alpha <- user(1e-5) ## between-patch transmission
+r[] <- user()   ## growth rate (per patch)
+K[] <- user()   ## carrying capacity (per patch)
 
 dim(S) <- n_patch
 dim(I) <- c(n_patch, nstrains)
