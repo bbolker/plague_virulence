@@ -41,21 +41,26 @@ conv_fun <- function(x) {
 ## -- macpan2 setup -------------------------------------------------------------
 source(here::here("metapop/odin", "macpan2_twostrain_npatch.R"))
 
+## -- pureR setup ---------------------------------------------------------------
+source(here::here("metapop/odin", "pureR_twostrain_npatch.R"))
+
 ## -- timings -------------------------------------------------------------------
 cat("=== Timings (nt=1000, n_patch=100) ===\n")
 t_odin    <- system.time(res_odin    <- run_odin(seed = 42))
 t_macpan2 <- system.time(res_macpan2 <- run_twostrain_macpan2(seed = 42))
+t_pureR   <- system.time(res_pureR   <- run_twostrain_pureR(seed = 42))
 cat(sprintf("odin:    %.2f s\n", t_odin["elapsed"]))
 cat(sprintf("macpan2: %.2f s\n", t_macpan2["elapsed"]))
+cat(sprintf("pureR:   %.2f s\n", t_pureR["elapsed"]))
 
 ## -- summaries: mean over patches at each time step ---------------------------
-odin_means <- conv_fun(res_odin) |>
+means_from <- function(df) df |>
   group_by(step, state) |>
   summarise(mean_val = mean(value, na.rm=TRUE), .groups="drop")
 
-macpan2_means <- res_macpan2 |>
-  group_by(step, state) |>
-  summarise(mean_val = mean(value, na.rm=TRUE), .groups="drop")
+odin_means    <- conv_fun(res_odin) |> means_from()
+macpan2_means <- res_macpan2       |> means_from()
+pureR_means   <- res_pureR         |> means_from()
 
 fmt <- function(df) df |>
   group_by(state) |>
@@ -65,7 +70,9 @@ fmt <- function(df) df |>
 cat("\n=== Grand mean +/- sd of patch-mean trajectory (all steps) ===\n")
 cat("odin:\n");    print(fmt(odin_means))
 cat("macpan2:\n"); print(fmt(macpan2_means))
+cat("pureR:\n");   print(fmt(pureR_means))
 
 cat("\n=== Patch mean at final time step ===\n")
 cat("odin:\n");    print(odin_means    |> filter(step == max(step)))
 cat("macpan2:\n"); print(macpan2_means |> filter(step == max(step)))
+cat("pureR:\n");   print(pureR_means   |> filter(step == max(step)))
