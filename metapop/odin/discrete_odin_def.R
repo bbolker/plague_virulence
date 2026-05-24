@@ -3,7 +3,7 @@
 ##  * set to discrete-time, single generation (all individuals recover after one time step)
 ##  * logistic growth (rounded) [no explicit death]
 ##  * for now, no recovered
-##  * n_patch patches running in parallel (no interpatch communication yet)
+##  * n_patch patches running in parallel
 
 ## based on https://mrc-ide.github.io/odin/articles/discrete.html
 

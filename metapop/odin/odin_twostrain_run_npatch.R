@@ -12,13 +12,13 @@ library(patchwork)
 ##' @param n_strains number of strains [HARD-CODED]
 ##' @param nt time steps
 ##' @param alpha between-patch transmission  probability
-##' @param I_init initial infection (chosen as rpois)
+##' @param I_init initial infection (chosen as Poisson random variable across platforms)
 ##' @param seed PRNG seed
+##' @param platform
 run_twostrain <- function(beta_vec = c(1.5, 2.5),
                           K = 1e4,
                           r = 0.125,
                           n_patch = 100,
-                          n_strain = 2,
                           nt = 1000,
                           alpha = 1e-3,
                           strain2_delay = 0,
@@ -26,26 +26,23 @@ run_twostrain <- function(beta_vec = c(1.5, 2.5),
                           seed = NULL,
                           nsim = 1,
                           cl = NULL,
-                          ncores = 1) {
+                          ncores = 1,
+                          platform = c("odin", "macpan2", "pureR")) {
 
+  platform <- match.arg(platform)
+  
   ## patch-level parameters (vectors, length n_patch)
   K_vec <- rep(K, length.out = n_patch)
   r_vec <- rep(r, length.out = n_patch)
   I_init <- rep(I_init, length.out = n_strain)
   if (!is.null(seed)) set.seed(seed)
   
-  if (n_strain != 2) {
-    stop("code not set up for n_strain > 2 (and not tested/may not work for n_strain < 2")
-  }
-
   ## strain x patch parameters: matrices [n_patch, n_strain], rows = patches, cols = strains
   I_ini_mat <- matrix(rpois(n_strain*n_patch, lambda = I_init),
                       byrow = TRUE,
                       ncol = n_strain)
 
   S_ini_vec <- K_vec - rowSums(I_ini_mat)
-
-  odin_file <- here::here("metapop/odin", "odin_twostrain_npatch.R")
 
   args <- tibble::lst(beta    = beta_vec,
                       r       = r_vec,
@@ -55,6 +52,8 @@ run_twostrain <- function(beta_vec = c(1.5, 2.5),
                       alpha,
                       strain2_delay,
                       n_patch)
+
+  odin_file <- here::here("metapop/odin", "odin_twostrain_npatch.R")
 
   FUN <- function(i) {
     gen_local <- suppressMessages(odin::odin(odin_file))

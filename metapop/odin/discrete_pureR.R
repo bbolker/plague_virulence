@@ -1,4 +1,5 @@
 library(ggplot2)
+do_test <- FALSE
 
 ##' @param beta_vec length-2 vector of per-capita transmission rates
 ##' @param K carrying capacity (scalar or vector of length n_patch)
@@ -10,7 +11,7 @@ library(ggplot2)
 ##' @param I_init mean initial infected per patch (Poisson draw, length 1 or 2)
 ##' @param seed PRNG seed
 ##' @return long-format data frame with columns step, state, patch, value
-run_twostrain_pureR <- function(
+run_discrete_pureR <- function(
   beta_vec  = c(1.5, 2.5),
   K         = 1e4,
   r         = 0.125,
@@ -19,10 +20,12 @@ run_twostrain_pureR <- function(
   nt        = 1000,
   alpha     = 1e-3,
   I_init    = 10,
+  strain2_delay = 0,
   seed      = NULL
 ) {
   if (n_strain != 2) stop("only n_strain = 2 is supported")
 
+  if (strain2_delay != 0) stop("strain2_delay not yet implemented for macpan2")
   K_vec   <- rep(K, length.out = n_patch)
   r_vec   <- rep(r, length.out = n_patch)
   I_init2 <- rep(I_init, length.out = 2)
@@ -90,13 +93,15 @@ run_twostrain_pureR <- function(
         I_long[, c("step", "state", "patch", "value")])
 }
 
-run1 <- run_twostrain_pureR(seed = 101)
+if (do_test) {
+  run1 <- run_twostrain_pureR(seed = 101)
 
-gg1 <- ggplot(run1, aes(step, value, colour = state)) +
-  geom_line(aes(group = interaction(state, patch))) +
-  scale_y_log10() +
-  theme_bw()
+  gg1 <- ggplot(run1, aes(step, value, colour = state)) +
+    geom_line(aes(group = interaction(state, patch))) +
+    scale_y_log10() +
+    theme_bw()
 
-print(gg1)
+  print(gg1)
 
-ggsave(filename = "pureR_twostrain_run_patch.png", plot = gg1)
+  ggsave(filename = "pureR_twostrain_run_patch.png", plot = gg1)
+}

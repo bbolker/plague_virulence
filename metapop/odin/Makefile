@@ -1,5 +1,42 @@
-odin_twostrain_run.Rout: odin_twostrain_run.R odin_twostrain0.R
-	R CMD BATCH --vanilla $<
+## This is [project.Makefile] …
 
-clean:
-	rm *~ \#*
+## This section is for Dushoff-style vim-setup and vim targeting
+## You can delete it if you don't want it
+current: target
+-include target.mk
+Ignore = target.mk
+
+vim_session:
+	bash -ic "vmt"
+
+## -include makestuff/perl.def
+
+###
+
+
+
+
+######################################################################
+
+### Makestuff
+
+Sources += Makefile
+
+Ignore += makestuff
+msrepo = https://github.com/dushoff
+
+## ln -s ../makestuff . ## Do this first if you want a linked makestuff
+Makefile: makestuff/00.stamp
+makestuff/%.stamp: | makestuff
+	- $(RM) makestuff/*.stamp
+	cd makestuff && $(MAKE) pull
+	touch $@
+makestuff:
+	git clone --depth 1 $(msrepo)/makestuff
+
+-include makestuff/os.mk
+
+-include makestuff/pipeR.mk
+
+-include makestuff/git.mk
+-include makestuff/visual.mk

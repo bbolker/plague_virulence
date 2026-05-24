@@ -21,14 +21,14 @@ make_simulator_macpan2 <- function(
   K         = 1e4,
   r         = 0.125,
   n_patch   = 100,
-  n_strain  = 2,
   nt        = 1000,
   alpha     = 1e-3,
   I_init    = 10,
+  strain2_delay = 0,
   seed      = NULL
 ) {
-  if (n_strain != 2) stop("only n_strain = 2 is supported")
 
+  if (strain2_delay != 0) stop("strain2_delay not yet implemented for macpan2")
   K_vec   <- matrix(rep(K, length.out = n_patch), ncol = 1)
   r_vec   <- matrix(rep(r, length.out = n_patch), ncol = 1)
   ones    <- matrix(1, nrow = n_patch, ncol = 1)
@@ -97,6 +97,10 @@ make_simulator_macpan2 <- function(
   mp_simulator(spec, time_steps = nt, outputs = c("S", "I"))
 }
 
+run_simulator_macpan2 <- function(x) {
+  macpan2::mp_trajectory(x)
+}
+
 ##' Reshape mp_trajectory() output to the long format used by odin/pureR versions
 conv_macpan2 <- function(traj) {
   traj |>
@@ -106,14 +110,17 @@ conv_macpan2 <- function(traj) {
     select(step, state, patch, value)
 }
 
-sim1 <- make_simulator_macpan2(seed = 101)
-run1 <- conv_macpan2(mp_trajectory(sim1))
+if (FALSE) {
+  sim1 <- make_simulator_macpan2(seed = 101)
+  run1 <- 
+  run1 <- conv_macpan2(mp_trajectory(sim1))
+  
+  gg1 <- ggplot(run1, aes(step, value, colour = state)) +
+    geom_line(aes(group = interaction(state, patch))) +
+    scale_y_log10() +
+    theme_bw()
 
-gg1 <- ggplot(run1, aes(step, value, colour = state)) +
-  geom_line(aes(group = interaction(state, patch))) +
-  scale_y_log10() +
-  theme_bw()
+  print(gg1)
 
-print(gg1)
-
-ggsave(filename = "macpan2_twostrain_run_patch.png", plot = gg1)
+  ggsave(filename = "macpan2_twostrain_run_patch.png", plot = gg1)
+}
