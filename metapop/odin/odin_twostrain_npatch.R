@@ -16,7 +16,7 @@ update(I[,]) <- n_SI[i,j] + immig[i,j]
 hazard_SI[,] <- beta[j]*I[i,j]/K[i]
 p_all[] <- -expm1(-sum(hazard_SI[i,]))
 ## probability that an infection is of type i
-p_SI[,] <- if(sum(hazard_SI[i,])>0) hazard_SI[i,j]/sum(hazard_SI[i,]) else 1/nstrains
+p_SI[,] <- if(sum(hazard_SI[i,])>0) hazard_SI[i,j]/sum(hazard_SI[i,]) else 1/n_strain
 
 ## Draws from binomial distributions for numbers changing between
 ## compartments:
@@ -24,7 +24,7 @@ p_SI[,] <- if(sum(hazard_SI[i,])>0) hazard_SI[i,j]/sum(hazard_SI[i,]) else 1/nst
 ## suggests first drawing a binomial for total number infected, then
 ##    multinomial from proportions
 ## odin rmultinom cannot accept array slices as arguments, so for
-## nstrains=2 use sequential binomials (exact equivalent)
+## n_strain=2 use sequential binomials (exact equivalent)
 ## FIXME: how much  more complicated to generalize this to n>2 strains?
 ##  (realistically, this is very low priority)
 tot_incidence[] <- rbinom(S[i], p_all[i])
@@ -47,7 +47,7 @@ initial(I[,]) <- I_ini[i,j]
 
 ## User defined parameters - default in parentheses:
 n_patch <- user(100)
-nstrains <- 2
+n_strain <- 2
 
 ## FIXME: add vector-valued defaults? (need to assign and then put into user(), functions not allowed)
 beta[] <- user()
@@ -58,19 +58,19 @@ r[] <- user()   ## growth rate (per patch)
 K[] <- user()   ## carrying capacity (per patch)
 
 dim(S) <- n_patch
-dim(I) <- c(n_patch, nstrains)
-dim(hazard_SI) <- c(n_patch, nstrains)
+dim(I) <- c(n_patch, n_strain)
+dim(hazard_SI) <- c(n_patch, n_strain)
 dim(p_all) <- n_patch
-dim(p_SI) <- c(n_patch, nstrains)
+dim(p_SI) <- c(n_patch, n_strain)
 dim(tot_incidence) <- n_patch
 dim(n_SI_strain1) <- n_patch
-dim(n_SI) <- c(n_patch, nstrains)
+dim(n_SI) <- c(n_patch, n_strain)
 dim(delta_log) <- n_patch
 dim(pop_change) <- n_patch
 dim(S_ini) <- n_patch
-dim(I_ini) <- c(n_patch, nstrains)
-dim(foi) <- nstrains
-dim(immig) <- c(n_patch, nstrains)
-dim(beta) <- nstrains
+dim(I_ini) <- c(n_patch, n_strain)
+dim(foi) <- n_strain
+dim(immig) <- c(n_patch, n_strain)
+dim(beta) <- n_strain
 dim(r) <- n_patch
 dim(K) <- n_patch

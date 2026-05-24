@@ -16,7 +16,7 @@ run_twostrain <- function(beta_vec = c(1.5, 2.5),
                           K = 1e4,
                           r = 0.125,
                           n_patch = 100,
-                          n_strains = 2,
+                          n_strain = 2,
                           nt = 1000,
                           alpha = 1e-3,
                           I_init = 10,
@@ -25,16 +25,17 @@ run_twostrain <- function(beta_vec = c(1.5, 2.5),
   ## patch-level parameters (vectors, length n_patch)
   K_vec <- rep(K, length.out = n_patch)
   r_vec <- rep(r, length.out = n_patch)
-
+  I_init <- rep(I_init, length.out = n_strain)
   if (!is.null(seed)) set.seed(seed)
   
-  if (n_strains != 2) {
-    stop("code not set up for n_strains > 2 (and not tested/may not work for n_strains < 2")
+  if (n_strain != 2) {
+    stop("code not set up for n_strain > 2 (and not tested/may not work for n_strain < 2")
   }
-  ## strain x patch parameters: matrices [n_patch, n_strains], rows = patches, cols = strains
 
-  I_ini_mat <- matrix(rpois(n_strains*n_patch, lambda = I_init),
-                      ncol = n_strains)
+  ## strain x patch parameters: matrices [n_patch, n_strain], rows = patches, cols = strains
+  I_ini_mat <- matrix(rpois(n_strain*n_patch, lambda = I_init),
+                      byrow = TRUE,
+                      ncol = n_strain)
 
   S_ini_vec <- K_vec - rowSums(I_ini_mat)
 
@@ -85,5 +86,9 @@ gg1 <- ggplot(cc1, aes(step, value, colour = state)) +
 print(gg1)
 
 print(gg_sep <- gg1 + cc_sep)
+
+run_1strain <- run_twostrain(seed = 101, I_init = c(10, 0))
+cc_1strain <- conv_fun(run_1strain)
+print(gg_1strain <- gg1 + cc_1strain)
 
 ggsave(filename = "odin_twostrain_run_patch.png", plot = gg1)

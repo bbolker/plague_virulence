@@ -1,5 +1,18 @@
 ## To do
 
+* summary info:
+    * n occupied, quasi-eq, etc.
+    * YZ PIP invasion characteristics
+* single-strain runs	
+* run PIPs
+* basic tests
+* port odin to metapop via Claude?
+* lay out/test mechanisms: dens-indep R0, fixed N, extinction-independent ... ?
+* invasibility equations
+* rename/clean up
+
+## old
+
 * update CSEE slides?
 * tweak poisson/sim.R; allow sim prefix
 * allow burnout in poisson sim?
