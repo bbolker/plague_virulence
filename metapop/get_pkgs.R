@@ -9,6 +9,7 @@ pkgs <- c(
  , "ggrastr"
  , "gsl"
  , "optparse"
+ , "patchwork"
  , "progressr"
  , "tidyverse"
  , "tinysnapshot"
@@ -21,3 +22,4 @@ if (length(pkgs)>0) {
   install.packages(pkgs)
 }
 remotes::install_github("davidearn/burnout")
+remotes::install_github("canmod/macpan2")

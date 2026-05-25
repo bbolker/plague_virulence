@@ -1,5 +1,21 @@
 ## To do
 
+* makestuff/shellpipes?
+* summary info:
+    * n occupied, quasi-eq, etc.
+    * YZ PIP invasion characteristics
+* single-strain runs	
+* run PIPs
+* 1 30x30 PIP array (200 sims per parameter set) should take about 10 hours in serial -- 
+* job array/META runs on Nibi?
+* profiling macpan2 runner
+* set up tinytest machinery for basic tests
+* lay out/test mechanisms: dens-indep R0, fixed N, extinction-independent ... ?
+* invasibility equations
+* better stochastic (+/-) dynamics (cleaner, avoid clamping in macpan2)
+
+## old
+
 * update CSEE slides?
 * tweak poisson/sim.R; allow sim prefix
 * allow burnout in poisson sim?
