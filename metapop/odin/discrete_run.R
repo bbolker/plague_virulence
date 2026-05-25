@@ -111,7 +111,7 @@ sum_run1 <- function(x, return_type = c("long", "wide")) {
 ## @param runs list of long-format tibbles from discrete_run() (or a single tibble)
 ## @param nsteps number of trailing steps used for quasi-equilibrium averages
 ## @return named numeric vector of summary statistics
-sumfun_discrete <- function(runs, nsteps = 100) {
+sumfun_discrete <- function(runs, nsteps = 100, which = c(1, 2)) {
   if (!is.list(runs) || inherits(runs, "data.frame")) runs <- list(runs)
   nsim <- length(runs)
 

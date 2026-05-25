@@ -17,7 +17,7 @@ dd <- expand.grid(
 nrow(dd) ## 400
 
 plan(multicore(workers = 10))
-plan(sequential)
+## plan(sequential)
 set.seed(101)
 
 ctr <- 0
@@ -29,7 +29,7 @@ FUN <- function(x) {
                       beta_vec = c(R0, 1),
                       I_init = c(10, 0),
                       nt = 500))
-    
+    sumfun_discrete(out)
 }
 FUN(dd[1,])
 

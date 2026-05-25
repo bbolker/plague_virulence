@@ -1,5 +1,6 @@
 ## To do
 
+* figure out how to enable early stopping on extinction
 * store parameter values as attributes
 * makestuff/shellpipes?
    * sort out working-directory stuff (package??)
