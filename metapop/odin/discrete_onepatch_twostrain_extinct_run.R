@@ -13,7 +13,10 @@ first_zero <- function(x) which(x == 0)[1]
 ## parameter note
 ## plague generation time ~ 10 - 20 days
 ## rat $r$ ~ 3 / year?  ~ 0.125?
-ctr <- 0 ## checkpoint counter
+ctr             <- 0
+checkpoint_freq <- 100
+checkpoint_file <- "discrete_onepatch_twostrain_extinct_checkpoint.rds"
+
 sumfun <- function(beta1, beta2, K = 1e6, I_init = c(10, 10)) {
   runs <- discrete_run(beta_vec = c(beta1, beta2), K = K, r = 0.125,
                        n_patch = 1, nt = 1000, alpha = 0, I_init = I_init,
@@ -23,16 +26,28 @@ sumfun <- function(beta1, beta2, K = 1e6, I_init = c(10, 10)) {
     c(I1 = first_zero(traj$value[traj$state == "I1"]),
       I2 = first_zero(traj$value[traj$state == "I2"]))
   })
-  rowMeans(ext, na.rm = TRUE)
+  result <- rowMeans(ext, na.rm = TRUE)
+  ctr <<- ctr + 1
+  res[, ctr] <<- result
+  if (ctr %% checkpoint_freq == 0) saveRDS(res, checkpoint_file)
+  result
 }
 
 R0vec <- seq(1, 5, by = 0.025)
-dd <- expand.grid(R01 = R0vec, R02 = R0vec)
+dd    <- expand.grid(R01 = R0vec, R02 = R0vec)
+
+## run once on first row to determine output dimensions; 2-row placeholder
+## lets the call succeed before res is properly initialised
+res      <- matrix(NA_real_, 2L, nrow(dd))
+test_out <- sumfun(dd[1, 1], dd[1, 2])
+res      <- matrix(NA_real_, nrow = length(test_out), ncol = nrow(dd),
+                   dimnames = list(names(test_out), NULL))
+ctr      <- 0  ## reset; test run does not count toward the grid sweep
 
 plan(multicore(workers = 10))
 set.seed(101)
 system.time(
-  res <- apply(dd, 1, \(x) sumfun(x[1], x[2]))
+  apply(dd, 1, \(x) sumfun(x[1], x[2]))
 )
 plan(sequential)
 
