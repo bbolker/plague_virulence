@@ -43,6 +43,11 @@ discrete_run <- function(beta_vec = c(1.5, 2.5),
   runfun  <- get(sprintf("run_simulator_%s", platform))
   convfun <- get(sprintf("conv_%s", platform))
 
+  ## Each future builds its own simulator. A per-worker cache (<<- into the
+  ## closure) would be more efficient but furrr re-serializes the closure for
+  ## every task, so the cache never persists across futures. If compilation
+  ## time dominates, consider pre-building via makefun and passing the object
+  ## as a future global (if odin objects serialize safely across workers).
   FUN <- function(i) convfun(runfun(do.call(makefun, args)))
 
   if (nsim == 1) {
