@@ -3,7 +3,8 @@ library(dde) ## odin insists on this
 library(tidyr)
 library(dplyr)
 library(ggplot2)
-library(parallel)
+library(future)
+library(furrr)
 library(patchwork)
 
 s <- function(x) source(here::here("metapop/odin", x))
@@ -20,6 +21,9 @@ s("discrete_pureR.R")
 ##' @param I_init initial infection (chosen as Poisson random variable across platforms)
 ##' @param seed PRNG seed
 ##' @param platform
+## Parallelism is controlled by the caller via future::plan() before invoking
+## discrete_run(). e.g. plan(multisession, workers = 8) for parallel runs,
+## plan(sequential) (the default) for single-threaded execution.
 discrete_run <- function(beta_vec = c(1.5, 2.5),
                           K = 1e4,
                           r = 0.125,
@@ -30,43 +34,24 @@ discrete_run <- function(beta_vec = c(1.5, 2.5),
                           I_init = 10,
                           seed = NULL,
                           nsim = 1,
-                          cl = NULL,
-                          ncores = 1,
                           platform = c("odin", "macpan2", "pureR")) {
 
   platform <- match.arg(platform)
-
   args <- tibble::lst(beta_vec, r, K, n_patch, nt, I_init, alpha, strain2_delay)
 
-  if (!is.null(seed)) set.seed(seed)
-
   makefun <- get(sprintf("make_simulator_%s", platform))
-  runfun <- get(sprintf("run_simulator_%s", platform))
+  runfun  <- get(sprintf("run_simulator_%s", platform))
   convfun <- get(sprintf("conv_%s", platform))
 
-  ## cache the built simulator per-worker: first call builds, subsequent calls reuse.
-  ## <<- assigns into FUN's closure env (discrete_run's frame locally; worker's
-  ## deserialized closure copy in parallel), giving per-worker caching for free.
-  mod_cache <- NULL
+  FUN <- function(i) convfun(runfun(do.call(makefun, args)))
 
-  FUN <- function(i) {
-    if (is.null(mod_cache)) mod_cache <<- do.call(makefun, args)
-    convfun(runfun(mod_cache))
+  if (nsim == 1) {
+    if (!is.null(seed)) set.seed(seed)
+    return(FUN(1L))
   }
 
-  if (nsim == 1) return(FUN(1))
-
-  created_cl <- is.null(cl)
-  cl <- cl %||% makeCluster(ncores)
-  if (created_cl) {
-    on.exit(stopCluster(cl))
-    clusterSetRNGStream(cl)
-  }
-
-  clusterExport(cl, varlist = "FUN", envir = environment())
-  clusterEvalQ(cl, { library(odin); library(dde); library(macpan2) })
-  return(parLapply(cl = cl, X = seq.int(nsim), fun = FUN))
-
+  furrr::future_map(seq.int(nsim), FUN,
+                    .options = furrr::furrr_options(seed = seed %||% TRUE))
 }
 
 

@@ -3,7 +3,7 @@ library(tidyr)
 library(odin)
 library(dde) ## odin insists on this
 library(ggplot2); theme_set(theme_bw())
-library(parallel)
+library(future)
 
 K <- 1e4
 I_ini <- c(5, 5)
@@ -16,18 +16,17 @@ args <- list(beta = c(2.1, 1.1),
 
 source(here::here("metapop/odin", "discrete_run.R"))
 
-nsim   <- 20
-ncores <- min(12L, detectCores() - 1L)
+nsim <- 20
 
 first_zero <- function(x) which(x == 0)[1]
 
 ## parameter note
 ## plague generation time ~ 10 - 20 days
 ## rat $r$ ~ 3 / year?  ~ 0.125?
-sumfun <- function(beta1, beta2, K = 1e6, I_init = c(10, 10), cl = NULL) {
+sumfun <- function(beta1, beta2, K = 1e6, I_init = c(10, 10)) {
   runs <- discrete_run(beta_vec = c(beta1, beta2), K = K, r = 0.125,
                        n_patch = 1, nt = 1000, alpha = 0, I_init = I_init,
-                       nsim = nsim, cl = cl, platform = "odin")
+                       nsim = nsim, platform = "odin")
   if (!is.list(runs)) runs <- list(runs)
   ext <- sapply(runs, function(traj) {
     c(I1 = first_zero(traj$value[traj$state == "I1"]),
@@ -39,17 +38,18 @@ sumfun <- function(beta1, beta2, K = 1e6, I_init = c(10, 10), cl = NULL) {
 R0vec <- seq(1, 5, by = 0.025)
 dd <- expand.grid(R01 = R0vec, R02 = R0vec)
 
+plan(multisession)
 set.seed(101)
-cl <- makeCluster(ncores)
-clusterSetRNGStream(cl)
 system.time(
-  res <- apply(dd, 1, \(x) sumfun(x[1], x[2], cl = cl))
+  res <- apply(dd, 1, \(x) sumfun(x[1], x[2]))
 )
-stopCluster(cl)
+plan(sequential)
 
 res_df <- t(res) |> as.data.frame() |> bind_cols(dd)
 dd2    <- res_df |> pivot_longer(cols = c("I1", "I2"))
 dd2_i1 <- dd2 |> dplyr::filter(name == "I1")
+
+saveRDS(dd2_i1, file = "discrete_onepatch_twostrain_extinct.rds")
 
 ggplot(dd2_i1, aes(R01, R02, fill = value)) +
   geom_raster() +
@@ -62,4 +62,4 @@ ggplot(dd2_i1, aes(R01, R02, fill = value)) +
        title = expression('extinction time when '*list(K==10^6, r==0.125))) +
   annotate(x = 2.5, y = 1.5, size = 10, label = "time > 1000", geom = "label")
 
-ggsave(width = 6.5, height = 6, "twostrain_onepatch.png")
+ggsave(width = 6.5, height = 6, "discrete_onepatch_twostrain_extinct.png")
