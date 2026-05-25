@@ -55,11 +55,15 @@ discrete_run <- function(beta_vec = c(1.5, 2.5),
 
   if (nsim == 1) return(FUN(1))
 
-  cl <- cl %||% { on.exit(stopCluster(cl)); makeCluster(ncores) }
+  created_cl <- is.null(cl)
+  cl <- cl %||% makeCluster(ncores)
+  if (created_cl) {
+    on.exit(stopCluster(cl))
+    clusterSetRNGStream(cl)
+  }
 
   clusterExport(cl, varlist = "FUN", envir = environment())
   clusterEvalQ(cl, { library(odin); library(dde); library(macpan2) })
-  clusterSetRNGStream(cl)
   return(parLapply(cl = cl, X = seq.int(nsim), fun = FUN))
 
 }

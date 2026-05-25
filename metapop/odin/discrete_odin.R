@@ -1,5 +1,3 @@
-odin_file <- here::here("metapop/odin", "discrete_odin_def.R")
-
 make_simulator_odin <- function(
   beta_vec  = c(1.5, 2.5),
   K         = 1e4,
@@ -12,6 +10,7 @@ make_simulator_odin <- function(
   ) {
 
   n_strain <- 2 ## hard-coded on purpose
+  odin_file <- here::here("metapop/odin", "discrete_odin_def.R")
 
   ## patch-level parameters (vectors, length n_patch)
   K_vec <- rep(K, length.out = n_patch)

@@ -1,7 +1,7 @@
 library(tinytest)
 using("tinysnapshot")
 
-source("discrete_odin.R")
+source(here::here("metapop/odin", "discrete_odin.R"))
 mod <- make_simulator_odin()
 set.seed(101)
 run <- run_simulator_odin(mod)
@@ -17,7 +17,7 @@ print(gg1)
 
 ## expect_snapshot_print(out, label = "odin_run1")
 
-source("discrete_macpan2.R")
+source(here::here("metapop/odin", "discrete_macpan2.R"))
 mod <- make_simulator_macpan2()
 set.seed(101)
 run <- run_simulator_macpan2(mod)
@@ -27,7 +27,7 @@ out <- conv_macpan2(run) |> dplyr::arrange(step, patch, state)
 
 afun <- function(x) dplyr::arrange(x, step, patch, state)
 
-source("discrete_pureR.R")
+source(here::here("metapop/odin", "discrete_pureR.R"))
 mod <- make_simulator_pureR()
 set.seed(101)
 run <- run_simulator_pureR(mod)
@@ -35,7 +35,8 @@ out <- conv_pureR(run)
 
 ## expect_snapshot_print(out, label = "pureR_run1")
 
-source("discrete_run.R")
+
+source(here::here("metapop/odin", "discrete_run.R"))
 run1 <- discrete_run(seed = 101)
 
 run_sep <- discrete_run(seed = 101, alpha = 0)

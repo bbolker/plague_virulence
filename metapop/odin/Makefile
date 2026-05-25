@@ -12,8 +12,12 @@ vim_session:
 compare_platforms.Rout: compare_platforms.R
 	$(pipeR)
 
-tests.Rout: tests.R
+tests.Rout: tinytest/tests.R
 	$(pipeR)
+
+## not working yet
+tests:
+	R --vanilla -e "tinytest::run_test_dir('tinytest')"
 
 ######################################################################
 
