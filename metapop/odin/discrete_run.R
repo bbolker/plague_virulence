@@ -6,9 +6,10 @@ library(ggplot2)
 library(parallel)
 library(patchwork)
 
-source("discrete_odin.R")
-source("discrete_macpan2.R")
-source("discrete_pureR.R")
+s <- function(x) source(here::here("metapop/odin", x))
+s("discrete_odin.R")
+s("discrete_macpan2.R")
+s("discrete_pureR.R")
 
 ##' @param K carrying capacity (scalar or vector of length n_patch)
 ##' @param r host growth rate per disease generation (ditto)
@@ -90,21 +91,74 @@ sum_run1 <- function(x, return_type = c("long", "wide")) {
 }
 
 if (FALSE) {
-  x <- discrete_run(nsim = 10) |>
-    purrr::map(sum_run1) |>
-    dplyr::bind_rows(.id = "run")
+    ## no parallelization
+    system.time(
+        x <- discrete_run(nsim = 20) |>
+            purrr::map(sum_run1) |>
+            dplyr::bind_rows(.id = "run")
+    )
+  
 
   x |>
     filter(step > max(step)-100) |>
     summarise(across(value, mean), .by = c(var, type))
 }
 
-## filter to single strain first if appropriate
-## extinction time, extinction rate,
-## quasi-eq: host pop, infected patches, total infected
+## Analogue of sumfun in poisson/simulation_funs.R, adapted for the long-format
+## list output of discrete_run() and extended to two strains.
+##
+## For each strain j:
+##   - extinction time: first step where total Ij across patches == 0
+##   - QE means: average of last `nsteps` steps over (step, run) cells where
+##     Ij is still present, matching the cell-level masking of the original
+##
+## @param runs list of long-format tibbles from discrete_run() (or a single tibble)
+## @param nsteps number of trailing steps used for quasi-equilibrium averages
+## @return named numeric vector of summary statistics
+sumfun_discrete <- function(runs, nsteps = 100) {
+  if (!is.list(runs) || inherits(runs, "data.frame")) runs <- list(runs)
+  nsim <- length(runs)
 
+  ## aggregate each run to wide per-step format and sort by step
+  agg <- lapply(runs, \(x) dplyr::arrange(sum_run1(x, "wide"), step))
+  nt     <- nrow(agg[[1]])
+  window <- seq(max(1L, nt - nsteps + 1L), nt)
 
-## lok at sumfun in poisson/simulation_funs.R
-  
+  ## row index of first step where total infected == 0 (NA if never extinct)
+  first_ext <- function(pop) {
+    idx <- which(pop == 0)
+    if (length(idx) == 0L) NA_integer_ else idx[1L]
+  }
+  ext1 <- sapply(agg, \(a) first_ext(a$I1_pop))
+  ext2 <- sapply(agg, \(a) first_ext(a$I2_pop))
 
-  
+  ## cell-level QE mean: mask (window-row, run) cells at or after extinction,
+  ## then average over all remaining cells (matching original sumfun logic)
+  qe_mean <- function(var, ext_vec) {
+    m <- sapply(seq_len(nsim), \(i) {
+      v <- agg[[i]][[var]][window]
+      if (!is.na(ext_vec[i])) v[window >= ext_vec[i]] <- NA_real_
+      v
+    })
+    mean(m, na.rm = TRUE)
+  }
+
+  c(
+    mean_ext_time_I1 = mean(ext1, na.rm = TRUE),
+    mean_ext_time_I2 = mean(ext2, na.rm = TRUE),
+    ext_rate_I1      = mean(!is.na(ext1)),
+    ext_rate_I2      = mean(!is.na(ext2)),
+    n_extinct_I1     = sum(!is.na(ext1)),
+    n_extinct_I2     = sum(!is.na(ext2)),
+    n_persist_I1     = sum(is.na(ext1)),
+    n_persist_I2     = sum(is.na(ext2)),
+    ## QE means conditioned on I1 surviving
+    qe_S_pop_I1  = qe_mean("S_pop",    ext1),
+    qe_I1_pop    = qe_mean("I1_pop",   ext1),
+    qe_I1_patch  = qe_mean("I1_patch", ext1),
+    ## QE means conditioned on I2 surviving
+    qe_S_pop_I2  = qe_mean("S_pop",    ext2),
+    qe_I2_pop    = qe_mean("I2_pop",   ext2),
+    qe_I2_patch  = qe_mean("I2_patch", ext2)
+  )
+}
