@@ -34,21 +34,27 @@ discrete_run <- function(beta_vec = c(1.5, 2.5),
                           I_init = 10,
                           seed = NULL,
                           nsim = 1,
+                          chunk = NULL,
+                          stop_cond = NULL,
                           platform = c("odin", "macpan2", "pureR")) {
 
   platform <- match.arg(platform)
+  if ((!is.null(chunk) || !is.null(stop_cond)) && platform != "odin")
+    stop("chunk and stop_cond are only supported for platform = 'odin'")
+
   args <- tibble::lst(beta_vec, r, K, n_patch, nt, I_init, alpha, strain2_delay)
 
-  makefun <- get(sprintf("make_simulator_%s", platform))
-  runfun  <- get(sprintf("run_simulator_%s", platform))
-  convfun <- get(sprintf("conv_%s", platform))
+  makefun  <- get(sprintf("make_simulator_%s", platform))
+  runfun   <- get(sprintf("run_simulator_%s", platform))
+  convfun  <- get(sprintf("conv_%s", platform))
+  run_args <- Filter(Negate(is.null), list(chunk = chunk, stop_cond = stop_cond))
 
   ## Each future builds its own simulator. A per-worker cache (<<- into the
   ## closure) would be more efficient but furrr re-serializes the closure for
   ## every task, so the cache never persists across futures. If compilation
   ## time dominates, consider pre-building via makefun and passing the object
   ## as a future global (if odin objects serialize safely across workers).
-  FUN <- function(i) convfun(runfun(do.call(makefun, args)))
+  FUN <- function(i) convfun(do.call(runfun, c(list(do.call(makefun, args)), run_args)))
 
   if (nsim == 1) {
     if (!is.null(seed)) set.seed(seed)

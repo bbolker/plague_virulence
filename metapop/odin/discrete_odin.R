@@ -39,12 +39,47 @@ make_simulator_odin <- function(
   mod
 }
 
-run_simulator_odin <- function(x) {
+## @param stop_cond NULL (run all steps) or a function(row) -> logical called
+##   on the last row of each chunk; return TRUE to stop early.
+##   See stop_either_extinct() and stop_both_extinct() below.
+## @param chunk number of steps per chunk when stop_cond is supplied
+run_simulator_odin <- function(x, chunk = 50L, stop_cond = NULL) {
   nt <- attr(x, "nt")
-  ## run from step 0 so step==0 fires during the first transition;
-  ## drop the initial-conditions row (step 0) to match other platforms
-  res <- x$run(seq(0, nt))
-  res[-1, , drop = FALSE]
+
+  ## odin returns state at every requested step, including the first one in the
+  ## vector. For consecutive chunks the shared boundary step appears as both the
+  ## last row of one chunk and the first row of the next, so it would be
+  ## duplicated in the combined output. Dropping the first row of every chunk
+  ## with [-1, ] removes the duplicate; for the first chunk this also drops the
+  ## step-0 initial-conditions row, matching the original single-call behaviour.
+  drop_first <- function(m) m[-1L, , drop = FALSE]
+
+  if (is.null(stop_cond)) {
+    return(drop_first(x$run(seq(0, nt))))
+  }
+
+  breaks <- unique(c(seq(0L, nt, by = chunk), nt))
+  out <- vector("list", length(breaks) - 1L)
+  for (k in seq_along(out)) {
+    res      <- x$run(seq(breaks[k], breaks[k + 1L]))
+    out[[k]] <- drop_first(res)
+    if (stop_cond(res[nrow(res), , drop = FALSE])) break
+  }
+  do.call(rbind, out[!vapply(out, is.null, logical(1L))])
+}
+
+## Stopping conditions for stop_cond argument of run_simulator_odin().
+## Operate on a raw odin output row (before conv_odin reshaping).
+## Strain columns in the raw matrix are named "I[patch,strain]";
+## grep on the trailing ",1]" / ",2]" selects each strain across all patches.
+stop_either_extinct <- function(row) {
+  sum(row[, grep(",1\\]$", colnames(row))]) == 0 ||
+    sum(row[, grep(",2\\]$", colnames(row))]) == 0
+}
+
+stop_both_extinct <- function(row) {
+  sum(row[, grep(",1\\]$", colnames(row))]) == 0 &&
+    sum(row[, grep(",2\\]$", colnames(row))]) == 0
 }
 
 conv_odin <- function(x, format = c("long", "wide")) {
