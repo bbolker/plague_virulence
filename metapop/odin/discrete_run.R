@@ -68,9 +68,9 @@ discrete_run <- function(beta_vec = c(1.5, 2.5),
 
 }
 
-## discrete_run(nsim = 10)
 
-sim_to_sum <- function(x, return_type = c("long", "wide")) {
+
+sum_run1 <- function(x, return_type = c("long", "wide")) {
   return_type <- match.arg(return_type)
   ret <- x |>
     dplyr::summarise(
@@ -85,6 +85,26 @@ sim_to_sum <- function(x, return_type = c("long", "wide")) {
   ret |>
     tidyr::pivot_longer(cols = -step, names_to = "state") |>
     dplyr::mutate(var  = sub(".*_", "", state),
-                  type = sub("_.*", "", state))
+                  type = sub("_.*", "", state)) |>
+    select(-state)
 }
 
+if (FALSE) {
+  x <- discrete_run(nsim = 10) |>
+    purrr::map(sum_run1) |>
+    dplyr::bind_rows(.id = "run")
+
+  x |>
+    filter(step > max(step)-100) |>
+    summarise(across(value, mean), .by = c(var, type))
+}
+
+## filter to single strain first if appropriate
+## extinction time, extinction rate,
+## quasi-eq: host pop, infected patches, total infected
+
+
+## lok at sumfun in poisson/simulation_funs.R
+  
+
+  
