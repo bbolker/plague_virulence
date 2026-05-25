@@ -20,7 +20,21 @@ s("discrete_pureR.R")
 ##' @param alpha between-patch transmission  probability
 ##' @param I_init initial infection (chosen as Poisson random variable across platforms)
 ##' @param seed PRNG seed
+##' @param chunk steps per chunk for early stopping (odin only; ignored if stop_cond is NULL)
+##' @param stop_cond function(row) -> logical; called on the last row of each
+##'   chunk; return TRUE to halt early. Use stop_either_extinct() or
+##'   stop_both_extinct() from discrete_odin.R, or supply a custom function.
+##'   NULL (default) runs all nt steps. Only supported for platform = "odin".
 ##' @param platform
+##' @examples
+##' ## stop as soon as either strain goes extinct (odin platform only):
+##' ## plan(multisession)
+##' ## runs <- discrete_run(nsim = 20, stop_cond = stop_either_extinct)
+##' ## sumfun_discrete(runs)
+##'
+##' ## custom condition — stop when strain 2 alone is gone:
+##' ## runs <- discrete_run(nsim = 20, chunk = 100,
+##' ##   stop_cond = function(row) sum(row[, grep(",2\\]$", colnames(row))]) == 0)
 ## Parallelism is controlled by the caller via future::plan() before invoking
 ## discrete_run(). e.g. plan(multisession, workers = 8) for parallel runs,
 ## plan(sequential) (the default) for single-threaded execution.
@@ -103,7 +117,12 @@ sumfun_discrete <- function(runs, nsteps = 100) {
 
   ## aggregate each run to wide per-step format and sort by step
   agg <- lapply(runs, \(x) dplyr::arrange(sum_run1(x, "wide"), step))
-  nt     <- nrow(agg[[1]])
+
+  ## With early stopping, runs may have different lengths. Use the longest run
+  ## to anchor the QE window. Shorter (extinct) runs return NA for out-of-bounds
+  ## row accesses, but those runs are already masked by ext_vec, so the mean is
+  ## unaffected.
+  nt     <- max(vapply(agg, nrow, integer(1L)))
   window <- seq(max(1L, nt - nsteps + 1L), nt)
 
   ## row index of first step where total infected == 0 (NA if never extinct)
