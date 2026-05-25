@@ -1,9 +1,11 @@
 ## To do
 
 * makestuff/shellpipes?
+   * sort out working-directory stuff (package??)
 * summary info:
     * n occupied, quasi-eq, etc.
     * YZ PIP invasion characteristics
+* convert parallel to future?
 * single-strain runs	
 * run PIPs
 * 1 30x30 PIP array (200 sims per parameter set) should take about 10 hours in serial -- 

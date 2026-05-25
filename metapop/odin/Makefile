@@ -15,6 +15,9 @@ compare_platforms.Rout: compare_platforms.R
 tests.Rout: tinytest/tests.R
 	$(pipeR)
 
+discrete_onepatch_twostrain_extinct.png: odin_twostrain_run1.R
+	$(pipeR)
+
 ## not working yet
 tests:
 	R --vanilla -e "tinytest::run_test_dir('tinytest')"

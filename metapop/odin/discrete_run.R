@@ -4,7 +4,7 @@ library(tidyr)
 library(dplyr)
 library(ggplot2)
 library(future)
-library(furrr)
+ibrary(furrr)
 library(patchwork)
 
 s <- function(x) source(here::here("metapop/odin", x))
@@ -80,20 +80,6 @@ sum_run1 <- function(x, return_type = c("long", "wide")) {
     select(-state)
 }
 
-if (FALSE) {
-    ## no parallelization
-    system.time(
-        x <- discrete_run(nsim = 20) |>
-            purrr::map(sum_run1) |>
-            dplyr::bind_rows(.id = "run")
-    )
-  
-
-  x |>
-    filter(step > max(step)-100) |>
-    summarise(across(value, mean), .by = c(var, type))
-}
-
 ## Analogue of sumfun in poisson/simulation_funs.R, adapted for the long-format
 ## list output of discrete_run() and extended to two strains.
 ##
@@ -134,21 +120,33 @@ sumfun_discrete <- function(runs, nsteps = 100) {
   }
 
   c(
-    mean_ext_time_I1 = mean(ext1, na.rm = TRUE),
-    mean_ext_time_I2 = mean(ext2, na.rm = TRUE),
-    ext_rate_I1      = mean(!is.na(ext1)),
-    ext_rate_I2      = mean(!is.na(ext2)),
-    n_extinct_I1     = sum(!is.na(ext1)),
-    n_extinct_I2     = sum(!is.na(ext2)),
-    n_persist_I1     = sum(is.na(ext1)),
-    n_persist_I2     = sum(is.na(ext2)),
+    mean_ext_time.I1 = mean(ext1, na.rm = TRUE),
+    mean_ext_time.I2 = mean(ext2, na.rm = TRUE),
+    ext_prob.I1      = mean(!is.na(ext1)),
+    ext_prob.I2      = mean(!is.na(ext2)),
     ## QE means conditioned on I1 surviving
-    qe_S_pop_I1  = qe_mean("S_pop",    ext1),
-    qe_I1_pop    = qe_mean("I1_pop",   ext1),
-    qe_I1_patch  = qe_mean("I1_patch", ext1),
+    qe_pop_S.I1  = qe_mean("S_pop",    ext1),
+    qe_infpop.I1    = qe_mean("I1_pop",   ext1),
+    qe_infpatch.I1  = qe_mean("I1_patch", ext1),
     ## QE means conditioned on I2 surviving
-    qe_S_pop_I2  = qe_mean("S_pop",    ext2),
-    qe_I2_pop    = qe_mean("I2_pop",   ext2),
-    qe_I2_patch  = qe_mean("I2_patch", ext2)
+    qe_pop_S.I2  = qe_mean("S_pop",    ext2),
+    qe_infpop.I2    = qe_mean("I2_pop",   ext2),
+    qe_infpatch.I2  = qe_mean("I2_patch", ext2)
   )
 }
+
+## scratch work
+if (FALSE) {
+    
+    ## no parallelization
+    system.time(
+        x <- discrete_run(nsim = 10)  ## 6.5 seconds
+    )
+    plan(multisession(workers = 4))
+    system.time(
+        x <- discrete_run(nsim = 10)  ## 1.23 seconds
+    )
+    sumfun_discrete(x)
+  
+}
+
