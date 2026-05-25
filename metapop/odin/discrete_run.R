@@ -4,7 +4,7 @@ library(tidyr)
 library(dplyr)
 library(ggplot2)
 library(future)
-ibrary(furrr)
+library(furrr)
 library(patchwork)
 
 s <- function(x) source(here::here("metapop/odin", x))

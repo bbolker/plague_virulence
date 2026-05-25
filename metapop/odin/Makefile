@@ -15,7 +15,10 @@ compare_platforms.Rout: compare_platforms.R
 tests.Rout: tinytest/tests.R
 	$(pipeR)
 
-discrete_onepatch_twostrain_extinct.png: odin_twostrain_run1.R
+discrete_onepatch_twostrain_extinct.rds: discrete_onepatch_twostrain_extinct_run.R
+	$(pipeR)
+
+discrete_onepatch_twostrain_extinct.png: discrete_onepatch_twostrain_extinct_plot.R discrete_onepatch_twostrain_extinct.rds
 	$(pipeR)
 
 ## not working yet
