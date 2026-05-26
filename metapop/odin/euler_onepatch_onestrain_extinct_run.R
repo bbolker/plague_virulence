@@ -26,9 +26,10 @@ result_list <- lapply(seq_len(nrow(dd)), function(i) {
                        I_init   = c(10, 0),
                        gamma    = c(1, 1),
                        dt       = dt,
-                       def_file = "euler_odin_def.R",
-                       nsim     = nsim,
-                       platform = "odin")
+                       def_file  = "euler_odin_def.R",
+                       stop_cond = NULL,
+                       nsim      = nsim,
+                       platform  = "odin")
   bind_cols(dd[i, ], as.data.frame(as.list(sumfun_discrete(runs))))
 })
 plan(sequential)

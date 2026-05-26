@@ -15,9 +15,9 @@ set.seed(101)
 
 run <- discrete_run(beta_vec  = c(2, 0),
                     K         = 1e4,
-                    r         = 0,
+                    r         = 0.125,
                     n_patch   = 1,
-                    nt        = round(8 / dt),
+                    nt        = round(100 / dt),
                     alpha     = 0,
                     I_init    = c(2, 0),
                     gamma     = 1,
@@ -34,7 +34,3 @@ runx2 <- dplyr::filter(runx, state %in% c("I1", "S"))
 
 ggplot(runx2, aes(step, value)) +
   geom_line(aes(group = interaction(run, state), colour = state))
-
-S <- filter(runx, state == "S") |> pull(value)
-all(diff(S) <= 0)
-which(diff(S) > 0)

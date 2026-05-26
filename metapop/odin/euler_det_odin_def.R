@@ -4,7 +4,7 @@
 ## State variables become real-valued (not integer).
 
 ## Core equations for transitions between compartments:
-update(S[]) <- S[i] - tot_incidence[i] ## + pop_change[i]
+update(S[]) <- S[i] - tot_incidence[i] + pop_change[i]
 update(I[,1]) <- I[i,1] + n_SI[i,1] - n_IR[i,1] + immig[i,1]
 update(I[,2]) <- I[i,2] + n_SI[i,2] - n_IR[i,2] + immig[i,2] + I2_seed[i]
 
