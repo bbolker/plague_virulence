@@ -2,9 +2,12 @@
 % Please edit documentation in R/discrete_odin.R
 \name{stop_either_extinct}
 \alias{stop_either_extinct}
+\alias{stop_both_extinct}
 \title{Stop when either strain is globally extinct}
 \usage{
 stop_either_extinct(row)
+
+stop_both_extinct(row)
 }
 \arguments{
 \item{row}{single-row matrix from odin$run(), column names "I[patch,strain]"}

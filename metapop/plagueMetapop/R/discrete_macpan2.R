@@ -1,10 +1,5 @@
-##' Build a macpan2 simulator for the two-strain n-patch model.
-##' Simulator creation is separated from trajectory generation so the two
-##' steps can be timed independently.
-##'
-##' @inheritParams make_simulator_odin
+##' @rdname make_simulator_odin
 ##' @param seed PRNG seed (used for initial condition draws in R)
-##' @return a macpan2 simulator object
 ##' @export
 make_simulator_macpan2 <- function(
   beta_vec  = c(1.5, 2.5),
@@ -89,15 +84,13 @@ make_simulator_macpan2 <- function(
   macpan2::mp_simulator(spec, time_steps = nt, outputs = c("S", "I"))
 }
 
-##' Run a macpan2 simulator
-##' @param x macpan2 simulator from make_simulator_macpan2()
+##' @rdname make_simulator_odin
 ##' @export
 run_simulator_macpan2 <- function(x) {
   macpan2::mp_trajectory(x)
 }
 
-##' Reshape mp_trajectory() output to the long format used by odin/pureR versions
-##' @param traj data frame returned by run_simulator_macpan2()
+##' @rdname make_simulator_odin
 ##' @export
 conv_macpan2 <- function(traj) {
   traj |>

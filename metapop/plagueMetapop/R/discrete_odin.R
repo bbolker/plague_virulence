@@ -9,7 +9,15 @@ compile_odin <- function(def_file = "discrete_odin_def.R") {
   gen
 }
 
-##' Build an odin simulator for the two-strain n-patch model
+##' Two-strain n-patch simulator interface (odin, macpan2, pureR backends)
+##' @description
+##' Three-function interface shared across all backends:
+##' \itemize{
+##'   \item \code{make_simulator_*()} constructs a simulator object
+##'   \item \code{run_simulator_*()} runs it and returns raw output
+##'   \item \code{conv_*()} converts raw output to a common long-format tibble
+##'     with columns \code{step}, \code{state}, \code{patch}, \code{value}
+##' }
 ##' @param beta_vec length-2 vector of per-capita transmission rates
 ##' @param K carrying capacity (scalar or vector of length n_patch)
 ##' @param r host growth rate per disease generation (ditto)
@@ -79,8 +87,8 @@ make_simulator_odin <- function(
   mod
 }
 
-##' Run an odin simulator, optionally with chunked early stopping
-##' @param x odin model instance from make_simulator_odin()
+##' @rdname make_simulator_odin
+##' @param x simulator object from the corresponding \code{make_simulator_*()} function
 ##' @param chunk steps per chunk; only used when stop_cond is non-NULL
 ##' @param stop_cond NULL (run all nt steps) or a function(row) -> logical
 ##'   called on the last row of each chunk; return TRUE to stop early.
@@ -154,16 +162,14 @@ stop_either_extinct <- function(row) {
     sum(row[, grep(",2\\]$", colnames(row))]) == 0
 }
 
-##' Stop when both strains are globally extinct
-##' @inheritParams stop_either_extinct
+##' @rdname stop_either_extinct
 ##' @export
 stop_both_extinct <- function(row) {
   sum(row[, grep(",1\\]$", colnames(row))]) == 0 &&
     sum(row[, grep(",2\\]$", colnames(row))]) == 0
 }
 
-##' Convert raw odin output to long or wide format
-##' @param x matrix returned by run_simulator_odin()
+##' @rdname make_simulator_odin
 ##' @param format "long" (default) or "wide"
 ##' @export
 conv_odin <- function(x, format = c("long", "wide")) {

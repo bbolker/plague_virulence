@@ -1,8 +1,6 @@
-##' Pure-R reference implementation of the two-strain n-patch model
-##' @inheritParams make_simulator_odin
+##' @rdname make_simulator_odin
 ##' @param n_strain number of strains [only 2 supported]
 ##' @param seed PRNG seed
-##' @return list with a \code{run(nt)} closure; pass to run_simulator_pureR()
 ##' @export
 make_simulator_pureR <- function(
   beta_vec  = c(1.5, 2.5),
@@ -95,15 +93,13 @@ make_simulator_pureR <- function(
   ret
 }
 
-##' Run a pureR simulator
-##' @param x simulator list from make_simulator_pureR()
+##' @rdname make_simulator_odin
 ##' @export
 run_simulator_pureR <- function(x) {
   nt <- attr(x, "nt")
   x$run(nt)
 }
 
-##' Convert pureR output to tibble (identity for already-long output)
-##' @param x long-format data frame from run_simulator_pureR()
+##' @rdname make_simulator_odin
 ##' @export
 conv_pureR <- function(x) dplyr::as_tibble(x)
