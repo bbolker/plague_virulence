@@ -3,7 +3,7 @@ pkgs <- c(
   "biscale"
  , "colorspace"
  , "cowplot"
- , "dde"
+ , "dde" ## cryptic odin requirement
  , "deSolve"
  , "furrr"
  , "future"
@@ -11,7 +11,9 @@ pkgs <- c(
  , "gsl"
  , "odin"
  , "optparse"
- , "patchwork"
+, "patchwork"
+, "pkgbuild" ## cryptic odin requirement
+   , "pkgload" ## cryptic odin requirement
  , "progressr"
  , "remotes"
  , "tidyverse"
