@@ -7,9 +7,8 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --output=logs/euler_%A_%a.out
 
-# Submit from the metapop/odin directory so here::here() resolves correctly.
+# Submit from the metapop/odin/sharcnet directory.
 # Before first submission: mkdir -p logs outputs
-# Check available R versions with: module spider r
 
 module load r/4.5.0
 
