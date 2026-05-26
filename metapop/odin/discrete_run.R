@@ -63,6 +63,11 @@ discrete_run <- function(beta_vec = c(1.5, 2.5),
   convfun  <- get(sprintf("conv_%s", platform))
   run_args <- Filter(Negate(is.null), list(chunk = chunk, stop_cond = stop_cond))
 
+  ## pre-compile the odin generator once on the main process; workers receive it
+  ## via the closure and skip recompilation (odin caches the .so by file hash,
+  ## so even if serialization forces a reload, compilation is skipped)
+  if (platform == "odin") args$gen_local <- compile_odin()
+
   ## Each future builds its own simulator. A per-worker cache (<<- into the
   ## closure) would be more efficient but furrr re-serializes the closure for
   ## every task, so the cache never persists across futures. If compilation

@@ -3,10 +3,18 @@ library(tidyr)
 library(odin)
 library(dde) ## odin insists on this
 library(future)
+library(optparse)
 
 source(here::here("metapop/odin", "discrete_run.R"))
 
-nsim <- 20
+opt <- parse_args(OptionParser(option_list = list(
+  make_option(c("-s", "--stepR0"), type = "double",  default = 0.025,
+              help = "step size of the R0 grid [default %default]"),
+  make_option(c("-n", "--nsim"),   type = "integer", default = 20L,
+              help = "simulations averaged per R0 pair [default %default]")
+)))
+
+nsim <- opt$nsim
 
 first_zero <- function(x) which(x == 0)[1]
 
@@ -33,7 +41,7 @@ sumfun <- function(beta1, beta2, K = 1e6, I_init = c(10, 10)) {
   result
 }
 
-R0vec <- seq(1, 5, by = 0.025)
+R0vec <- seq(1, 5, by = opt$stepR0)
 dd    <- expand.grid(R01 = R0vec, R02 = R0vec)
 
 ## run once on first row to determine output dimensions; 2-row placeholder

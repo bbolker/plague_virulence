@@ -1,7 +1,7 @@
 ## To do
 
-* figure out how to enable early stopping on extinction
 * store parameter values as attributes
+* understand two-strain 1-patch results!
 * makestuff/shellpipes?
    * sort out working-directory stuff (package??)
 * summary info:

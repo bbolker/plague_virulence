@@ -2,9 +2,8 @@ library(ggplot2); theme_set(theme_bw())
 
 ## temporary, from checkpoint
 
-
 fn <- "discrete_onepatch_twostrain_extinct_checkpoint.rds"
-R0vec <- seq(1, 5, by = 0.025)
+R0vec <- seq(1, 5, by = 0.1)
 dd    <- expand.grid(R01 = R0vec, R02 = R0vec)
 res <- readRDS(fn)
 res_df <- t(res) |> as.data.frame() |> dplyr::bind_cols(dd)

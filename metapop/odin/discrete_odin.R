@@ -1,3 +1,8 @@
+compile_odin <- function() {
+  odin_file <- here::here("metapop/odin", "discrete_odin_def.R")
+  suppressMessages(odin::odin(odin_file))
+}
+
 make_simulator_odin <- function(
   beta_vec  = c(1.5, 2.5),
   K         = 1e4,
@@ -6,11 +11,12 @@ make_simulator_odin <- function(
   nt        = 1000,
   alpha     = 1e-3,
   I_init    = 10,
-  strain2_delay = 0
+  strain2_delay = 0,
+  gen_local = NULL
   ) {
 
   n_strain <- 2 ## hard-coded on purpose
-  odin_file <- here::here("metapop/odin", "discrete_odin_def.R")
+  gen_local <- gen_local %||% compile_odin()
 
   ## patch-level parameters (vectors, length n_patch)
   K_vec <- rep(K, length.out = n_patch)
@@ -33,7 +39,6 @@ make_simulator_odin <- function(
                       strain2_delay,
                       n_patch)
 
-  gen_local <- suppressMessages(odin::odin(odin_file))
   mod <- do.call(gen_local$new, args)
   attr(mod, "nt") <- nt
   mod
