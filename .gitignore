@@ -310,3 +310,12 @@ Rplots.pdf
 .Rhistory
 
 *_files/
+target.mk
+makestuff
+
+*.Rout.pdf
+*.Rout.log
+
+\.~*.csv#
+
+
