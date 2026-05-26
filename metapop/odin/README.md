@@ -28,6 +28,19 @@ This directory implements plague virulence simulations using [odin](https://mrc-
 | `compare_platforms.R` | Compares odin, macpan2, and pureR outputs for consistency; also times simulator creation and trajectory generation |
 | `tinytest/tests.R` | Automated tests via tinytest: correctness checks for each platform, parallel execution, and summary statistics |
 
+### HPC job arrays (Alliance Canada / SLURM)
+
+Each pair of scripts runs the corresponding grid on Compute Canada using SLURM job arrays. Submit from the `metapop/odin/` directory after `mkdir -p logs outputs`.
+
+| File | Description |
+|------|-------------|
+| `submit_euler_extinct.sh` | 280-task array (1 per grid point) for the euler one-strain extinction grid; 4 CPUs/task, 2 h |
+| `euler_onepatch_onestrain_extinct_run_array.R` | Array R script: reads `SLURM_ARRAY_TASK_ID`, runs one (R0, K) point with `nsim=100`; saves `outputs/euler_extinct_task_NNNN.rds` |
+| `euler_onepatch_onestrain_extinct_combine.R` | Combines all per-task `.rds` files into `euler_onepatch_onestrain_extinct.rds` |
+| `submit_twostrain_extinct.sh` | 1000-task array (batched) for the two-strain extinction grid (25 921 points → ~26 rows/job); 1 CPU/task, 1 h |
+| `discrete_onepatch_twostrain_extinct_run_array.R` | Array R script: reads task ID and `--stepR0`/`--nsim`/`--njobs` options, runs one batch of grid rows; saves `outputs/twostrain_extinct_task_NNNN.rds` |
+| `discrete_onepatch_twostrain_extinct_combine.R` | Combines all per-task `.rds` files into `discrete_onepatch_twostrain_extinct.rds` |
+
 ### Run and plot scripts (current)
 
 | File | Description |
