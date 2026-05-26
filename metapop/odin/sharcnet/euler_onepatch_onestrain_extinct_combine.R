@@ -6,5 +6,5 @@ files <- sort(list.files("outputs", pattern = "^euler_onepatch_onestrain_extinct
 if (length(files) == 0) stop("no task output files found in outputs/")
 
 out <- bind_rows(lapply(files, readRDS))
-saveRDS(out, "euler_onepatch_onestrain_extinct.rds")
+saveRDS(out, "outputs/euler_onepatch_onestrain_extinct.rds")
 cat("combined", nrow(out), "rows from", length(files), "files\n")
