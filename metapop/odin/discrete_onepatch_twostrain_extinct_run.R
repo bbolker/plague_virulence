@@ -1,11 +1,6 @@
-library(dplyr)
-library(tidyr)
-library(odin)
-library(dde) ## odin insists on this
+library(plagueMetapop)
 library(future)
 library(optparse)
-
-source(here::here("metapop/odin", "discrete_run.R"))
 
 opt <- parse_args(OptionParser(option_list = list(
   make_option(c("-s", "--stepR0"), type = "double",  default = 0.025,

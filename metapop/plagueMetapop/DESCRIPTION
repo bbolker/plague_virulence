@@ -1,0 +1,26 @@
+Package: plagueMetapop
+Title: Plague Virulence Metapopulation Model
+Version: 0.0.1
+Authors@R: person("Ben", "Bolker", email = "bbolker@gmail.com",
+    role = c("aut", "cre"))
+Description: Stochastic discrete-time and continuous-time two-strain n-patch SIR
+    models for studying plague virulence evolution in metapopulations.
+    Supports odin, macpan2, and pure-R simulation backends.
+Depends:
+    R (>= 4.4.0)
+License: GPL-3
+Imports:
+    dplyr,
+    furrr,
+    macpan2,
+    odin,
+    tibble,
+    tidyr
+Suggests:
+    dde,
+    future,
+    ggplot2,
+    patchwork,
+    tinytest
+Encoding: UTF-8
+Config/roxygen2/version: 8.0.0

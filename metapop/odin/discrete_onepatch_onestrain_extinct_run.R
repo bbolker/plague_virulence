@@ -1,10 +1,5 @@
-library(dplyr)
-library(tidyr)
-library(odin)
-library(dde)
+library(plagueMetapop)
 library(future)
-
-source(here::here("metapop/odin", "discrete_run.R"))
 
 nsim <- 100L
 

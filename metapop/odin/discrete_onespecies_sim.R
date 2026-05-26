@@ -1,10 +1,6 @@
-library(dplyr)
-library(tidyr)
-library(odin)
-library(dde) ## odin insists on this
-library(ggplot2); theme_set(theme_bw())
+library(plagueMetapop)
 library(future)
-source(here::here("metapop/odin", "discrete_run.R"))
+library(ggplot2); theme_set(theme_bw())
 
 nsim <- 20
 ncores <- 10

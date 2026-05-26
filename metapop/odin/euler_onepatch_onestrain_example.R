@@ -1,11 +1,6 @@
-library(dplyr)
-library(tidyr)
-library(odin)
-library(dde)
+library(plagueMetapop)
 library(future)
 library(ggplot2); theme_set(theme_bw())
-
-source(here::here("metapop/odin", "discrete_run.R"))
 
 nsim <- 100L
 dt   <- 0.2

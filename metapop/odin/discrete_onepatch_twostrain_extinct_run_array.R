@@ -3,16 +3,11 @@
 ## We batch: each of 1000 jobs processes ~26 rows.
 ## Combine outputs with discrete_onepatch_twostrain_extinct_combine.R
 
-library(dplyr)
-library(tidyr)
-library(odin)
-library(dde)
+library(plagueMetapop)
 library(optparse)
 
 task_id <- as.integer(Sys.getenv("SLURM_ARRAY_TASK_ID"))
 if (is.na(task_id)) stop("SLURM_ARRAY_TASK_ID not set")
-
-source(here::here("metapop/odin", "discrete_run.R"))
 
 opt <- parse_args(OptionParser(option_list = list(
   make_option(c("-s", "--stepR0"), type = "double",  default = 0.025,

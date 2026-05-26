@@ -4,15 +4,12 @@
 ## For odin and macpan2, simulator creation and trajectory generation are timed separately.
 
 suppressPackageStartupMessages({
-  library(odin); library(dde); library(tidyr); library(dplyr)
-  library(macpan2); library(ggplot2)
+  library(plagueMetapop)
+  library(ggplot2)
 })
 options(macpan2_verbose = FALSE)
 
 platforms <- c("odin", "macpan2", "pureR")
-for (p in platforms)  {
-  source(here::here("metapop/odin", sprintf("discrete_%s.R", p)))
-}
 
 ## FIXME: set up basic S3 class structure to avoid all the mget() nonsense
 

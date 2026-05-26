@@ -2,16 +2,11 @@
 ## Submit via submit_euler_extinct.sh; each task runs one (R0, K) grid point.
 ## Combine outputs with euler_onepatch_onestrain_extinct_combine.R
 
-library(dplyr)
-library(tidyr)
-library(odin)
-library(dde)
+library(plagueMetapop)
 library(future)
 
 task_id <- as.integer(Sys.getenv("SLURM_ARRAY_TASK_ID"))
 if (is.na(task_id)) stop("SLURM_ARRAY_TASK_ID not set")
-
-source(here::here("metapop/odin", "discrete_run.R"))
 
 nsim <- 100L
 dt   <- 0.1
