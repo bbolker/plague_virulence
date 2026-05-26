@@ -5,10 +5,11 @@
 
   Chose r=0.125 on the basis of intrinsic rat pop growth rates of 3-5/year; generation time of plague 10-20 days; `3/365*15 ~ 0.125`. However, this leads to near-certain burnout for R0 = 4 (with dt = 0.2 disease generations) at K=1e6. 0.125 is *way* above the range shown in Parsons et al (which goes only up to 0.02, reasonable for human diseases).  What do the burnout contours look like for epsilon in the range of 0.02 to 0.2 ... ?
 
+* one-strain: n-patch, factorial over R01/K/alpha
+* two-strain: n-patch, factorial over R01/R02/K/alpha (drop if either extinct)
 
+* instrument 
 * store parameter values as attributes
-* understand two-strain 1-patch results!
-* one-strain 1-patch results!
 * makestuff/shellpipes?
    * sort out working-directory stuff (package??)
 * summary info:
@@ -19,7 +20,6 @@
 * 1 30x30 PIP array (200 sims per parameter set) should take about 10 hours in serial -- 
 * job array/META runs on Nibi?
 * profiling macpan2 runner
-* set up tinytest machinery for basic tests
 * lay out/test mechanisms: dens-indep R0, fixed N, extinction-independent ... ?
 * invasibility equations
 * better stochastic (+/-) dynamics (cleaner, avoid clamping in macpan2)
