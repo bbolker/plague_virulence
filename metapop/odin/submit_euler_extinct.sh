@@ -2,7 +2,7 @@
 #SBATCH --account=def-bolker
 #SBATCH --job-name=euler_extinct
 #SBATCH --array=1-280
-#SBATCH --time=0-02:00:00
+#SBATCH --time=0-00:30:00
 #SBATCH --mem=4G
 #SBATCH --cpus-per-task=4
 #SBATCH --output=logs/euler_%A_%a.out
