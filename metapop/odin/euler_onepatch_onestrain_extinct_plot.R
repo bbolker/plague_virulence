@@ -4,7 +4,9 @@ library(patchwork)
 
 theme_set(theme_bw())
 
-dat <- readRDS("euler_onepatch_onestrain_extinct.rds") |>
+## "euler_onepatch_onestrain_extinct.rds"
+fn <- "sharcnet/outputs/euler_onepatch_onestrain_extinct_mini.rds"
+dat <- readRDS(fn) |>
   mutate(log10K = log10(K))
 
 ## FIXME: convert to long and facet rather than using patchwork

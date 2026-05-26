@@ -8,11 +8,11 @@ library(future)
 task_id <- as.integer(Sys.getenv("SLURM_ARRAY_TASK_ID"))
 if (is.na(task_id)) stop("SLURM_ARRAY_TASK_ID not set")
 
-nsim <- 100L
+nsim <- 500L
 dt   <- 0.1
 
 dd <- expand.grid(R0 = seq(1.1, 5, by = 0.1),
-                  K  = 10^(seq(3, 6, by = 0.5)))
+                  K  = 10^(seq(3, 6, by = 0.25)))
 
 row <- dd[task_id, ]
 
