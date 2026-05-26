@@ -6,9 +6,9 @@ This directory implements plague virulence simulations using [odin](https://mrc-
 
 | File | Description |
 |------|-------------|
-| `discrete_odin_def.R` | Stochastic discrete-time two-strain n-patch SIR model (mass-action, binomial/Poisson draws, logistic vital dynamics) |
-| `euler_odin_def.R` | Stochastic continuous-time version: adds per-strain recovery rate `gamma[]` and time step `dt`; transitions use exponential-hazard probabilities scaled by `dt` |
-| `euler_det_odin_def.R` | Deterministic version of `euler_odin_def.R`: replaces `rpois`/`rbinom` draws with their expectations; state variables are real-valued |
+| `discrete_odin_def.R` | Stochastic discrete-time two-strain n-patch SIR model (mass-action, binomial/Poisson draws, logistic vital dynamics); `I2_ini[]` allows strain-2 initial condition to be set on chunked restarts |
+| `euler_odin_def.R` | Stochastic continuous-time version: adds per-strain recovery rate `gamma[]` and time step `dt`; transitions use exponential-hazard probabilities scaled by `dt`; also carries `I2_ini[]` |
+| `euler_det_odin_def.R` | Deterministic version of `euler_odin_def.R`: replaces `rpois`/`rbinom` draws with their expectations; state variables are real-valued; also carries `I2_ini[]` |
 | `odin_twostrain0.R` | Earlier single-patch two-strain odin model definition (continuous-time SIR with explicit `mu`); superseded by `discrete_odin_def.R` |
 | `discrete_onepatch_odin.R` | Early prototype: single-patch discrete-time SIR with logistic growth; superseded |
 
@@ -16,10 +16,10 @@ This directory implements plague virulence simulations using [odin](https://mrc-
 
 | File | Description |
 |------|-------------|
-| `discrete_odin.R` | `compile_odin`, `make_simulator_odin`, `run_simulator_odin`, `conv_odin`, and extinction stopping-condition helpers (`stop_either_extinct`, `stop_both_extinct`) |
+| `discrete_odin.R` | `compile_odin`, `make_simulator_odin` (stores generator and init args as attributes for chunked restarts), `run_simulator_odin` (chunked early-stopping via per-chunk reinitialisation), `conv_odin`, and stopping-condition helpers (`stop_either_extinct`, `stop_both_extinct`) |
 | `discrete_macpan2.R` | Equivalent make/run/conv functions for the macpan2 platform |
 | `discrete_pureR.R` | Pure-R reference implementation of the same model (no compiled backend) |
-| `discrete_run.R` | Top-level `discrete_run()` dispatcher: compiles the chosen platform, parallelises over `nsim` simulations via furrr/future, and provides `sumfun_discrete()` for summarising results |
+| `discrete_run.R` | Top-level `discrete_run()` dispatcher: compiles the chosen platform, parallelises over `nsim` simulations via furrr/future, and provides `sumfun_discrete()` for summarising results; default `stop_cond = stop_both_extinct` halts odin runs as soon as both strains are globally extinct |
 
 ### Testing and validation
 
