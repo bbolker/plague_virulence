@@ -33,7 +33,7 @@ runs <- discrete_run(beta_vec  = c(row$R0, 0),
                      platform  = "odin")
 plan(sequential)
 
-out <- bind_cols(row, as.data.frame(as.list(sumfun_discrete(runs))))
+out <- dplyr::bind_cols(row, as.data.frame(as.list(sumfun_discrete(runs))))
 
 dir.create("outputs", showWarnings = FALSE)
 saveRDS(out, sprintf("outputs/euler_extinct_mini_task_%04d.rds", task_id))
