@@ -53,6 +53,11 @@ run_1strain <- discrete_run(seed = 101, I_init = c(10, 0))
 print(gg_1strain <- gg1 + run_1strain)
 
 
+## NOTE: n_patch=1 with default K=1e4 and beta=c(2,1) — strain 1 (R0=2) is
+## unlikely to go extinct within nt=1000 steps for most runs, but strain 2
+## is never introduced (I_init[2]=0, alpha=0) so ext_prob.I2==1 is guaranteed.
+## The ext_prob.I1 < 1 test would fail if all 6 runs went extinct, which is
+## extremely unlikely at this K but could happen at much smaller K.
 plan(multicore(workers = 2))
 d0 <- discrete_run(beta_vec = c(2, 1), I_init = c(10, 0),
                    n_patch = 1, nsim = 6)

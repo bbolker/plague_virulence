@@ -49,6 +49,11 @@ mean_df <- conv_list |>
             .by = c(platform, step, state))
 
 ## grand mean
+## NOTE: strain 1 (beta=1.5, R0~1.5) goes extinct in these runs, so its grand
+## mean is dominated by the early trajectory before extinction. Because RNGs
+## differ between platforms, extinction timing differs and I1 grand means are
+## NOT expected to agree closely across platforms — this is not a bug.
+## I2 and S grand means should be consistent.
 mean_df |> summarise(across(mean_val, .fns = c(mean = mean, sd = sd), .names = "grand_{.fn}"),
                      .by = c(platform, state))
 
