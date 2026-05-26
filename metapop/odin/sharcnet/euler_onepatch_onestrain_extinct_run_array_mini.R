@@ -36,4 +36,4 @@ plan(sequential)
 out <- dplyr::bind_cols(row, as.data.frame(as.list(sumfun_discrete(runs))))
 
 dir.create("outputs", showWarnings = FALSE)
-saveRDS(out, sprintf("outputs/euler_extinct_mini_task_%04d.rds", task_id))
+saveRDS(out, sprintf("outputs/euler_onepatch_onestrain_extinct_mini_task_%04d.rds", task_id))
