@@ -7,6 +7,7 @@ Ignore = target.mk
 vim_session:
 	bash -ic "vmt"
 
+R=R CMD BATCH --vanilla
 ######################################################################
 
 compare_platforms.Rout: compare_platforms.R
@@ -17,6 +18,12 @@ tests.Rout: tinytest/tests.R
 
 discrete_onepatch_twostrain_extinct.rds: discrete_onepatch_twostrain_extinct_run.R
 	$(pipeR)
+
+euler_onepatch_onestrain_extinct.rds: euler_onepatch_onestrain_extinct_run.R
+	$(R) $<
+
+euler_onepatch_onestrain_extinct.png: euler_onepatch_onestrain_extinct_plot.R euler_onepatch_onestrain_extinct.rds
+	$(R) $<
 
 discrete_onepatch_twostrain_extinct.png: discrete_onepatch_twostrain_extinct_plot.R discrete_onepatch_twostrain_extinct.rds
 	$(pipeR)

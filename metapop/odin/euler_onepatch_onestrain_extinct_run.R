@@ -12,7 +12,7 @@ dt   <- 0.1
 dd <- expand.grid(R0 = seq(1.1, 5, by = 0.1),
                   K  = 10^(seq(3, 6, by = 0.5)))
 
-plan(multicore(workers = 10L))
+plan(multicore(workers = 14L))
 set.seed(101)
 
 result_list <- lapply(seq_len(nrow(dd)), function(i) {

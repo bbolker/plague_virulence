@@ -1,0 +1,31 @@
+---
+title: "parameter table"
+---
+
+```{r}
+library(tidyverse)
+library(kableExtra)
+```
+
+<!-- https://stackoverflow.com/a/70891533/190277 -->
+
+```{r}
+expSup <- function(x, digits=3) {
+  ifelse(is.na(x), NA,
+         sprintf(paste0("%05.", digits, "f x 10^%d^"),
+                 x/10^floor(log10(abs(x))), floor(log10(abs(x)))))
+}
+
+dd <- read_csv("parameters.csv") |>
+  filter(type == "param") |>
+  select(Symbol, Definition, Value, minval, maxval) |>
+  ## mutate(across(c(Value, minval, maxval), expSup)) |>
+  mutate(Value = ifelse(is.na(minval), Value,
+                        sprintf("%s - %s", minval, maxval))) |>
+  select(-c(minval, maxval))
+
+kbl(dd) |>
+  column_spec(2, width = "3in")
+```
+
+
