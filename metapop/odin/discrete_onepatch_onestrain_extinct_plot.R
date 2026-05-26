@@ -4,7 +4,7 @@ library(patchwork)
 
 theme_set(theme_bw())
 
-dat <- readRDS("discrete_onepatch_onestrain_extinct.rds") |>
+dat <- readRDS("euler_onepatch_onestrain_extinct.rds") |>
   mutate(log10K = log10(K))
 
 make_raster <- function(fill_var, fill_label) {

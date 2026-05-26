@@ -18,9 +18,10 @@ run <- discrete_run(beta_vec = c(4, 0),
                     n_patch  = 1,
                     nt       = 500,
                     alpha    = 0,
-                    I_init   = c(10, 0),
-                    nsim     = nsim,
-                    platform = "odin")
+                    I_init    = c(10, 0),
+                    stop_cond = NULL,
+                    nsim      = nsim,
+                    platform  = "odin")
 
 runx <- bind_rows(run, .id = "run")
 
@@ -30,9 +31,3 @@ dplyr::filter(runx, state == "I1") |>
   scale_y_log10()
 
 
-  bind_cols(dd[i, ], as.data.frame(as.list(sumfun_discrete(runs))))
-})
-plan(sequential)
-
-out <- bind_rows(result_list)
-saveRDS(out, "discrete_onepatch_onestrain_extinct.rds")

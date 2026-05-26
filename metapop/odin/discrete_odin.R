@@ -1,6 +1,8 @@
-compile_odin <- function() {
-  odin_file <- here::here("metapop/odin", "discrete_odin_def.R")
-  suppressMessages(odin::odin(odin_file))
+compile_odin <- function(def_file = "discrete_odin_def.R") {
+  odin_file <- here::here("metapop/odin", def_file)
+  gen <- suppressMessages(odin::odin(odin_file))
+  attr(gen, "def_filename") <- def_file
+  gen
 }
 
 make_simulator_odin <- function(
@@ -12,11 +14,14 @@ make_simulator_odin <- function(
   alpha     = 1e-3,
   I_init    = 10,
   strain2_delay = 0,
+  gamma     = c(1, 1),
+  dt        = 1,
+  def_file  = "discrete_odin_def.R",
   gen_local = NULL
   ) {
 
   n_strain <- 2 ## hard-coded on purpose
-  gen_local <- gen_local %||% compile_odin()
+  gen_local <- gen_local %||% compile_odin(def_file)
 
   ## patch-level parameters (vectors, length n_patch)
   K_vec <- rep(K, length.out = n_patch)
@@ -24,9 +29,12 @@ make_simulator_odin <- function(
   I_init <- rep(I_init, length.out = n_strain)
   
   ## strain x patch parameters: matrices [n_patch, n_strain], rows = patches, cols = strains
-  I_ini_mat <- matrix(rpois(n_strain*n_patch, lambda = I_init),
-                      byrow = TRUE,
-                      ncol = n_strain)
+  ## single-patch: use I_init directly (deterministic); multi-patch: Poisson draws
+  I_ini_mat <- if (n_patch == 1L) {
+    matrix(round(I_init), byrow = TRUE, ncol = n_strain)
+  } else {
+    matrix(rpois(n_strain * n_patch, lambda = I_init), byrow = TRUE, ncol = n_strain)
+  }
 
   S_ini_vec <- K_vec - rowSums(I_ini_mat)
 
@@ -38,6 +46,11 @@ make_simulator_odin <- function(
                       alpha,
                       strain2_delay,
                       n_patch)
+
+  if (grepl("^euler_", attr(gen_local, "def_filename"))) {
+    args$gamma <- rep(gamma, length.out = n_strain)
+    args$dt    <- dt
+  }
 
   mod <- do.call(gen_local$new, args)
   attr(mod, "nt") <- nt
@@ -51,17 +64,23 @@ make_simulator_odin <- function(
 run_simulator_odin <- function(x, chunk = 50L, stop_cond = NULL) {
   nt <- attr(x, "nt")
 
-  ## odin returns state at every requested step, including the first one in the
-  ## vector. For consecutive chunks the shared boundary step appears as both the
-  ## last row of one chunk and the first row of the next, so it would be
-  ## duplicated in the combined output. Dropping the first row of every chunk
-  ## with [-1, ] removes the duplicate; for the first chunk this also drops the
-  ## step-0 initial-conditions row, matching the original single-call behaviour.
+  ## odin's $run() always restarts from initial conditions; it does NOT persist
+  ## state between calls. drop_first removes the initial-conditions row (step 0)
+  ## from the single-call output so the returned matrix covers steps 1..nt.
   drop_first <- function(m) m[-1L, , drop = FALSE]
 
   if (is.null(stop_cond)) {
     return(drop_first(x$run(seq(0, nt))))
   }
+
+  ## TODO (approach 2): to fix chunked early stopping, each chunk must reinitialise
+  ## odin from the last-row state of the previous chunk rather than calling $run()
+  ## again on the same object. Steps: (a) run chunk with seq(0, chunk_size);
+  ## (b) extract last-row state variables; (c) construct a new model instance
+  ## (gen$new(...)) with those values as initial conditions; (d) repeat.
+  ## Requires all state variables (S, I) to be exposed as user() parameters.
+  stop("chunked stop_cond path reached in run_simulator_odin — ",
+       "this is currently disabled; see discrete_run.R guard and TODO above")
 
   breaks <- unique(c(seq(0L, nt, by = chunk), nt))
   out <- vector("list", length(breaks) - 1L)

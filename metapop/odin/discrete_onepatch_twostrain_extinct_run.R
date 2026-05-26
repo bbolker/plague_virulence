@@ -28,7 +28,7 @@ checkpoint_file <- "discrete_onepatch_twostrain_extinct_checkpoint.rds"
 sumfun <- function(beta1, beta2, K = 1e6, I_init = c(10, 10)) {
   runs <- discrete_run(beta_vec = c(beta1, beta2), K = K, r = 0.125,
                        n_patch = 1, nt = 1000, alpha = 0, I_init = I_init,
-                       nsim = nsim, platform = "odin")
+                       stop_cond = NULL, nsim = nsim, platform = "odin")
   if (!is.list(runs)) runs <- list(runs)
   ext <- sapply(runs, function(traj) {
     c(I1 = first_zero(traj$value[traj$state == "I1"]),
