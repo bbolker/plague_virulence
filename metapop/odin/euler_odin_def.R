@@ -46,7 +46,7 @@ I2_seed[] <- I_ini[i,2] * I2_active
 ## Initial states:
 initial(S[]) <- S_ini[i]
 initial(I[,1]) <- I_ini[i,1]
-initial(I[,2]) <- 0
+initial(I[,2]) <- I2_ini[i]
 
 ## User defined parameters - default in parentheses:
 n_patch <- user(100)
@@ -61,6 +61,7 @@ alpha <- user(1e-5) ## between-patch transmission
 strain2_delay <- user(0L) ## steps before strain 2 is seeded (integer: compared to step)
 r[] <- user()   ## growth rate (per patch)
 K[] <- user()   ## carrying capacity (per patch)
+I2_ini[] <- user() ## initial I[,2] per patch; normally 0, set by chunked runner on restart
 
 dim(S) <- n_patch
 dim(I) <- c(n_patch, n_strain)
@@ -77,6 +78,7 @@ dim(pop_change) <- n_patch
 dim(S_ini) <- n_patch
 dim(I_ini) <- c(n_patch, n_strain)
 dim(I2_seed) <- n_patch
+dim(I2_ini) <- n_patch
 dim(foi) <- n_strain
 dim(immig) <- c(n_patch, n_strain)
 dim(beta) <- n_strain

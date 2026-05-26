@@ -50,7 +50,7 @@ discrete_run <- function(beta_vec = c(1.5, 2.5),
                           seed = NULL,
                           nsim = 1,
                           chunk = NULL,
-                          stop_cond = NULL,
+                          stop_cond = stop_both_extinct,
                           def_file = "discrete_odin_def.R",
                           dt = 1,
                           platform = c("odin", "macpan2", "pureR")) {
@@ -58,15 +58,6 @@ discrete_run <- function(beta_vec = c(1.5, 2.5),
   platform <- match.arg(platform)
   if ((!is.null(chunk) || !is.null(stop_cond)) && platform != "odin")
     stop("chunk and stop_cond are only supported for platform = 'odin'")
-  ## odin's $run() resets to initial conditions on every call, so the chunked
-  ## early-stopping path in run_simulator_odin is broken: each chunk silently
-  ## reruns from t=0 with output relabelled to the requested step range.
-  ## TODO: fix via approach 2 — after each chunk extract the last-row state,
-  ## create a fresh model instance with those values as initial conditions
-  ## (all state vars must be user-settable), then run the next chunk from seq(0, chunk).
-  if ((!is.null(chunk) || !is.null(stop_cond)) && platform == "odin")
-    stop("chunk/stop_cond + odin is currently broken: odin resets to initial ",
-         "conditions on each $run() call. Pass stop_cond = NULL for now.")
 
   args <- tibble::lst(beta_vec, r, K, n_patch, nt, I_init, alpha, strain2_delay,
                       gamma, dt, def_file)

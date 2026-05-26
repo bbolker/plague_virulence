@@ -43,6 +43,7 @@ make_simulator_odin <- function(
                       K       = K_vec,
                       I_ini   = I_ini_mat,
                       S_ini   = S_ini_vec,
+                      I2_ini  = rep(0, n_patch),
                       alpha,
                       strain2_delay,
                       n_patch)
@@ -53,7 +54,9 @@ make_simulator_odin <- function(
   }
 
   mod <- do.call(gen_local$new, args)
-  attr(mod, "nt") <- nt
+  attr(mod, "nt")        <- nt
+  attr(mod, "gen")       <- gen_local
+  attr(mod, "init_args") <- args
   mod
 }
 
@@ -62,33 +65,59 @@ make_simulator_odin <- function(
 ##   See stop_either_extinct() and stop_both_extinct() below.
 ## @param chunk number of steps per chunk when stop_cond is supplied
 run_simulator_odin <- function(x, chunk = 50L, stop_cond = NULL) {
-  nt <- attr(x, "nt")
+  nt        <- attr(x, "nt")
+  gen       <- attr(x, "gen")
+  init_args <- attr(x, "init_args")
 
   ## odin's $run() always restarts from initial conditions; it does NOT persist
-  ## state between calls. drop_first removes the initial-conditions row (step 0)
-  ## from the single-call output so the returned matrix covers steps 1..nt.
+  ## state between calls. drop_first removes the step-0 initial-conditions row.
   drop_first <- function(m) m[-1L, , drop = FALSE]
 
   if (is.null(stop_cond)) {
     return(drop_first(x$run(seq(0, nt))))
   }
 
-  ## TODO (approach 2): to fix chunked early stopping, each chunk must reinitialise
-  ## odin from the last-row state of the previous chunk rather than calling $run()
-  ## again on the same object. Steps: (a) run chunk with seq(0, chunk_size);
-  ## (b) extract last-row state variables; (c) construct a new model instance
-  ## (gen$new(...)) with those values as initial conditions; (d) repeat.
-  ## Requires all state variables (S, I) to be exposed as user() parameters.
-  stop("chunked stop_cond path reached in run_simulator_odin — ",
-       "this is currently disabled; see discrete_run.R guard and TODO above")
+  ## Chunked early-stopping (approach 2):
+  ## Each chunk runs seq(0, chunk_len) on a fresh model instance initialised
+  ## from the previous chunk's last-row state. This works around odin resetting
+  ## to initial conditions on every $run() call.
+  ##
+  ## strain2_delay is adjusted each chunk: once the seeding step has passed
+  ## (orig_delay < steps_elapsed) we set it to .Machine$integer.max so it
+  ## never fires again; otherwise we decrement by the elapsed step count so
+  ## the seeding fires at the right absolute time.
+  breaks             <- unique(c(seq(0L, nt, by = chunk), nt))
+  out                <- vector("list", length(breaks) - 1L)
+  mod                <- x
+  orig_strain2_delay <- init_args$strain2_delay
 
-  breaks <- unique(c(seq(0L, nt, by = chunk), nt))
-  out <- vector("list", length(breaks) - 1L)
   for (k in seq_along(out)) {
-    res      <- x$run(seq(breaks[k], breaks[k + 1L]))
-    out[[k]] <- drop_first(res)
+    chunk_len <- breaks[k + 1L] - breaks[k]
+    res       <- mod$run(seq(0L, chunk_len))
+    out[[k]]  <- drop_first(res)
+    out[[k]][, 1L] <- out[[k]][, 1L] + breaks[k]   ## shift to absolute step numbers
+
     if (stop_cond(res[nrow(res), , drop = FALSE])) break
+
+    if (k < length(out)) {
+      t_elapsed <- breaks[k + 1L]
+      last_row  <- res[nrow(res), , drop = FALSE]
+      cn        <- colnames(last_row)
+
+      new_args           <- init_args
+      new_args$S_ini       <- last_row[, grepl("^S\\[",  cn)]
+      new_args$I_ini[, 1L] <- last_row[, grepl(",1\\]$", cn)]
+      new_args$I2_ini      <- last_row[, grepl(",2\\]$", cn)]
+      new_args$strain2_delay <- if (orig_strain2_delay < t_elapsed) {
+        .Machine$integer.max   ## seeding already fired; suppress forever
+      } else {
+        orig_strain2_delay - t_elapsed
+      }
+
+      mod <- do.call(gen$new, new_args)
+    }
   }
+
   do.call(rbind, out[!vapply(out, is.null, logical(1L))])
 }
 
