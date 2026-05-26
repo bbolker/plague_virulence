@@ -14,7 +14,7 @@ plan(multicore(workers = 10L))
 set.seed(101)
 
 runs <- discrete_run(beta_vec  = c(4, 0),
-                    K         = 1e6,
+                    K         = 1e5,
                     r         = 0.125,
                     n_patch   = 1,
                     nt        = round(100 / dt),
@@ -35,4 +35,5 @@ runx2 <- dplyr::filter(runx, state %in% c("I1", "S"))
 ggplot(runx2, aes(step, value)) +
   geom_line(aes(group = interaction(run, state), colour = state))
 
+ggsave("euler_onepatch_onestrain_example.pdf")
 sumfun_discrete(runs)

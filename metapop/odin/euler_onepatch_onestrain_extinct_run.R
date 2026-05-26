@@ -4,13 +4,19 @@ library(odin)
 library(dde)
 library(future)
 
+short_run <- FALSE
 source(here::here("metapop/odin", "discrete_run.R"))
 
 nsim <- 100L
 dt   <- 0.1
 
-dd <- expand.grid(R0 = seq(1.1, 5, by = 0.1),
-                  K  = 10^(seq(3, 6, by = 0.5)))
+if (short_run) {
+  dd <- expand.grid(R0 = seq(1.1, 3, by = 0.25),
+                  K  = 10^(seq(4, 6, by = 1)))
+} else {
+  dd <- expand.grid(R0 = seq(1.1, 5, by = 0.1),
+                    K  = 10^(seq(3, 6, by = 0.5)))
+}
 
 plan(multicore(workers = 14L))
 set.seed(101)

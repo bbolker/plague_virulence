@@ -25,6 +25,9 @@ euler_onepatch_onestrain_extinct.rds: euler_onepatch_onestrain_extinct_run.R
 euler_onepatch_onestrain_extinct.png: euler_onepatch_onestrain_extinct_plot.R euler_onepatch_onestrain_extinct.rds
 	$(R) $<
 
+euler_onepatch_onestrain_example.pdf: euler_onepatch_onestrain_example.R
+	$(R) $<
+
 discrete_onepatch_twostrain_extinct.png: discrete_onepatch_twostrain_extinct_plot.R discrete_onepatch_twostrain_extinct.rds
 	$(pipeR)
 
