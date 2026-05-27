@@ -4,7 +4,9 @@
 * retrieve batch2 onestrain results, plot
 * run two-strain mini example
 * set up plotting (à la YZ) for the two-strain PIP plots
-
+* compare deterministic models with leaky-bucket vs logistic demography (trough depth vs R0)
+* re-run one-strain/one-patch/extinct with more simulations
+  
 * create a model that has sensible/expected burnout behaviour for one patch, one strain (note effects of [1] generation interval/infectious period distribution; [2] demography (SIR w/ constant (leaky-bucket) vital dynamics vs SIRS vs SID w/ logistic growth) [3] ??)
 
   Chose r=0.125 on the basis of intrinsic rat pop growth rates of 3-5/year; generation time of plague 10-20 days; `3/365*15 ~ 0.125`. However, this leads to near-certain burnout for R0 = 4 (with dt = 0.2 disease generations) at K=1e6. 0.125 is *way* above the range shown in Parsons et al (which goes only up to 0.02, reasonable for human diseases).  What do the burnout contours look like for epsilon in the range of 0.02 to 0.2 ... ?

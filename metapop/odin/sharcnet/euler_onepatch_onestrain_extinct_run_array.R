@@ -8,7 +8,7 @@ library(future)
 task_id <- as.integer(Sys.getenv("SLURM_ARRAY_TASK_ID"))
 if (is.na(task_id)) stop("SLURM_ARRAY_TASK_ID not set")
 
-nsim <- 500L
+nsim <- 1000L
 dt   <- 0.1
 
 dd <- expand.grid(R0 = seq(1.1, 5, by = 0.1),
@@ -27,7 +27,7 @@ runs <- discrete_run(beta_vec  = c(row$R0, 0),
                      gamma     = c(1, 1),
                      dt        = dt,
                      def_file  = "euler_odin_def.R",
-                     stop_cond = NULL,
+                     stop_cond = stop_both_extinct,
                      nsim      = nsim,
                      platform  = "odin")
 plan(sequential)

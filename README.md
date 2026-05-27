@@ -9,13 +9,23 @@ This repo is highly organic, reflecting evolution from a collection of ideas abo
 
 * the documents in the head directory of the repo (`abstract2.qmd`, `main.qmd`, `notes_*`) are discussion of the verbal model; `virulence.bib` is a collection of useful references on evolution of virulence and math models of plague.
 * `metapop` represents our attempts to develop analytical (Levins-style) and stochastic-simulation models of the metapopulation dynamics. For the single-species Levins-style model, we considered both 2-dimensional (proportion of patches infected, average patch population size) and 3-D (average pop size for both susceptible and infectious patches) model.
-   * `fixedns`: 2D model?
-   * `3d`: 3-D Levins (single-species) model
-   * `stochastic`: initial attempt at stochastic (single-species) model
-   * `poisson`: stochastic model with a different mechanism; consider Poisson colonization rates
-   * `two_strain`: stochastic 2-strain metapop model
-   * `odin`: single-patch stochastic epidemic model written in [odin](https://mrc-ide.github.io/odin/)
-   * `parameters`: discussion of parameter ranges/estimation
+
+Stuff in `metapop/`, from newest to oldest:
+
+* `odin`: mostly continuous-time simulations with [odin](https://mrc-ide.github.io/odin/) (and also comparable implementations with [macpan2](https://canmod.github.io/macpan2/)
+* `plagueMetapop`: mini-R package implementing the functionality used in the `odin` runs
+* `parameters`: discussion of estimating/guessing orders of magnitude for parameters
+* `poisson`: a single-strain, stochastic model driven by rat colonization limitation (colonization uses Poisson deviates)
+* `two_strain`: a two-strain version of the Poisson model (PIP computations)
+* `csee_talk`: BMB talk for Canadian Society of Ecology and Evolution, May 2026
+* `stochastic`: stochastic model with burnout 
+* `two_strain_burnout_probability`: calculations of burnout probability in two-strain (coinfected) patches
+* `3d`: Levins model, state variables {average host pop size in S patches; average host pop size in I patches; fraction of patches infected}
+`within_season_transmission`: ?
+`report_for_summer`: YZ's report
+`fixedns`: : 2D model Levins model, state variables: {average host pop size; fraction of patches infected}
+`averaging_all_patches`: ?
+`outputs`
 
 Parsons, Todd L., Benjamin M. Bolker, Jonathan Dushoff, and David J. D. Earn. 2024. “The Probability of Epidemic Burnout in the Stochastic SIR Model with Vital Dynamics.” Proceedings of the National Academy of Sciences 121 (5): e2313708120. https://doi.org/10.1073/pnas.2313708120.
 
