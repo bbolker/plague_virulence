@@ -97,6 +97,8 @@ Grid (mini): `R01 = R02 = seq(1.1, 3, by=0.5)` × `K = 10^seq(3, 5)` × `alpha =
 Parameters (full): `nsim=200`, `dt=0.1`, `n_patch=200`  
 Parameters (mini): `nsim=50`, `dt=0.2`, `n_patch=50`
 
+**Wall-time derivation (from mini sacct, job 15051381):** Mini tasks took ~6.5 s elapsed with 4 CPUs → 0.52 CPU-s/sim. Full run: 4× more patches, 2× more steps, 200 sims on 1 CPU → ~4.2 CPU-s/sim × 200 = ~840 s ≈ 14 min/task. With 14.4 tasks/metajob → ~3.4 h worst case; 8 h provides ~2.4× buffer.
+
 **Mini (SLURM array):**
 ```bash
 sbatch submit_euler_twostrain_mini.sh
