@@ -115,6 +115,11 @@ mkdir -p logs
 submit.run 1000                      # 1000 metajobs × 8 h wall time
 ```
 
+Monitor progress (run from inside `meta_euler_twostrain/`):
+```bash
+Status.run    # note capital S — shows COMPLETED/RUNNING/FAILED counts
+```
+
 After completion (run from `sharcnet/`):
 ```bash
 Rscript euler_twostrain_combine.R
