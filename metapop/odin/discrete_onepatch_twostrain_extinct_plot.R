@@ -27,3 +27,4 @@ ggplot(dd2_i1, aes(R01, R02, fill = value)) +
   annotate(x = 2.25, y = 1.5, size = 5, label = "time > 1000", geom = "label")
 
 ggsave(width = 6.5, height = 6, "discrete_onepatch_twostrain_extinct.png")
+ggsave(width = 6.5, height = 6, "discrete_onepatch_twostrain_extinct.pdf")

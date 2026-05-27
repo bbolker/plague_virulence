@@ -23,3 +23,4 @@ p2 <- make_raster("mean_ext_time.I1", "mean extinction\ntime (steps)")
 
 print(p1 + p2)
 ggsave("discrete_onepatch_onestrain_extinct.png", width = 10, height = 5)
+ggsave("discrete_onepatch_onestrain_extinct.pdf", width = 10, height = 5)

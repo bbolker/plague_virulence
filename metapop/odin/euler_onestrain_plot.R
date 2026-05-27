@@ -6,18 +6,11 @@ opt <- parse_args(OptionParser(option_list = list(
               help = "input RDS file [default %default]"),
   make_option(c("-o", "--output"), default = "euler_onestrain_plot.pdf",
               help = "output plot file [default %default]"),
-  make_option(c("-m", "--mini"), action = "store_true", default = FALSE,
-              help = "use mini output (overrides --input)"),
   make_option(c("-w", "--width"),  type = "double", default = 14,
               help = "plot width in inches [default %default]"),
   make_option(c("--height"), type = "double", default = 10,
               help = "plot height in inches [default %default]")
 )))
-
-if (opt$mini) {
-  opt$input <- "sharcnet/outputs/euler_onestrain_mini.rds"
-  if (opt$output == "euler_onestrain_plot.pdf") opt$output <- "euler_onestrain_mini_plot.pdf"
-}
 
 library(ggplot2); theme_set(theme_bw())
 library(dplyr)
@@ -41,7 +34,7 @@ dd_long <- dd |>
          log10K_f = factor(log10K))
 
 hpal <- scale_color_continuous_sequential(
-  l1 = 50, l2 = 70, h1 = 240, h2 = 60, c1 = 80, c2 = 30,
+  l1 = 50, l2 = 70, h1 = 0, h2 = 60, c1 = 80, c2 = 30,
   name = expression(log[10](K)),
   guide = guide_legend())
 
@@ -80,5 +73,8 @@ for (i in seq_len(length(plot_list) - 1)) {
 }
 
 g <- suppressWarnings(plot_grid(plotlist = plot_list))
-ggsave(opt$output, g, width = opt$width, height = opt$height)
-cat("wrote", opt$output, "\n")
+for (ext in c("pdf", "png")) {
+  ggsave(sub("\\.[^.]+$", paste0(".", ext), opt$output), g,
+         width = opt$width, height = opt$height)
+}
+
