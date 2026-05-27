@@ -125,7 +125,14 @@ submit.run 1000                      # 1000 metajobs × 8 h wall time
 
 Note current meta run is 15056098_[1-1000]
 
-To resubmit after failure without re-initialising, just re-run `submit.run` from inside `meta_euler_twostrain/`. To start completely fresh (new farm), run `clean.run` first.
+To resubmit after failure without re-initialising, just re-run `submit.run` from inside `meta_euler_twostrain/`. To start completely fresh (new farm), run `clean.run` first — but note that `clean.run` deletes `make_table.sh` (a git-tracked file), so restore it afterwards:
+```bash
+clean.run
+git checkout -- make_table.sh
+bash make_table.sh
+mkdir -p logs
+submit.run 1000
+```
 
 Monitor progress (run from inside `meta_euler_twostrain/`):
 ```bash
