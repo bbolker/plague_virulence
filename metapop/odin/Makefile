@@ -22,8 +22,11 @@ discrete_onepatch_twostrain_extinct.rds: discrete_onepatch_twostrain_extinct_run
 euler_onepatch_onestrain_extinct.rds: euler_onepatch_onestrain_extinct_run.R
 	$(R) $<
 
-euler_onepatch_onestrain_extinct.png: euler_onepatch_onestrain_extinct_plot.R euler_onepatch_onestrain_extinct.rds
+euler_onepatch_onestrain_extinct.png: euler_onepatch_onestrain_extinct_plot.R sharcnet/outputs/euler_onepatch_onestrain_extinct.rds
 	$(R) $<
+
+euler_onestrain_plot.png: euler_onestrain_plot.R sharcnet/outputs/euler_onestrain.rds
+	Rscript $< --output $@
 
 euler_onepatch_onestrain_example.pdf: euler_onepatch_onestrain_example.R
 	$(R) $<

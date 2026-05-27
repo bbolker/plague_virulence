@@ -15,8 +15,8 @@ opt <- parse_args(OptionParser(option_list = list(
 )))
 
 if (opt$mini) {
-  opt$input  <- "sharcnet/outputs/euler_onestrain_mini.rds"
-  opt$output <- "euler_onestrain_mini_plot.pdf"
+  opt$input <- "sharcnet/outputs/euler_onestrain_mini.rds"
+  if (opt$output == "euler_onestrain_plot.pdf") opt$output <- "euler_onestrain_mini_plot.pdf"
 }
 
 library(ggplot2); theme_set(theme_bw())
@@ -79,7 +79,6 @@ for (i in seq_len(length(plot_list) - 1)) {
   plot_list[[i]] <- plot_list[[i]] + guides(color = "none")
 }
 
-pdf(opt$output, width = opt$width, height = opt$height)
-suppressWarnings(print(plot_grid(plotlist = plot_list)))
-dev.off()
+g <- suppressWarnings(plot_grid(plotlist = plot_list))
+ggsave(opt$output, g, width = opt$width, height = opt$height)
 cat("wrote", opt$output, "\n")
