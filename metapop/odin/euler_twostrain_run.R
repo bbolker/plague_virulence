@@ -13,7 +13,7 @@ if (opt$mini) base_fn <- paste0(base_fn, "_mini")
 if (opt$mini) {
   dd <- expand.grid(R01   = seq(1.1, 3, by = 0.5),
                     R02   = seq(1.1, 3, by = 0.5),
-                    K     = 10^seq(4, 6, by = 1),
+                    K     = 10^seq(3, 5, by = 1),
                     alpha = 10^seq(-5, -4))
   n_patch <- 50
   n_sim   <- 50L
@@ -21,8 +21,8 @@ if (opt$mini) {
 } else {
   dd <- expand.grid(R01   = seq(1.1, 5, by = 0.1),
                     R02   = seq(1.1, 5, by = 0.1),
-                    K     = 10^seq(3, 6, by = 0.5),
-                    alpha = 10^seq(-5.5, -3.5, by = 0.5))
+                    K     = 10^seq(3, 5),
+                    alpha = 10^seq(-5, -3))
   n_patch <- 200
   n_sim   <- 200L
   dt      <- 0.1
