@@ -73,7 +73,7 @@ Parallelism is controlled by the caller via future::plan() before
 \examples{
 ## stop as soon as either strain goes extinct (odin platform only):
 ## plan(multisession)
-## runs <- discrete_run(nsim = 20, stop_cond = stop_either_extinct)
+## runs <- discrete_run(nsim = 20, stop_cond = stop_either_extinct())
 ## sumfun_discrete(runs)
 
 ## custom condition — stop when strain 2 alone is gone:

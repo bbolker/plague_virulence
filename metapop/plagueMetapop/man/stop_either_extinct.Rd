@@ -3,17 +3,34 @@
 \name{stop_either_extinct}
 \alias{stop_either_extinct}
 \alias{stop_both_extinct}
-\title{Stop when either strain is globally extinct}
+\title{Stopping conditions for run_simulator_odin()}
 \usage{
-stop_either_extinct(row)
+stop_either_extinct()
 
 stop_both_extinct(row)
 }
 \arguments{
 \item{row}{single-row matrix from odin$run(), column names "I[patch,strain]"}
 }
+\value{
+\code{stop_either_extinct()} returns a \code{function(row)} closure.
+}
 \description{
-Stopping condition for run_simulator_odin(): returns TRUE when
-  any strain has zero infected hosts across all patches.
-  Operates on a raw odin output row (before conv_odin reshaping).
+\code{stop_either_extinct()} is a factory: call it once to create a
+  stateful closure, then pass the closure as \code{stop_cond}.  The closure
+  returns TRUE when strain 1 is globally extinct, or when strain 2 was
+  previously present and is now globally extinct.  Strain 2 is considered
+  absent (not yet introduced) until the closure first observes I2 > 0, so
+  simulations with \code{strain2_delay > 0} are not stopped prematurely.
+  Because \code{furrr} serialises the closure independently for each task,
+  each simulation gets its own fresh \code{strain2_seen = FALSE}.
+
+  \code{stop_both_extinct(row)} is a plain function (not a factory) that
+  returns TRUE only when both strains are simultaneously globally extinct.
+  It does not need factory wrapping because I1 > 0 before strain-1 goes
+  extinct, so the condition cannot fire before strain 2 is seeded.
+}
+\examples{
+## pass the closure, not the factory:
+## runs <- discrete_run(nsim = 20, stop_cond = stop_either_extinct())
 }

@@ -151,18 +151,38 @@ run_simulator_odin <- function(x, chunk = 50L, stop_cond = NULL) {
   do.call(rbind, out[!vapply(out, is.null, logical(1L))])
 }
 
-##' Stop when either strain is globally extinct
-##' @description Stopping condition for run_simulator_odin(): returns TRUE when
-##'   any strain has zero infected hosts across all patches.
-##'   Operates on a raw odin output row (before conv_odin reshaping).
-##' @param row single-row matrix from odin$run(), column names "I[patch,strain]"
+##' Stopping conditions for run_simulator_odin()
+##' @description
+##'   \code{stop_either_extinct()} is a factory: call it once to create a
+##'   stateful closure, then pass the closure as \code{stop_cond}.  The closure
+##'   returns TRUE when strain 1 is globally extinct, or when strain 2 was
+##'   previously present and is now globally extinct.  Strain 2 is considered
+##'   absent (not yet introduced) until the closure first observes I2 > 0, so
+##'   simulations with \code{strain2_delay > 0} are not stopped prematurely.
+##'   Because \code{furrr} serialises the closure independently for each task,
+##'   each simulation gets its own fresh \code{strain2_seen = FALSE}.
+##'
+##'   \code{stop_both_extinct(row)} is a plain function (not a factory) that
+##'   returns TRUE only when both strains are simultaneously globally extinct.
+##'   It does not need factory wrapping because I1 > 0 before strain-1 goes
+##'   extinct, so the condition cannot fire before strain 2 is seeded.
+##' @return \code{stop_either_extinct()} returns a \code{function(row)} closure.
+##' @examples
+##' ## pass the closure, not the factory:
+##' ## runs <- discrete_run(nsim = 20, stop_cond = stop_either_extinct())
 ##' @export
-stop_either_extinct <- function(row) {
-  sum(row[, grep(",1\\]$", colnames(row))]) == 0 ||
-    sum(row[, grep(",2\\]$", colnames(row))]) == 0
+stop_either_extinct <- function() {
+  strain2_seen <- FALSE
+  function(row) {
+    I1 <- sum(row[, grep(",1\\]$", colnames(row))])
+    I2 <- sum(row[, grep(",2\\]$", colnames(row))])
+    if (I2 > 0) strain2_seen <<- TRUE
+    I1 == 0 || (strain2_seen && I2 == 0)
+  }
 }
 
 ##' @rdname stop_either_extinct
+##' @param row single-row matrix from odin$run(), column names "I[patch,strain]"
 ##' @export
 stop_both_extinct <- function(row) {
   sum(row[, grep(",1\\]$", colnames(row))]) == 0 &&
