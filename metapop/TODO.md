@@ -3,13 +3,15 @@
 * switch from job array to META runs?
 * retrieve batch2 onestrain results, plot
 * retrieve two-strain mini example
+   * current job id is 15051381
 * set up plotting (à la YZ) for the two-strain PIP plots
 * compare deterministic models with leaky-bucket vs logistic demography (trough depth vs R0)
 * re-run one-strain/one-patch/extinct with more simulations
 * implement non-extinction variant, compare with extinction-allowed (strength of burnout mechanism)
 * implement power-law R0(N) ?
 
-* create dedicated single-strain model
+* create dedicated single-strain model (doens't help that much)
+
 Note effects of [1] generation interval/infectious period distribution; [2] demography (SIR w/ constant (leaky-bucket) vital dynamics vs SIRS vs SID w/ logistic growth) [3] ??
 
   Chose r=0.125 on the basis of intrinsic rat pop growth rates of 3-5/year; generation time of plague 10-20 days; `3/365*15 ~ 0.125`. However, this leads to near-certain burnout for R0 = 4 (with dt = 0.2 disease generations) at K=1e6. 0.125 is *way* above the range shown in Parsons et al (which goes only up to 0.02, reasonable for human diseases).  What do the burnout contours look like for epsilon in the range of 0.02 to 0.2 ... ?
@@ -32,14 +34,11 @@ Note effects of [1] generation interval/infectious period distribution; [2] demo
 * update CSEE slides?
 * tweak poisson/sim.R; allow sim prefix
 * allow burnout in poisson sim?
-* implement density-dependent R0?
-* re-run baseline poisson sim example?
 * re-run PIP sims, with ODE final sizes - on SHARCNET?
 * check Levine and Earn for two-strain final info
 * run odin two-strain for burnout calcs? (with vital dynamics, with some rubric for finding first trough)
 * compare with YZ computations?
 
-* investigate details of runs in 'blackout' range of new middle PIP
 * Go back and compare analytical results ...
 * miscellaneous thoughts
     * flea travel/colonization decoupled from rat movement?

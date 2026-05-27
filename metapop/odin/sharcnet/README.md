@@ -18,7 +18,7 @@ One-patch, one-strain extinction grid: varies R0 × K.
 
 | file | purpose |
 |------|---------|
-| `submit_euler_extinct.sh` | full run (520 tasks, R0 × K grid) |
+| `submit_euler_extinct.sh` | full run (520 tasks, R0 × K grid, 5 min wall time) |
 | `submit_euler_extinct_mini.sh` | mini test (32 tasks, coarser grid) |
 | `euler_onepatch_onestrain_extinct_run_array.R` | shared array script (full and mini) |
 | `euler_onepatch_onestrain_extinct_run_array_mini.R` | mini array script (separate parameters) |
@@ -80,11 +80,16 @@ Multi-patch, two-strain PIP grid: varies R01 × R02 × K × alpha.
 Strain 1 runs alone for `strain2_delay = round(100/dt)` steps before strain 2 is seeded;
 run stops when either strain goes extinct (`stop_either_extinct()`).
 
+The full run uses **META-Farm** (dynamic load balancing) rather than a SLURM array;
+the mini test still uses a plain SLURM array.
+
 | file | purpose |
 |------|---------|
-| `submit_euler_twostrain.sh` | full run (14400 tasks, 32G, 1 CPU) |
-| `submit_euler_twostrain_mini.sh` | mini test (96 tasks, 4G, 4 CPUs) |
-| `euler_twostrain_run_array.R` | shared array script (`--mini` flag) |
+| `meta_euler_twostrain/job_script.sh` | META metajob SLURM script (32G, 1 CPU, 8 h) |
+| `meta_euler_twostrain/single_case.sh` | per-case worker: sets `SLURM_ARRAY_TASK_ID=$ID`, runs R script |
+| `meta_euler_twostrain/make_table.sh` | generates `table.dat` (lines 1–14400) |
+| `submit_euler_twostrain_mini.sh` | mini SLURM array (96 tasks, 4G, 4 CPUs) |
+| `euler_twostrain_run_array.R` | shared R script (`--mini` flag) |
 | `euler_twostrain_combine.R` | combine outputs (`--mini` flag) |
 
 Grid (full): `R01 = R02 = seq(1.1, 5, by=0.1)` × `K = 10^seq(3, 5)` × `alpha = 10^seq(-5, -3)` — 14400 tasks  
@@ -92,11 +97,24 @@ Grid (mini): `R01 = R02 = seq(1.1, 3, by=0.5)` × `K = 10^seq(3, 5)` × `alpha =
 Parameters (full): `nsim=200`, `dt=0.1`, `n_patch=200`  
 Parameters (mini): `nsim=50`, `dt=0.2`, `n_patch=50`
 
+**Mini (SLURM array):**
 ```bash
-sbatch submit_euler_twostrain_mini.sh   # test first
+sbatch submit_euler_twostrain_mini.sh
 Rscript euler_twostrain_combine.R --mini
+```
 
-sbatch submit_euler_twostrain.sh        # full run
+**Full (META-Farm) — initialise once, then submit from `meta_euler_twostrain/`:**
+```bash
+module load meta-farm
+farm_init.run meta_euler_twostrain   # run once from sharcnet/; creates the farm dir
+cd meta_euler_twostrain
+bash make_table.sh                   # generates table.dat (14400 lines)
+mkdir -p logs
+submit.run 1000                      # 1000 metajobs × 8 h wall time
+```
+
+After completion (run from `sharcnet/`):
+```bash
 Rscript euler_twostrain_combine.R
 ```
 
@@ -112,4 +130,6 @@ bash check_jobs.sh      # state summary for most recent job array
 bash check_jobs.sh 3    # state summaries for 3 most recent job arrays
 sq                      # running/pending jobs
 sacct -j <jobid> --format=JobID,JobName%20,CPUTime,Elapsed,State
+sshare -l -u bolker -A def-bolker_cpu
 ```
+
