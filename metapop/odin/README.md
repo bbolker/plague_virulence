@@ -5,6 +5,22 @@ Core simulation infrastructure (model definitions, platform backends, dispatcher
 lives in the [`plagueMetapop`](../plagueMetapop/) R package; all scripts load it
 via `library(plagueMetapop)`.
 
+## 2026 May 27 (Wed)
+
+the current simulations are at the scale of disease generations (or smaller). We have given up for now on the annual (or pseudo-annual) time scale because of conceptual problems in linking scales (particularly rat and flea movement).
+
+Using an Euler step with “some” hazard calculations. Started with Reed-Frost (meaning fixed-length generations; everyone recovers or dies at the end of each time step). Things that start with discrete (rather than Euler) are left over from that.
+
+Reed-Frost leads to _lots_ of burnout: JD suggested possibly leaning in to this, since it might lead to more coexistence tradeoffs. Bellman-Harris and Crump–Mode–Jagers (CMJ) are more general words for “branching process” without the exponential assumption. Back now to geometric distribution (~5-10 Euler steps per disease generation.
+
+An interesting observation: replacing “leaky bucket” (standard replenishment) dynamics with logistic (survivor-based replenishment) is expected to favor relatively more burnout at higher R values. This is apparently reflected in [a burnout plot you can make](euler_onepatch_onestrain_extinct.png). 
+
+Also true that ε is much larger here (Ben says ~ 0.02), but the logisticity seems like a larger problem. Todd asks whether we can examine what the rat troughs look like across these simulations.
+
+Ben wants to do pairwise invasion plots, panelled by α (patch-linkage) and K (rat carrying capacity per patch).
+
+Right now, we're doing mass-action (in JD terms B(N) = βN/K). Should consider other functional forms (one example would be β(N/K)̂^φ).
+
 ### plagueMetapop package ([`../plagueMetapop/`](../plagueMetapop/))
 
 | Component | Description |
