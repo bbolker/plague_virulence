@@ -20,7 +20,11 @@ library(colorspace)
 
 zmargin <- theme(panel.spacing = grid::unit(0, "lines"))
 
-dd <- readRDS(opt$input)
+batch2_file <- sub("\\.rds$", "_batch2.rds", opt$input)
+dd <- dplyr::bind_rows(
+  readRDS(opt$input),
+  if (file.exists(batch2_file)) readRDS(batch2_file) else NULL
+)
 
 plot_vars <- c("ext_prob.I1", "mean_ext_time.I1",
                "qe_infpop.I1", "qe_infpatch.I1", "qe_pop_S.I1")
