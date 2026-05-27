@@ -2,9 +2,9 @@
 #SBATCH --account=def-bolker
 #SBATCH --job-name=euler_onestrain
 #SBATCH --array=1-1400
-#SBATCH --time=0-00:15:00
-#SBATCH --mem=16G
-#SBATCH --cpus-per-task=4
+#SBATCH --time=0-00:30:00
+#SBATCH --mem=8G
+#SBATCH --cpus-per-task=1
 #SBATCH --output=logs/euler_onestrain_%A_%a.out
 
 # Submit from the metapop/odin/sharcnet directory.
