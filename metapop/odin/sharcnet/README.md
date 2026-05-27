@@ -42,18 +42,20 @@ Combined: `outputs/euler_onepatch_onestrain_extinct[_mini].rds`
 ### euler_onestrain
 
 Multi-patch, one-strain grid: varies R0 × K × alpha.  
-Uses a single `_run_array.R`; the submit script passes `--mini` to switch modes.
+A single `_run_array.R` handles all modes; the submit script passes the appropriate flag.
 
 | file | purpose |
 |------|---------|
-| `submit_euler_onestrain.sh` | full run (1400 tasks) |
-| `submit_euler_onestrain_mini.sh` | mini test (24 tasks) |
-| `euler_onestrain_run_array.R` | shared array script (full and mini via `--mini`) |
-| `euler_onestrain_combine.R` | combine outputs (`--mini` for mini) |
+| `submit_euler_onestrain.sh` | full run (1400 tasks, 32G, 1 CPU) |
+| `submit_euler_onestrain_mini.sh` | mini test (24 tasks, 2G, 4 CPUs) |
+| `submit_euler_onestrain_batch2.sh` | batch 2: higher alpha range (840 tasks, 32G, 1 CPU) |
+| `euler_onestrain_run_array.R` | shared array script (`--mini` / `--batch2` flags) |
+| `euler_onestrain_combine.R` | combine outputs (`--mini` / `--batch2` flags) |
 
-Grid (full): `R0 = seq(1.1, 5, by=0.1)` × `K = 10^seq(3, 6, by=0.5)` × `alpha = 10^seq(-5.5, -3.5, by=0.5)` — 1400 tasks  
-Grid (mini): `R0 = seq(1.1, 3, by=0.5)` × `K = 10^seq(4, 6)` × `alpha = 10^seq(-5, -4)` — 24 tasks  
-Parameters (full): `nsim=200`, `dt=0.1`, `n_patch=200`  
+Grid (full):   `R0 = seq(1.1, 5, by=0.1)` × `K = 10^seq(3, 6, by=0.5)` × `alpha = 10^seq(-5.5, -3.5, by=0.5)` — 1400 tasks  
+Grid (batch2): `R0 = seq(1.1, 5, by=0.1)` × `K = 10^seq(3, 6, by=0.5)` × `alpha = 10^seq(-3, -2, by=0.5)` — 840 tasks  
+Grid (mini):   `R0 = seq(1.1, 3, by=0.5)` × `K = 10^seq(4, 6)` × `alpha = 10^seq(-5, -4)` — 24 tasks  
+Parameters (full/batch2): `nsim=200`, `dt=0.1`, `n_patch=200`  
 Parameters (mini): `nsim=50`, `dt=0.2`, `n_patch=50`
 
 ```bash
@@ -62,10 +64,13 @@ Rscript euler_onestrain_combine.R --mini
 
 sbatch submit_euler_onestrain.sh        # full run
 Rscript euler_onestrain_combine.R
+
+sbatch submit_euler_onestrain_batch2.sh # higher-alpha extension
+Rscript euler_onestrain_combine.R --batch2
 ```
 
-Outputs: `outputs/euler_onestrain[_mini]_task_NNNN.rds`  
-Combined: `euler_onestrain[_mini].rds`
+Outputs: `outputs/euler_onestrain[_mini|_batch2]_task_NNNN.rds`  
+Combined: `euler_onestrain[_mini|_batch2].rds`
 
 ---
 
