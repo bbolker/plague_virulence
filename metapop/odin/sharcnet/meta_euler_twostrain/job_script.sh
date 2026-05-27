@@ -6,5 +6,6 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --output=logs/meta_twostrain_%j.out
 
+module load meta-farm
 module load r/4.5.0
 task.run
