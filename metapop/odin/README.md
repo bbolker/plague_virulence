@@ -5,6 +5,8 @@ Core simulation infrastructure (model definitions, platform backends, dispatcher
 lives in the [`plagueMetapop`](../plagueMetapop/) R package; all scripts load it
 via `library(plagueMetapop)`.
 
+There is a sharcnet subdirectory that BB is leaning on right now.
+
 ## 2026 May 27 (Wed)
 
 the current simulations are at the scale of disease generations (or smaller). We have given up for now on the annual (or pseudo-annual) time scale because of conceptual problems in linking scales (particularly rat and flea movement).
