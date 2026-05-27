@@ -5,11 +5,13 @@ library(patchwork)
 theme_set(theme_bw())
 
 ## "euler_onepatch_onestrain_extinct.rds"
-fn <- "sharcnet/outputs/euler_onepatch_onestrain_extinct_mini.rds"
+fn <- here::here("metapop/odin",
+                 "sharcnet/outputs/euler_onepatch_onestrain_extinct.rds")
 dat <- readRDS(fn) |>
   mutate(log10K = log10(K))
 
 ## FIXME: convert to long and facet rather than using patchwork
+## (will free scales on the fill guide work? maybe not worth it?)
 
 make_raster <- function(fill_var, fill_label) {
   ggplot(dat, aes(R0, log10K, fill = .data[[fill_var]])) +

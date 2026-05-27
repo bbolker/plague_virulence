@@ -8,17 +8,17 @@
 * one-strain: n-patch, factorial over R01/K/alpha
 * two-strain: n-patch, factorial over R01/R02/K/alpha (drop if either extinct)
 
-* instrument 
+* instrument runs to record r(t), foi(t), etc. (to understand invasion criteria etc.)
 * store parameter values as attributes
 * makestuff/shellpipes?
    * sort out working-directory stuff (package??)
+   * interference between shellpipes/makestuff and command-line args?
 * summary info:
     * n occupied, quasi-eq, etc.
     * YZ PIP invasion characteristics
 * single-strain runs	
 * run PIPs
 * 1 30x30 PIP array (200 sims per parameter set) should take about 10 hours in serial -- 
-* job array/META runs on Nibi?
 * profiling macpan2 runner
 * lay out/test mechanisms: dens-indep R0, fixed N, extinction-independent ... ?
 * invasibility equations
