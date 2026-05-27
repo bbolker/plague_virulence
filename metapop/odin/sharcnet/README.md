@@ -108,12 +108,14 @@ Rscript euler_twostrain_combine.R --mini
 **Full (META-Farm) — initialise once, then submit from `meta_euler_twostrain/`:**
 ```bash
 module load meta-farm
-farm_init.run meta_euler_twostrain   # run once from sharcnet/; creates the farm dir
+farm_init.run meta_euler_twostrain   # run once from sharcnet/; fails if dir already exists
 cd meta_euler_twostrain
 bash make_table.sh                   # generates table.dat (14400 lines)
 mkdir -p logs
 submit.run 1000                      # 1000 metajobs × 8 h wall time
 ```
+
+To resubmit after failure without re-initialising, just re-run `submit.run` from inside `meta_euler_twostrain/`. To start completely fresh (new farm), run `clean.run` first.
 
 Monitor progress (run from inside `meta_euler_twostrain/`):
 ```bash
