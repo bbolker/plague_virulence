@@ -3,6 +3,14 @@
 Submit all jobs from this directory (`metapop/odin/sharcnet/`).  
 Before the first submission: `mkdir -p logs outputs`
 
+Need to install all the required packages (this takes a while):
+
+```
+module load r/4.5.0
+module load gsl ## not sure about this, maybe required for some packages?
+Rscript --vanilla get_pkgs.R  ## in metapop/ dir
+```
+
 The `plagueMetapop` package must be installed on the cluster:
 ```
 R CMD INSTALL ../../plagueMetapop
@@ -114,6 +122,8 @@ bash make_table.sh                   # generates table.dat (14400 lines)
 mkdir -p logs
 submit.run 1000                      # 1000 metajobs × 8 h wall time
 ```
+
+Note current meta run is 15056098_[1-1000]
 
 To resubmit after failure without re-initialising, just re-run `submit.run` from inside `meta_euler_twostrain/`. To start completely fresh (new farm), run `clean.run` first.
 

@@ -74,5 +74,6 @@ plot_fun <- function(sub_dat, facet = FALSE, title = NULL) {
 summary(dd$ext_prob.I2) ## ALL extinct ... ??? is this expected?
 summary(dd$ext_prob.I1) ## sometimes extinct
 
-ggplot(dd, aes(R01, R02, fill = ext_prob.I2)
+ggplot(dd, aes(R01, R02, fill = ext_prob.I1)) +
+  geom_raster() + facet_grid(alpha ~ K)
 plot_fun(dd, facet = TRUE)

@@ -54,6 +54,8 @@ Submit all jobs from the `sharcnet/` directory after `mkdir -p logs outputs`.
 
 ### Run and plot scripts (current)
 
+`discrete` is the Reed-Frost model, `euler` is the continuous (ish) model (time scale = disease generation time; `gamma=1` wlog; multiple steps per disease generation). * indicates there's a corresponding batch run in the `sharcnet` subdir
+
 | File | Description |
 |------|-------------|
 | `discrete_onepatch_onestrain_example.R` | Single-patch, one-strain example run using the discrete stochastic model |
@@ -62,9 +64,10 @@ Submit all jobs from the `sharcnet/` directory after `mkdir -p logs outputs`.
 | `discrete_onepatch_twostrain_extinct_run.R` | Grid run over R0₁ × R0₂ for two-strain invasion/coexistence analysis |
 | `discrete_onepatch_twostrain_extinct_plot.R` | Plots of two-strain extinction results |
 | `euler_onepatch_onestrain_example.R` | Single-patch example using the continuous-time (`euler_odin_def.R`) model |
-| `euler_onepatch_onestrain_extinct_run.R` | Grid run over R0 × K using the continuous-time stochastic model |
+| `euler_onepatch_onestrain_extinct_run.R` | Grid run over R0 × K using the continuous-time stochastic model * |
 | `euler_onepatch_onestrain_extinct_plot.R` | Raster plots of extinction results from the euler one-strain grid |
-| `euler_onestrain_run.R` | Multi-patch grid run over R0 × K × alpha; supports `--mini` flag via optparse |
+| `euler_onestrain_run.R` | Multi-patch grid run over R0 × K × alpha; supports `--mini` flag via optparse  * |
+| `odin_twostrain_run.R` | Two-strain run script; grid over R01 x R02 x K x alpha *: `meta_euler_twostrain`|
 
 ### Run and plot scripts (older/exploratory)
 
@@ -73,6 +76,5 @@ Submit all jobs from the `sharcnet/` directory after `mkdir -p logs outputs`.
 | `odin_twostrain0.R` | Earlier single-patch two-strain odin model definition; superseded by `discrete_odin_def.R` |
 | `discrete_onepatch_odin.R` | Early prototype: single-patch discrete-time SIR; superseded |
 | `odin_twostrain_run0.R` | Early two-strain run script; superseded by `plagueMetapop` framework |
-| `odin_twostrain_run.R` | Intermediate two-strain run script; superseded by `plagueMetapop` framework |
 | `odin_invasion_run.R` | Invasion experiment: resident run to quasi-equilibrium then invader seeded |
 | `discrete_onespecies_sim.R` | Single-species (no strains) simulation; exploratory |
