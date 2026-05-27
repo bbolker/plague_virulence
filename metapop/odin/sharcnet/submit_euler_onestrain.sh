@@ -2,7 +2,7 @@
 #SBATCH --account=def-bolker
 #SBATCH --job-name=euler_onestrain
 #SBATCH --array=1-1400
-#SBATCH --time=0-00:30:00
+#SBATCH --time=0-00:15:00
 #SBATCH --mem=4G
 #SBATCH --cpus-per-task=8
 #SBATCH --output=logs/euler_onestrain_%A_%a.out
