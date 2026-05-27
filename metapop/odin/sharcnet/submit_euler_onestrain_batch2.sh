@@ -3,7 +3,7 @@
 #SBATCH --job-name=euler_onestrain_b2
 #SBATCH --array=1-840
 #SBATCH --time=0-00:30:00
-#SBATCH --mem=8G
+#SBATCH --mem=32G
 #SBATCH --cpus-per-task=1
 #SBATCH --output=logs/euler_onestrain_batch2_%A_%a.out
 
