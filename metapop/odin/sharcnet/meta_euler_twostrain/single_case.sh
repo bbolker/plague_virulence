@@ -16,8 +16,7 @@ ID=$(echo "$LINE" | cut -d" " -f1)
 METAJOB_ID=${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}
 
 module load r/4.5.0
-export SLURM_ARRAY_TASK_ID=$ID
-(cd .. && Rscript euler_twostrain_run_array.R)
+(cd .. && export SLURM_ARRAY_TASK_ID=$ID && Rscript euler_twostrain_run_array.R)
 STATUS=$?
 
 echo "$ID $STATUS" >> STATUSES/status.$METAJOB_ID
