@@ -1,9 +1,8 @@
 ## To do
 
-* switch from job array to META runs?
-* retrieve batch2 onestrain results, plot
+* switch from job array to META runs? (ugh, nasty)
 * retrieve two-strain mini example
-   * current job id is 15051381
+   * strain 2 is always going extinct in the mini-example. Is that expected?
 * set up plotting (à la YZ) for the two-strain PIP plots
 * compare deterministic models with leaky-bucket vs logistic demography (trough depth vs R0)
 * re-run one-strain/one-patch/extinct with more simulations
