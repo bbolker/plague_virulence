@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --account=def-bolker
 #SBATCH --job-name=twostrain_mini2
-#SBATCH --array=1-1600
+#SBATCH --array=1-900
 #SBATCH --time=0-00:30:00
 #SBATCH --mem=32G
 #SBATCH --cpus-per-task=1
