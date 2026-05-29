@@ -49,7 +49,8 @@ if (opt$mini) {
   stop_cond <- stop_either_extinct()
 }
 
-row <- dd[task_id, ]
+row           <- dd[task_id, ]
+strain2_delay <- round(100 / dt)
 
 plan(multicore(workers = as.integer(Sys.getenv("SLURM_CPUS_PER_TASK", 1L))))
 runs <- discrete_run(beta_vec      = c(row$R01, row$R02),
@@ -62,13 +63,13 @@ runs <- discrete_run(beta_vec      = c(row$R01, row$R02),
                      gamma         = c(1, 1),
                      dt            = dt,
                      def_file      = "euler_odin_def.R",
-                     strain2_delay = round(100 / dt),
+                     strain2_delay = strain2_delay,
                      stop_cond     = stop_cond,
                      nsim          = n_sim,
                      platform      = "odin")
 plan(sequential)
 
-out <- dplyr::bind_cols(row, as.data.frame(as.list(sumfun_discrete(runs, strain2_delay = round(100 / dt)))))
+out <- dplyr::bind_cols(row, as.data.frame(as.list(sumfun_discrete(runs, strain2_delay = strain2_delay))))
 
 dir.create("outputs", showWarnings = FALSE)
 saveRDS(out, sprintf("outputs/%s_task_%06d.rds", base_fn, task_id))
