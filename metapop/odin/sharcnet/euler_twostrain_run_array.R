@@ -30,8 +30,8 @@ if (opt$mini) {
   dt        <- 0.2
   stop_cond <- stop_either_extinct()
 } else if (opt$mini2) {
-  dd <- expand.grid(R01   = seq(1.1, 4, length.out = 10),
-                    R02   = seq(1.1, 4, length.out = 10),
+  dd <- expand.grid(R01   = seq(1.1, 5, by = 0.1),
+                    R02   = seq(1.1, 5, by = 0.1),
                     K     = 1e4,
                     alpha = 10^-5.5)
   n_patch   <- 200
