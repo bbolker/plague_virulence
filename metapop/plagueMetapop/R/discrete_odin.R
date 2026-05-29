@@ -78,10 +78,8 @@ make_simulator_odin <- function(
                       n_patch)
 
   if (grepl("^euler_", attr(gen_local, "def_filename"))) {
-    args$gamma          <- rep(gamma, length.out = n_strain)
-    args$dt             <- dt
-    args$logistic_growth <- logistic_growth
-    args$reedfrost       <- reedfrost
+    args <- c(args, tibble::lst(gamma = rep(gamma, length.out = n_strain),
+                                dt, logistic_growth, reedfrost))
   }
 
   mod <- do.call(gen_local$new, args)
