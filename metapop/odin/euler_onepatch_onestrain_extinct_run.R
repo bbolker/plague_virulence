@@ -16,10 +16,11 @@ reedfrost       <- if (opt$reedfrost) 1 else 0
 dt              <- if (reedfrost == 1) 1 else 0.1
 nsim            <- 100L
 
-base_fn <- "euler_onepatch_onestrain_extinct"
-if (opt$lineargrowth) base_fn <- paste0(base_fn, "_linear")
-if (opt$reedfrost)    base_fn <- paste0(base_fn, "_reedfrost")
-if (opt$mini)         base_fn <- paste0(base_fn, "_mini")
+base_fn <- paste("euler_onepatch_onestrain_extinct",
+                 if (opt$lineargrowth) "linear" else "logistic",
+                 if (opt$reedfrost) "reedfrost" else "continuous",
+                 sep = "_")
+if (opt$mini) base_fn <- paste0(base_fn, "_mini")
 
 if (opt$mini) {
   dd <- expand.grid(R0 = seq(1.1, 3, by = 0.25),
