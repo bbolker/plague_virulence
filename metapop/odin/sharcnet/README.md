@@ -57,8 +57,6 @@ Rscript euler_onepatch_onestrain_extinct_combine.R linear_reedfrost
 Outputs: `outputs/euler_onepatch_onestrain_extinct_{logistic|linear}_{continuous|reedfrost}_task_NNNN.rds`  
 Combined: `outputs/euler_onepatch_onestrain_extinct_{logistic|linear}_{continuous|reedfrost}.rds`
 
-Note: `submit_euler_extinct.sh` is the legacy default-flags script (equivalent to `logistic_continuous`); prefer the named scripts going forward.
-
 ---
 
 ### euler_onestrain
