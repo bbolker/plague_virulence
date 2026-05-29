@@ -22,28 +22,36 @@ R CMD INSTALL ../../plagueMetapop
 
 ### euler_onepatch_onestrain_extinct
 
-One-patch, one-strain extinction grid: varies R0 × K.
+One-patch, one-strain extinction grid: varies R0 × K.  
+Four combinations of demography (logistic / linear restoring force) × dynamics (continuous Euler / Reed-Frost).
 
 | file | purpose |
 |------|---------|
-| `submit_euler_extinct.sh` | full run (520 tasks, R0 × K grid, 5 min wall time) |
+| `submit_euler_extinct_logistic_continuous.sh` | logistic demography, continuous Euler (520 tasks, 5 min) |
+| `submit_euler_extinct_logistic_reedfrost.sh` | logistic demography, Reed-Frost (520 tasks, 5 min) |
+| `submit_euler_extinct_linear_continuous.sh` | linear demography, continuous Euler (520 tasks, 5 min) |
+| `submit_euler_extinct_linear_reedfrost.sh` | linear demography, Reed-Frost (520 tasks, 5 min) |
 | `submit_euler_extinct_mini.sh` | mini test (32 tasks, coarser grid) |
-| `euler_onepatch_onestrain_extinct_run_array.R` | shared array script (full and mini) |
+| `euler_onepatch_onestrain_extinct_run_array.R` | shared array script (`--lineargrowth`, `--reedfrost` flags) |
 | `euler_onepatch_onestrain_extinct_run_array_mini.R` | mini array script (separate parameters) |
-| `euler_onepatch_onestrain_extinct_combine.R` | combine full outputs |
+| `euler_onepatch_onestrain_extinct_combine.R` | combine outputs for one combination (update pattern to match) |
 | `euler_onepatch_onestrain_extinct_mini_combine.R` | combine mini outputs |
 
 Grid (full): `R0 = seq(1.1, 5, by=0.1)` × `K = 10^seq(3, 6, by=0.25)` — 40 × 13 = 520 tasks  
 Grid (mini): `R0 = seq(1.1, 5, by=0.5)` × `K = 10^seq(3, 6)` — 32 tasks  
-Parameters: `nsim=1000`, `dt=0.1`, `n_patch=1`
+Parameters: `nsim=1000`, `n_patch=1`; `dt=0.1` (continuous), `dt=1` (Reed-Frost)
 
 ```bash
-sbatch submit_euler_extinct.sh          # or submit_euler_extinct_mini.sh
-Rscript euler_onepatch_onestrain_extinct_combine.R      # after completion
+sbatch submit_euler_extinct_logistic_continuous.sh   # logistic demography, continuous Euler
+sbatch submit_euler_extinct_logistic_reedfrost.sh    # logistic demography, Reed-Frost
+sbatch submit_euler_extinct_linear_continuous.sh     # linear demography, continuous Euler
+sbatch submit_euler_extinct_linear_reedfrost.sh      # linear demography, Reed-Frost
 ```
 
-Outputs: `outputs/euler_onepatch_onestrain_extinct_task_NNNN.rds`  
-Combined: `outputs/euler_onepatch_onestrain_extinct[_mini].rds`
+Outputs: `outputs/euler_onepatch_onestrain_extinct_{logistic|linear}_{continuous|reedfrost}_task_NNNN.rds`  
+Combined: `outputs/euler_onepatch_onestrain_extinct_{logistic|linear}_{continuous|reedfrost}.rds`
+
+Note: `submit_euler_extinct.sh` is the legacy default-flags script (equivalent to `logistic_continuous`); prefer the named scripts going forward.
 
 ---
 
