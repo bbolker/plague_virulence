@@ -1,14 +1,26 @@
 library(dplyr)
 library(ggplot2)
 library(patchwork)
+library(optparse)
 
-theme_set(theme_bw())
+opt <- parse_args(OptionParser(option_list = list(
+  make_option(c("-c", "--combo"), type = "character",
+              default = "logistic_reedfrost",
+              help = "combination to plot: logistic_continuous, logistic_reedfrost, linear_continuous, linear_reedfrost [default: %default]")
+)))
 
-## "euler_onepatch_onestrain_extinct.rds"
-fn <- here::here("metapop/odin",
-                 "sharcnet/outputs/euler_onepatch_onestrain_extinct.rds")
+valid <- c("logistic_continuous", "logistic_reedfrost",
+           "linear_continuous",   "linear_reedfrost")
+if (!opt$combo %in% valid)
+  stop("--combo must be one of: ", paste(valid, collapse = ", "))
+
+base_fn <- paste0("euler_onepatch_onestrain_extinct_", opt$combo)
+fn <- here::here("metapop/odin", "sharcnet/outputs",
+                 paste0(base_fn, ".rds"))
 dat <- readRDS(fn) |>
   mutate(log10K = log10(K))
+
+theme_set(theme_bw())
 
 ## FIXME: convert to long and facet rather than using patchwork
 ## (will free scales on the fill guide work? maybe not worth it?)
@@ -29,5 +41,5 @@ p1 <- make_raster("ext_prob.I1",      "extinction\nprobability")
 p2 <- make_raster("mean_ext_time.I1", "mean extinction\ntime (steps)")
 
 print(p1 + p2)
-ggsave("euler_onepatch_onestrain_extinct.png", width = 10, height = 5)
-ggsave("euler_onepatch_onestrain_extinct.pdf", width = 10, height = 5)
+ggsave(paste0(base_fn, ".png"), width = 10, height = 5)
+ggsave(paste0(base_fn, ".pdf"), width = 10, height = 5)
