@@ -15,7 +15,7 @@ hybrid_metric_fun <- function(extinction_rate,
   )
 }
 
-dd <- readRDS("sharcnet/outputs/euler_twostrain_mini.rds") |>
+dd <- readRDS("sharcnet/outputs/euler_twostrain_mini2.rds") |>
   mutate(time_after_invasion = mean_ext_time.I2 - invade_start,
          hybrid_metric = hybrid_metric_fun(ext_prob.I2,
                                        time_after_invasion))
@@ -74,6 +74,11 @@ plot_fun <- function(sub_dat, facet = FALSE, title = NULL) {
 summary(dd$ext_prob.I2) ## ALL extinct ... ??? is this expected?
 summary(dd$ext_prob.I1) ## sometimes extinct
 
-ggplot(dd, aes(R01, R02, fill = ext_prob.I1)) +
-  geom_raster() + facet_grid(alpha ~ K)
+ggplot(dd, aes(R01, R02, fill = ext_prob.I2)) +
+  geom_raster() +
+  facet_grid(alpha ~ K) +
+  scale_fill_viridis_c(trans = "log10") +
+  scale_y_continuous(expand = c(0,0)) +
+  scale_x_continuous(expand = c(0,0))
+  
 plot_fun(dd, facet = TRUE)
