@@ -97,8 +97,9 @@ Combined: `euler_onestrain[_mini|_batch2].rds`
 ### euler_twostrain
 
 Multi-patch, two-strain PIP grid: varies R01 × R02 × K × alpha.  
-Strain 1 runs alone for `strain2_delay = round(100/dt)` steps before strain 2 is seeded;
-run stops when either strain goes extinct (`stop_either_extinct()`).
+Strain 1 runs alone for `strain2_delay = round(100/dt)` steps before strain 2 is seeded.
+Full and mini runs stop when either strain goes extinct (`stop_either_extinct()`);
+mini2 stops only when both strains are simultaneously extinct (`stop_both_extinct`).
 
 The full run uses **META-Farm** (dynamic load balancing) rather than a SLURM array;
 the mini test still uses a plain SLURM array.
@@ -109,12 +110,14 @@ the mini test still uses a plain SLURM array.
 | `meta_euler_twostrain/single_case.sh` | per-case worker: sets `SLURM_ARRAY_TASK_ID=$ID`, runs R script |
 | `meta_euler_twostrain/make_table.sh` | generates `table.dat` (lines 1–14400) |
 | `submit_euler_twostrain_mini.sh` | mini SLURM array (96 tasks, 4G, 4 CPUs) |
-| `euler_twostrain_run_array.R` | shared R script (`--mini` flag) |
-| `euler_twostrain_combine.R` | combine outputs (`--mini` flag) |
+| `submit_euler_twostrain_mini2.sh` | mini2 SLURM array (100 tasks, 32G, 1 CPU) |
+| `euler_twostrain_run_array.R` | shared R script (`--mini` / `--mini2` flags) |
+| `euler_twostrain_combine.R` | combine outputs (`--mini` / `--mini2` flags, short: `-m` / `-2`) |
 
-Grid (full): `R01 = R02 = seq(1.1, 5, by=0.1)` × `K = 10^seq(3, 5)` × `alpha = 10^seq(-5, -3)` — 14400 tasks  
-Grid (mini): `R01 = R02 = seq(1.1, 3, by=0.5)` × `K = 10^seq(3, 5)` × `alpha = 10^seq(-5, -4)` — 96 tasks  
-Parameters (full): `nsim=200`, `dt=0.1`, `n_patch=200`  
+Grid (full):  `R01 = R02 = seq(1.1, 5, by=0.1)` × `K = 10^seq(3, 5)` × `alpha = 10^seq(-5, -3)` — 14400 tasks  
+Grid (mini):  `R01 = R02 = seq(1.1, 3, by=0.5)` × `K = 10^seq(3, 5)` × `alpha = 10^seq(-5, -4)` — 96 tasks  
+Grid (mini2): `R01 = R02 = seq(1.1, 4, length.out=10)` × `K = 1e4` × `alpha = 10^-5.5` — 100 tasks; uses `stop_both_extinct`  
+Parameters (full/mini2): `nsim=200`, `dt=0.1`, `n_patch=200`  
 Parameters (mini): `nsim=50`, `dt=0.2`, `n_patch=50`
 
 **Wall-time derivation (from mini sacct, job 15051381):** Mini tasks took ~6.5 s elapsed with 4 CPUs → 0.52 CPU-s/sim. Full run: 4× more patches, 2× more steps, 200 sims on 1 CPU → ~4.2 CPU-s/sim × 200 = ~840 s ≈ 14 min/task. With 14.4 tasks/metajob → ~3.4 h worst case; 8 h provides ~2.4× buffer.
@@ -123,6 +126,12 @@ Parameters (mini): `nsim=50`, `dt=0.2`, `n_patch=50`
 ```bash
 sbatch submit_euler_twostrain_mini.sh
 Rscript euler_twostrain_combine.R --mini
+```
+
+**Mini2 (SLURM array — fixed K=1e4, alpha=10^-5.5, full-run parameters):**
+```bash
+sbatch submit_euler_twostrain_mini2.sh
+Rscript euler_twostrain_combine.R --mini2
 ```
 
 **Full (META-Farm) — initialise once, then submit from `meta_euler_twostrain/`:**
