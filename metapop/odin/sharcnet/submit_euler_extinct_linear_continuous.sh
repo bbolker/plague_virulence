@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --account=def-bolker
-#SBATCH --job-name=euler_extinct
+#SBATCH --job-name=extinct_lincon
 #SBATCH --array=1-520
 #SBATCH --time=0-00:05:00
 #SBATCH --mem=4G
@@ -12,4 +12,4 @@
 
 module load r/4.5.0
 
-Rscript euler_onepatch_onestrain_extinct_run_array.R
+Rscript euler_onepatch_onestrain_extinct_run_array.R --lineargrowth

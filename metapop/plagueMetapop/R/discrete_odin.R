@@ -44,7 +44,9 @@ make_simulator_odin <- function(
   gamma     = c(1, 1),
   dt        = 1,
   def_file  = "discrete_odin_def.R",
-  gen_local = NULL
+  gen_local = NULL,
+  logistic_growth = 1,
+  reedfrost = 0
   ) {
 
   n_strain <- 2 ## hard-coded on purpose
@@ -76,8 +78,8 @@ make_simulator_odin <- function(
                       n_patch)
 
   if (grepl("^euler_", attr(gen_local, "def_filename"))) {
-    args$gamma <- rep(gamma, length.out = n_strain)
-    args$dt    <- dt
+    args <- c(args, tibble::lst(gamma = rep(gamma, length.out = n_strain),
+                                dt, logistic_growth, reedfrost))
   }
 
   mod <- do.call(gen_local$new, args)

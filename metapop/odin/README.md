@@ -32,10 +32,11 @@ Right now, we're doing mass-action (in JD terms B(N) = βN/K). Should consider o
 | `R/discrete_pureR.R` | Pure-R reference implementation |
 | `R/discrete_run.R` | Top-level `discrete_run()` dispatcher and `sumfun_discrete()` summary function |
 | `inst/odin/discrete_odin_def.R` | Stochastic discrete-time two-strain n-patch SIR model |
-| `inst/odin/euler_odin_def.R` | Stochastic continuous-time version with per-strain recovery and `dt` |
+| `inst/odin/euler_odin_def.R` | Stochastic continuous-time version with per-strain recovery, `dt`, `logistic_growth` (1=logistic, 0=linear restoring force), and `reedfrost` (1=100% removal per step) |
 | `inst/odin/euler_det_odin_def.R` | Deterministic version of `euler_odin_def.R` |
 | `inst/tinytest/test_platforms.R` | Tests: platform correctness, parallel execution, summary statistics |
 | `inst/tinytest/test_stop_conditions.R` | Tests: `stop_either_extinct()` factory and pre-seeding behaviour |
+| `inst/tinytest/test_discrete-vs-euler.R` | Tests: euler with `reedfrost=1, gamma=1, dt=1` matches discrete model |
 
 Run package tests with `tinytest::test_package("plagueMetapop")`.
 
@@ -54,6 +55,8 @@ Submit all jobs from the `sharcnet/` directory after `mkdir -p logs outputs`.
 
 ### Run and plot scripts (current)
 
+`discrete` is the Reed-Frost model, `euler` is the continuous (ish) model (time scale = disease generation time; `gamma=1` wlog; multiple steps per disease generation). * indicates there's a corresponding batch run in the `sharcnet` subdir
+
 | File | Description |
 |------|-------------|
 | `discrete_onepatch_onestrain_example.R` | Single-patch, one-strain example run using the discrete stochastic model |
@@ -62,9 +65,10 @@ Submit all jobs from the `sharcnet/` directory after `mkdir -p logs outputs`.
 | `discrete_onepatch_twostrain_extinct_run.R` | Grid run over R0₁ × R0₂ for two-strain invasion/coexistence analysis |
 | `discrete_onepatch_twostrain_extinct_plot.R` | Plots of two-strain extinction results |
 | `euler_onepatch_onestrain_example.R` | Single-patch example using the continuous-time (`euler_odin_def.R`) model |
-| `euler_onepatch_onestrain_extinct_run.R` | Grid run over R0 × K using the continuous-time stochastic model |
+| `euler_onepatch_onestrain_extinct_run.R` | Grid run over R0 × K; `--lineargrowth` (linear demography), `--reedfrost` (Reed-Frost dynamics), `--mini` flags * |
 | `euler_onepatch_onestrain_extinct_plot.R` | Raster plots of extinction results from the euler one-strain grid |
-| `euler_onestrain_run.R` | Multi-patch grid run over R0 × K × alpha; supports `--mini` flag via optparse |
+| `euler_onestrain_run.R` | Multi-patch grid run over R0 × K × alpha; supports `--mini` flag via optparse  * |
+| `odin_twostrain_run.R` | Two-strain run script; grid over R01 x R02 x K x alpha *: `meta_euler_twostrain`|
 
 ### Run and plot scripts (older/exploratory)
 
@@ -73,6 +77,5 @@ Submit all jobs from the `sharcnet/` directory after `mkdir -p logs outputs`.
 | `odin_twostrain0.R` | Earlier single-patch two-strain odin model definition; superseded by `discrete_odin_def.R` |
 | `discrete_onepatch_odin.R` | Early prototype: single-patch discrete-time SIR; superseded |
 | `odin_twostrain_run0.R` | Early two-strain run script; superseded by `plagueMetapop` framework |
-| `odin_twostrain_run.R` | Intermediate two-strain run script; superseded by `plagueMetapop` framework |
 | `odin_invasion_run.R` | Invasion experiment: resident run to quasi-equilibrium then invader seeded |
 | `discrete_onespecies_sim.R` | Single-species (no strains) simulation; exploratory |

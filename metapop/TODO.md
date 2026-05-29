@@ -1,12 +1,15 @@
 ## To do
 
-* switch from job array to META runs?
-* retrieve batch2 onestrain results, plot
-* retrieve two-strain mini example
-   * current job id is 15051381
-* set up plotting (à la YZ) for the two-strain PIP plots
+* trouble-shoot PIP runs
+   * retrieve two-strain mini example.
+   * strain 2 is always going extinct in the mini-example. Is that expected?
+
+* single-species extinction runs for (Reed-Frost, continuous) x (logistic, linear)
+
+* switch from job array to META runs? (ugh, nasty)
+   * switch back to job arrays?
+* odin ODE version; quantify trough depth vs R0 for leaky-bucket vs logistic demography
 * compare deterministic models with leaky-bucket vs logistic demography (trough depth vs R0)
-* re-run one-strain/one-patch/extinct with more simulations
 * implement non-extinction variant, compare with extinction-allowed (strength of burnout mechanism)
 * implement power-law R0(N) ?
 
@@ -14,7 +17,9 @@
 
 Note effects of [1] generation interval/infectious period distribution; [2] demography (SIR w/ constant (leaky-bucket) vital dynamics vs SIRS vs SID w/ logistic growth) [3] ??
 
-  Chose r=0.125 on the basis of intrinsic rat pop growth rates of 3-5/year; generation time of plague 10-20 days; `3/365*15 ~ 0.125`. However, this leads to near-certain burnout for R0 = 4 (with dt = 0.2 disease generations) at K=1e6. 0.125 is *way* above the range shown in Parsons et al (which goes only up to 0.02, reasonable for human diseases).  What do the burnout contours look like for epsilon in the range of 0.02 to 0.2 ... ?
+  Chose r=0.125 on the basis of intrinsic rat pop growth rates of 3-5/year; generation time of plague 10-20 days; `3/365*15 ~ 0.125`.
+
+  Linear growth rate would be equal to death rate, in disease generation times (== epsilon); death rate is about 1 (lifespan == 1 year), so approx 1/3 of r == 0.04 (maybe less, 15 is on the high end)
 
 * instrument runs to record r(t), foi(t), etc. (to understand invasion criteria etc.)
 * store parameter values as attributes

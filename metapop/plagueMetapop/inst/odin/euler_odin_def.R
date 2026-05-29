@@ -28,10 +28,11 @@ n_SI[,1] <- n_SI_strain1[i]
 n_SI[,2] <- tot_incidence[i] - n_SI_strain1[i]
 
 ## Recovery/death draws
-n_IR[,] <- rbinom(I[i,j], p_recov[j])
+n_IR[,] <- if (reedfrost == 1) I[i,j] else rbinom(I[i,j], p_recov[j])
 
 ## Vital dynamics (births/deaths), scaled by dt
-delta_log[] <- r[i]*S[i]*(1-S[i]/K[i])*dt
+## logistic_growth==1: standard logistic (quadratic in S); ==0: linear restoring force
+delta_log[] <- if (logistic_growth == 1) r[i]*S[i]*(1-S[i]/K[i])*dt else r[i]*(K[i]-S[i])*dt
 pop_change[] <- if (delta_log[i] < 0) -rbinom(S[i], -delta_log[i]/S[i]) else rpois(delta_log[i])
 
 ## colonization (rate scaled by dt)
@@ -61,6 +62,8 @@ alpha <- user(1e-5) ## between-patch transmission
 strain2_delay <- user(0L) ## steps before strain 2 is seeded (integer: compared to step)
 r[] <- user()   ## growth rate (per patch)
 K[] <- user()   ## carrying capacity (per patch)
+logistic_growth <- user(1)  ## 1 = standard logistic; 0 = linear restoring force
+reedfrost <- user(0)        ## 1 = Reed-Frost (100% removal per step); requires gamma==1, dt==1
 I2_ini[] <- user() ## initial I[,2] per patch; normally 0, set by chunked runner on restart
 
 dim(S) <- n_patch

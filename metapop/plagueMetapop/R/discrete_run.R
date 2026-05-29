@@ -1,6 +1,8 @@
 ##' Run one or more two-strain n-patch simulations across platforms
 ##' @param beta_vec length-2 vector of per-capita transmission rates (one per strain)
 ##' @param K carrying capacity (scalar or vector of length n_patch)
+##' @param logistic_growth 1 (default) = standard logistic demography; 0 = linear restoring force
+##' @param reedfrost 1 = Reed-Frost mode (100\% removal per step); requires gamma == 1 and dt == 1
 ##' @param r host growth rate per disease generation (ditto)
 ##' @param n_patch number of patches
 ##' @param nt time steps
@@ -34,7 +36,9 @@
 ##' @export
 discrete_run <- function(beta_vec = c(1.5, 2.5),
                          K = 1e4,
-                         r = 0.125,
+                         logistic_growth = 1,
+                         reedfrost = 0,
+                         r = if (logistic_growth) 0.125 else 0.04,
                          n_patch = 100,
                          nt = 1000,
                          alpha = 1e-3,
@@ -52,9 +56,15 @@ discrete_run <- function(beta_vec = c(1.5, 2.5),
   platform <- match.arg(platform)
   if ((!is.null(chunk) || !is.null(stop_cond)) && platform != "odin")
     stop("chunk and stop_cond are only supported for platform = 'odin'")
+  if (reedfrost == 1 && !(all(gamma == 1) && dt == 1))
+    stop("reedfrost = 1 requires gamma == 1 and dt == 1")
 
   args <- tibble::lst(beta_vec, r, K, n_patch, nt, I_init, alpha, strain2_delay,
                       gamma, dt, def_file)
+  if (platform == "odin" && def_file == "euler_odin_def.R") {
+    args$logistic_growth <- logistic_growth
+    args$reedfrost        <- reedfrost
+  }
 
   makefun  <- get(sprintf("make_simulator_%s", platform))
   runfun   <- get(sprintf("run_simulator_%s", platform))
@@ -115,10 +125,12 @@ sum_run1 <- function(x, return_type = c("long", "wide")) {
 ##'   on the strain still being present (cell-level masking).
 ##' @param runs list of long-format tibbles from discrete_run(), or a single tibble
 ##' @param nsteps number of trailing steps used for quasi-equilibrium averages
+##' @param strain2_delay steps before strain 2 is seeded; zeros in I2 before
+##'   this step are not counted as extinction
 ##' @param which strains to summarise (currently ignored; both strains always returned)
 ##' @return named numeric vector of summary statistics
 ##' @export
-sumfun_discrete <- function(runs, nsteps = 100, which = c(1, 2)) {
+sumfun_discrete <- function(runs, nsteps = 100, strain2_delay = 0, which = c(1, 2)) {
   if (!is.list(runs) || inherits(runs, "data.frame")) runs <- list(runs)
   nsim <- length(runs)
 
@@ -132,13 +144,15 @@ sumfun_discrete <- function(runs, nsteps = 100, which = c(1, 2)) {
   nt     <- max(vapply(agg, nrow, integer(1L)))
   window <- seq(max(1L, nt - nsteps + 1L), nt)
 
-  ## row index of first step where total infected == 0 (NA if never extinct)
-  first_ext <- function(pop) {
-    idx <- which(pop == 0)
+  ## row index of first step where total infected == 0 (NA if never extinct).
+  ## `after`: ignore zeros at or before this step (used to skip pre-seeding
+  ## zeros for strain 2).
+  first_ext <- function(pop, steps = seq_along(pop), after = 0L) {
+    idx <- which(pop == 0 & steps > after)
     if (length(idx) == 0L) NA_integer_ else idx[1L]
   }
   ext1 <- sapply(agg, \(a) first_ext(a$I1_pop))
-  ext2 <- sapply(agg, \(a) first_ext(a$I2_pop))
+  ext2 <- sapply(agg, \(a) first_ext(a$I2_pop, steps = a$step, after = strain2_delay))
 
   ## cell-level QE mean: mask (window-row, run) cells at or after extinction,
   ## then average over all remaining cells (matching original sumfun logic)

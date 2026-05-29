@@ -28,7 +28,9 @@ if (opt$mini) {
   dt      <- 0.1
 }
 
-plan(multicore(workers = 14L))
+strain2_delay <- round(100 / dt)
+
+plan(multicore(workers = 24L))
 set.seed(101)
 
 result_list <- lapply(seq_len(nrow(dd)), function(i) {
@@ -43,11 +45,11 @@ result_list <- lapply(seq_len(nrow(dd)), function(i) {
                        gamma         = c(1, 1),
                        dt            = dt,
                        def_file      = "euler_odin_def.R",
-                       strain2_delay = round(100 / dt),
+                       strain2_delay = strain2_delay,
                        stop_cond     = stop_either_extinct(),
                        nsim          = n_sim,
                        platform      = "odin")
-  dplyr::bind_cols(dd[i, ], as.data.frame(as.list(sumfun_discrete(runs))))
+  dplyr::bind_cols(dd[i, ], as.data.frame(as.list(sumfun_discrete(runs, strain2_delay = strain2_delay))))
 })
 plan(sequential)
 

@@ -1,0 +1,2 @@
+N_cases=14400
+WALLTIME=900
