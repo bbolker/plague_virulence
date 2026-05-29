@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --account=def-bolker
 #SBATCH --job-name=meta_twostrain
-#SBATCH --time=0-08:00:00   # est. ~14 min/task (scaled from mini: 6.5 s × 4 CPU / 50 sims × 2 dt × 4 patches × 200 sims) → ~3.4 h/metajob worst case; 8 h adds ~2.4× buffer
-#SBATCH --mem=32G
+#SBATCH --time=0-02:00:00   # mini2 sacct: ~3 min/task × 14.4 tasks/metajob ≈ 43 min; 2 h gives ~2.8× buffer
+#SBATCH --mem=12G            # mini2 MaxRSS ~8.35 GB; 12 G gives ~1.4× buffer
 #SBATCH --cpus-per-task=1
 #SBATCH --output=logs/meta_twostrain_%j.out
 
