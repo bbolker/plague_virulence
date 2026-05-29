@@ -34,7 +34,7 @@ Four combinations of demography (logistic / linear restoring force) × dynamics 
 | `submit_euler_extinct_mini.sh` | mini test (32 tasks, coarser grid) |
 | `euler_onepatch_onestrain_extinct_run_array.R` | shared array script (`--lineargrowth`, `--reedfrost` flags) |
 | `euler_onepatch_onestrain_extinct_run_array_mini.R` | mini array script (separate parameters) |
-| `euler_onepatch_onestrain_extinct_combine.R` | combine outputs for one combination (update pattern to match) |
+| `euler_onepatch_onestrain_extinct_combine.R` | combine outputs for one combination (takes combination name as argument) |
 | `euler_onepatch_onestrain_extinct_mini_combine.R` | combine mini outputs |
 
 Grid (full): `R0 = seq(1.1, 5, by=0.1)` × `K = 10^seq(3, 6, by=0.25)` — 40 × 13 = 520 tasks  
@@ -46,6 +46,12 @@ sbatch submit_euler_extinct_logistic_continuous.sh   # logistic demography, cont
 sbatch submit_euler_extinct_logistic_reedfrost.sh    # logistic demography, Reed-Frost
 sbatch submit_euler_extinct_linear_continuous.sh     # linear demography, continuous Euler
 sbatch submit_euler_extinct_linear_reedfrost.sh      # linear demography, Reed-Frost
+
+# after each run completes, combine with the matching combination name:
+Rscript euler_onepatch_onestrain_extinct_combine.R logistic_continuous
+Rscript euler_onepatch_onestrain_extinct_combine.R logistic_reedfrost
+Rscript euler_onepatch_onestrain_extinct_combine.R linear_continuous
+Rscript euler_onepatch_onestrain_extinct_combine.R linear_reedfrost
 ```
 
 Outputs: `outputs/euler_onepatch_onestrain_extinct_{logistic|linear}_{continuous|reedfrost}_task_NNNN.rds`  
