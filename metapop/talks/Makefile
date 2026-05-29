@@ -1,3 +1,6 @@
+ssc_talk.html: ssc_talk.qmd
+	quarto render $<
+
 csee_talk.html: csee_talk.qmd
 	quarto render $<
 

@@ -1,10 +1,12 @@
 ## To do
 
+* refactor twostrain delay to be part of discrete_run (chunked run), rather than part of model definition
+
 * trouble-shoot PIP runs
    * retrieve two-strain mini example.
    * strain 2 is always going extinct in the mini-example. Is that expected?
 
-* single-species extinction runs for (Reed-Frost, continuous) x (logistic, linear)
+    * single-species extinction runs for (Reed-Frost, continuous) x (logistic, linear) [plot]
 
 * switch from job array to META runs? (ugh, nasty)
    * switch back to job arrays?
@@ -13,7 +15,7 @@
 * implement non-extinction variant, compare with extinction-allowed (strength of burnout mechanism)
 * implement power-law R0(N) ?
 
-* create dedicated single-strain model (doens't help that much)
+    * create dedicated single-strain model (doens't help that much)
 
 Note effects of [1] generation interval/infectious period distribution; [2] demography (SIR w/ constant (leaky-bucket) vital dynamics vs SIRS vs SID w/ logistic growth) [3] ??
 
