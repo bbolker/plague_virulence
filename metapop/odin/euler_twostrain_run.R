@@ -28,7 +28,7 @@ if (opt$mini) {
   dt      <- 0.1
 }
 
-plan(multicore(workers = 14L))
+plan(multicore(workers = 24L))
 set.seed(101)
 
 result_list <- lapply(seq_len(nrow(dd)), function(i) {

@@ -1,0 +1,248 @@
+---
+title: "Eco-evolutionary dynamics of plague virulence"
+bibliography: ../../virulence.bib
+format:
+  revealjs:
+    embed-resources: true
+    slide-number: true
+    preview-links: auto
+# revealjs-plugins:
+#     - editable
+# filters:
+#    - editable
+csl: reflist2.csl
+nocite: |
+  @Lens1988
+---
+
+## the question
+
+```{r setup, echo = FALSE, include = FALSE}
+library(tidyverse); theme_set(theme_bw())
+library(colorspace) ## lighten()
+library(kableExtra)
+```
+
+<!-- .refs is style for reference page (small text) -->
+<style>
+.refs {
+   font-size: 14px;
+}
+.tiny {
+   font-size: 10px;
+}
+
+h2 { 
+ color: #3399ff;		
+}
+h3 { 
+ color: #3399ff;		
+}
+.title-slide {
+   background-color: #55bbff;
+}
+<!-- https://stackoverflow.com/questions/50378349/force-column-break-in-rmarkdown-ioslides-columns-2-layout -->
+.forceBreak { -webkit-column-break-after: always; break-after: column; }
+</style>
+
+\newcommand{\rzero}{{\cal R}_0}
+
+
+What (eco-)evolutionary dynamics drove the repeated evolution of reduced virulence in *Yersinia pestis* in multiple pandemics?
+
+<!-- https://emilhvitfeldt.github.io/quarto-revealjs-editable/
+  quarto add emilhvitfeldt/quarto-revealjs-editable
+  https://emilhvitfeldt.github.io/quarto-revealjs-editable/getting-started.html
+  -->
+
+## acknowledgements
+
+* **Yuyang Zhang** (張雨陽), Jonathan Dushoff, David Earn, Todd Parsons
+* Ravneet Sidhu, Hendrik Poinar (ancient DNA work)
+* NSERC ($$$)
+
+## plague basics
+
+* vector-borne bacterial disease of rodents
+    * rats and fleas
+* spillover into human populations
+    * human-to-human (or human-vector-human) transmission possible, but unusual
+* history:
+    * originated Bronze Age, $\approx$ 5-6 KYBP
+    * three **pandemics**: 540-750 AD, 1347-18th c. ("the Black Death"), 1850-1960
+
+## the inspiration 
+
+::: {.absolute width=645.5px height=415px left=-94px top=164px}
+* @sidhuAttenuationVirulenceYersinia2025: *Y. pestis* **repeatedly** evolved a lower-virulence phenotype, in each pandemic
+* ... via copy-number reduction of a plasmid-encoded virulence gene (*Pla*)
+:::
+
+![](pix/pla_phylogeny_pand2.png){.absolute width=581.5px height=410px left=601px top=82px}
+
+<!--
+## experimental mortality data
+
+* mouse injections with varying levels of *Pla* depletion 
+* infection mortality decreases, survival time increases
+
+```{r sidhu-mort,echo = FALSE}
+dd4 <- read.csv("Sidhu_mort.csv")  |>
+    mutate(across(strain, \(x) reorder(factor(x), gene_ratio,
+                                       decreasing = TRUE))) |>
+    arrange(strain) |>
+    mutate(strainx = sprintf("%s\n(%1.1f%% Pla)", strain, gene_ratio) |>
+               factor() |> forcats::fct_inorder()) |>
+    mutate(event = ifelse(dod==20, 0, 1)) ## censoring
+cvec0 <- c("#69BE44", "#49A5DF", "#D5D5D8")
+cvec1 <- c(cvec0[1],
+           lighten(cvec0[2], c(-0.3, 0, 0.3)),
+           cvec0[3])
+cvec <- cvec1
+theme_set(theme_bw(base_size = 16))
+
+gg_ttd <- ggplot(dd4, aes(x=strainx, y = dod, colour = strain, fill = strain)) +
+    geom_dotplot(binaxis="y", stackdir = "center", binwidth = 0.5) +
+    geom_boxplot(alpha = 0.2) + 
+    expand_limits(y=0) +
+    scale_colour_manual(values = cvec) +
+    scale_fill_manual(values = cvec) +
+    theme(legend.position = "none") +
+    labs(y = "day of death", x = "strain")
+
+print(gg_ttd)
+```
+
+## classical tradeoff theory
+
+::: {.absolute width=542px height=395px left=0px top=151px}
+* $\rzero \propto$ transmissibility ($\textrm{time}^{-1}$) × infectious period
+* infectious period $\propto$ 1/virulence
+* transmissibility is an increasing, decelerating function of virulence
+* $\to$ $\rzero$, $r$ maximum at *intermediate* virulence
+:::
+
+![](pix/tradeoff3.png){.absolute width=698px height=528px left=573px top=121px}
+
+-->
+
+## tradeoff theory for plague
+
+![](pix/lenski_date.png){.absolute width=373px height=63px left=335px top=97px}
+![](pix/lenski_hdr.png){.absolute width=407px height=105px left=-73px top=80px}
+![](pix/lenski_text.png){.absolute width=575px height=549px left=-1px top=196px}
+
+## tradeoff theory doesn't work here!
+
+* classical **tradeoff theory**:  
+* assumes transmission occurs continuously
+* but fleas move/transmission occurs **at host death** (!)
+* → *Pla* depletion uniformly **lowers** $\rzero$  
+(and growth rate $r$)
+
+## then how can this work?
+
+* metapopulation dynamics
+   * for plague persistence [@KeelGill2000b]
+   * for virulence evolution (@bootsSmall1999, many others)
+* lower local (**within-patch**) $\rzero$ could be evolutionarily advantageous
+
+## the story as a cartoon
+
+![](pix/sidhu_graphical_abstract.png){.absolute width=1050px height=557px left=0px top=89px}
+
+## metapopulation mechanisms
+
+* **burnout** [@Pars+2024]: probability of local, stochastic disease extinction is highest at $\rzero \approx 2$
+* **density-dependent $\rzero$**: lower $\rzero$ → more surviving hosts → higher probability of local outbreak (?)
+
+## fizzle and burnout
+
+## persistence probability
+
+![](pix/parsons_burnout.png){.absolute width=778px height=711px left=0px top=59px}
+
+## models (all stochastic)
+
+* several iterations
+* discrete-time, one epidemic per time step ($\approx$ annual)
+    * analytical patch-occupancy models
+	* stochastic metapopulation model
+* discrete-time, one disease *generation* per step ($\approx$ 15 days)
+* continuous-time: Euler steps
+
+## model steps
+
+* **growth**: logistic growth of rat population
+* **host colonization**: rat movement among patches
+* **epidemic initiation**
+   * \# infected fleas per patch $\propto$ total epidemic size
+   * between-patch transmission depends on available rats and fleas
+   * (Poisson) infected fleas per patch spark new epidemic
+* **epidemic size**: epidemic either "fizzles" or follows standard dynamics; possibility of burnout
+   
+## model parameters
+
+* $\rzero$ (**within-patch**)  
+[captures effects of *Pla* depletion]
+* $\alpha$: between-patch transmission
+* $r$, $K$: host demography
+* (number of metapopulation patches)
+
+## single-strain model (burnout)
+
+![](pix/burnout_sum.png){.absolute width=775px height=598.3px left=0px top=89px}
+
+## single-strain model (colonization)
+
+![](pix/poisson_ext.png){.absolute width=775.2px height=599.8px left=0px top=89px}
+
+## two strains (pairwise invasion plots)
+
+![](pix/pip.png){.absolute width=1111px height=755px left=0px top=64px}
+
+## conclusions
+
+* metapopulation extinction occurs for intermediate $\rzero$
+* depends on colonization (and demographic?) parameters
+* a metapopulation explanation of virulence evolution seems plausible
+* multiple, potentially interacting mechanisms
+
+## caveats/next steps/open questions
+
+* effects of *Pla* depletion on alternative hosts: **sylvatic cycle**
+* parameter values very uncertain  
+(what do we really know about 6th century rat/flea ecology?)
+* calibrate metapopulation dynamics based on geography?
+
+![](pix/black_death_spread.png){.absolute width=459px height=307px left=125px top=372px}
+
+:::: {.absolute width=1035px height=52px left=-42px top=709px}
+::: {.tiny}
+Flappiefh - Own work from: Natural Earth ; @cesanaOriginEarlySpread2017
+::::
+:::
+
+## References {.refs}
+
+::: {#refs}
+:::
+
+## single-strain quasi-equilibrium
+
+![](pix/poisson_qepop.png){.absolute width=815px height=705px left=0px top=89px}
+
+## parameters
+
+```{r param-tab, echo =FALSE, output = 'asis'}
+dd <- read_csv("../parameters/parameters.csv") |>
+  filter(type == "param") |>
+  select(Symbol, Definition, Value, minval, maxval) |>
+  ## mutate(across(c(Value, minval, maxval), expSup)) |>
+  mutate(Value = ifelse(is.na(minval), Value,
+                        sprintf("%s - %s", minval, maxval))) |>
+  select(-c(minval, maxval))
+
+kbl(dd, format = "html", escape = FALSE) |>
+  column_spec(2, width = "5in")
+```
