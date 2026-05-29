@@ -68,7 +68,7 @@ runs <- discrete_run(beta_vec      = c(row$R01, row$R02),
                      platform      = "odin")
 plan(sequential)
 
-out <- dplyr::bind_cols(row, as.data.frame(as.list(sumfun_discrete(runs))))
+out <- dplyr::bind_cols(row, as.data.frame(as.list(sumfun_discrete(runs, strain2_delay = round(100 / dt)))))
 
 dir.create("outputs", showWarnings = FALSE)
 saveRDS(out, sprintf("outputs/%s_task_%06d.rds", base_fn, task_id))

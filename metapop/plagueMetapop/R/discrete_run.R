@@ -125,10 +125,12 @@ sum_run1 <- function(x, return_type = c("long", "wide")) {
 ##'   on the strain still being present (cell-level masking).
 ##' @param runs list of long-format tibbles from discrete_run(), or a single tibble
 ##' @param nsteps number of trailing steps used for quasi-equilibrium averages
+##' @param strain2_delay steps before strain 2 is seeded; zeros in I2 before
+##'   this step are not counted as extinction
 ##' @param which strains to summarise (currently ignored; both strains always returned)
 ##' @return named numeric vector of summary statistics
 ##' @export
-sumfun_discrete <- function(runs, nsteps = 100, which = c(1, 2)) {
+sumfun_discrete <- function(runs, nsteps = 100, strain2_delay = 0, which = c(1, 2)) {
   if (!is.list(runs) || inherits(runs, "data.frame")) runs <- list(runs)
   nsim <- length(runs)
 
@@ -142,13 +144,15 @@ sumfun_discrete <- function(runs, nsteps = 100, which = c(1, 2)) {
   nt     <- max(vapply(agg, nrow, integer(1L)))
   window <- seq(max(1L, nt - nsteps + 1L), nt)
 
-  ## row index of first step where total infected == 0 (NA if never extinct)
-  first_ext <- function(pop) {
-    idx <- which(pop == 0)
+  ## row index of first step where total infected == 0 (NA if never extinct).
+  ## `after`: ignore zeros at or before this step (used to skip pre-seeding
+  ## zeros for strain 2).
+  first_ext <- function(pop, steps = seq_along(pop), after = 0L) {
+    idx <- which(pop == 0 & steps > after)
     if (length(idx) == 0L) NA_integer_ else idx[1L]
   }
   ext1 <- sapply(agg, \(a) first_ext(a$I1_pop))
-  ext2 <- sapply(agg, \(a) first_ext(a$I2_pop))
+  ext2 <- sapply(agg, \(a) first_ext(a$I2_pop, steps = a$step, after = strain2_delay))
 
   ## cell-level QE mean: mask (window-row, run) cells at or after extinction,
   ## then average over all remaining cells (matching original sumfun logic)

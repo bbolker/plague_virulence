@@ -47,7 +47,7 @@ result_list <- lapply(seq_len(nrow(dd)), function(i) {
                        stop_cond     = stop_either_extinct(),
                        nsim          = n_sim,
                        platform      = "odin")
-  dplyr::bind_cols(dd[i, ], as.data.frame(as.list(sumfun_discrete(runs))))
+  dplyr::bind_cols(dd[i, ], as.data.frame(as.list(sumfun_discrete(runs, strain2_delay = round(100 / dt)))))
 })
 plan(sequential)
 
