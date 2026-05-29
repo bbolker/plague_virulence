@@ -98,23 +98,23 @@ Combined: `euler_onestrain[_mini|_batch2].rds`
 
 Multi-patch, two-strain PIP grid: varies R01 × R02 × K × alpha.  
 Strain 1 runs alone for `strain2_delay = round(100/dt)` steps before strain 2 is seeded.
-Full and mini runs stop when either strain goes extinct (`stop_either_extinct()`);
-mini2 stops only when both strains are simultaneously extinct (`stop_both_extinct`).
+Full and mini2 runs stop when both strains are simultaneously extinct (`stop_both_extinct`);
+mini stops when either strain goes extinct (`stop_either_extinct()`).
 
 The full run uses **META-Farm** (dynamic load balancing) rather than a SLURM array;
 the mini test still uses a plain SLURM array.
 
 | file | purpose |
 |------|---------|
-| `meta_euler_twostrain/job_script.sh` | META metajob SLURM script (32G, 1 CPU, 8 h) |
+| `meta_euler_twostrain/job_script.sh` | META metajob SLURM script (12G, 1 CPU, 2 h) |
 | `meta_euler_twostrain/single_case.sh` | per-case worker: sets `SLURM_ARRAY_TASK_ID=$ID`, runs R script |
-| `meta_euler_twostrain/make_table.sh` | generates `table.dat` (lines 1–14400) |
+| `meta_euler_twostrain/make_table.sh` | generates `table.dat` (lines 1–8100) |
 | `submit_euler_twostrain_mini.sh` | mini SLURM array (96 tasks, 4G, 4 CPUs) |
-| `submit_euler_twostrain_mini2.sh` | mini2 SLURM array (900 tasks, 32G, 1 CPU) |
+| `submit_euler_twostrain_mini2.sh` | mini2 SLURM array (900 tasks, 12G, 1 CPU) |
 | `euler_twostrain_run_array.R` | shared R script (`--mini` / `--mini2` flags) |
 | `euler_twostrain_combine.R` | combine outputs (`--mini` / `--mini2` flags, short: `-m` / `-2`) |
 
-Grid (full):  `R01 = R02 = seq(1.1, 5, by=0.1)` × `K = 10^seq(3, 5)` × `alpha = 10^seq(-5, -3)` — 14400 tasks  
+Grid (full):  `R01 = R02 = seq(1.1, 4, by=0.1)` × `K = 10^seq(3, 5)` × `alpha = 10^seq(-5, -3)` — 8100 tasks; uses `stop_both_extinct`  
 Grid (mini):  `R01 = R02 = seq(1.1, 3, by=0.5)` × `K = 10^seq(3, 5)` × `alpha = 10^seq(-5, -4)` — 96 tasks  
 Grid (mini2): `R01 = R02 = seq(1.1, 4, by=0.1)` × `K = 1e4` × `alpha = 10^-5.5` — 900 tasks; uses `stop_both_extinct`  
 Parameters (full/mini2): `nsim=200`, `dt=0.1`, `n_patch=200`  
