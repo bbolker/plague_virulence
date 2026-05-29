@@ -1,6 +1,8 @@
 ##' Run one or more two-strain n-patch simulations across platforms
 ##' @param beta_vec length-2 vector of per-capita transmission rates (one per strain)
 ##' @param K carrying capacity (scalar or vector of length n_patch)
+##' @param logistic_growth 1 (default) = standard logistic demography; 0 = linear restoring force
+##' @param reedfrost 1 = Reed-Frost mode (100\% removal per step); requires gamma == 1 and dt == 1
 ##' @param r host growth rate per disease generation (ditto)
 ##' @param n_patch number of patches
 ##' @param nt time steps
@@ -34,7 +36,9 @@
 ##' @export
 discrete_run <- function(beta_vec = c(1.5, 2.5),
                          K = 1e4,
-                         r = 0.125,
+                         logistic_growth = 1,
+                         reedfrost = 0,
+                         r = if (logistic_growth) 0.125 else 0.04,
                          n_patch = 100,
                          nt = 1000,
                          alpha = 1e-3,
@@ -52,9 +56,15 @@ discrete_run <- function(beta_vec = c(1.5, 2.5),
   platform <- match.arg(platform)
   if ((!is.null(chunk) || !is.null(stop_cond)) && platform != "odin")
     stop("chunk and stop_cond are only supported for platform = 'odin'")
+  if (reedfrost == 1 && !(all(gamma == 1) && dt == 1))
+    stop("reedfrost = 1 requires gamma == 1 and dt == 1")
 
   args <- tibble::lst(beta_vec, r, K, n_patch, nt, I_init, alpha, strain2_delay,
                       gamma, dt, def_file)
+  if (platform == "odin" && def_file == "euler_odin_def.R") {
+    args$logistic_growth <- logistic_growth
+    args$reedfrost        <- reedfrost
+  }
 
   makefun  <- get(sprintf("make_simulator_%s", platform))
   runfun   <- get(sprintf("run_simulator_%s", platform))
