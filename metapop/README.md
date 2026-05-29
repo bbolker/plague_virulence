@@ -26,6 +26,10 @@ In this case, the main tradeoff driver is going to be burnout probabilities, and
    * is synchronizing infections (within and across patches) by disease generation OK/reasonable?
 * a purely deterministic, extinction-free metapopulation model where every patch gets continuous-time FOI from within and between patches (can this work at all?)
 
+## deterministic metapopulation model
+
+What will happen in a deterministic metapopulation model? All patches are coupled, but not perfectly. But (???) we need some kind of asynchrony/time scale separation/prevention of patch coinfection in order to make anything different from the homogeneous model ... ? (among-patch coupling will eventually synchronize everything
+
 #### More biology
 
 We should look at [Keeling and Gilligan metapopulation plague](https://pubmed.ncbi.nlm.nih.gov/11057668/)
