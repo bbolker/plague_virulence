@@ -176,6 +176,9 @@ print(gg_ttd)
 
 * start with single-species metapopulations
 * find parameter values where decreasing $R_0$ **increases** patch occupancy/persistence
+* $\approx$ parameter values favoured by evolution?
+
+## 
 
 * several iterations
 * discrete-time, one epidemic per time step ($\approx$ annual)

@@ -1,7 +1,10 @@
 ## To do
 
-* direct solution of deterministic metapop model???
-* 
+* direct solution of deterministic metapop model??? does it collapse?
+* plot PIPs
+* finish equalN plot
+* 3d: ?? (too hard)
+
 * refactor twostrain delay to be part of discrete_run (chunked run), rather than part of model definition
 
 * trouble-shoot PIP runs
