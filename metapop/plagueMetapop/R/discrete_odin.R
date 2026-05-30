@@ -67,19 +67,30 @@ make_simulator_odin <- function(
 
   S_ini_vec <- K_vec - rowSums(I_ini_mat)
 
-  args <- tibble::lst(beta    = beta_vec,
-                      r       = r_vec,
-                      K       = K_vec,
-                      I_ini   = I_ini_mat,
-                      S_ini   = S_ini_vec,
-                      I2_ini  = rep(0, n_patch),
+  def_fn <- attr(gen_local, "def_filename")
+
+  ## Base args shared by all models
+  args <- tibble::lst(beta  = beta_vec,
+                      r     = r_vec,
+                      K     = K_vec,
+                      I_ini = I_ini_mat,
+                      S_ini = S_ini_vec,
                       alpha,
-                      strain2_delay,
                       n_patch)
 
-  if (grepl("^euler_", attr(gen_local, "def_filename"))) {
+  if (def_fn == "ode_odin_def.R") {
+    ## ODE model: no step-based seeding; rates per unit time; no dt or reedfrost
     args <- c(args, tibble::lst(gamma = rep(gamma, length.out = n_strain),
-                                dt, logistic_growth, reedfrost))
+                                logistic_growth))
+  } else {
+    ## Discrete and Euler models: step-based strain-2 seeding via I2_ini/strain2_delay
+    args$I2_ini        <- rep(0, n_patch)
+    args$strain2_delay <- strain2_delay
+    if (grepl("^euler_", def_fn)) {
+      args <- c(args, tibble::lst(gamma = rep(gamma, length.out = n_strain), dt))
+      if (def_fn == "euler_odin_def.R")
+        args <- c(args, tibble::lst(logistic_growth, reedfrost))
+    }
   }
 
   mod <- do.call(gen_local$new, args)
@@ -196,6 +207,8 @@ stop_both_extinct <- function(row) {
 ##' @export
 conv_odin <- function(x, format = c("long", "wide")) {
   format <- match.arg(format)
+  ## ODE models label the time column 't'; normalise to 'step' for uniform output
+  colnames(x)[colnames(x) == "t"] <- "step"
   ## convert S[i] -> S_i, I[i,j] -> Ij_i
   cn <- colnames(x)
   cn <- cn |>

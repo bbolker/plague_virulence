@@ -56,14 +56,18 @@ discrete_run <- function(beta_vec = c(1.5, 2.5),
   platform <- match.arg(platform)
   if ((!is.null(chunk) || !is.null(stop_cond)) && platform != "odin")
     stop("chunk and stop_cond are only supported for platform = 'odin'")
+  if (!is.null(stop_cond) && platform == "odin" && def_file == "ode_odin_def.R")
+    stop("stop_cond is not supported for the deterministic ODE model (ode_odin_def.R)")
   if (reedfrost == 1 && !(all(gamma == 1) && dt == 1))
     stop("reedfrost = 1 requires gamma == 1 and dt == 1")
 
   args <- tibble::lst(beta_vec, r, K, n_patch, nt, I_init, alpha, strain2_delay,
                       gamma, dt, def_file)
-  if (platform == "odin" && def_file == "euler_odin_def.R") {
-    args$logistic_growth <- logistic_growth
-    args$reedfrost        <- reedfrost
+  if (platform == "odin") {
+    if (def_file %in% c("euler_odin_def.R", "ode_odin_def.R"))
+      args$logistic_growth <- logistic_growth
+    if (def_file == "euler_odin_def.R")
+      args$reedfrost <- reedfrost
   }
 
   makefun  <- get(sprintf("make_simulator_%s", platform))
