@@ -156,13 +156,26 @@ print(gg_ttd)
 * **burnout** [@Pars+2024]: probability of local, stochastic disease extinction is highest at $\rzero \approx 2$
 * **density-dependent $\rzero$**: lower $\rzero$ → more surviving hosts → higher probability of local outbreak (?)
 
-## fizzle and burnout
-
 ## persistence probability
 
 ![](pix/parsons_burnout.png){.absolute width=778px height=711px left=0px top=59px}
 
-## models (all stochastic)
+##  modeling metapopulations?
+
+* discrete patches
+* patch state
+    * patch occupancy: $\{p_{\varnothing}, p_1, p_2, p_{12},
+    N_{\varnothing}, N_1, N_2, N_{12}\}$
+    * multilevel: $S_{i}$, $I_{ij}$ $\in {\mathbb Z}$ 
+* time
+    * discrete ($\Delta t$ = 1 epidemic)
+    * discrete ($\Delta t$ = 1 disease generation)
+    * continuous
+
+## strategy
+
+* start with single-species metapopulations
+* find parameter values where decreasing $R_0$ **increases** patch occupancy/persistence
 
 * several iterations
 * discrete-time, one epidemic per time step ($\approx$ annual)
