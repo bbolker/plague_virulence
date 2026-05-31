@@ -73,3 +73,5 @@ out <- dplyr::bind_cols(row, as.data.frame(as.list(sumfun_discrete(runs, strain2
 
 dir.create("outputs", showWarnings = FALSE)
 saveRDS(out, sprintf("outputs/%s_task_%06d.rds", base_fn, task_id))
+if (task_id == 1L)
+  saveRDS(runs, sprintf("outputs/%s_runs_task_%06d.rds", base_fn, task_id))
