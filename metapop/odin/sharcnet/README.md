@@ -117,10 +117,10 @@ the mini test still uses a plain SLURM array.
 Grid (full):  `R01 = R02 = seq(1.1, 4, by=0.1)` × `K = 10^seq(3, 5)` × `alpha = 10^seq(-5, -3)` — 8100 tasks; uses `stop_both_extinct`  
 Grid (mini):  `R01 = R02 = seq(1.1, 3, by=0.5)` × `K = 10^seq(3, 5)` × `alpha = 10^seq(-5, -4)` — 96 tasks  
 Grid (mini2): `R01 = R02 = seq(1.1, 4, by=0.1)` × `K = 1e4` × `alpha = 10^-5.5` — 900 tasks; uses `stop_both_extinct`  
-Parameters (full/mini2): `nsim=200`, `dt=0.1`, `n_patch=200`  
-Parameters (mini): `nsim=50`, `dt=0.2`, `n_patch=50`
+Parameters (full/mini2): `nsim=200`, `dt=0.1`, `n_patch=200`; full run: `nt=500/dt=5000` steps; mini2: `nt=200/dt=2000` steps  
+Parameters (mini): `nsim=50`, `dt=0.2`, `n_patch=50`; `nt=200/dt=1000` steps
 
-**Wall-time derivation (from mini sacct, job 15051381):** Mini tasks took ~6.5 s elapsed with 4 CPUs → 0.52 CPU-s/sim. Full run: 4× more patches, 2× more steps, 200 sims on 1 CPU → ~4.2 CPU-s/sim × 200 = ~840 s ≈ 14 min/task. With 14.4 tasks/metajob → ~3.4 h worst case; 8 h provides ~2.4× buffer.
+**Wall-time derivation:** Mini2 sacct: ~3 min/task (n_patch=200, nsim=200, nt=2000). Full run (nt=5000, 2.5× more steps): ~7.5 min/task × 14.4 tasks/metajob ≈ 1.8 h worst case; 6 h provides ~3.3× buffer.
 
 **Mini (SLURM array):**
 ```bash
