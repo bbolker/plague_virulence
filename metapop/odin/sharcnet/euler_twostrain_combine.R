@@ -13,10 +13,14 @@ base_fn <- "euler_twostrain"
 if (opt$mini)  base_fn <- paste0(base_fn, "_mini")
 if (opt$mini2) base_fn <- paste0(base_fn, "_mini2")
 
+
+cat("starting\n")
 pattern <- sprintf("^%s_task_[0-9]+\\.rds$", base_fn)
 files <- sort(list.files("outputs", pattern = pattern, full.names = TRUE))
 if (length(files) == 0) stop("no task output files found in outputs/ matching ", pattern)
 
+cat(length(files), "files found\n")
 out <- bind_rows(lapply(files, readRDS))
+cat("saving ...\n")
 saveRDS(out, paste0(base_fn, ".rds"))
 cat("combined", nrow(out), "rows from", length(files), "files\n")
