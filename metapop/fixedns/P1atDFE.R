@@ -1,11 +1,11 @@
 library(burnout)
 
-getDFE<-function(c0=0.01, ## was: 0.5
+getDFE <- function(c0=0.01, ## was: 0.5
                  S=1e6, ## smaller population makes the decreasing range larger
                  R0=3,
                  D=1,
-                 r=0.5
-) {
+                 r=0.2   ## was: 0.5
+                 ) {
   z=final_size(R0)
   N_DFE=c0*S/(1-(1+r)*(1-z*D)*(1-c0))
   return(N_DFE)}
@@ -30,8 +30,6 @@ for (j in 2:length(R0vec)) {
   grad_R0[,j] <- (persist[,j]-persist[,j-1])/dR0
 }
 
-
-
 par(las=1, bty = "l")
   image(epsvec, R0vec, grad_R0>0, col = c(adjustcolor("blue", alpha = 0.3), "#FFFFFF"),
       main = "P1 at DFE")
@@ -43,13 +41,26 @@ contour(epsvec, R0vec, log10(persist),
 dd <- data.frame(eps = rep(epsvec, length(R0vec)),
                  R0 = rep(R0vec, each = length(epsvec)), grad_R0 = c(grad_R0),
                  persist = c(persist))
+dd <- dplyr::filter(dd, R0 > 1.1)
 
 ## hack only the part we want of the contour
 cc <- contourLines(epsvec, R0vec, grad_R0, level = 0)
-cc <- do.call(data.frame, cc[[1]][c("x", "y")])[-(1:138),]
+if (FALSE) {
+  xmax <- max(sapply(cc, \(d) max(d$x)))
+  ymax <- max(sapply(cc, \(d) max(d$y)))
+  plot(cc[[1]]$x, cc[[1]]$y, type = "n",
+       xlim = c(0, xmax), ylim = c(0, ymax))
+  for (i in 1:length(cc)) {
+    points(cc[[i]]$x, cc[[i]]$y, col = i)
+  }
+  points(cc[[2]]$x, cc[[2]]$y, pch = 16)
+}
+
+## cc <- do.call(data.frame, cc[[1]][c("x", "y")])[-(1:138),]
+cc <- do.call(data.frame, cc[[2]][c("x", "y")])
 
 
-library(ggplot2); theme_set(theme_bw(base_size=16))
+library(ggplot2); theme_set(theme_bw(base_size=20))
 ggplot(dd, aes(eps, R0)) +
   geom_raster(aes(fill = persist)) +
   scale_fill_viridis_c(name = "equilibrium\nmetapop\noccupancy") +

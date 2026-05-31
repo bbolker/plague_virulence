@@ -26,15 +26,17 @@ theme_set(theme_bw())
 ## (will free scales on the fill guide work? maybe not worth it?)
 ## Hmm, this doesn't seem easy: https://stackoverflow.com/q/45109293/190277
 
-make_raster <- function(fill_var, fill_label) {
-  ggplot(dat, aes(R0, log10K, fill = .data[[fill_var]])) +
+make_raster <- function(fill_var, fill_label, title = "") {
+  ggplot(dat, aes(log10K, R0, fill = .data[[fill_var]])) +
     geom_raster() +
-    scale_fill_viridis_c(trans = "log10", na.value = "grey80",
+    scale_fill_viridis_c(trans = "log10",
+                         na.value = "#44015460",
+                         ## na.value = "grey80",
                          name = fill_label) +
-    scale_x_continuous(expand = c(0, 0)) +
-    scale_y_continuous(expand = c(0, 0), breaks = 3:6,
+    scale_y_continuous(expand = c(0, 0)) +
+    scale_x_continuous(expand = c(0, 0), breaks = 3:6,
                        labels = scales::label_math(10^.x)) +
-    labs(x = expression(R[0]), y = "K")
+    labs(y = expression(R[0]), x = "K", title = title)
 }
 
 p1 <- make_raster("ext_prob.I1",      "extinction\nprobability")

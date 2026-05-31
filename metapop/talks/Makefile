@@ -6,7 +6,7 @@ csee_talk.html: csee_talk.qmd
 
 ## retrieve revealjs-edited version
 switch:
-	mv -b ~/Downloads/csee_talk.qmd .
+	mv -b ~/Downloads/ssc_talk.qmd .
 
 quarto_install:
 	quarto add emilhvitfeldt/quarto-revealjs-editable

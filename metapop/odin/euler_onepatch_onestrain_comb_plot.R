@@ -30,12 +30,16 @@ theme_set(theme_bw(base_size=16))
 
 gg0 <- ggplot(dat, aes(log10K, R0, fill = ext_prob.I1)) +
   geom_raster() +
-  scale_fill_viridis_c(trans = "log10", na.value = "grey80",
-                       name  = "extinction probability") +
+  scale_fill_viridis_c(trans = "log10",
+                       name  = "extinction probability",
+                       ## lowest value on viridis palette, alpha = 60/FF
+                       na.value = "#44015460") +
   scale_y_continuous(expand = c(0, 0)) +
   scale_x_continuous(expand = c(0, 0), breaks = 3:6,
                      labels = scales::label_math(10^.x)) + 
-  labs(y = expression(R[0]), x = "K") +
+  labs(y = expression(R[0]), x = "K",
+       title = expression(list(epsilon*" (linear)"==0.04,
+                               r*" (logistic)"==0.125))) +
   facet_grid(`time-step` ~ demography, labeller = label_both) +
   zmargin
 

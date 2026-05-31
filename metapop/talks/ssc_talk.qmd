@@ -6,10 +6,10 @@ format:
     embed-resources: true
     slide-number: true
     preview-links: auto
-# revealjs-plugins:
-#     - editable
-# filters:
-#    - editable
+revealjs-plugins:
+    - editable
+filters:
+   - editable
 csl: reflist2.csl
 nocite: |
   @Lens1988
@@ -128,13 +128,19 @@ print(gg_ttd)
 
 ## tradeoff theory for plague
 
-![](pix/lenski_date.png){.absolute width=373px height=63px left=335px top=97px}
-![](pix/lenski_hdr.png){.absolute width=407px height=105px left=-73px top=80px}
-![](pix/lenski_text.png){.absolute width=575px height=549px left=-1px top=196px}
+::: {.absolute width=598.8px height=402.6px left=-66px top=105px}
+* $\rzero \propto$ transmissibility ($\textrm{time}^{-1}$) × infectious period
+* infectious period $\propto$ 1/virulence
+* **if** transmissibility is an increasing, decelerating function of virulence
+* $\to$ $\rzero$, $r$ maximum at *intermediate* virulence
+:::
+
+![](pix/lenski_date.png){.absolute width=233px height=50px left=568.4px top=148px}
+![](pix/lenski_hdr.png){.absolute width=345.5px height=105.5px left=696.6px top=62.1px}
+![](pix/lenski_text.png){.absolute width=386.1px height=406.8px left=630.6px top=218.7px}
 
 ## tradeoff theory doesn't work here!
 
-* classical **tradeoff theory**:  
 * assumes transmission occurs continuously
 * but fleas move/transmission occurs **at host death** (!)
 * → *Pla* depletion uniformly **lowers** $\rzero$  
@@ -162,41 +168,36 @@ print(gg_ttd)
 
 ##  modeling metapopulations?
 
-* discrete patches
-* patch state
+* patch state?
     * patch occupancy: $\{p_{\varnothing}, p_1, p_2, p_{12},
-    N_{\varnothing}, N_1, N_2, N_{12}\}$
-    * multilevel: $S_{i}$, $I_{ij}$ $\in {\mathbb Z}$ 
+    N_{\varnothing}, N_1, N_2, N_{12}\}$ **or**
+    * multilevel: $S_{i}$, $I_{ij}$ $\in {\mathbb Z}$  ?
 * time
-    * discrete ($\Delta t$ = 1 epidemic)
-    * discrete ($\Delta t$ = 1 disease generation)
-    * continuous
+    * discrete ($\Delta t$ = 1 epidemic) **or**
+    * discrete ($\Delta t$ = 1 disease generation) **or**
+    * continuous ?
+* demography: linear **or** logistic?
 
 ## strategy
 
-* start with single-species metapopulations
-* find parameter values where decreasing $R_0$ **increases** patch occupancy/persistence
-* $\approx$ parameter values favoured by evolution?
+* effects of demography, time scale on single-species, single-patch outcomes
+* effects of $R_0$ on patch occupancy in metapopulations
+    * parameter regimes where decreasing $R_0$ **increases** patch occupancy/persistence
+* is lower $R_0$ selected in these regimes?
+* how do patch carrying capacity and connectivity affect these results?
 
-## 
+## effects of demography and timestep
 
-* several iterations
-* discrete-time, one epidemic per time step ($\approx$ annual)
-    * analytical patch-occupancy models
-	* stochastic metapopulation model
-* discrete-time, one disease *generation* per step ($\approx$ 15 days)
-* continuous-time: Euler steps
+![](pix/euler_onepatch_onestrain_comb.png)
 
-## model steps
+## logistic/continuous
 
-* **growth**: logistic growth of rat population
-* **host colonization**: rat movement among patches
-* **epidemic initiation**
-   * \# infected fleas per patch $\propto$ total epidemic size
-   * between-patch transmission depends on available rats and fleas
-   * (Poisson) infected fleas per patch spark new epidemic
-* **epidemic size**: epidemic either "fizzles" or follows standard dynamics; possibility of burnout
-   
+![](pix/euler_onepatch_onestrain_extinct_logistic_continuous.png)
+
+## one-species metapopulation results
+
+![](pix/analytic_MP_occ.png)
+
 ## model parameters
 
 * $\rzero$ (**within-patch**)  

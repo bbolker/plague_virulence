@@ -8,6 +8,7 @@ vim_session:
 	bash -ic "vmt"
 
 R=R CMD BATCH --vanilla
+OUTDIR=sharcnet/outputs
 ######################################################################
 
 compare_platforms.Rout: compare_platforms.R
@@ -22,10 +23,13 @@ discrete_onepatch_twostrain_extinct.rds: discrete_onepatch_twostrain_extinct_run
 euler_onepatch_onestrain_extinct.rds: euler_onepatch_onestrain_extinct_run.R
 	$(R) $<
 
-euler_onepatch_onestrain_extinct_%.png: euler_onepatch_onestrain_extinct_plot.R sharcnet/outputs/euler_onepatch_onestrain_extinct_%.rds
+euler_onepatch_onestrain_extinct_%.png: euler_onepatch_onestrain_extinct_plot.R $(OUTDIR)/euler_onepatch_onestrain_extinct_%.rds
 	Rscript $< --combo $*
 
-euler_onestrain_plot.png: euler_onestrain_plot.R sharcnet/outputs/euler_onestrain.rds
+euler_onepatch_onestrain_extinct_comb.png: euler_onepatch_onestrain_comb_plot.R $(OUTDIR)/euler_onepatch_onestrain_extinct_logistic_continuous.rds
+	Rscript $< --combo $*
+
+euler_onestrain_plot.png: euler_onestrain_plot.R $(OUTDIR)/euler_onestrain.rds
 	Rscript $< --output $@
 
 euler_onepatch_onestrain_example.pdf: euler_onepatch_onestrain_example.R
