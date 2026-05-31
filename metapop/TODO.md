@@ -1,42 +1,32 @@
 ## To do
 
 * direct solution of deterministic metapop model??? does it collapse?
-* plot PIPs
-* finish equalN plot
-* 3d: ?? (too hard)
-
-* refactor twostrain delay to be part of discrete_run (chunked run), rather than part of model definition
-
-* trouble-shoot PIP runs
-   * retrieve two-strain mini example.
-   * strain 2 is always going extinct in the mini-example. Is that expected?
-
+* PIP runs for longer than 100+100 generations?
 * odin ODE version; quantify trough depth vs R0 for leaky-bucket vs logistic demography
 * implement non-extinction variant, compare with extinction-allowed (strength of burnout mechanism)
 * implement power-law R0(N) ?
+* think about an invasibility expression: if we know patch occupancy and S/I distributions of resident, can we calculate invasion, or do extinction dynamics etc. make expectations of instantaneous growth rate irrelevant?
+* sensitivity to $r$?
 
+### code
+
+* refactor two-strain delay to be part of discrete_run (chunked run), rather than part of model definition
 * prototype and benchmark hybrid deterministic (above threshold)/stochastic (below threshold) model
 * create dedicated single-strain model (doesn't help that much)
-
+* instrument runs to record r(t), foi(t), etc. (to understand invasion criteria etc.)
+* store parameter values as attributes
+* makestuff/shellpipes?
+   * sort out working-directory stuff (package??)
+   * interference between shellpipes/makestuff and command-line args?
+* profiling macpan2 runner
+* lay out/test mechanisms: dens-indep R0, fixed N, extinction-independent ... ?
+* better stochastic (+/-) dynamics (cleaner, avoid clamping in macpan2)
 
 Note effects of [1] generation interval/infectious period distribution; [2] demography (SIR w/ constant (leaky-bucket) vital dynamics vs SIRS vs SID w/ logistic growth) [3] ??
 
   Chose r=0.125 on the basis of intrinsic rat pop growth rates of 3-5/year; generation time of plague 10-20 days; `3/365*15 ~ 0.125`.
 
   Linear growth rate would be equal to death rate, in disease generation times (== epsilon); death rate is about 1 (lifespan == 1 year), so approx 1/3 of r == 0.04 (maybe less, 15 is on the high end)
-
-* instrument runs to record r(t), foi(t), etc. (to understand invasion criteria etc.)
-* store parameter values as attributes
-* makestuff/shellpipes?
-   * sort out working-directory stuff (package??)
-   * interference between shellpipes/makestuff and command-line args?
-* summary info:
-    * n occupied, quasi-eq, etc.
-    * YZ PIP invasion characteristics
-* profiling macpan2 runner
-* lay out/test mechanisms: dens-indep R0, fixed N, extinction-independent ... ?
-* invasibility equations
-* better stochastic (+/-) dynamics (cleaner, avoid clamping in macpan2)
 
 ## old
 

@@ -23,6 +23,14 @@ library(colorspace) ## lighten()
 library(kableExtra)
 ```
 
+<!--
+
+global centering of figures in a Quarto/revealjs doc is ugly, see e.g.
+https://github.com/quarto-dev/quarto-cli/issues/
+I tried the lua-filter approach, but that messed up the figures that were using
+absolute positioning ...
+-->
+
 <!-- .refs is style for reference page (small text) -->
 <style>
 .refs {
@@ -179,11 +187,18 @@ print(gg_ttd)
 
 ## strategy
 
-* effects of demography, time scale on single-species, single-patch outcomes
-* effects of $R_0$ on patch occupancy in metapopulations
-    * parameter regimes where decreasing $R_0$ **increases** patch occupancy/persistence
-* is lower $R_0$ selected in these regimes?
+* explore effects of demography, time scale (1-species, 1-patch)
+* explore effects of $R_0$ on patch occupancy, prevalence in metapopulations
+* explore invasion dynamics in two-species model
 * how do patch carrying capacity and connectivity affect these results?
+
+## the model
+
+* discrete-time ($\Delta t$ = disease gen/10)
+* within-patch infection with hazard $R0_{ij} \times I_{ij}$ $\to$ multinomial outcome
+* binomial recovery with hazard $\gamma$
+* logistic (Poisson) growth of host population in each patch
+* Poisson colonization of infectives at rate $\alpha \sum I_{i.}$
 
 ## effects of demography and timestep
 
@@ -232,6 +247,13 @@ print(gg_ttd)
 Flappiefh - Own work from: Natural Earth ; @cesanaOriginEarlySpread2017
 ::::
 :::
+
+## QR code
+
+```{r qrcode, out.width = "90%"}
+library("qrcode")
+plot(qr_code("https://www.math.mcmaster.ca/bolker/misc/ssc_plaguetalk_2026.html"))
+```
 
 ## References {.refs}
 
