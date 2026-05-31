@@ -1,6 +1,9 @@
 library(dplyr)
 library(ggplot2); theme_set(theme_bw())
 
+input_dir <- here::here("metapop/odin/sharcnet/outputs")
+input_fn <- "euler_twostrain.rds"
+
 invade_start <- 100
 max_duration <- 200
 
@@ -15,7 +18,7 @@ hybrid_metric_fun <- function(extinction_rate,
   )
 }
 
-dd <- readRDS("sharcnet/outputs/euler_twostrain_mini2.rds") |>
+dd <- readRDS(file.path(input_dir, input_fn)) |>
   mutate(time_after_invasion = mean_ext_time.I2 - invade_start,
          hybrid_metric = hybrid_metric_fun(ext_prob.I2,
                                        time_after_invasion))
@@ -82,3 +85,4 @@ ggplot(dd, aes(R01, R02, fill = ext_prob.I2)) +
   scale_x_continuous(expand = c(0,0))
   
 plot_fun(dd, facet = TRUE)
+ggsave("euler_twostrain_pip.png")

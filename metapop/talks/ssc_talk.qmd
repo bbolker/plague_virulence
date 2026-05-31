@@ -206,17 +206,13 @@ print(gg_ttd)
 * $r$, $K$: host demography
 * (number of metapopulation patches)
 
-## single-strain model (burnout)
+## single-strain metapopulation results
 
-![](pix/burnout_sum.png){.absolute width=775px height=598.3px left=0px top=89px}
-
-## single-strain model (colonization)
-
-![](pix/poisson_ext.png){.absolute width=775.2px height=599.8px left=0px top=89px}
+![](pix/euler_onestrain_ssc.png)
 
 ## two strains (pairwise invasion plots)
 
-![](pix/pip.png){.absolute width=1111px height=755px left=0px top=64px}
+![](pix/euler_twostrain_pip.png)
 
 ## conclusions
 
@@ -245,15 +241,11 @@ Flappiefh - Own work from: Natural Earth ; @cesanaOriginEarlySpread2017
 ::: {#refs}
 :::
 
-## single-strain quasi-equilibrium
-
-![](pix/poisson_qepop.png){.absolute width=815px height=705px left=0px top=89px}
-
 ## parameters
 
 ```{r param-tab, echo =FALSE, output = 'asis'}
 dd <- read_csv("../parameters/parameters.csv") |>
-  filter(type == "param") |>
+  filter(type == "param", !grepl("nu|rho|c|epsilon", Symbol)) |>
   select(Symbol, Definition, Value, minval, maxval) |>
   ## mutate(across(c(Value, minval, maxval), expSup)) |>
   mutate(Value = ifelse(is.na(minval), Value,

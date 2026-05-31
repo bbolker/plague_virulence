@@ -82,3 +82,69 @@ for (ext in c("pdf", "png")) {
          width = opt$width, height = opt$height)
 }
 
+## part 2 (hack for SSC talk)
+
+facs <- c("ext_prob.I1", "qe_infpatch.I1", "qe_pop_S.I1")
+dd_long2 <- dd_long |>
+  dplyr::filter(metric %in% facs, log10alpha %in% c(-5, -4, -3),
+                log10K %in% c(3, 4, 5, 6)) |>
+  dplyr::mutate(value = case_when(metric == "qe_infpatch.I1" ~ value/200,
+                                  metric == "qe_pop_S.I1" ~ value/(200*10^log10K),
+                                  TRUE ~ value)) |>
+  dplyr::mutate(across(metric, ~factor(., levels = facs,
+                                       labels = c("Metapop\nextinction\nprobability",
+                                                  "Quasi-equilibrium\npatch occupancy",
+                                                  "Quasi-equilibrium\nsusceptible population\n(proportion)"))))
+
+
+am_names <- c(
+  `0` = "delta^{15}*N-NO[3]^-{}",
+  `1` = "sqrt(x,y)"
+)
+
+# use `scriptstyle` to reduce the size of the parentheses &
+# `bgroup` to make adding `)` possible 
+cyl_names <- c(
+  `4` = 'scriptstyle(bgroup("", a, ")"))~T~-~5*"%"',
+  `6` = 'scriptstyle(bgroup("", b, ")"))~T~+~10~degree*C',
+  `8` = 'scriptstyle(bgroup("", c, ")"))~T~+~30*"%"'
+)
+
+log10alpha_labeller <- function(labels) {
+  list(lapply(labels[[1]], function(val) {
+    parse(text = sprintf("alpha == 10^{%s}", val))[[1]]
+  }))
+}
+
+log10alpha_labeller <- function(labels) {
+  labels[[1]] <- sprintf("alpha == 10^{%s}", labels[[1]])
+  label_parsed(labels)
+}
+
+
+log10alpha_labeller <- function(labels) {
+  list(lapply(sprintf("alpha == 10^{%s}", labels[[1]]), function(x) parse(text = x)[[1]]))
+}
+class(log10alpha_labeller) <- c("function", "labeller")
+
+brkvec <- 3:6
+hpal2 <- scale_color_continuous_sequential(
+  l1 = 50, l2 = 70, h1 = 0, h2 = 60, c1 = 80, c2 = 30,
+  name = expression(K),
+  breaks = brkvec,
+  labels = lapply(sprintf("10^{%d}", brkvec), function(x) parse(text = x)[[1]]),
+  guide = guide_legend())
+
+theme_set(theme_bw(base_size=18))
+gg2 <- ggplot(dd_long2, aes(R0, value, colour = log10K, group = log10K_f)) +
+  geom_line() +
+  geom_point(size = 0.8) +
+  facet_grid(metric ~ log10alpha, scale = "free",
+             labeller = labeller(log10alpha = log10alpha_labeller,
+                                 metric = label_value)) +
+  hpal2 +
+  labs(x = expression(R[0]), y = "", title = "r=0.125, npatch=200") +
+  zmargin +
+  theme(strip.text.y = element_text(angle = 0)) 
+
+ggsave(gg2, file = "euler_onestrain_ssc.png")
