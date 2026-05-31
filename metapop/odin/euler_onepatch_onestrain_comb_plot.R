@@ -44,9 +44,10 @@ gg0 <- ggplot(dat, aes(log10K, R0, fill = ext_prob.I1)) +
   zmargin
 
 dd_ann <- tibble::tibble(demography = "linear", `time-step` = "continuous",
-                         log10K = 5.5, R0 = 3.5,
+                         log10K = 5, R0 = 3.5,
                          ext_prob.I1 = NA,
-                         label = expression("extprob" < 10^{-3}))
+                         ## label = expression(atop("extinction", "probability") < 10^{-3}))
+                         label = expression("extinction\Nprobability") < 10^{-3}))
 
 gg0 + geom_label(data = dd_ann, aes(label = label),
                  fill = "white")

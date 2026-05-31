@@ -5,10 +5,10 @@ statevar,\(q_{ij}\),proportions of strain \(i\) in patch \(j\),,,,,
 param,\(\nu\),scaling constant: infected fleas per host death,,5,,,
 param,\(\rho\),infectious propagules per live host (\(\approx\) flea capacity),,3,,,
 param,\(r\),host population growth rate,,0.125,,,
-param,\(K\),host patch carrying capacity,,1.00E+06,1.00E+02,1.00E+08, same for all patches
+param,\(K\),host patch carrying capacity,,\(10^6\),\(10^3\),\(10^6\), same for all patches
 param,\(c\),host emigration probability,,0.2,,,
 param,\(\mathcal{R}_{0}\),within-patch reproductive number of strain \(i\),,2,1.2,5,
 param,\(D\),infection fatality proportion,,1,,, assumed = 1
-param,\(\alpha\),transmission efficiency (successful infections) per propagule,,5.00E-05,5.00E-05,1.00E-04,
-param,\(n\),number of patches  ,,100,,,
+param,\(\alpha\),transmission efficiency (successful infections) per case,,\(5\times 10^{-5}\),\(10^{-6}\),\(10^{-3}\)
+param,\(n\),number of patches  ,,200,,,
 param,\(\epsilon\),parasite/host generation time,,1.00E-02,,,

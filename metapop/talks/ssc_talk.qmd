@@ -6,10 +6,10 @@ format:
     embed-resources: true
     slide-number: true
     preview-links: auto
-revealjs-plugins:
-    - editable
-filters:
-   - editable
+# revealjs-plugins:
+#     - editable
+# filters:
+#    - editable
 csl: reflist2.csl
 nocite: |
   @Lens1988
@@ -132,7 +132,7 @@ print(gg_ttd)
 * $\rzero \propto$ transmissibility ($\textrm{time}^{-1}$) × infectious period
 * infectious period $\propto$ 1/virulence
 * **if** transmissibility is an increasing, decelerating function of virulence
-* $\to$ $\rzero$, $r$ maximum at *intermediate* virulence
+* $\to$ $\rzero$, $r$ (growth rate) maximum at *intermediate* virulence
 :::
 
 ![](pix/lenski_date.png){.absolute width=233px height=50px left=568.4px top=148px}
@@ -143,8 +143,7 @@ print(gg_ttd)
 
 * assumes transmission occurs continuously
 * but fleas move/transmission occurs **at host death** (!)
-* → *Pla* depletion uniformly **lowers** $\rzero$  
-(and growth rate $r$)
+* → *Pla* depletion uniformly **lowers** $\rzero$ and $r$
 
 ## then how can this work?
 
@@ -160,7 +159,7 @@ print(gg_ttd)
 ## metapopulation mechanisms
 
 * **burnout** [@Pars+2024]: probability of local, stochastic disease extinction is highest at $\rzero \approx 2$
-* **density-dependent $\rzero$**: lower $\rzero$ → more surviving hosts → higher probability of local outbreak (?)
+* **deterministic mechanisms**: intermediate $\rzero$ → host population size → optimal probability of local outbreaks, more colonization potential?
 
 ## persistence probability
 
@@ -188,15 +187,15 @@ print(gg_ttd)
 
 ## effects of demography and timestep
 
-![](pix/euler_onepatch_onestrain_comb.png)
+![](pix/euler_onepatch_onestrain_comb.png){fig-align="center"}
 
 ## logistic/continuous
 
-![](pix/euler_onepatch_onestrain_extinct_logistic_continuous.png)
+![](pix/euler_onepatch_onestrain_extinct_logistic_continuous.png){fig-align="center"}
 
 ## one-species metapopulation results
 
-![](pix/analytic_MP_occ.png)
+![](pix/analytic_MP_occ.png){fig-align="center"}
 
 ## model parameters
 
@@ -208,25 +207,23 @@ print(gg_ttd)
 
 ## single-strain metapopulation results
 
-![](pix/euler_onestrain_ssc.png)
+![](pix/euler_onestrain_ssc.png){fig-align="center"}
 
 ## two strains (pairwise invasion plots)
 
-![](pix/euler_twostrain_pip.png)
+![](pix/euler_twostrain_pip.png){fig-align="center"}
 
 ## conclusions
 
-* metapopulation extinction occurs for intermediate $\rzero$
-* depends on colonization (and demographic?) parameters
+* for logistic growth, intermediate $R_0$ may be *best*
 * a metapopulation explanation of virulence evolution seems plausible
 * multiple, potentially interacting mechanisms
 
 ## caveats/next steps/open questions
 
-* effects of *Pla* depletion on alternative hosts: **sylvatic cycle**
-* parameter values very uncertain  
-(what do we really know about 6th century rat/flea ecology?)
-* calibrate metapopulation dynamics based on geography?
+* substitute more analysis for brute force
+* disentangle extinction vs host regulation mechanisms
+* parameter estimates: calibrate metapopulation dynamics based on geography?
 
 ![](pix/black_death_spread.png){.absolute width=459px height=307px left=125px top=372px}
 
