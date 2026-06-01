@@ -3,7 +3,7 @@
 #SBATCH --job-name=euler_twostrain
 #SBATCH --array=1-8100
 #SBATCH --time=0-00:30:00
-#SBATCH --mem=12G
+#SBATCH --mem=32G
 #SBATCH --cpus-per-task=1
 #SBATCH --output=logs/euler_twostrain_%A_%a.out
 
