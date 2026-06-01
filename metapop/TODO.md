@@ -2,6 +2,7 @@
 
 * direct solution of deterministic metapop model??? does it collapse?
 * PIP runs for longer than 100+100 generations?
+    * PIP runs starting from a *single patch* introduction
 * odin ODE version; quantify trough depth vs R0 for leaky-bucket vs logistic demography
 * implement non-extinction variant, compare with extinction-allowed (strength of burnout mechanism)
 * implement power-law R0(N) ?
