@@ -48,3 +48,18 @@ S_final_linear <- run_linear |>
 
 expect_equal(S_final_linear, S_eq, tolerance = 0.01,
              info = "ODE linear restoring-force demography: S converges to gamma*K/beta within 1%")
+
+## Disease-free equilibrium: beta < gamma (R0 < 1).
+## I decays at rate (beta - gamma) < 0, so I -> 0 and S -> K.
+## With beta=0.5, gamma=1: R0=0.5; I ~ 10*exp(-0.5*500) ~ machine zero by t=500.
+
+run_dfree <- do.call(discrete_run,
+                     modifyList(ode_base, list(beta_vec = c(0.5, 0))))
+
+S_final_dfree <- run_dfree[run_dfree$step == max(run_dfree$step) & run_dfree$state == "S",  "value"][[1]]
+I_final_dfree <- run_dfree[run_dfree$step == max(run_dfree$step) & run_dfree$state == "I1", "value"][[1]]
+
+expect_equal(S_final_dfree, K, tolerance = 0.01,
+             info = "ODE disease-free (R0<1): S converges to K within 1%")
+expect_true(I_final_dfree < 1e-6,
+            info = "ODE disease-free (R0<1): I converges to 0")
