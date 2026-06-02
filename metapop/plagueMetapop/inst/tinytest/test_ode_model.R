@@ -12,6 +12,8 @@ library(plagueMetapop)
 ## Setup: one isolated patch (n_patch=1, alpha=0), strain 2 absent (I_init[2]=0),
 ## run to t = 500 disease generations.
 
+get_last <- function(df, state) df[df$step == max(df$step) & df$state == state, ]$value
+
 beta  <- 2
 gamma <- 1
 K     <- 1e4
@@ -32,9 +34,7 @@ ode_base <- list(
 
 ## logistic vital dynamics (logistic_growth = 1, default)
 run_logistic <- do.call(discrete_run, c(ode_base, list(logistic_growth = 1)))
-S_final_logistic <- run_logistic |>
-  dplyr::filter(step == max(step), state == "S") |>
-  dplyr::pull(value)
+S_final_logistic <- get_last(run_logistic, "S")
 
 expect_equal(S_final_logistic, S_eq, tolerance = 0.01,
              info = "ODE logistic demography: S converges to gamma*K/beta within 1%")
@@ -42,9 +42,7 @@ expect_equal(S_final_logistic, S_eq, tolerance = 0.01,
 ## linear restoring-force vital dynamics (logistic_growth = 0)
 run_linear <- do.call(discrete_run,
                       modifyList(ode_base, list(logistic_growth = 0, r = 0.04)))
-S_final_linear <- run_linear |>
-  dplyr::filter(step == max(step), state == "S") |>
-  dplyr::pull(value)
+S_final_linear <- get_last(run_linear, "S")
 
 expect_equal(S_final_linear, S_eq, tolerance = 0.01,
              info = "ODE linear restoring-force demography: S converges to gamma*K/beta within 1%")
@@ -56,8 +54,8 @@ expect_equal(S_final_linear, S_eq, tolerance = 0.01,
 run_dfree <- do.call(discrete_run,
                      modifyList(ode_base, list(beta_vec = c(0.5, 0))))
 
-S_final_dfree <- run_dfree[run_dfree$step == max(run_dfree$step) & run_dfree$state == "S",  "value"][[1]]
-I_final_dfree <- run_dfree[run_dfree$step == max(run_dfree$step) & run_dfree$state == "I1", "value"][[1]]
+S_final_dfree <- get_last(run_dfree, "S")
+I_final_dfree <- get_last(run_dfree, "I1")
 
 expect_equal(S_final_dfree, K, tolerance = 0.01,
              info = "ODE disease-free (R0<1): S converges to K within 1%")
