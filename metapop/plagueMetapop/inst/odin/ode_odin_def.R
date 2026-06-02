@@ -1,10 +1,18 @@
-## ODE (continuous-time) version of euler_odin_def.R using deriv():
-##  * update(x) <- x + delta  replaced by  deriv(x) <- delta
-##  * rpois(x) -> x;  rbinom(N, p) -> N*p  (deterministic means)
-##  * p_all and p_recov are now instantaneous rates per unit time,
-##    not per-step probabilities (expm1 removed; no explicit dt)
-##  * reedfrost and strain2_delay are not applicable to ODE models and are dropped;
-##    strain 2 starts at t=0 from I_ini[,2] (set to 0 for "strain 2 absent initially")
+## ODE (continuous-time) version of euler_odin_def.R using deriv().
+##
+## Contrast with euler_det_odin_def.R, which is also deterministic but retains
+## the Euler update() structure with explicit dt (flows replace random draws,
+## step-by-step logic unchanged). This file instead hands integration to odin's
+## ODE solver: derivatives are expressed per unit time, dt disappears, and the
+## solver chooses its own internal step sizes.
+##
+## Changes from euler_det_odin_def.R:
+##  * update(x) <- x + delta  ->  deriv(x) <- delta
+##  * p_all and p_recov become instantaneous rates (expm1 and dt removed)
+##  * delta_log and immig drop dt scaling
+##  * reedfrost and strain2_delay dropped (discrete-time concepts);
+##    strain 2 starts at t=0 from I_ini[,2] (set to 0 for "absent initially")
+##  * logistic_growth flag retained
 
 ## Core derivatives:
 deriv(S[])   <- -tot_incidence[i] + pop_change[i]

@@ -33,7 +33,8 @@ Right now, we're doing mass-action (in JD terms B(N) = βN/K). Should consider o
 | `R/discrete_run.R` | Top-level `discrete_run()` dispatcher and `sumfun_discrete()` summary function |
 | `inst/odin/discrete_odin_def.R` | Stochastic discrete-time two-strain n-patch SIR model |
 | `inst/odin/euler_odin_def.R` | Stochastic continuous-time version with per-strain recovery, `dt`, `logistic_growth` (1=logistic, 0=linear restoring force), and `reedfrost` (1=100% removal per step) |
-| `inst/odin/euler_det_odin_def.R` | Deterministic version of `euler_odin_def.R` |
+| `inst/odin/euler_det_odin_def.R` | Deterministic Euler-step version of `euler_odin_def.R` (uses `update()`; explicit `dt`; same step-by-step structure as the stochastic model) |
+| `inst/odin/ode_odin_def.R` | Deterministic ODE version using `deriv()` (no explicit `dt`; integrated by odin's ODE solver; no `strain2_delay` or `reedfrost`; supports `logistic_growth`) |
 | `inst/tinytest/test_platforms.R` | Tests: platform correctness, parallel execution, summary statistics |
 | `inst/tinytest/test_stop_conditions.R` | Tests: `stop_either_extinct()` factory and pre-seeding behaviour |
 | `inst/tinytest/test_discrete-vs-euler.R` | Tests: euler with `reedfrost=1, gamma=1, dt=1` matches discrete model |

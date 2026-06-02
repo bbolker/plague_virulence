@@ -17,8 +17,17 @@
 ##'   chunk; return TRUE to halt early. Use stop_either_extinct() or
 ##'   stop_both_extinct(), or supply a custom function.
 ##'   NULL runs all nt steps. Only supported for platform = "odin".
-##' @param def_file odin DSL filename in inst/odin/ (odin platform only)
-##' @param dt time-step size in disease-generation units (euler models only)
+##' @param def_file odin DSL filename in inst/odin/ (odin platform only).
+##'   \code{"discrete_odin_def.R"}: stochastic discrete-time model (default).
+##'   \code{"euler_odin_def.R"}: stochastic Euler model with explicit \code{dt},
+##'     \code{gamma}, \code{logistic_growth}, \code{reedfrost}, and step-based
+##'     strain-2 seeding via \code{strain2_delay}.
+##'   \code{"euler_det_odin_def.R"}: deterministic Euler version (same step structure;
+##'     flows replace random draws; still uses explicit \code{dt} and \code{strain2_delay}).
+##'   \code{"ode_odin_def.R"}: deterministic ODE model using \code{deriv()} and odin's
+##'     ODE solver; no \code{dt}, \code{strain2_delay}, or \code{reedfrost};
+##'     \code{stop_cond} is not supported.
+##' @param dt time-step size in disease-generation units (euler models only; ignored for ode_odin_def.R)
 ##' @examples
 ##' ## stop as soon as either strain goes extinct (odin platform only):
 ##' ## plan(multisession)
