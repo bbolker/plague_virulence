@@ -28,10 +28,15 @@ run1 <- rfun(nsim = 100)
 run2 <- rfun(def_file = "euler_odin_def.R", nsim = 100)
 run3 <- rfun(def_file = "euler_odin_def.R", nsim = 100,
              reedfrost = 1)
-run4 <- rfun(def_file = "ode_odin_def.R")
+isDeSolve <- function(x) is(x, "deSolve")
+run4 <- rfun(def_file = "ode_odin_def.R") |>
+    mutate(across(where(isDeSolve), as.numeric))
 run5 <- rfun(def_file = "euler_odin_def.R", nsim = 100,
              ## adjust init I upward to match K increase
-             K = 1e9, I_init = 1000)
+             K = 1e9, I_init = 1e4)
+
+run6 <- rfun(def_file = "euler_onestrain_odin_def.R", nsim = 100,
+             K = 1e9, I_init = 1e4, beta_vec = 3, gamma = 1.0)
 
 
 ## test ...
