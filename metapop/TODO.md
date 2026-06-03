@@ -1,6 +1,7 @@
 ## To do
 
 * did I mess something up in the package with a3f558f1c20e ? (git bisect, speed test?)
+* set `step` output to be `step*dt`, for comparability when changing `dt`
 * direct solution of deterministic metapop model??? does it collapse?
 * PIP runs for longer than 100+100 generations?
     * PIP runs starting from a *single patch* introduction
