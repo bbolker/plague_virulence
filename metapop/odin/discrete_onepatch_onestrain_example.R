@@ -67,5 +67,7 @@ gg2 <- gg0 + runx_mean + geom_line()
 print(gg2)
 
 ## ... discrepancy between ode and euler_large ... ???
-gg0 + dplyr::filter(runx_I1, model %in% c("euler_large", "ode"))
+gg2 + dplyr::filter(runx_mean, model %in% c("euler_large", "ode")) +
+    scale_x_continuous(limits = c(0, 100))
+    
 
