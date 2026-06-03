@@ -94,7 +94,8 @@ discrete_run <- function(beta_vec = c(1.5, 2.5),
   ## every task, so the cache never persists across futures. If compilation
   ## time dominates, consider pre-building via makefun and passing the object
   ## as a future global (if odin objects serialize safely across workers).
-  FUN <- function(i) convfun(do.call(runfun, c(list(do.call(makefun, args)), run_args)))
+  FUN <- function(i) convfun(do.call(runfun,
+                                       c(list(do.call(makefun, args)), run_args)))
 
   if (nsim == 1) {
     if (!is.null(seed)) set.seed(seed)

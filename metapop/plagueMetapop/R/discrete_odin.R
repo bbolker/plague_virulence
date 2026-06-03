@@ -117,7 +117,7 @@ run_simulator_odin <- function(x, chunk = 50L, stop_cond = NULL) {
   drop_first <- function(m) m[-1L, , drop = FALSE]
 
   if (is.null(stop_cond)) {
-    return(drop_first(x$run(seq(0, nt))))
+    return(x$run(seq(0, nt)))
   }
 
   ## Chunked early-stopping (approach 2):
@@ -137,7 +137,7 @@ run_simulator_odin <- function(x, chunk = 50L, stop_cond = NULL) {
   for (k in seq_along(out)) {
     chunk_len <- breaks[k + 1L] - breaks[k]
     res       <- mod$run(seq(0L, chunk_len))
-    out[[k]]  <- drop_first(res)
+    out[[k]]  <- if (k==1) res else drop_first(res)
     out[[k]][, 1L] <- out[[k]][, 1L] + breaks[k]   ## shift to absolute step numbers
 
     if (stop_cond(res[nrow(res), , drop = FALSE])) break
