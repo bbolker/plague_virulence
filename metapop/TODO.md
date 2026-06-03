@@ -12,6 +12,7 @@
 ### code
 
 * refactor two-strain delay to be part of discrete_run (chunked run), rather than part of model definition
+* lightweight S3 code for odin runs (store call for update() method; print, plot methods ...)
 * prototype and benchmark hybrid deterministic (above threshold)/stochastic (below threshold) model
 * create dedicated single-strain model (doesn't help that much)
 * instrument runs to record r(t), foi(t), etc. (to understand invasion criteria etc.)
