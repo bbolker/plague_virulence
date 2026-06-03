@@ -1,6 +1,7 @@
 library(plagueMetapop)
 library(future)
 library(ggplot2); theme_set(theme_bw())
+library(dplyr)
 
 nsim <- 100L
 
@@ -29,7 +30,8 @@ run3 <- rfun(def_file = "euler_odin_def.R", nsim = 100,
              reedfrost = 1)
 run4 <- rfun(def_file = "ode_odin_def.R")
 run5 <- rfun(def_file = "euler_odin_def.R", nsim = 100,
-             K = 1e9)
+             ## adjust init I upward to match K increase
+             K = 1e9, I_init = 1000)
 
 
 ## test ...
@@ -45,15 +47,25 @@ runx <- purrr::map_dfr(run_list,
   dplyr::mutate(across(model, ~factor(., levels = names(run_list))),
                 value = ifelse(grepl("large", model),
                                value/1000, value))
-  
-dplyr::filter(runx, state == "I1") |>
-  ggplot(aes(step, value, colour = model, linewidth = model,
-             alpha = model)) +
-  geom_line(aes(group = interaction(run, model))) +
-  scale_linewidth_manual(values = c(1, 1, 1, 2)) +
-  scale_alpha_manual(values = c(0.4, 0.4, 0.4, 1)) +
-  scale_y_log10() +
-  scale_colour_brewer(palette="Dark2")
+
+runx_I1 <- dplyr::filter(runx, state == "I1")
+
+gg0 <- (ggplot(runx_I1, aes(step, value, colour = model)) +
+        scale_y_log10() +
+        scale_colour_brewer(palette="Dark2")
+)
+        
+gg1 <- gg0 + geom_line(aes(group = interaction(run, model),
+                           linewidth = model, alpha = model)) +
+    scale_linewidth_manual(values = c(1, 1, 1, 2)) +
+    scale_alpha_manual(values = c(0.4, 0.4, 0.4, 1))
+
+runx_mean <- (runx_I1 |>
+              summarise(across(value, mean), .by = c(model, step)))
+
+gg2 <- gg0 + runx_mean + geom_line()
+print(gg2)
 
 ## ... discrepancy between ode and euler_large ... ???
+gg0 + dplyr::filter(runx_I1, model %in% c("euler_large", "ode"))
 
