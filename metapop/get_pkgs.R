@@ -26,5 +26,5 @@ pkgs <- setdiff(pkgs, rownames(i1))
 if (length(pkgs)>0) {
   install.packages(pkgs)
 }
-remotes::install_github("davidearn/burnout")
+try(remotes::install_github("davidearn/burnout"))
 remotes::install_github("canmod/macpan2")
