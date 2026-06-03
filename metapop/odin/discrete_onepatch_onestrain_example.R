@@ -33,11 +33,8 @@ run4 <- rfun(def_file = "ode_odin_def.R") |>
     mutate(across(where(isDeSolve), as.numeric))
 run5 <- rfun(def_file = "euler_odin_def.R", nsim = 100,
              ## adjust init I upward to match K increase
-             K = 1e9, I_init = 1e4)
-
-run6 <- rfun(def_file = "euler_onestrain_odin_def.R", nsim = 100,
-             K = 1e9, I_init = 1e4, beta_vec = 3, gamma = 1.0)
-
+             K = 1e9, I_init = 1e5, dt = 0.1) |>
+    purrr::map_dfr(~ mutate(., step = step/10))
 
 ## test ...
 stopifnot(all.equal(run1, run3))
@@ -59,14 +56,14 @@ gg0 <- (ggplot(runx_I1, aes(step, value, colour = model)) +
         scale_y_log10() +
         scale_colour_brewer(palette="Dark2")
 )
-        
+
+runx_mean <- (runx_I1 |>
+              summarise(across(value, mean), .by = c(model, step)))
+
 gg1 <- gg0 + geom_line(aes(group = interaction(run, model),
                            linewidth = model, alpha = model)) +
     scale_linewidth_manual(values = c(1, 1, 1, 2)) +
     scale_alpha_manual(values = c(0.4, 0.4, 0.4, 1))
-
-runx_mean <- (runx_I1 |>
-              summarise(across(value, mean), .by = c(model, step)))
 
 gg2 <- gg0 + runx_mean + geom_line()
 print(gg2)
