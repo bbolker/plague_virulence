@@ -1,9 +1,8 @@
 ## To do
 
 * direct solution of deterministic metapop model??? does it collapse?
-* PIP runs for longer than 100+100 generations?
-    * PIP runs starting from a *single patch* introduction
-* odin ODE version; quantify trough depth vs R0 for leaky-bucket vs logistic demography
+* PIP runs starting from a *single patch* introduction
+* using odin ODE version, quantify trough depth vs R0 for leaky-bucket vs logistic demography
 * implement non-extinction variant, compare with extinction-allowed (strength of burnout mechanism)
 * implement power-law R0(N) ?
 * think about an invasibility expression: if we know patch occupancy and S/I distributions of resident, can we calculate invasion, or do extinction dynamics etc. make expectations of instantaneous growth rate irrelevant?
@@ -33,7 +32,6 @@ Note effects of [1] generation interval/infectious period distribution; [2] demo
 
 ## old
 
-* update CSEE slides?
 * tweak poisson/sim.R; allow sim prefix
 * allow burnout in poisson sim?
 * re-run PIP sims, with ODE final sizes - on SHARCNET?
