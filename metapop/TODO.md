@@ -1,7 +1,5 @@
 ## To do
 
-* did I mess something up in the package with a3f558f1c20e ? (git bisect, speed test?)
-* set `step` output to be `step*dt`, for comparability when changing `dt`
 * direct solution of deterministic metapop model??? does it collapse?
 * PIP runs for longer than 100+100 generations?
     * PIP runs starting from a *single patch* introduction
@@ -10,6 +8,7 @@
 * implement power-law R0(N) ?
 * think about an invasibility expression: if we know patch occupancy and S/I distributions of resident, can we calculate invasion, or do extinction dynamics etc. make expectations of instantaneous growth rate irrelevant?
 * sensitivity to $r$?
+* test ODE with euler integrator (pass through to deSolve)? allow switch to disable hazard correction in stoch models?
 
 ### code
 
