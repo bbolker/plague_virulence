@@ -111,16 +111,18 @@ the mini test still uses a plain SLURM array.
 | `meta_euler_twostrain/make_table.sh` | generates `table.dat` (lines 1–8100) |
 | `submit_euler_twostrain_mini.sh` | mini SLURM array (96 tasks, 4G, 4 CPUs) |
 | `submit_euler_twostrain_mini2.sh` | mini2 SLURM array (900 tasks, 12G, 1 CPU) |
-| `euler_twostrain_run_array.R` | shared R script (`--mini` / `--mini2` flags) |
-| `euler_twostrain_combine.R` | combine outputs (`--mini` / `--mini2` flags, short: `-m` / `-2`) |
+| `submit_euler_twostrain_singlepatchintro.sh` | singlepatchintro SLURM array (8100 tasks, 32G, 1 CPU, 1.5 h) |
+| `euler_twostrain_run_array.R` | shared R script (`--mini` / `--mini2` / `--singlepatchintro` flags) |
+| `euler_twostrain_combine.R` | combine outputs (`--mini` / `--mini2` / `--singlepatchintro` flags, short: `-m` / `-2`) |
 
-Grid (full):  `R01 = R02 = seq(1.1, 4, by=0.1)` × `K = 10^seq(3, 5)` × `alpha = 10^seq(-5, -3)` — 8100 tasks; uses `stop_both_extinct`  
+Grid (full/singlepatchintro): `R01 = R02 = seq(1.1, 4, by=0.1)` × `K = 10^seq(3, 5)` × `alpha = 10^seq(-5, -3)` — 8100 tasks; uses `stop_both_extinct`  
 Grid (mini):  `R01 = R02 = seq(1.1, 3, by=0.5)` × `K = 10^seq(3, 5)` × `alpha = 10^seq(-5, -4)` — 96 tasks  
 Grid (mini2): `R01 = R02 = seq(1.1, 4, by=0.1)` × `K = 1e4` × `alpha = 10^-5.5` — 900 tasks; uses `stop_both_extinct`  
 Parameters (full/mini2): `nsim=200`, `dt=0.1`, `n_patch=200`; full run: `nt=500/dt=5000` steps; mini2: `nt=200/dt=2000` steps  
-Parameters (mini): `nsim=50`, `dt=0.2`, `n_patch=50`; `nt=200/dt=1000` steps
+Parameters (mini): `nsim=50`, `dt=0.2`, `n_patch=50`; `nt=200/dt=1000` steps  
+Parameters (singlepatchintro): same grid and `n_patch`/`dt`/`nt` as full, but `nsim=500`; strain 2 seeded into **patch 1 only** (Poisson mean 10) at `strain2_delay`; all other patches start at 0
 
-**Wall-time derivation:** Mini2 sacct: ~3 min/task (n_patch=200, nsim=200, nt=2000). Full run (nt=5000, 2.5× more steps): ~7.5 min/task × 14.4 tasks/metajob ≈ 1.8 h worst case; 6 h provides ~3.3× buffer.
+**Wall-time derivation:** Mini2 sacct: ~3 min/task (n_patch=200, nsim=200, nt=2000). Full run (nt=5000, 2.5× more steps): ~7.5 min/task × 14.4 tasks/metajob ≈ 1.8 h worst case; 6 h provides ~3.3× buffer. Singlepatchintro (nsim=500 vs 200, 2.5× more sims): ~18 min/task → 1.5 h wall time.
 
 **Mini (SLURM array):**
 ```bash
@@ -165,8 +167,14 @@ After completion (run from `sharcnet/`):
 Rscript euler_twostrain_combine.R
 ```
 
-Outputs: `outputs/euler_twostrain[_mini]_task_NNNNNN.rds`  
-Combined: `euler_twostrain[_mini].rds`
+**Singlepatchintro (SLURM array — same grid as full, strain 2 seeded to patch 1 only):**
+```bash
+sbatch submit_euler_twostrain_singlepatchintro.sh
+Rscript euler_twostrain_combine.R --singlepatchintro
+```
+
+Outputs: `outputs/euler_twostrain[_mini|_mini2|_singlepatchintro]_task_NNNNNN.rds`  
+Combined: `euler_twostrain[_mini|_mini2|_singlepatchintro].rds`
 
 ---
 
