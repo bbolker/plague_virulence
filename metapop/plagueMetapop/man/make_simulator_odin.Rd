@@ -20,9 +20,8 @@ make_simulator_macpan2(
   n_patch = 100,
   nt = 1000,
   alpha = 0.001,
-  I_init = 10,
-  strain2_delay = 0,
-  seed = NULL
+  I_ini_mat = make_I_ini_mat(10, n_patch),
+  strain2_delay = 0
 )
 
 run_simulator_macpan2(x)
@@ -36,7 +35,7 @@ make_simulator_odin(
   n_patch = 100,
   nt = 1000,
   alpha = 0.001,
-  I_init = 10,
+  I_ini_mat = make_I_ini_mat(10, n_patch),
   strain2_delay = 0,
   gamma = c(1, 1),
   dt = 1,
@@ -58,9 +57,8 @@ make_simulator_pureR(
   n_strain = 2,
   nt = 1000,
   alpha = 0.001,
-  I_init = 10,
-  strain2_delay = 0,
-  seed = NULL
+  I_ini_mat = make_I_ini_mat(10, n_patch),
+  strain2_delay = 0
 )
 
 run_simulator_pureR(x)
@@ -80,11 +78,10 @@ conv_pureR(x)
 
 \item{alpha}{between-patch transmission probability}
 
-\item{I_init}{mean initial infected per patch (Poisson draw; length 1 or 2)}
+\item{I_ini_mat}{n_patch x 2 integer matrix of initial infected counts;
+construct with \code{\link{make_I_ini_mat}()}}
 
 \item{strain2_delay}{steps before strain 2 is seeded (0 = immediate)}
-
-\item{seed}{PRNG seed}
 
 \item{x}{simulator object from the corresponding \code{make_simulator_*()} function}
 

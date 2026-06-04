@@ -68,9 +68,9 @@ set.seed(42)
 mod <- make_simulator_odin(
   beta_vec      = c(1.5, 2.5),
   K             = 1e4,
-  n_patch       = 1,
-  nt            = 500,
-  I_init        = c(50, 20),
+  n_patch       = 1L,
+  nt            = 500L,
+  I_ini_mat     = make_I_ini_mat(c(50, 20), n_patch = 1L, method = "fixed"),
   strain2_delay = 30
 )
 run <- run_simulator_odin(mod, chunk = 5, stop_cond = stop_either_extinct())

@@ -16,6 +16,7 @@ discrete_run(
   gamma = c(1, 1),
   strain2_delay = 0,
   I_init = 10,
+  I_ini_method = c("rpois", "fixed"),
   seed = NULL,
   nsim = 1,
   chunk = NULL,
@@ -46,7 +47,13 @@ discrete_run(
 
 \item{strain2_delay}{steps before strain 2 is seeded (0 = immediate)}
 
-\item{I_init}{mean initial infected per patch (Poisson draw; length 1 or 2)}
+\item{I_init}{scalar, length-2 vector, or n_patch x 2 matrix of initial infected
+counts (interpreted as means for \code{I_ini_method = "rpois"}, or used
+directly for \code{"fixed"}).  See \code{\link{make_I_ini_mat}}.}
+
+\item{I_ini_method}{\code{"rpois"} (default): each simulation draws a fresh
+\code{n_patch x 2} matrix of Poisson counts; \code{"fixed"}: all simulations
+share the same rounded \code{I_init} values.}
 
 \item{seed}{PRNG seed}
 

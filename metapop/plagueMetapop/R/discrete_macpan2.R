@@ -1,5 +1,4 @@
 ##' @rdname make_simulator_odin
-##' @param seed PRNG seed (used for initial condition draws in R)
 ##' @export
 make_simulator_macpan2 <- function(
   beta_vec  = c(1.5, 2.5),
@@ -8,23 +7,17 @@ make_simulator_macpan2 <- function(
   n_patch   = 100,
   nt        = 1000,
   alpha     = 1e-3,
-  I_init    = 10,
-  strain2_delay = 0,
-  seed      = NULL
+  I_ini_mat = make_I_ini_mat(10, n_patch),
+  strain2_delay = 0
 ) {
 
   n_strain <- 2 ## hard-coded
 
   if (strain2_delay != 0) stop("strain2_delay not yet implemented for macpan2")
-  K_vec   <- matrix(rep(K, length.out = n_patch), ncol = 1)
-  r_vec   <- matrix(rep(r, length.out = n_patch), ncol = 1)
-  ones    <- matrix(1, nrow = n_patch, ncol = 1)
-  I_init2 <- rep(I_init, length.out = 2)
-
-  if (!is.null(seed)) set.seed(seed)
-  I_ini <- matrix(rpois(n_strain * n_patch, lambda = I_init2),
-                  nrow = n_patch, ncol = n_strain, byrow = TRUE)
-  S_ini <- K_vec - rowSums(I_ini)
+  K_vec <- matrix(rep(K, length.out = n_patch), ncol = 1)
+  r_vec <- matrix(rep(r, length.out = n_patch), ncol = 1)
+  ones  <- matrix(1, nrow = n_patch, ncol = 1)
+  S_ini <- K_vec - rowSums(I_ini_mat)
 
   spec <- macpan2::mp_tmb_model_spec(
     during = list(
@@ -54,7 +47,7 @@ make_simulator_macpan2 <- function(
     default = list(
       ## state variables
       S             = S_ini,
-      I             = I_ini,
+      I             = I_ini_mat,
       ## parameters
       beta          = matrix(beta_vec, nrow = 1),   # 1 x 2
       K             = K_vec,

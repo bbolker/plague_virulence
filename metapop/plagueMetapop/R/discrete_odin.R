@@ -24,7 +24,8 @@ compile_odin <- function(def_file = "discrete_odin_def.R") {
 ##' @param n_patch number of patches
 ##' @param nt time steps
 ##' @param alpha between-patch transmission probability
-##' @param I_init mean initial infected per patch (Poisson draw; length 1 or 2)
+##' @param I_ini_mat n_patch x 2 integer matrix of initial infected counts;
+##'   construct with \code{\link{make_I_ini_mat}()}
 ##' @param strain2_delay steps before strain 2 is seeded (0 = immediate)
 ##' @param gamma length-2 vector of per-strain recovery rates (euler models only)
 ##' @param dt time-step size in disease-generation units (euler models only)
@@ -41,7 +42,7 @@ make_simulator_odin <- function(
   n_patch   = 100,
   nt        = 1000,
   alpha     = 1e-3,
-  I_init    = 10,
+  I_ini_mat = make_I_ini_mat(10, n_patch),
   strain2_delay = 0,
   gamma     = c(1, 1),
   dt        = 1,
@@ -57,17 +58,8 @@ make_simulator_odin <- function(
   ## patch-level parameters (vectors, length n_patch)
   K_vec <- rep(K, length.out = n_patch)
   r_vec <- rep(r, length.out = n_patch)
-  I_init <- rep(I_init, length.out = n_strain)
 
-  ## strain x patch parameters: matrices [n_patch, n_strain], rows = patches, cols = strains
-  ## single-patch: use I_init directly (deterministic); multi-patch: Poisson draws
-  I_ini_mat <- if (n_patch == 1L) {
-    matrix(round(I_init), byrow = TRUE, ncol = n_strain)
-  } else {
-    matrix(rpois(n_strain * n_patch, lambda = I_init), byrow = TRUE, ncol = n_strain)
-  }
-
-  S_ini_vec <- K_vec - rowSums(I_ini_mat)
+  S_ini <- K_vec - rowSums(I_ini_mat)
 
   def_fn <- attr(gen_local, "def_filename")
 
@@ -76,7 +68,7 @@ make_simulator_odin <- function(
                       r     = r_vec,
                       K     = K_vec,
                       I_ini = I_ini_mat,
-                      S_ini = S_ini_vec,
+                      S_ini = S_ini,
                       alpha,
                       n_patch)
 

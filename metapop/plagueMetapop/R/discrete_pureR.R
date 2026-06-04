@@ -1,6 +1,5 @@
 ##' @rdname make_simulator_odin
 ##' @param n_strain number of strains [only 2 supported]
-##' @param seed PRNG seed
 ##' @export
 make_simulator_pureR <- function(
   beta_vec  = c(1.5, 2.5),
@@ -10,22 +9,17 @@ make_simulator_pureR <- function(
   n_strain  = 2,
   nt        = 1000,
   alpha     = 1e-3,
-  I_init    = 10,
-  strain2_delay = 0,
-  seed      = NULL
+  I_ini_mat = make_I_ini_mat(10, n_patch),
+  strain2_delay = 0
   ) {
 
   if (n_strain != 2) stop("only n_strain = 2 is supported")
 
   if (strain2_delay != 0) stop("strain2_delay not yet implemented for pureR")
-  K_vec   <- rep(K, length.out = n_patch)
-  r_vec   <- rep(r, length.out = n_patch)
-  I_init2 <- rep(I_init, length.out = 2)
-
-  if (!is.null(seed)) set.seed(seed)
-  I <- matrix(rpois(n_strain * n_patch, lambda = I_init2),
-              nrow = n_patch, ncol = n_strain, byrow = TRUE)
-  S <- K_vec - rowSums(I)
+  K_vec <- rep(K, length.out = n_patch)
+  r_vec <- rep(r, length.out = n_patch)
+  I     <- I_ini_mat
+  S     <- K_vec - rowSums(I_ini_mat)
 
   ret <- list(run = function(nt) {
 

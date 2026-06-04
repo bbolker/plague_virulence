@@ -1,3 +1,33 @@
+##' Construct the n_patch x n_strain matrix of initial infected counts
+##' @description
+##'   Expands \code{I_init} to a full \code{n_patch x n_strain} matrix.
+##'   \code{I_init} may be a scalar (same value for all patches and strains),
+##'   a length-\code{n_strain} vector (one value per strain, replicated across
+##'   patches), or a full \code{n_patch x n_strain} matrix.
+##' @param I_init scalar, length-\code{n_strain} vector, or \code{n_patch x n_strain} matrix
+##' @param n_patch number of patches
+##' @param n_strain number of strains (default 2)
+##' @param method \code{"rpois"} (default): independent Poisson draws with
+##'   \code{I_init} as per-cell means; \code{"fixed"}: use rounded \code{I_init}
+##'   values directly (deterministic)
+##' @return integer \code{n_patch x n_strain} matrix
+##' @export
+make_I_ini_mat <- function(I_init, n_patch, n_strain = 2L,
+                            method = c("rpois", "fixed")) {
+  method <- match.arg(method)
+  if (is.matrix(I_init)) {
+    stopifnot(nrow(I_init) == n_patch, ncol(I_init) == n_strain)
+    lambda <- I_init
+  } else {
+    lambda <- matrix(rep(rep(I_init, length.out = n_strain), each = n_patch),
+                     nrow = n_patch, ncol = n_strain)
+  }
+  if (method == "rpois")
+    matrix(rpois(n_patch * n_strain, lambda = lambda), nrow = n_patch, ncol = n_strain)
+  else
+    matrix(round(lambda), nrow = n_patch, ncol = n_strain)
+}
+
 ##' Run one or more two-strain n-patch simulations across platforms
 ##' @param beta_vec length-2 vector of per-capita transmission rates (one per strain)
 ##' @param K carrying capacity (scalar or vector of length n_patch)
@@ -9,7 +39,12 @@
 ##' @param alpha between-patch transmission probability
 ##' @param gamma length-2 vector of per-strain recovery rates (euler models only)
 ##' @param strain2_delay steps before strain 2 is seeded (0 = immediate)
-##' @param I_init mean initial infected per patch (Poisson draw; length 1 or 2)
+##' @param I_init scalar, length-2 vector, or n_patch x 2 matrix of initial infected
+##'   counts (interpreted as means for \code{I_ini_method = "rpois"}, or used
+##'   directly for \code{"fixed"}).  See \code{\link{make_I_ini_mat}}.
+##' @param I_ini_method \code{"rpois"} (default): each simulation draws a fresh
+##'   \code{n_patch x 2} matrix of Poisson counts; \code{"fixed"}: all simulations
+##'   share the same rounded \code{I_init} values.
 ##' @param seed PRNG seed
 ##' @param nsim number of simulations to run
 ##' @param chunk steps per chunk for early stopping (odin only; ignored if stop_cond is NULL)
@@ -54,6 +89,7 @@ discrete_run <- function(beta_vec = c(1.5, 2.5),
                          gamma = c(1, 1),
                           strain2_delay = 0,
                           I_init = 10,
+                          I_ini_method = c("rpois", "fixed"),
                           seed = NULL,
                           nsim = 1,
                           chunk = NULL,
@@ -62,7 +98,8 @@ discrete_run <- function(beta_vec = c(1.5, 2.5),
                           dt = 1,
                           platform = c("odin", "macpan2", "pureR")) {
 
-  platform <- match.arg(platform)
+  platform     <- match.arg(platform)
+  I_ini_method <- match.arg(I_ini_method)
   if ((!is.null(chunk) || !is.null(stop_cond)) && platform != "odin")
     stop("chunk and stop_cond are only supported for platform = 'odin'")
   if (!is.null(stop_cond) && platform == "odin" && def_file == "ode_odin_def.R")
@@ -70,7 +107,7 @@ discrete_run <- function(beta_vec = c(1.5, 2.5),
   if (reedfrost == 1 && !(all(gamma == 1) && dt == 1))
     stop("reedfrost = 1 requires gamma == 1 and dt == 1")
 
-  args <- tibble::lst(beta_vec, r, K, n_patch, nt, I_init, alpha, strain2_delay,
+  args <- tibble::lst(beta_vec, r, K, n_patch, nt, alpha, strain2_delay,
                       gamma, dt, def_file)
   if (platform == "odin") {
     if (def_file %in% c("euler_odin_def.R", "ode_odin_def.R"))
@@ -94,8 +131,14 @@ discrete_run <- function(beta_vec = c(1.5, 2.5),
   ## every task, so the cache never persists across futures. If compilation
   ## time dominates, consider pre-building via makefun and passing the object
   ## as a future global (if odin objects serialize safely across workers).
+  ## I_ini_mat is constructed inside FUN so each parallel simulation gets
+  ## independent Poisson draws (for I_ini_method = "rpois"); for "fixed" all
+  ## simulations share the same rounded values, but the copy is still made
+  ## per-call to keep the interface uniform.
   FUN <- function(i) {
-    fun <- do.call(makefun, args)
+    local_args <- c(args,
+                    list(I_ini_mat = make_I_ini_mat(I_init, n_patch, 2L, I_ini_method)))
+    fun <- do.call(makefun, local_args)
     res <- do.call(runfun, c(list(fun), run_args)) |> convfun()
     if (dt != 1) dplyr::mutate(res, dplyr::across(step, ~ . * dt)) else res
   }
