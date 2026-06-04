@@ -96,7 +96,8 @@ discrete_run <- function(beta_vec = c(1.5, 2.5),
   ## as a future global (if odin objects serialize safely across workers).
   FUN <- function(i) {
     fun <- do.call(makefun, args)
-    do.call(runfun, c(list(fun), run_args)) |> convfun()
+    res <- do.call(runfun, c(list(fun), run_args)) |> convfun()
+    if (dt != 1) dplyr::mutate(res, dplyr::across(step, ~ . * dt)) else res
   }
 
   if (nsim == 1) {
