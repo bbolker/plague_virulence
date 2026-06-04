@@ -4,12 +4,15 @@
 \alias{sumfun_discrete}
 \title{Summarise extinction and quasi-equilibrium statistics across runs}
 \usage{
-sumfun_discrete(runs, nsteps = 100, which = c(1, 2))
+sumfun_discrete(runs, nsteps = 100, strain2_delay = 0, which = c(1, 2))
 }
 \arguments{
 \item{runs}{list of long-format tibbles from discrete_run(), or a single tibble}
 
 \item{nsteps}{number of trailing steps used for quasi-equilibrium averages}
+
+\item{strain2_delay}{steps before strain 2 is seeded; zeros in I2 before
+this step are not counted as extinction}
 
 \item{which}{strains to summarise (currently ignored; both strains always returned)}
 }

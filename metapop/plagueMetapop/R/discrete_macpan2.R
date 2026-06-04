@@ -92,8 +92,8 @@ run_simulator_macpan2 <- function(x) {
 
 ##' @rdname make_simulator_odin
 ##' @export
-conv_macpan2 <- function(traj) {
-  traj |>
+conv_macpan2 <- function(x) {
+  x |>
     dplyr::as_tibble() |>
     dplyr::filter(matrix %in% c("S", "I")) |>
     dplyr::rename(step = time, patch = row, state = matrix) |>

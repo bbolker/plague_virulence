@@ -30,6 +30,8 @@ compile_odin <- function(def_file = "discrete_odin_def.R") {
 ##' @param dt time-step size in disease-generation units (euler models only)
 ##' @param def_file odin DSL filename in inst/odin/
 ##' @param gen_local pre-compiled odin generator; compiled via compile_odin() if NULL
+##' @param logistic_growth 1 (default) = standard logistic demography; 0 = linear restoring force (euler/ODE models only)
+##' @param reedfrost 1 = Reed-Frost mode (100\% removal per step); requires gamma == 1 and dt == 1
 ##' @return an odin model instance with nt, gen, and init_args attributes
 ##' @export
 make_simulator_odin <- function(
@@ -202,8 +204,12 @@ stop_both_extinct <- function(row) {
     sum(row[, grep(",2\\]$", colnames(row))]) == 0
 }
 
+isDeSolve <- function(x) is(x, "deSolve")
+
 ##' @rdname make_simulator_odin
 ##' @param format "long" (default) or "wide"
+##' @importFrom methods is
+##' @importFrom dplyr across where
 ##' @export
 conv_odin <- function(x, format = c("long", "wide")) {
   format <- match.arg(format)
@@ -221,6 +227,7 @@ conv_odin <- function(x, format = c("long", "wide")) {
     tidyr::pivot_longer(-step, names_to = "state") |>
     dplyr::mutate(patch = as.numeric(sub(".*_", "", state)),
                   state = sub("_.*", "", state)) |>
-    dplyr::select(step, state, patch, value)
-  x
+    dplyr::select(step, state, patch, value) |>
+    dplyr::mutate(across(where(isDeSolve), as.numeric))
+  x 
 }

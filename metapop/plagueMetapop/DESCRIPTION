@@ -13,6 +13,7 @@ Imports:
     dplyr,
     furrr,
     macpan2,
+    methods,
     odin,
     tibble,
     tidyr

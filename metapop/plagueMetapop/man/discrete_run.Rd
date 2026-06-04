@@ -7,7 +7,9 @@
 discrete_run(
   beta_vec = c(1.5, 2.5),
   K = 10000,
-  r = 0.125,
+  logistic_growth = 1,
+  reedfrost = 0,
+  r = if (logistic_growth) 0.125 else 0.04,
   n_patch = 100,
   nt = 1000,
   alpha = 0.001,
@@ -27,6 +29,10 @@ discrete_run(
 \item{beta_vec}{length-2 vector of per-capita transmission rates (one per strain)}
 
 \item{K}{carrying capacity (scalar or vector of length n_patch)}
+
+\item{logistic_growth}{1 (default) = standard logistic demography; 0 = linear restoring force}
+
+\item{reedfrost}{1 = Reed-Frost mode (100\% removal per step); requires gamma == 1 and dt == 1}
 
 \item{r}{host growth rate per disease generation (ditto)}
 
@@ -53,9 +59,18 @@ chunk; return TRUE to halt early. Use stop_either_extinct() or
 stop_both_extinct(), or supply a custom function.
 NULL runs all nt steps. Only supported for platform = "odin".}
 
-\item{def_file}{odin DSL filename in inst/odin/ (odin platform only)}
+\item{def_file}{odin DSL filename in inst/odin/ (odin platform only).
+\code{"discrete_odin_def.R"}: stochastic discrete-time model (default).
+\code{"euler_odin_def.R"}: stochastic Euler model with explicit \code{dt},
+  \code{gamma}, \code{logistic_growth}, \code{reedfrost}, and step-based
+  strain-2 seeding via \code{strain2_delay}.
+\code{"euler_det_odin_def.R"}: deterministic Euler version (same step structure;
+  flows replace random draws; still uses explicit \code{dt} and \code{strain2_delay}).
+\code{"ode_odin_def.R"}: deterministic ODE model using \code{deriv()} and odin's
+  ODE solver; no \code{dt}, \code{strain2_delay}, or \code{reedfrost};
+  \code{stop_cond} is not supported.}
 
-\item{dt}{time-step size in disease-generation units (euler models only)}
+\item{dt}{time-step size in disease-generation units (euler models only; ignored for ode_odin_def.R)}
 
 \item{platform}{simulation backend: "odin" (default), "macpan2", or "pureR"}
 }

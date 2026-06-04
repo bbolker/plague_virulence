@@ -27,7 +27,7 @@ make_simulator_macpan2(
 
 run_simulator_macpan2(x)
 
-conv_macpan2(traj)
+conv_macpan2(x)
 
 make_simulator_odin(
   beta_vec = c(1.5, 2.5),
@@ -41,7 +41,9 @@ make_simulator_odin(
   gamma = c(1, 1),
   dt = 1,
   def_file = "discrete_odin_def.R",
-  gen_local = NULL
+  gen_local = NULL,
+  logistic_growth = 1,
+  reedfrost = 0
 )
 
 run_simulator_odin(x, chunk = 50L, stop_cond = NULL)
@@ -93,6 +95,10 @@ conv_pureR(x)
 \item{def_file}{odin DSL filename in inst/odin/}
 
 \item{gen_local}{pre-compiled odin generator; compiled via compile_odin() if NULL}
+
+\item{logistic_growth}{1 (default) = standard logistic demography; 0 = linear restoring force (euler/ODE models only)}
+
+\item{reedfrost}{1 = Reed-Frost mode (100\% removal per step); requires gamma == 1 and dt == 1}
 
 \item{chunk}{steps per chunk; only used when stop_cond is non-NULL}
 
