@@ -154,6 +154,92 @@ discrete_run <- function(beta_vec = c(1.5, 2.5),
 
 
 
+##' Endemic equilibrium of I1 for the single-strain single-patch ODE model
+##'
+##' At the non-trivial equilibrium, dI/dt = 0 gives S* = gamma*K/beta.
+##' Setting dS/dt = 0 then determines I*:
+##' logistic: r*S*(1-S/K) = beta*I*S/K => I* = r*(K - S*)/beta;
+##' linear:   r*(K-S)      = beta*I*S/K => I* = r*(K - S*)*K/(beta*S*).
+##' Returns NA when R0 = beta/gamma <= 1.
+##' @param beta transmission rate (beta_vec[1])
+##' @param gamma recovery rate (gamma[1]; default 1)
+##' @param K carrying capacity
+##' @param r host intrinsic growth rate
+##' @param logistic_growth 1 = standard logistic (default); 0 = linear restoring force
+##' @return scalar endemic equilibrium value of I1, or NA when R0 <= 1
+##' @export
+ode_I1_eq <- function(beta, gamma = 1, K = 1e4, r = 0.125, logistic_growth = 1) {
+  if (beta <= gamma) return(NA_real_)
+  S_star <- gamma * K / beta
+  if (logistic_growth == 1) {
+    r * (K - S_star) / beta
+  } else {
+    r * (K - S_star) * K / (beta * S_star)
+  }
+}
+
+##' Epidemic transient summary statistics for a single-strain single-patch ODE run
+##'
+##' @param run long-format tibble from \code{discrete_run()} with \code{n_patch = 1}
+##'   and \code{I_init = c(I0, 0)} (single strain)
+##' @param beta transmission rate (\code{beta_vec[1]})
+##' @param gamma recovery rate (\code{gamma[1]}; default 1)
+##' @param K carrying capacity
+##' @param r host intrinsic growth rate
+##' @param logistic_growth 1 = logistic (default); 0 = linear restoring force
+##' @return named numeric vector with elements:
+##'   \code{eq} (endemic equilibrium of I1),
+##'   \code{T1} (first downward crossing of eq by I1: last step with I1 > eq before dip),
+##'   \code{T2}, \code{I2} (time and value of first local minimum of I1,
+##'     identified by the first index where diff(diff(I1)) > 0 after T1),
+##'   \code{T3}, \code{I3} (time and value of first local minimum of S),
+##'   \code{T4} (second upward crossing of eq by I1: last step with I1 < eq before recovery).
+##'   Any statistic that cannot be found returns \code{NA}.
+##' @export
+traj_stats_ode <- function(run, beta, gamma = 1, K = 1e4, r = 0.125, logistic_growth = 1) {
+  agg <- dplyr::arrange(sum_run1(run, "wide"), step)
+  I1  <- agg$I1_pop
+  S   <- agg$S_pop
+  t   <- agg$step
+  n   <- length(t)
+
+  eq <- ode_I1_eq(beta, gamma, K, r, logistic_growth)
+
+  ## T1: first downward crossing (last step with I1 > eq before I1 drops below eq)
+  down_idx <- which(I1[-n] > eq & I1[-1] < eq)
+  T1 <- if (length(down_idx) > 0L) t[down_idx[1L]] else NA_real_
+
+  ## T2, I2: first local minimum of I1 after T1
+  ## diff(diff(I1))[k] > 0 implies a local minimum at I1[k + 1] (1-based)
+  d2_I1 <- diff(diff(I1))
+  cand2 <- which(d2_I1 > 0) + 1L
+  if (!is.na(T1)) cand2 <- cand2[t[cand2] > T1]
+  if (length(cand2) > 0L) {
+    T2     <- t[cand2[1L]]
+    I2_val <- I1[cand2[1L]]
+  } else {
+    T2 <- I2_val <- NA_real_
+  }
+
+  ## T3, I3: first local minimum of S
+  d2_S  <- diff(diff(S))
+  cand3 <- which(d2_S > 0) + 1L
+  if (length(cand3) > 0L) {
+    T3     <- t[cand3[1L]]
+    I3_val <- S[cand3[1L]]
+  } else {
+    T3 <- I3_val <- NA_real_
+  }
+
+  ## T4: second upward crossing (last step with I1 < eq before I1 rises above eq)
+  up_idx <- which(I1[-n] < eq & I1[-1] > eq)
+  T4 <- if (length(up_idx) >= 2L) t[up_idx[2L]] else NA_real_
+
+  c(eq = eq, T1 = T1, T2 = T2, I2 = I2_val, T3 = T3, I3 = I3_val, T4 = T4)
+}
+
+
+
 ##' Aggregate a single run to per-step population totals
 ##' @param x long-format tibble from discrete_run()
 ##' @param return_type "long" or "wide"
