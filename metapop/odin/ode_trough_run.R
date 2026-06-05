@@ -2,16 +2,16 @@ library(plagueMetapop)
 library(future)
 library(furrr)
 
-plan(multicore(workers = 10))
+plan(multicore(workers = 16))
 
 dt <- 0.01
 run1 <- discrete_run(beta_vec  = c(4, 0),
                     K         = 1,
                     r         = 0.125,
                     n_patch   = 1,
-                    nt        = round(50 / dt),
+                    nt        = round(100 / dt),
                     alpha     = 0,
-                    I_init    = c(0.001, 0),
+                    I_init    = c(1e-5, 0),
                     I_ini_method = "fixed",
                     gamma     = 1,
                     dt        = dt,
