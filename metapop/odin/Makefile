@@ -9,12 +9,15 @@ vim_session:
 
 R=R CMD BATCH --vanilla
 OUTDIR=sharcnet/outputs
+
 ######################################################################
 
 compare_platforms.Rout: compare_platforms.R
 	$(pipeR)
 
-ode_trough_linear.pdf: ode_trough_plot.R outputs/ode_trough.rds
+ode_trough_linear.pdf: ode_trough_linear.Rout ;
+
+ode_trough_linear.Rout: ode_trough_plot.R outputs/ode_trough.rds
 	$(pipeR)
 
 tests.Rout: tinytest/tests.R

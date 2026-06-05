@@ -1,4 +1,4 @@
-## This is a personal makefile for plague_virulence
+## This is a PERSONAL MAKEFILE for plague_virulence
 ## It is version-controlled as jd.MK and linked and used as extras.mk
 ## make jd.extras to use
 
