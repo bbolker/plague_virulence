@@ -24,7 +24,7 @@ run1 <- discrete_run(beta_vec  = c(4, 0),
 cc <- attr(run1, "call")
 
 dt <- 0.01
-ng <- 5
+ng <- 51
 dd <- expand.grid(beta = seq(1.1, 10, length = ng),
                   r = 10^seq(-3, log(0.5), length = ng))
 res <- vector("list", length = 2) |> setNames(c("linear", "logistic"))
