@@ -29,11 +29,14 @@ plotfun <- function(run) {
         setNames("value") |>
         tibble::rownames_to_column("var")
     
-    ggplot(run1, aes(step, value)) + geom_line(aes(colour = state)) +
+    gg1 <- ggplot(run1, aes(step, value)) + geom_line(aes(colour = state)) +
         scale_y_log10() +
         geom_hline(data = dplyr::filter(t1, !grepl("^t_", var)),
                    aes(yintercept = value), lty = 2) +
         geom_vline(data = dplyr::filter(t1, grepl("^t_", var)),
                    aes(xintercept = value), lty = 2)
+
+    return(gg1)
 }
 
+plotfun(run1)
