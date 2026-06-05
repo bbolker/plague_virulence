@@ -36,3 +36,4 @@ for (dem in c("logistic", "linear")) {
   ggsave(paste0("ode_trough_", dem, ".png"), pw, width = 16, height = 8)
   ggsave(paste0("ode_trough_", dem, ".pdf"), pw, width = 16, height = 8)
 }
+invisible(NULL)
