@@ -37,8 +37,8 @@ expect_equal(t1, t2, tolerance = 1e-3,
 ## return value has the expected names
 expect_equal(
   names(t1),
-  c("eq", "t_enter.boundary", "t_Imin", "Imin", "t_Smin", "Smin", "t_leave.boundary",
-    "trough_area"),
+  c("eq_S", "eq_I", "t_enter.boundary", "t_Imin", "Imin", "t_Smin", "Smin",
+    "t_leave.boundary", "trough_area"),
   info = "traj_stats_ode returns correctly named vector"
 )
 
@@ -51,3 +51,7 @@ expect_true(unname(t1["t_enter.boundary"]) < unname(t1["t_Imin"]),
             info = "t_enter.boundary precedes t_Imin")
 expect_true(unname(t1["t_Imin"]) < unname(t1["t_leave.boundary"]),
             info = "t_Imin precedes t_leave.boundary")
+
+## snapshot: full numeric values
+expect_equal_to_reference(t1, "traj_stats_ode_snapshot.rds",
+                          info = "traj_stats_ode snapshot")

@@ -179,16 +179,18 @@ discrete_run <- function(beta_vec = c(1.5, 2.5),
 ##' @param K carrying capacity
 ##' @param r host intrinsic growth rate
 ##' @param logistic_growth 1 = standard logistic (default); 0 = linear restoring force
-##' @return scalar endemic equilibrium value of I1, or NA when R0 <= 1
+##' @return named numeric vector with elements \code{eq_S} (S*) and \code{eq_I} (I1*),
+##'   or \code{c(eq_S = NA, eq_I = NA)} when R0 <= 1
 ##' @export
-ode_I1_eq <- function(beta, gamma = 1, K = 1e4, r = 0.125, logistic_growth = 1) {
-  if (beta <= gamma) return(NA_real_)
+ode_eq <- function(beta, gamma = 1, K = 1e4, r = 0.125, logistic_growth = 1) {
+  if (beta <= gamma) return(c(eq_S = NA_real_, eq_I = NA_real_))
   S_star <- gamma * K / beta
-  if (logistic_growth == 1) {
+  I_star <- if (logistic_growth == 1) {
     r * (K - S_star) / beta
   } else {
     r * (K - S_star) * K / (beta * S_star)
   }
+  c(eq_S = S_star, eq_I = I_star)
 }
 
 ##' Epidemic transient summary statistics for a single-strain single-patch ODE run
@@ -223,10 +225,12 @@ traj_stats_ode <- function(run, beta = NULL, gamma = NULL, K = NULL, r = NULL,
   t   <- agg$step
   n   <- length(t)
 
-  eq <- ode_I1_eq(beta, gamma, K, r, logistic_growth)
+  eq   <- ode_eq(beta, gamma, K, r, logistic_growth)
+  eq_S <- eq[["eq_S"]]
+  eq_I <- eq[["eq_I"]]
 
-  ## T1: first downward crossing (last step with I1 > eq before I1 drops below eq)
-  down_idx <- which(I1[-n] > eq & I1[-1] < eq)
+  ## T1: first downward crossing (last step with I1 > eq_I before I1 drops below eq_I)
+  down_idx <- which(I1[-n] > eq_I & I1[-1] < eq_I)
   T1 <- if (length(down_idx) > 0L) t[down_idx[1L]] else NA_real_
 
   ## T2, I2: first local minimum of I1 after T1
@@ -248,20 +252,20 @@ traj_stats_ode <- function(run, beta = NULL, gamma = NULL, K = NULL, r = NULL,
     T3 <- I3_val <- NA_real_
   }
 
-  ## T4: second upward crossing (last step with I1 < eq before I1 rises above eq)
-  up_idx <- which(I1[-n] < eq & I1[-1] > eq)
+  ## T4: second upward crossing (last step with I1 < eq_I before I1 rises above eq_I)
+  up_idx <- which(I1[-n] < eq_I & I1[-1] > eq_I)
   T4 <- if (length(up_idx) >= 2L) t[up_idx[2L]] else NA_real_
 
-  ## trough_area: integral of (eq - S) * dt between t_enter.boundary and t_leave.boundary
+  ## trough_area: integral of (eq_S - S) * dt between t_enter.boundary and t_leave.boundary
   if (!is.na(T1) && !is.na(T4)) {
     dt_step    <- if (n > 1L) t[2L] - t[1L] else 1
     trough_idx <- which(t >= T1 & t <= T4)
-    trough_area <- sum(eq - S[trough_idx]) * dt_step
+    trough_area <- sum(eq_S - S[trough_idx]) * dt_step
   } else {
     trough_area <- NA_real_
   }
 
-  c(eq = eq, t_enter.boundary = T1, t_Imin = T2, Imin = I2_val,
+  c(eq_S = eq_S, eq_I = eq_I, t_enter.boundary = T1, t_Imin = T2, Imin = I2_val,
     t_Smin = T3, Smin = I3_val, t_leave.boundary = T4, trough_area = trough_area)
 }
 

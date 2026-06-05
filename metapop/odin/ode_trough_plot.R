@@ -15,7 +15,8 @@ make_raster <- function(dat, fill_var, fill_label = fill_var, title = fill_var) 
 }
 
 panels <- list(
-  list(var = "eq",               label = "equilibrium\nI*"),
+  list(var = "eq_S",             label = "equilibrium\nS*"),
+  list(var = "eq_I",             label = "equilibrium\nI*"),
   list(var = "t_enter.boundary", label = "t enter\nboundary"),
   list(var = "t_Imin",           label = "t I min"),
   list(var = "Imin",             label = "I min"),
