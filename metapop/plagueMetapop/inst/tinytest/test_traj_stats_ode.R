@@ -37,7 +37,8 @@ expect_equal(t1, t2, tolerance = 1e-3,
 ## return value has the expected names
 expect_equal(
   names(t1),
-  c("eq", "t_enter.boundary", "t_Imin", "Imin", "t_Smin", "Smin", "t_leave.boundary"),
+  c("eq", "t_enter.boundary", "t_Imin", "Imin", "t_Smin", "Smin", "t_leave.boundary",
+    "trough_area"),
   info = "traj_stats_ode returns correctly named vector"
 )
 

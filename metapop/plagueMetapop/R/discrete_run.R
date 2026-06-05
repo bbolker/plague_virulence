@@ -252,8 +252,17 @@ traj_stats_ode <- function(run, beta = NULL, gamma = NULL, K = NULL, r = NULL,
   up_idx <- which(I1[-n] < eq & I1[-1] > eq)
   T4 <- if (length(up_idx) >= 2L) t[up_idx[2L]] else NA_real_
 
+  ## trough_area: integral of (eq - S) * dt between t_enter.boundary and t_leave.boundary
+  if (!is.na(T1) && !is.na(T4)) {
+    dt_step    <- if (n > 1L) t[2L] - t[1L] else 1
+    trough_idx <- which(t >= T1 & t <= T4)
+    trough_area <- sum(eq - S[trough_idx]) * dt_step
+  } else {
+    trough_area <- NA_real_
+  }
+
   c(eq = eq, t_enter.boundary = T1, t_Imin = T2, Imin = I2_val,
-    t_Smin = T3, Smin = I3_val, t_leave.boundary = T4)
+    t_Smin = T3, Smin = I3_val, t_leave.boundary = T4, trough_area = trough_area)
 }
 
 
