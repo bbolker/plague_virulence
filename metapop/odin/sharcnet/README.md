@@ -183,6 +183,7 @@ Combined: `euler_twostrain[_mini|_mini2|_singlepatchintro].rds`
 ```bash
 bash check_jobs.sh      # state summary for most recent job array
 bash check_jobs.sh 3    # state summaries for 3 most recent job arrays
+bash count_status.sh    # like check_jobs.sh but one count per task (filters .batch sub-steps)
 sq                      # running/pending jobs
 sacct -j <jobid> --format=JobID,JobName%20,CPUTime,Elapsed,State
 sshare -l -u bolker -A def-bolker_cpu
