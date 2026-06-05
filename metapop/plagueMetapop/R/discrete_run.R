@@ -230,9 +230,7 @@ traj_stats_ode <- function(run, beta = NULL, gamma = NULL, K = NULL, r = NULL,
   T1 <- if (length(down_idx) > 0L) t[down_idx[1L]] else NA_real_
 
   ## T2, I2: first local minimum of I1 after T1
-  ## diff(diff(I1))[k] > 0 implies a local minimum at I1[k + 1] (1-based)
-  d2_I1 <- diff(diff(I1))
-  cand2 <- which(d2_I1 > 0) + 1L
+  cand2 <- which(diff(sign(diff(I1)))==2)
   if (!is.na(T1)) cand2 <- cand2[t[cand2] > T1]
   if (length(cand2) > 0L) {
     T2     <- t[cand2[1L]]
@@ -242,8 +240,7 @@ traj_stats_ode <- function(run, beta = NULL, gamma = NULL, K = NULL, r = NULL,
   }
 
   ## T3, I3: first local minimum of S
-  d2_S  <- diff(diff(S))
-  cand3 <- which(d2_S > 0) + 1L
+  cand3 <- which(diff(sign(diff(S)))==2)
   if (length(cand3) > 0L) {
     T3     <- t[cand3[1L]]
     I3_val <- S[cand3[1L]]

@@ -16,17 +16,26 @@ run1 <- discrete_run(beta_vec  = c(4, 0),
                     stop_cond = NULL,
                     nsim      = 1,
                     platform  = "odin") |>
-  dplyr::filter(state != "I2")
+    dplyr::filter(state != "I2")
+
+ii <- run1 |> dplyr::filter(state == "I1") |> dplyr::pull(value)
+plot(ii, log="y")
+
+t1 <-traj_stats_ode(run1) |>
+    cbind() |>
+    as.data.frame() |>
+    setNames("value") |>
+    tibble::rownames_to_column("var")
+    
+ggplot(run1, aes(step, value)) + geom_line(aes(colour = state)) +
+    scale_y_log10() +
+    geom_hline(data = dplyr::filter(t1, !grepl("^t_", var)),
+               aes(yintercept = value), lty = 2) +
+    geom_vline(data = dplyr::filter(t1, grepl("^t_", var)),
+               aes(xintercept = value), lty = 2)
 
 cc <- attr(run1, "call")
-dt <- 0.005
-run2 <- eval(cc) |>   dplyr::filter(state != "I2")
 
-ggplot(run1, aes(step, value, colour = state)) + geom_line() +
-  scale_y_log10() +
-  geom_line(data = run2, lty = 2)
-
-t1 <-traj_stats_ode(run1)
 t2 <-traj_stats_ode(run2)
 all.equal(t1, t2, tolerance = 1e-3)
 
