@@ -88,6 +88,7 @@ make_simulator_odin <- function(
   }
 
   mod <- do.call(gen_local$new, args)
+  attr(mod, "dt")        <- dt
   attr(mod, "nt")        <- nt
   attr(mod, "gen")       <- gen_local
   attr(mod, "init_args") <- args
@@ -103,18 +104,28 @@ make_simulator_odin <- function(
 ##' @export
 run_simulator_odin <- function(x, chunk = 50L, stop_cond = NULL) {
   nt        <- attr(x, "nt")
+  dt        <- attr(x, "dt")
   gen       <- attr(x, "gen")
   init_args <- attr(x, "init_args")
+  is_ode    <- identical(attr(gen, "def_filename"), "ode_odin_def.R")
 
   ## odin's $run() always restarts from initial conditions; it does NOT persist
   ## state between calls. drop_first removes the step-0 initial-conditions row.
   drop_first <- function(m) m[-1L, , drop = FALSE]
 
   if (is.null(stop_cond)) {
-    return(x$run(seq(0, nt)))
+    if (is_ode) {
+      ## ODE: $run() takes actual time values, so scale the time vector directly
+      return(x$run(seq(0, nt) * dt))
+    } else {
+      ## Euler/discrete: $run() takes integer step indices; scale the output column
+      res <- x$run(seq(0L, nt))
+      if (dt != 1) res[, "step"] <- res[, "step"] * dt
+      return(res)
+    }
   }
 
-  ## Chunked early-stopping (approach 2):
+  ## Chunked early-stopping (approach 2); only reached for non-ODE models.
   ## Each chunk runs seq(0, chunk_len) on a fresh model instance initialised
   ## from the previous chunk's last-row state. This works around odin resetting
   ## to initial conditions on every $run() call.
@@ -132,7 +143,7 @@ run_simulator_odin <- function(x, chunk = 50L, stop_cond = NULL) {
     chunk_len <- breaks[k + 1L] - breaks[k]
     res       <- mod$run(seq(0L, chunk_len))
     out[[k]]  <- if (k==1) res else drop_first(res)
-    out[[k]][, 1L] <- out[[k]][, 1L] + breaks[k]   ## shift to absolute step numbers
+    out[[k]][, "step"] <- out[[k]][, "step"] + breaks[k]   ## shift to absolute step numbers
 
     if (stop_cond(res[nrow(res), , drop = FALSE])) break
 
@@ -155,7 +166,9 @@ run_simulator_odin <- function(x, chunk = 50L, stop_cond = NULL) {
     }
   }
 
-  do.call(rbind, out[!vapply(out, is.null, logical(1L))])
+  result <- do.call(rbind, out[!vapply(out, is.null, logical(1L))])
+  if (dt != 1) result[, "step"] <- result[, "step"] * dt
+  result
 }
 
 ##' Stopping conditions for run_simulator_odin()

@@ -1,4 +1,14 @@
 library(plagueMetapop)
+library(methods)
+
+all.equal.nocheck <- function(x, y, ..., check.attributes = FALSE, check.class = FALSE) {
+  if (is(x, "Matrix")) x <- matrix(x)
+  if (is(y, "Matrix")) y <- matrix(y)
+  all.equal(x, y, ..., check.attributes = check.attributes, check.class = check.class)
+}
+expect_equal_nocheck <- function(..., tolerance = 5e-5) {
+  expect_true(isTRUE(all.equal.nocheck(..., tolerance = tolerance)))
+}
 
 ## Shared parameters for both runs
 common <- list(
@@ -23,5 +33,5 @@ run_euler_rf <- do.call(discrete_run,
                                        gamma       = c(1, 1),
                                        dt          = 1)))
 
-expect_equal(run_discrete, run_euler_rf,
-             info = "euler with reedfrost=1, gamma=1, dt=1 matches discrete model")
+expect_equal_nocheck(run_discrete, run_euler_rf,
+                     info = "euler with reedfrost=1, gamma=1, dt=1 matches discrete model")

@@ -24,8 +24,11 @@ make_I_ini_mat <- function(I_init, n_patch, n_strain = 2L,
   }
   if (method == "rpois")
     matrix(rpois(n_patch * n_strain, lambda = lambda), nrow = n_patch, ncol = n_strain)
-  else
-    matrix(round(lambda), nrow = n_patch, ncol = n_strain)
+  else {
+    ## don't round lambda: up to user
+    ## (warn if we can somehow figure out if a stoch model is being used and lambda is non-integer?)
+    matrix(lambda, nrow = n_patch, ncol = n_strain)
+  }
 }
 
 ##' Run one or more two-strain n-patch simulations across platforms
@@ -98,8 +101,18 @@ discrete_run <- function(beta_vec = c(1.5, 2.5),
                           dt = 1,
                           platform = c("odin", "macpan2", "pureR")) {
 
+  .call        <- match.call()
   platform     <- match.arg(platform)
   I_ini_method <- match.arg(I_ini_method)
+  .params      <- tibble::lst(beta_vec, K, logistic_growth, reedfrost, r, n_patch,
+                               nt, alpha, gamma, strain2_delay, I_init, I_ini_method,
+                               seed, nsim, chunk, stop_cond, def_file, dt, platform)
+  attach_meta  <- function(x) {
+    class(x) <- c("metapop_run", class(x))
+    attr(x, "call")   <- .call
+    attr(x, "params") <- .params
+    x
+  }
   if ((!is.null(chunk) || !is.null(stop_cond)) && platform != "odin")
     stop("chunk and stop_cond are only supported for platform = 'odin'")
   if (!is.null(stop_cond) && platform == "odin" && def_file == "ode_odin_def.R")
@@ -140,16 +153,16 @@ discrete_run <- function(beta_vec = c(1.5, 2.5),
                     list(I_ini_mat = make_I_ini_mat(I_init, n_patch, 2L, I_ini_method)))
     fun <- do.call(makefun, local_args)
     res <- do.call(runfun, c(list(fun), run_args)) |> convfun()
-    if (dt != 1) dplyr::mutate(res, dplyr::across(step, ~ . * dt)) else res
+    if (dt != 1 && platform != "odin") dplyr::mutate(res, dplyr::across(step, ~ . * dt)) else res
   }
 
   if (nsim == 1) {
     if (!is.null(seed)) set.seed(seed)
-    return(FUN(1L))
+    return(attach_meta(FUN(1L)))
   }
 
-  furrr::future_map(seq.int(nsim), FUN,
-                    .options = furrr::furrr_options(seed = seed %||% TRUE))
+  attach_meta(furrr::future_map(seq.int(nsim), FUN,
+                                .options = furrr::furrr_options(seed = seed %||% TRUE)))
 }
 
 
@@ -182,21 +195,28 @@ ode_I1_eq <- function(beta, gamma = 1, K = 1e4, r = 0.125, logistic_growth = 1) 
 ##'
 ##' @param run long-format tibble from \code{discrete_run()} with \code{n_patch = 1}
 ##'   and \code{I_init = c(I0, 0)} (single strain)
-##' @param beta transmission rate (\code{beta_vec[1]})
-##' @param gamma recovery rate (\code{gamma[1]}; default 1)
-##' @param K carrying capacity
-##' @param r host intrinsic growth rate
-##' @param logistic_growth 1 = logistic (default); 0 = linear restoring force
+##' @param beta transmission rate (\code{beta_vec[1]}); taken from \code{attr(run, "params")} if NULL
+##' @param gamma recovery rate (\code{gamma[1]}); taken from \code{attr(run, "params")} if NULL
+##' @param K carrying capacity; taken from \code{attr(run, "params")} if NULL
+##' @param r host intrinsic growth rate; taken from \code{attr(run, "params")} if NULL
+##' @param logistic_growth 1 = logistic; 0 = linear restoring force; taken from \code{attr(run, "params")} if NULL
 ##' @return named numeric vector with elements:
 ##'   \code{eq} (endemic equilibrium of I1),
-##'   \code{T1} (first downward crossing of eq by I1: last step with I1 > eq before dip),
-##'   \code{T2}, \code{I2} (time and value of first local minimum of I1,
-##'     identified by the first index where diff(diff(I1)) > 0 after T1),
-##'   \code{T3}, \code{I3} (time and value of first local minimum of S),
-##'   \code{T4} (second upward crossing of eq by I1: last step with I1 < eq before recovery).
+##'   \code{t_enter.boundary} (first downward crossing of eq by I1: last step with I1 > eq before dip),
+##'   \code{t_Imin}, \code{Imin} (time and value of first local minimum of I1,
+##'     identified by the first index where diff(diff(I1)) > 0 after \code{t_enter.boundary}),
+##'   \code{t_Smin}, \code{Smin} (time and value of first local minimum of S),
+##'   \code{t_leave.boundary} (second upward crossing of eq by I1: last step with I1 < eq before recovery).
 ##'   Any statistic that cannot be found returns \code{NA}.
 ##' @export
-traj_stats_ode <- function(run, beta, gamma = 1, K = 1e4, r = 0.125, logistic_growth = 1) {
+traj_stats_ode <- function(run, beta = NULL, gamma = NULL, K = NULL, r = NULL,
+                           logistic_growth = NULL) {
+  p <- attr(run, "params")
+  if (is.null(beta))            beta            <- p$beta_vec[1L]
+  if (is.null(gamma))           gamma           <- p$gamma[1L]
+  if (is.null(K))               K               <- p$K[1L]
+  if (is.null(r))               r               <- p$r[1L]
+  if (is.null(logistic_growth)) logistic_growth <- p$logistic_growth
   agg <- dplyr::arrange(sum_run1(run, "wide"), step)
   I1  <- agg$I1_pop
   S   <- agg$S_pop
@@ -235,7 +255,8 @@ traj_stats_ode <- function(run, beta, gamma = 1, K = 1e4, r = 0.125, logistic_gr
   up_idx <- which(I1[-n] < eq & I1[-1] > eq)
   T4 <- if (length(up_idx) >= 2L) t[up_idx[2L]] else NA_real_
 
-  c(eq = eq, T1 = T1, T2 = T2, I2 = I2_val, T3 = T3, I3 = I3_val, T4 = T4)
+  c(eq = eq, t_enter.boundary = T1, t_Imin = T2, Imin = I2_val,
+    t_Smin = T3, Smin = I3_val, t_leave.boundary = T4)
 }
 
 
