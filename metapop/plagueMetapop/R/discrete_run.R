@@ -167,13 +167,13 @@ discrete_run <- function(beta_vec = c(1.5, 2.5),
 
 
 
-##' Endemic equilibrium of I1 for the single-strain single-patch ODE model
+##' Endemic equilibria (S* and I*) for the single-strain single-patch ODE model
 ##'
 ##' At the non-trivial equilibrium, dI/dt = 0 gives S* = gamma*K/beta.
 ##' Setting dS/dt = 0 then determines I*:
 ##' logistic: r*S*(1-S/K) = beta*I*S/K => I* = r*(K - S*)/beta;
 ##' linear:   r*(K-S)      = beta*I*S/K => I* = r*(K - S*)*K/(beta*S*).
-##' Returns NA when R0 = beta/gamma <= 1.
+##' Returns NA for both components when R0 = beta/gamma <= 1.
 ##' @param beta transmission rate (beta_vec[1])
 ##' @param gamma recovery rate (gamma[1]; default 1)
 ##' @param K carrying capacity

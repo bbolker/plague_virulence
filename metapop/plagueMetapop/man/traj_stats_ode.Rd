@@ -30,11 +30,11 @@ and \code{I_init = c(I0, 0)} (single strain)}
 \value{
 named numeric vector with elements:
   \code{eq} (endemic equilibrium of I1),
-  \code{T1} (first downward crossing of eq by I1: last step with I1 > eq before dip),
-  \code{T2}, \code{I2} (time and value of first local minimum of I1,
-    identified by the first index where diff(diff(I1)) > 0 after T1),
-  \code{T3}, \code{I3} (time and value of first local minimum of S),
-  \code{T4} (second upward crossing of eq by I1: last step with I1 < eq before recovery).
+  \code{t_enter.boundary} (first downward crossing of eq by I1: last step with I1 > eq before dip),
+  \code{t_Imin}, \code{Imin} (time and value of first local minimum of I1,
+    identified by the first index where diff(diff(I1)) > 0 after \code{t_enter.boundary}),
+  \code{t_Smin}, \code{Smin} (time and value of first local minimum of S),
+  \code{t_leave.boundary} (second upward crossing of eq by I1: last step with I1 < eq before recovery).
   Any statistic that cannot be found returns \code{NA}.
 }
 \description{
