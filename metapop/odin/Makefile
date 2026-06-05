@@ -14,6 +14,9 @@ OUTDIR=sharcnet/outputs
 compare_platforms.Rout: compare_platforms.R
 	$(pipeR)
 
+ode_trough_linear.pdf: ode_trough_plot.R outputs/ode_trough.rds
+	$(R) $<
+
 tests.Rout: tinytest/tests.R
 	$(pipeR)
 

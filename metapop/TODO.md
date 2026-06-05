@@ -1,9 +1,8 @@
 ## To do
 
-* add integrated val in boundary layer to traj_ode
+* sanity-check/interpret trajectory summary results/plots
 * direct solution of deterministic metapop model??? does it collapse?
 * PIP runs starting from a *single patch* introduction (wait for it to be done)
-* using odin ODE version, quantify trough depth vs R0 for leaky-bucket vs logistic demography
 * implement non-extinction variant, compare with extinction-allowed (strength of burnout mechanism)
 * implement power-law R0(N) ?
 * think about an invasibility expression: if we know patch occupancy and S/I distributions of resident, can we calculate invasion, or do extinction dynamics etc. make expectations of instantaneous growth rate irrelevant?
@@ -13,11 +12,10 @@
 ### code
 
 * refactor two-strain delay to be part of discrete_run (chunked run), rather than part of model definition
-* lightweight S3 code for odin runs (store call for update() method; print, plot methods ...)
+* lightweight S3 code for odin runs (store call for update() method; print, plot methods ...); store parameter values as attributes
 * prototype and benchmark hybrid deterministic (above threshold)/stochastic (below threshold) model
 * create dedicated single-strain model (doesn't help that much)
 * instrument runs to record r(t), foi(t), etc. (to understand invasion criteria etc.)
-* store parameter values as attributes
 * makestuff/shellpipes?
    * sort out working-directory stuff (package??)
    * interference between shellpipes/makestuff and command-line args?
@@ -35,7 +33,6 @@ Note effects of [1] generation interval/infectious period distribution; [2] demo
 
 * tweak poisson/sim.R; allow sim prefix
 * allow burnout in poisson sim?
-* re-run PIP sims, with ODE final sizes - on SHARCNET?
 * check Levine and Earn for two-strain final info
 * run odin two-strain for burnout calcs? (with vital dynamics, with some rubric for finding first trough)
 * compare with YZ computations?
