@@ -2,7 +2,7 @@ library(plagueMetapop)
 library(future)
 library(furrr)
 
-plan(multicore(workers = 16))
+plan(multicore(workers = 15))
 
 dt <- 0.01
 run1 <- discrete_run(beta_vec  = c(4, 0),

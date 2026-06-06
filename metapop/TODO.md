@@ -1,6 +1,6 @@
 ## To do
 
-* sanity-check/interpret trajectory summary results/plots
+* sanity-check/interpret trajectory summary results/plots: re-run with nt dependent on 1/r
 * direct solution of deterministic metapop model??? does it collapse?
 * PIP runs starting from a *single patch* introduction (wait for it to be done)
 * implement non-extinction variant, compare with extinction-allowed (strength of burnout mechanism)

@@ -17,6 +17,8 @@ compare_platforms.Rout: compare_platforms.R
 
 ode_trough_linear.pdf: ode_trough_linear.Rout ;
 
+ode_trough.rds:	oud_trough_run.Rout 
+	$(pipeR)
 ode_trough_linear.Rout: ode_trough_plot.R outputs/ode_trough.rds
 	$(pipeR)
 

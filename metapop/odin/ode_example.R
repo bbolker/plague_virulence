@@ -3,9 +3,9 @@ library(ggplot2); theme_set(theme_bw())
 library(dplyr)
 
 dt <- 0.01
-run1 <- discrete_run(beta_vec  = c(4, 0),
+run1 <- discrete_run(beta_vec  = c(3, 0), ## was (4, 0)
                     K         = 1,
-                    r         = 0.125,
+                    r         = 0.003, ## was 0.125
                     n_patch   = 1,
                     nt        = round(50 / dt),
                     alpha     = 0,
