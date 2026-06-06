@@ -1,5 +1,6 @@
 library(plagueMetapop)
 library(ggplot2); theme_set(theme_bw())
+library(dplyr)
 
 dt <- 0.01
 run1 <- discrete_run(beta_vec  = c(4, 0),
@@ -16,27 +17,46 @@ run1 <- discrete_run(beta_vec  = c(4, 0),
                     stop_cond = NULL,
                     nsim      = 1,
                     platform  = "odin") |>
-    dplyr::filter(state != "I2")
-
-
+    filter(state != "I2")
 
 plotfun <- function(run) {
-    ii <- run |> dplyr::filter(state == "I1") |> dplyr::pull(value)    
+    ii <- run |> filter(state == "I1") |> pull(value)    
 
-    t1 <-traj_stats_ode(run1) |>
-        cbind() |>
-        as.data.frame() |>
-        setNames("value") |>
-        tibble::rownames_to_column("var")
-    
-    gg1 <- ggplot(run1, aes(step, value)) + geom_line(aes(colour = state)) +
-        scale_y_log10() +
-        geom_hline(data = dplyr::filter(t1, !grepl("^t_", var)),
-                   aes(yintercept = value), lty = 2) +
-        geom_vline(data = dplyr::filter(t1, grepl("^t_", var)),
-                   aes(xintercept = value), lty = 2)
+    t0 <-traj_stats_ode(run)
+    beg <- t0[["t_enter.boundary"]]
+    end <- t0[["t_leave.boundary"]]
+    dd_trough <- run |> filter(between(step, beg, end))
+    get_var <- function(v) {
+      vn <- deparse(substitute(v))
+      filter(dd_trough, state==vn) |> pull(value)
+    }
+    trough_S <- get_var(S)
+    trough_step <- unique(dd_trough$step)
+    t1 <- t0 |>
+      cbind() |>
+      as.data.frame() |>
+      setNames("value") |>
+      tibble::rownames_to_column("var") |>
+      filter(var != "trough_area") |>
+      mutate(var2 = case_when(
+               grepl("S", var) ~ "S",
+               grepl("I", var) ~ "I1",
+               grepl("bound|trough", var) ~ "trough"))
+    gg1 <- ggplot(run1, aes(step, value)) +
+      geom_line(aes(colour = state, linetype = state)) +
+      scale_y_log10() +
+      geom_hline(data = filter(t1, !grepl("^t_", var)),
+                 aes(yintercept = value, colour = var2, linetype  = var2), lty = 2) +
+      geom_vline(data = filter(t1, grepl("^t_", var)),
+                 aes(xintercept = value, colour = var2, linetype = var2), lty = 2) +
+      annotate(geom = "polygon",
+               x = c(trough_step, rev(trough_step)),
+               y = c(trough_S, rep(t0[["eq_S"]], length(trough_S))),
+               colour = NA, fill = "black", alpha = 0.3) +
+      scale_colour_brewer(palette = "Dark2")
 
     return(gg1)
 }
 
 plotfun(run1)
+ggsave(plotfun(run1), file = "ode_trough_example.pdf")
