@@ -208,7 +208,10 @@ ode_eq <- function(beta, gamma = 1, K = 1e4, r = 0.125, logistic_growth = 1) {
 ##'   \code{t_Imin}, \code{Imin} (time and value of first local minimum of I1,
 ##'     identified by the first index where diff(diff(I1)) > 0 after \code{t_enter.boundary}),
 ##'   \code{t_Smin}, \code{Smin} (time and value of first local minimum of S),
+##'   \code{t_eqS} (first time after \code{t_Smin} that S crosses upward through \code{eq_S}),
 ##'   \code{t_leave.boundary} (second upward crossing of eq by I1: last step with I1 < eq before recovery).
+##'   \code{trough_area} (integral of \code{eq_S - S} from \code{t_enter.boundary}
+##'     until the first time S rises back above \code{eq_S}).
 ##'   Any statistic that cannot be found returns \code{NA}.
 ##' @export
 traj_stats_ode <- function(run, beta = NULL, gamma = NULL, K = NULL, r = NULL,
@@ -256,17 +259,26 @@ traj_stats_ode <- function(run, beta = NULL, gamma = NULL, K = NULL, r = NULL,
   up_idx <- which(I1[-n] < eq_I & I1[-1] > eq_I)
   T4 <- if (length(up_idx) >= 2L) t[up_idx[2L]] else NA_real_
 
-  ## trough_area: integral of (eq_S - S) * dt between t_enter.boundary and t_leave.boundary
-  if (!is.na(T1) && !is.na(T4)) {
-    dt_step    <- if (n > 1L) t[2L] - t[1L] else 1
-    trough_idx <- which(t >= T1 & t <= T4)
+  ## T_S_recover: first upward crossing of eq_S by S (S recovers above equilibrium)
+  S_up_idx    <- which(S[-n] < eq_S & S[-1] > eq_S)
+  T_S_recover <- if (length(S_up_idx) > 0L) t[S_up_idx[1L]] else NA_real_
+
+  ## t_eqS: first upward S crossing of eq_S after t_Smin
+  S_up_after_Smin <- if (!is.na(T3)) S_up_idx[t[S_up_idx] > T3] else S_up_idx
+  t_eqS <- if (length(S_up_after_Smin) > 0L) t[S_up_after_Smin[1L]] else NA_real_
+
+  ## trough_area: integral of (eq_S - S) * dt from t_enter.boundary until S first exceeds eq_S
+  if (!is.na(T1) && !is.na(T_S_recover)) {
+    dt_step     <- if (n > 1L) t[2L] - t[1L] else 1
+    trough_idx  <- which(t >= T1 & t <= T_S_recover)
     trough_area <- sum(eq_S - S[trough_idx]) * dt_step
   } else {
     trough_area <- NA_real_
   }
 
   c(eq_S = eq_S, eq_I = eq_I, t_enter.boundary = T1, t_Imin = T2, Imin = I2_val,
-    t_Smin = T3, Smin = I3_val, t_leave.boundary = T4, trough_area = trough_area)
+    t_Smin = T3, Smin = I3_val, t_eqS = t_eqS, t_leave.boundary = T4,
+    trough_area = trough_area)
 }
 
 

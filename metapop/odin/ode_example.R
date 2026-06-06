@@ -24,7 +24,7 @@ plotfun <- function(run) {
 
     t0 <-traj_stats_ode(run)
     beg <- t0[["t_enter.boundary"]]
-    end <- t0[["t_leave.boundary"]]
+    end <- t0[["t_eqS"]]
     dd_trough <- run |> filter(between(step, beg, end))
     get_var <- function(v) {
       vn <- deparse(substitute(v))
