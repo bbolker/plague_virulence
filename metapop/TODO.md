@@ -1,8 +1,9 @@
 ## To do
 
 * sanity-check/interpret trajectory summary results/plots: re-run with nt dependent on 1/r
+* debug PIP runs starting from a *single patch* introduction/run single example: no extinction??
 * direct solution of deterministic metapop model??? does it collapse?
-* PIP runs starting from a *single patch* introduction (wait for it to be done)
+
 * implement non-extinction variant, compare with extinction-allowed (strength of burnout mechanism)
 * implement power-law R0(N) ?
 * think about an invasibility expression: if we know patch occupancy and S/I distributions of resident, can we calculate invasion, or do extinction dynamics etc. make expectations of instantaneous growth rate irrelevant?
@@ -11,7 +12,8 @@
 
 ### code
 
-* refactor two-strain delay to be part of discrete_run (chunked run), rather than part of model definition
+* refactor two-strain delay to be part of discrete_run (chunked run), rather than part of model definition (helps with trough calculations as well)
+* refactor stop_condition to allow calculations based on full trajectory to date (again, for trough calculations)
 * lightweight S3 code for odin runs (store call for update() method; print, plot methods ...); store parameter values as attributes
 * prototype and benchmark hybrid deterministic (above threshold)/stochastic (below threshold) model
 * create dedicated single-strain model (doesn't help that much)
