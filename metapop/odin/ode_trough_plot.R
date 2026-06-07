@@ -2,6 +2,7 @@ library(ggplot2); theme_set(theme_bw())
 library(dplyr)
 library(patchwork)
 
+plot_height <- 8; plot_width <- 10
 res <- readRDS("outputs/ode_trough.rds")
 
 make_raster <- function(dat, fill_var, fill_label = fill_var, title = fill_var) {
@@ -33,7 +34,13 @@ for (dem in c("logistic", "linear")) {
                                            title =  p$label))
   pw <- wrap_plots(plots, ncol = 3) +
     plot_annotation(title = dem)
-  ggsave(paste0("ode_trough_", dem, ".png"), pw, width = 16, height = 8)
-  ggsave(paste0("ode_trough_", dem, ".pdf"), pw, width = 16, height = 8)
+
+  sfun <- function(ext) {
+    ggsave(paste0("ode_trough_", dem, ext),
+           pw, width = plot_width, height = plot_height)
+  }
+  sfun(".png")
+  sfun(".pdf")
+
 }
 invisible(NULL)
