@@ -59,8 +59,8 @@ strain2_delay <- round(100 / dt)
 ## all other patches have lambda=0 so rpois always gives 0.
 if (opt$singlepatchintro) {
   n_sim  <- 500L
-  I_init <- matrix(c(rep(10, n_patch), c(10, rep(0, n_patch - 1L))),
-                   nrow = n_patch, ncol = 2L)
+  I_init <- cbind(rep(10, n_patch),
+                  c(10, rep(0, n_patch - 1L)))
 } else {
   I_init <- c(10, 10)
 }

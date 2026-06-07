@@ -3,11 +3,11 @@ library(ggplot2); theme_set(theme_bw())
 zmargin <- theme(panel.spacing=grid::unit(0,"lines"))
 
 input_dir <- here::here("metapop/odin/sharcnet/outputs")
-input_fn <- "euler_twostrain.rds"
+input_fn <- "euler_twostrain_singlepatchintro.rds"
 
 dt <- 0.1
 invade_start <- 100
-max_duration <- 200
+max_duration <- 500
 
 log10alpha_labeller <- function(labels) {
   list(lapply(sprintf("%s == 10^{%d}", names(labels)[1],
@@ -83,6 +83,7 @@ plot_fun <- function(sub_dat, facet = FALSE, title = NULL) {
   return(p)
 }
 
+summary(dd$mean_ext_time.I2) ## uh-oh
 summary(dd$ext_prob.I2) ## ALL extinct ... ??? is this expected?
 summary(dd$ext_prob.I1) ## sometimes extinct
 
@@ -95,3 +96,4 @@ ggplot(dd, aes(R01, R02, fill = mean_ext_time.I2)) +
   
 plot_fun(dd, facet = TRUE) + zmargin + theme(strip.text.y = element_text(angle = 0)) 
 ggsave("euler_twostrain_pip.png", width = 10, height = 8)
+ggsave("euler_twostrain_pip.pdf", width = 10, height = 8)
