@@ -3,7 +3,7 @@
 #SBATCH --job-name=euler_twostrain_spi
 #SBATCH --array=1-8100
 #SBATCH --time=0-01:30:00
-#SBATCH --mem=32G
+#SBATCH --mem=64G
 #SBATCH --cpus-per-task=1
 #SBATCH --output=logs/euler_twostrain_singlepatchintro_%A_%a.out
 
