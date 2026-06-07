@@ -9,7 +9,7 @@ run1 <- discrete_run(beta_vec  = c(4, 0),
                     K         = 1,
                     r         = 0.125,
                     n_patch   = 1,
-                    nt        = round(100 / dt),
+                    nt        = round(10/ dt),
                     alpha     = 0,
                     I_init    = c(1e-5, 0),
                     I_ini_method = "fixed",
@@ -36,6 +36,8 @@ for (nm in names(res)) {
         cc_i <- cc_nm
         cc_i$beta_vec <- c(dd$beta[i], 0)
         cc_i$r <- dd$r[i]
+        ## need to re-evaluate here; lazy eval not quite smart enough
+        cc_i$nt <- round(10 / dd$r[i] / dt)
         traj_stats_ode(eval(cc_i))
     }, .options = furrr_options(seed = TRUE))
     res[[nm]] <- dplyr::bind_cols(dd, dplyr::bind_rows(rows))
