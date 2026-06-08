@@ -3,21 +3,22 @@ library(ggplot2); theme_set(theme_bw())
 library(dplyr)
 
 dt <- 0.01
-run1 <- discrete_run(beta_vec  = c(3, 0), ## was (4, 0)
+r <- 0.003 ## was 0.125
+run1 <- discrete_run(beta_vec  = c(7, 0), ## was (4, 0)
                     K         = 1,
-                    r         = 0.003, ## was 0.125
+                    r         = r, ## was 0.125
                     n_patch   = 1,
-                    nt        = round(50 / dt),
+                    nt        = round(10 / r / dt),
                     alpha     = 0,
                     I_init    = c(0.001, 0),
                     I_ini_method = "fixed",
-                    gamma     = 1,
                     dt        = dt,
                     def_file  = "ode_odin_def.R",
-                    stop_cond = NULL,
+                    logistic_growth = 1,
                     nsim      = 1,
+                    stop_cond = NULL,
                     platform  = "odin") |>
-    filter(state != "I2")
+    dplyr::filter(state != "I2")
 
 plotfun <- function(run) {
     ii <- run |> filter(state == "I1") |> pull(value)    
@@ -57,6 +58,8 @@ plotfun <- function(run) {
 
     return(gg1)
 }
+
+run1 |> filter(state=="I1") |> pull(value) |> min()
 
 plotfun(run1)
 ggsave(plotfun(run1), file = "ode_trough_example.pdf")

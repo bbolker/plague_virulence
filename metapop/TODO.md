@@ -1,6 +1,6 @@
 ## To do
 
-* sanity-check/interpret trajectory summary results/plots: re-run with nt dependent on 1/r
+* share trough-run output (add overlay showing range of trough minima below `.Machine$double.xmin`) [are some panels from `ode_trough_plot.R` unnecessary? main differences are in `I_min`, `t(I_min)`, `trough area`, `t(leave boundary)`
 * debug PIP runs starting from a *single patch* introduction/run single example: no extinction??
 * direct solution of deterministic metapop model??? does it collapse?
 
@@ -13,8 +13,8 @@
 ### code
 
 * refactor two-strain delay to be part of discrete_run (chunked run), rather than part of model definition (helps with trough calculations as well)
-* refactor stop_condition to allow calculations based on full trajectory to date (again, for trough calculations)
-* lightweight S3 code for odin runs (store call for update() method; print, plot methods ...); store parameter values as attributes
+* refactor stop_condition to allow calculations based on more than last row (current state) alone: parameters (e.g. -> equilibrium values), derivative, complete trajectory? (for trough runs, want to know if we're beyond `t_Seq`)
+* lightweight S3 code for odin runs (print, plot methods ...); store parameter values as attributes. Make sure this propagates e.g. for multi-sample runs to summary?
 * prototype and benchmark hybrid deterministic (above threshold)/stochastic (below threshold) model
 * create dedicated single-strain model (doesn't help that much)
 * instrument runs to record r(t), foi(t), etc. (to understand invasion criteria etc.)
