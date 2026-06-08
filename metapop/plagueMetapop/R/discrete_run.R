@@ -153,6 +153,10 @@ discrete_run <- function(beta_vec = c(1.5, 2.5),
                     list(I_ini_mat = make_I_ini_mat(I_init, n_patch, 2L, I_ini_method)))
     fun <- do.call(makefun, local_args)
     res <- do.call(runfun, c(list(fun), run_args)) |> convfun()
+    if (def_file == "ode_odin_def.R" &&
+        any(res$value > 0 & res$value < .Machine$double.xmin))
+      warning("some state variable values are below .Machine$double.xmin; ",
+              "odin may have clamped underflowed values to this minimum")
     if (dt != 1 && platform != "odin") dplyr::mutate(res, dplyr::across(step, ~ . * dt)) else res
   }
 
