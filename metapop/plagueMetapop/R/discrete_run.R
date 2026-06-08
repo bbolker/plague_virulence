@@ -280,12 +280,15 @@ traj_stats_ode <- function(run, beta = NULL, gamma = NULL, K = NULL, r = NULL,
     trough_area <- NA_real_
   }
 
-  c(eq_S = eq_S, eq_I = eq_I, t_enter.boundary = T1, t_Imin = T2, Imin = I2_val,
-    t_Smin = T3, Smin = I3_val, t_eqS = t_eqS, t_leave.boundary = T4,
-    trough_area = trough_area)
+  any_small <- as.numeric(any(I1 > 0 & I1 < .Machine$double.xmin))
+  
+  unlist(tibble::lst(eq_S, eq_I,
+                     t_enter.boundary = T1, t_Imin = T2, Imin = I2_val,
+                     t_Smin = T3, Smin = I3_val, t_eqS = t_eqS,
+                     t_leave.boundary = T4,
+                     trough_area,
+                     any_small))
 }
-
-
 
 ##' Aggregate a single run to per-step population totals
 ##' @param x long-format tibble from discrete_run()
