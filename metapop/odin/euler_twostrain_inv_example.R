@@ -38,9 +38,5 @@ ggplot(runs_x, aes(step, value, colour = type)) +
   geom_line(aes(group = interaction(run, type)), alpha = 0.4) +
   scale_y_log10()
 
-out <- dplyr::bind_cols(row, as.data.frame(as.list(sumfun_discrete(runs, strain2_delay = strain2_delay))))
+sumfun_discrete(runs, strain2_delay = strain2_delay)
 
-dir.create("outputs", showWarnings = FALSE)
-saveRDS(out, sprintf("outputs/%s_task_%06d.rds", base_fn, task_id))
-if (task_id == 1L)
-  saveRDS(runs, sprintf("outputs/%s_runs_task_%06d.rds", base_fn, task_id))

@@ -1,6 +1,7 @@
 ## To do
 
-* share trough-run output (add overlay showing range of trough minima below `.Machine$double.xmin`) [are some panels from `ode_trough_plot.R` unnecessary? main differences are in `I_min`, `t(I_min)`, `trough area`, `t(leave boundary)`
+* update `sumfun_discrete()` to use attached attributes (run length etc.)
+* discuss trough-run output
 * debug PIP runs starting from a *single patch* introduction/run single example: no extinction??
 * direct solution of deterministic metapop model??? does it collapse?
 
