@@ -329,13 +329,17 @@ sum_runs <- function(x) {
 ##'   quasi-equilibrium means over the last \code{nsteps} steps, conditioned
 ##'   on the strain still being present (cell-level masking).
 ##' @param runs list of long-format tibbles from discrete_run(), or a single tibble
-##' @param nsteps number of trailing steps used for quasi-equilibrium averages
+##' @param nsteps_qeq number of trailing steps used for quasi-equilibrium averages
 ##' @param strain2_delay steps before strain 2 is seeded; zeros in I2 before
-##'   this step are not counted as extinction
+##'   this step are not counted as extinction; extracted from \code{attr(runs, "params")}
+##'   if \code{NULL}; error if missing
 ##' @param which strains to summarise (currently ignored; both strains always returned)
 ##' @return named numeric vector of summary statistics
 ##' @export
-sumfun_discrete <- function(runs, nsteps = 100, strain2_delay = 0, which = c(1, 2)) {
+sumfun_discrete <- function(runs, nsteps_qeq = 100, strain2_delay = NULL, which = c(1, 2)) {
+  p <- attr(runs, "params")
+  if (is.null(strain2_delay))
+    strain2_delay <- p$strain2_delay %||% stop("'strain2_delay' is missing and not found in run attributes")
   if (!is.list(runs) || inherits(runs, "data.frame")) runs <- list(runs)
   nsim <- length(runs)
 
@@ -347,7 +351,7 @@ sumfun_discrete <- function(runs, nsteps = 100, strain2_delay = 0, which = c(1, 
   ## row accesses, but those runs are already masked by ext_vec, so the mean is
   ## unaffected.
   nt     <- max(vapply(agg, nrow, integer(1L)))
-  window <- seq(max(1L, nt - nsteps + 1L), nt)
+  window <- seq(max(1L, nt - nsteps_qeq + 1L), nt)
 
   ## row index of first step where total infected == 0 (NA if never extinct).
   ## `after`: ignore zeros at or before this step (used to skip pre-seeding
