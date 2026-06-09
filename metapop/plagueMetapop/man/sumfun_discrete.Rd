@@ -4,15 +4,24 @@
 \alias{sumfun_discrete}
 \title{Summarise extinction and quasi-equilibrium statistics across runs}
 \usage{
-sumfun_discrete(runs, nsteps = 100, strain2_delay = 0, which = c(1, 2))
+sumfun_discrete(
+  runs,
+  nt_qeq = 100,
+  dt = NULL,
+  strain2_delay = NULL,
+  which = c(1, 2)
+)
 }
 \arguments{
 \item{runs}{list of long-format tibbles from discrete_run(), or a single tibble}
 
-\item{nsteps}{number of trailing steps used for quasi-equilibrium averages}
+\item{nt_qeq}{number of time units (disease generations) used for quasi-equilibrium averages}
+
+\item{dt}{time step size; extracted from \code{attr(runs, "params")} if \code{NULL}}
 
 \item{strain2_delay}{steps before strain 2 is seeded; zeros in I2 before
-this step are not counted as extinction}
+this step are not counted as extinction; extracted from \code{attr(runs, "params")}
+if \code{NULL}; error if missing}
 
 \item{which}{strains to summarise (currently ignored; both strains always returned)}
 }
@@ -26,6 +35,6 @@ Summarise extinction and quasi-equilibrium statistics across runs
 Analogue of sumfun in poisson/simulation_funs.R, adapted for the
   long-format list output of discrete_run() and extended to two strains.
   For each strain: extinction time (first step with total Ij == 0) and
-  quasi-equilibrium means over the last \code{nsteps} steps, conditioned
+  quasi-equilibrium means over the last \code{nt_qeq} time units, conditioned
   on the strain still being present (cell-level masking).
 }

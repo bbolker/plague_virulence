@@ -326,11 +326,11 @@ sum_runs <- function(x) {
 ##' @details Analogue of sumfun in poisson/simulation_funs.R, adapted for the
 ##'   long-format list output of discrete_run() and extended to two strains.
 ##'   For each strain: extinction time (first step with total Ij == 0) and
-##'   quasi-equilibrium means over the last \code{nsteps} steps, conditioned
+##'   quasi-equilibrium means over the last \code{nt_qeq} time units, conditioned
 ##'   on the strain still being present (cell-level masking).
 ##' @param runs list of long-format tibbles from discrete_run(), or a single tibble
 ##' @param nt_qeq number of time units (disease generations) used for quasi-equilibrium averages
-##' @param dt time step
+##' @param dt time step size; extracted from \code{attr(runs, "params")} if \code{NULL}
 ##' @param strain2_delay steps before strain 2 is seeded; zeros in I2 before
 ##'   this step are not counted as extinction; extracted from \code{attr(runs, "params")}
 ##'   if \code{NULL}; error if missing
