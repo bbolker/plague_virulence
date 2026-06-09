@@ -58,17 +58,16 @@ expect_equal_to_reference(t1, "traj_stats_ode_snapshot.rds",
 
 ## any_small == 1 for parameters that drive I1 below .Machine$double.xmin
 ## (ode_example.R parameters: high beta, very slow host growth → deep prolonged trough)
-dt_ex <- 0.01; r_ex <- 0.003
 run_ex <- suppressWarnings(discrete_run(
   beta_vec     = c(7, 0),
   K            = 1,
-  r            = r_ex,
+  r            = 0.003,
   n_patch      = 1,
-  nt           = round(10 / r_ex / dt_ex),
+  nt           = 10000,
   alpha        = 0,
   I_init       = c(0.001, 0),
   I_ini_method = "fixed",
-  dt           = dt_ex,
+  dt           = 0.1,
   def_file     = "ode_odin_def.R",
   logistic_growth = 1,
   stop_cond    = NULL,
