@@ -313,6 +313,15 @@ sum_run1 <- function(x, return_type = c("long", "wide")) {
     dplyr::select(-state)
 }
 
+##' Aggregate a single run to per-step population totals
+##' @param x a list of tibbles from a multi-run of discrete_run()
+##' @return a single, long tibble with runs indicated by the 'run' variable
+##' @export
+sum_runs <- function(x) {
+  lapply(x, function(y) sum_run1(y, "long")) |>
+    dplyr::bind_rows(.id = "run")
+}
+
 ##' Summarise extinction and quasi-equilibrium statistics across runs
 ##' @details Analogue of sumfun in poisson/simulation_funs.R, adapted for the
 ##'   long-format list output of discrete_run() and extended to two strains.

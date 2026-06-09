@@ -34,7 +34,10 @@ named numeric vector with elements:
   \code{t_Imin}, \code{Imin} (time and value of first local minimum of I1,
     identified by the first index where diff(diff(I1)) > 0 after \code{t_enter.boundary}),
   \code{t_Smin}, \code{Smin} (time and value of first local minimum of S),
+  \code{t_eqS} (first time after \code{t_Smin} that S crosses upward through \code{eq_S}),
   \code{t_leave.boundary} (second upward crossing of eq by I1: last step with I1 < eq before recovery).
+  \code{trough_area} (integral of \code{eq_S - S} from \code{t_enter.boundary}
+    until the first time S rises back above \code{eq_S}).
   Any statistic that cannot be found returns \code{NA}.
 }
 \description{
