@@ -1,8 +1,5 @@
 library(plagueMetapop)
-library(future)
-library(dplyr)
-library(ggplot2); theme_set(theme_bw())
-
+library(tinytest)
 ## lower right panel of PIP plot, purple area (resident fine, invader loses)
 R01 <- 2.5
 R02 <- 1.5
@@ -16,10 +13,7 @@ strain2_delay <- round(100 / dt)
 nt <- round(500/dt)
 I_init <- cbind(rep(10, n_patch),
                 c(10, rep(0, n_patch - 1L)))
-
-plan(multicore(workers=20))
 set.seed(101)
-
 runs <- discrete_run(beta_vec      = c(R01, R02),
                      K             = K,
                      r             = 0.125,
@@ -35,12 +29,18 @@ runs <- discrete_run(beta_vec      = c(R01, R02),
                      nsim          = n_sim,
                      platform      = "odin")
 
-runs_x <- sum_runs(runs) |> dplyr::filter(var == "pop") |>
-  mutate(across(value, ~ . /n_patch))
+ss <- sumfun_discrete(runs, strain2_delay = strain2_delay)
 
-ggplot(runs_x, aes(step, value, colour = type)) +
-  geom_line(aes(group = interaction(run, type)), alpha = 0.4) +
-  scale_y_log10()
-
-sumfun_discrete(runs, strain2_delay = strain2_delay)
-
+expect_equal(ss, 
+c(
+  mean_ext_time.I1 = NaN,
+  mean_ext_time.I2 = 1165,
+  ext_prob.I1 = 0,
+  ext_prob.I2 = 1,
+  qe_pop_S.I1 = 7642779.15,
+  qe_infpop.I1 = 619809.49,
+  qe_infpatch.I1 = 200,
+  qe_pop_S.I2 = NaN,
+  qe_infpop.I2 = NaN,
+  qe_infpatch.I2 = NaN
+))
