@@ -1,18 +1,32 @@
 library(ggplot2); theme_set(theme_bw())
 library(dplyr)
 library(patchwork)
+library(ggnewscale)
 
 plot_height <- 8; plot_width <- 10
-res <- readRDS("outputs/ode_trough.rds")
+res <- readRDS(here::here("metapop/odin/outputs/ode_trough.rds"))
 
-make_raster <- function(dat, fill_var, fill_label = fill_var, title = fill_var) {
-  ggplot(dat, aes(x = log10(r), y = beta, fill = .data[[fill_var]])) +
+make_raster <- function(dat, fill_var, fill_label = fill_var,
+                        title = fill_var, small_vals = NULL) {
+  gg0 <- ggplot(dat, aes(x = log10(r), y = beta, fill = .data[[fill_var]])) +
     geom_raster() +
       scale_fill_viridis_c(name = fill_label, na.value = "grey80",
                            trans = "log10") +
     scale_x_continuous(expand = c(0, 0)) +
     scale_y_continuous(expand = c(0, 0)) +
     labs(x = expression(log[10]('growth')), y = expression(R[0]), title = title)
+
+  
+  if (!is.null(small_vals)) {
+    ## colour 'small vals' region in pink
+    gg0 <- gg0 +
+      new_scale_fill() +
+      geom_raster(aes(fill = factor(.data[[small_vals]]))) +
+      scale_fill_manual(values = c("#00000001", "#ff0000cc"),
+                        guide = "none")
+  }
+
+  return(gg0)
 }
 
 panels <- list(
@@ -29,9 +43,14 @@ panels <- list(
 
 for (dem in c("logistic", "linear")) {
   dat <- filter(res, demography == dem)
-  plots <- lapply(panels, \(p) make_raster(dat, fill_var = p$var,
-                                           fill_label = "",
-                                           title =  p$label))
+  plots <- lapply(panels, \(p) {
+    small_vals <- if (p$var %in% c("Imin", "t_Imin")) "any_small" else NULL
+    make_raster(dat, fill_var = p$var,
+                fill_label = "",
+                title =  p$label,
+                small_vals = small_vals)
+  })
+
   pw <- wrap_plots(plots, ncol = 3) +
     plot_annotation(title = dem)
 

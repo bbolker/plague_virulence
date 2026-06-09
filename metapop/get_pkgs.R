@@ -1,16 +1,17 @@
 options(repos = (CRAN = "https://cloud.r-project.org"))
 pkgs <- c(
   "biscale"
- , "colorspace"
- , "cowplot"
- , "dde" ## cryptic odin requirement
- , "deSolve"
- , "furrr"
- , "future"
- , "ggrastr"
- , "gsl"
- , "odin"
- , "optparse"
+, "colorspace"
+, "cowplot"
+, "dde" ## cryptic odin requirement
+, "deSolve"
+, "furrr"
+, "future"
+, "ggnewscale"
+, "ggrastr"
+, "gsl"
+, "odin"
+, "optparse"
 , "patchwork"
 , "pkgbuild" ## cryptic odin requirement
    , "pkgload" ## cryptic odin requirement
