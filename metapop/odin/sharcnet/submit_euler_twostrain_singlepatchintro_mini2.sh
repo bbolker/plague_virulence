@@ -2,7 +2,7 @@
 #SBATCH --account=def-bolker
 #SBATCH --job-name=euler_2strain_spim2
 #SBATCH --array=1-900
-#SBATCH --time=0-00:30:00
+#SBATCH --time=0-01:00:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=1
 #SBATCH --output=logs/euler_twostrain_singlepatchintro_mini2_%A_%a.out
