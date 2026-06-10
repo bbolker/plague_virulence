@@ -5,6 +5,8 @@
     * interpolate between leaky-bucket and logistic equation?
     * `r*S*(1-S/K)` vs `r*(K-S)` 
     * (**not** theta-logistic)
+    * non-dimensionally, this is `x*(1-x)` vs `(1-x)`; dimensionally, `r*K*(S/K)*(1-S/K)` vs `r*K*(1-S/K)`. So `r*K*(S/K)^theta*(1-S/K)` recovers leaky-bucket as `theta → 0` and logistic as `theta → 1` (need to be a little careful implementing this with the special case of `S=0, theta = 0` (`0^0 = 1` in IEEE 754, which is actually what we want in this case ...)
+* seasonality!  (see @krauerInfluenceTemperatureSeasonality2021)
 * keep working on single-patch-introduction PIP runs
 * direct solution of deterministic metapop model??? does it collapse?
 
