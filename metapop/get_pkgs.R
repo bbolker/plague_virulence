@@ -7,7 +7,7 @@ pkgs <- c(
 , "deSolve"
 , "furrr"
 , "future"
-, "ggnewscale"
+## , "ggnewscale" ## useful extension but no longer needed
 , "ggrastr"
 , "gsl"
 , "odin"

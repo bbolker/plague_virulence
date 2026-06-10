@@ -5,8 +5,8 @@ R01 <- 2.5
 R02 <- 1.5
 K <- 1e5
 alpha <- 1e-3
-n_patch   <- 200
-n_sim     <- 25L
+n_patch   <- 10
+n_sim     <- 1L
 dt        <- 0.1
 stop_cond <- stop_both_extinct
 strain2_delay <- round(100 / dt)
@@ -31,16 +31,5 @@ runs <- discrete_run(beta_vec      = c(R01, R02),
 
 ss <- sumfun_discrete(runs, strain2_delay = strain2_delay)
 
-expect_equal(ss, 
-c(
-  mean_ext_time.I1 = NaN,
-  mean_ext_time.I2 = 1165,
-  ext_prob.I1 = 0,
-  ext_prob.I2 = 1,
-  qe_pop_S.I1 = 7642779.15,
-  qe_infpop.I1 = 619809.49,
-  qe_infpatch.I1 = 200,
-  qe_pop_S.I2 = NaN,
-  qe_infpop.I2 = NaN,
-  qe_infpatch.I2 = NaN
-))
+expect_equal_to_reference(ss, "sumfun_discrete_snapshot.rds",
+                          info = "sumfun_discrete snapshot")

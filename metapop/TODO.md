@@ -1,8 +1,11 @@
 ## To do
 
-* update `sumfun_discrete()` to use attached attributes (run length etc.)
+* implement thinning?
 * discuss trough-run output
-* debug PIP runs starting from a *single patch* introduction/run single example: no extinction??
+    * interpolate between leaky-bucket and logistic equation?
+    * `r*S*(1-S/K)` vs `r*(K-S)` 
+    * (**not** theta-logistic)
+* keep working on single-patch-introduction PIP runs
 * direct solution of deterministic metapop model??? does it collapse?
 
 * implement non-extinction variant, compare with extinction-allowed (strength of burnout mechanism)

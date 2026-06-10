@@ -4,12 +4,12 @@ library(dplyr)
 library(ggplot2); theme_set(theme_bw())
 
 ## lower right panel of PIP plot, purple area (resident fine, invader loses)
-R01 <- 2.5
-R02 <- 1.5
-K <- 1e5
-alpha <- 1e-3
+R01 <- 1.1
+R02 <- 4
+K <- 1e4
+alpha <- 1e-5
 n_patch   <- 200
-n_sim     <- 25L
+n_sim     <- 100L
 dt        <- 0.1
 stop_cond <- stop_both_extinct
 strain2_delay <- round(100 / dt)
@@ -19,7 +19,6 @@ I_init <- cbind(rep(10, n_patch),
 
 plan(multicore(workers=20))
 set.seed(101)
-
 runs <- discrete_run(beta_vec      = c(R01, R02),
                      K             = K,
                      r             = 0.125,
