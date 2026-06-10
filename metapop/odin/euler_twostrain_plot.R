@@ -3,14 +3,15 @@ library(ggplot2); theme_set(theme_bw())
 zmargin <- theme(panel.spacing=grid::unit(0,"lines"))
 
 input_dir <- here::here("metapop/odin/sharcnet/outputs")
-input_fn <- "euler_twostrain_singlepatchintro.rds"
+input_fn <- "euler_twostrain_mini2_singlepatchintro.rds"
 
+## FIXME: should retrieve from run attributes
 dt <- 0.1
 invade_start <- 100
 max_duration <- 500
 
 log10alpha_labeller <- function(labels) {
-  list(lapply(sprintf("%s == 10^{%d}", names(labels)[1],
+  list(lapply(sprintf("%s == 10^{%1.1f}", names(labels)[1],
                       log10(labels[[1]])), function(x) parse(text = x)[[1]]))
 }
 class(log10alpha_labeller) <- c("function", "labeller")
@@ -94,6 +95,12 @@ ggplot(dd, aes(R01, R02, fill = mean_ext_time.I2)) +
   scale_y_continuous(expand = c(0,0)) +
   scale_x_continuous(expand = c(0,0))
   
-plot_fun(dd, facet = TRUE) + zmargin + theme(strip.text.y = element_text(angle = 0)) 
+gg0 <- (plot_fun(dd, facet = TRUE)
+  + zmargin
+  + theme(strip.text.y = element_text(angle = 0))
+)
+
+print(gg0)
+
 ggsave("euler_twostrain_pip.png", width = 10, height = 8)
 ggsave("euler_twostrain_pip.pdf", width = 10, height = 8)
