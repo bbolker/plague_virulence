@@ -3,3 +3,5 @@ utils::globalVariables(c("col", "matrix", "patch", "row", "state", "step", "time
 
 ##' @importFrom stats rbinom rpois
 NULL
+
+

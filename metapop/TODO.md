@@ -1,5 +1,6 @@
 ## To do
 
+* implement thinning more generally (check consistency throughout for scaling by dt or not)
 * update euler examples; thin properly, summarize before storing (thin as part of discrete_run?)
 * discuss trough-run output
     * interpolate between leaky-bucket and logistic equation?

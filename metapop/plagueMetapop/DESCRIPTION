@@ -18,6 +18,7 @@ Imports:
     tibble,
     tidyr
 Suggests:
+    arrow,
     dde,
     future,
     ggplot2,
