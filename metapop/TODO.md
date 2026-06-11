@@ -1,6 +1,6 @@
 ## To do
 
-* implement thinning?
+* update euler examples; thin properly, summarize before storing
 * discuss trough-run output
     * interpolate between leaky-bucket and logistic equation?
     * `r*S*(1-S/K)` vs `r*(K-S)` 

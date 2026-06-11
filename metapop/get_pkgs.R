@@ -1,6 +1,7 @@
 options(repos = (CRAN = "https://cloud.r-project.org"))
 pkgs <- c(
-  "biscale"
+  "arrow"
+, "biscale"
 , "colorspace"
 , "cowplot"
 , "dde" ## cryptic odin requirement
