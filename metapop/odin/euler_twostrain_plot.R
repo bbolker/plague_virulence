@@ -3,7 +3,8 @@ library(ggplot2); theme_set(theme_bw())
 zmargin <- theme(panel.spacing=grid::unit(0,"lines"))
 
 input_dir <- here::here("metapop/odin/sharcnet/outputs")
-input_fn <- "euler_twostrain_mini2_singlepatchintro.rds"
+##input_fn <- "euler_twostrain_mini2_singlepatchintro.rds"
+input_fn <- "euler_twostrain_singlepatchintro.rds"
 
 ## FIXME: should retrieve from run attributes
 dt <- 0.1

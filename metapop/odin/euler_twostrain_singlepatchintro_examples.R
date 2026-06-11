@@ -18,7 +18,7 @@ I_init <- cbind(rep(10, n_patch),
                 c(10, rep(0, n_patch - 1L)))
 
 pars <- read.csv(here::here("metapop/odin/euler_twostrain_example_pars.csv"))
-plan(multicore(workers = 26))
+plan(multicore(workers = 8))
 
 results <- vector("list", nrow(pars))
 
@@ -41,8 +41,12 @@ for (i in seq_len(nrow(pars))) {
                        nsim          = n_sim,
                        platform      = "odin")
 
-  results[[i]] <- bind_rows(runs, .id = "run") |>
-    slice(seq(1L, n(), by = 10L))
+  results[[i]] <- bind_rows(
+    lapply(seq_along(runs), \(j) {
+      thin_idx <- seq(1L, nrow(runs[[j]]), by = 10L)
+      runs[[j]][thin_idx, ] |> mutate(run = as.character(j))
+    })
+  )
 }
 
 plan(sequential)
