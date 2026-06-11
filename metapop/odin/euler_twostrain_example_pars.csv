@@ -1,0 +1,7 @@
+K,alpha,R01,R02,description
+1.00E+03,1.00E-04,2,3,"low-K, everyone dies"
+1.00E+03,1.00E-04,3.5,2.5,"low-K, everyone persists"
+1.00E+04,1.00E-04,2,2.5,conventional invasion
+1.00E+04,1.00E-04,3.5,2,low-R0 invasion
+1.00E+04,1.00E-05,3,1.5,strong low-R0 invasion
+1.00E+05,1.00E-03,3.8,3,everyone persists?
