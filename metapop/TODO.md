@@ -1,6 +1,6 @@
 ## To do
 
-* update euler examples; thin properly, summarize before storing
+* update euler examples; thin properly, summarize before storing (thin as part of discrete_run?)
 * discuss trough-run output
     * interpolate between leaky-bucket and logistic equation?
     * `r*S*(1-S/K)` vs `r*(K-S)` 
