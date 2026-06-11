@@ -6,6 +6,7 @@
 library(plagueMetapop)
 library(future)
 library(dplyr)
+library(arrow)
 
 task_id <- as.integer(Sys.getenv("SLURM_ARRAY_TASK_ID"))
 if (is.na(task_id)) stop("SLURM_ARRAY_TASK_ID not set")
@@ -40,14 +41,21 @@ runs <- discrete_run(beta_vec      = c(row$R01, row$R02),
                      platform      = "odin")
 plan(sequential)
 
-## thin each run before binding to keep peak memory low
-result <- bind_rows(
-  lapply(seq_along(runs), \(j) {
-    thin_idx <- seq(1L, nrow(runs[[j]]), by = 10L)
-    runs[[j]][thin_idx, ] |> mutate(run = as.character(j))
-  })
-) |> mutate(K = row$K, alpha = row$alpha, R01 = row$R01, R02 = row$R02,
-            description = row$description)
+runs2 <- lapply(runs, function(x) {
+  x |>
+    arrow_table() |>
+    filter(step > strain2_delay * dt,
+           abs(step %% 1.0) < 1e-6) |>
+    summarise(patches = sum(value > 0),
+              mean    = mean(if_else(value == 0, NA_real_, value), na.rm = TRUE),
+              sd      = sd(if_else(value == 0, NA_real_, value),   na.rm = TRUE),
+              .by = c(state, step)) |>
+    collect()
+})
+
+result <- bind_rows(runs2, .id = "run") |>
+  mutate(across(run, as.integer))
+
 
 dir.create("outputs", showWarnings = FALSE)
 saveRDS(result, sprintf("outputs/euler_twostrain_examples_task_%06d.rds", task_id))
