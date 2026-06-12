@@ -35,7 +35,7 @@ summarise_runs <- function(runs_chunk) {
 }
 
 set.seed(101)
-plan(multicore(workers = 4))
+plan(multicore(workers = 8))
 
 results <- vector("list", nrow(pars))
 
