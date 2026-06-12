@@ -22,12 +22,14 @@ ggplot(ddr_s, aes(step, value, colour = state)) +
   facet_grid(parset ~ var) +
   scale_y_log10()
 
-mk_plot <- function(focal_var) {
+mk_plot <- function(focal_var, log_y = FALSE) {
   d <- filter(ddr_s, var == focal_var)
-  ggplot(ddr_s, aes(step, value, colour = state)) +
+  gg0 <- ggplot(ddr_s, aes(step, value, colour = state)) +
     geom_line(aes(group = interaction(run, state)), alpha = 0.3) +
     facet_wrap(~parset) +
-    scale_y_log10() +
     labs(title = focal_var)
+  if (log_y) gg0 <- gg0 + scale_y_log10()
+  gg0
 }
-  
+
+mk_plot("patches")
