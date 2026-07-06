@@ -12,6 +12,9 @@ OUTDIR=sharcnet/outputs
 
 ######################################################################
 
+euler_twostrain_singlepatchintro_examples_plot.Rout: euler_twostrain_singlepatchintro_examples_plot.R outputs/euler_twostrain_singlepatchintro_examples.rds
+	$(pipeR)
+
 compare_platforms.Rout: compare_platforms.R
 	$(pipeR)
 
