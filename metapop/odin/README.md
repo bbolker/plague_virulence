@@ -5,7 +5,7 @@ Core simulation infrastructure (model definitions, platform backends, dispatcher
 lives in the [`plagueMetapop`](../plagueMetapop/) R package; all scripts load it
 via `library(plagueMetapop)`.
 
-There is a sharcnet subdirectory that BB is leaning on right now.
+There is a sharcnet/ subdirectory that BB is leaning on right now.
 
 ## 2026 May 27 (Wed)
 

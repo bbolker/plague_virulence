@@ -3,6 +3,14 @@ title: "overview of plague metapopulation model"
 bibliography: "../virulence.bib"
 ---
 
+See also TODO.md
+
+The package is a subdirectory of this subdirectory: plagueMetapop/
+
+## 2026 Jul 06 (Mon)
+
+Currently active in the odin/ subdirectory; see odin/README.md
+
 ## 2026 May 20 (Wed)
 
 Trying to tell a good biological story behind our assumptions: the idea that fleas accumulate over the season but need to be carried by surviving rats seems troublesome.

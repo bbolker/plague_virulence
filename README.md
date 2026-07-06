@@ -3,6 +3,8 @@ title: "speculative modeling of plague virulence evolution"
 bibliography: virulence.bib
 ---
 
+2026 Jul 06 (Mon) Working mostly in metapop/, see metapop/README
+
 ## overview
 
 This repo is highly organic, reflecting evolution from a collection of ideas about how to *verbally* explain the evolution of attenuated virulence noted by Sidhu *et al* 2025, to a series of models trying to instantiate and explore those verbal models. A lot of this builds on Parsons *et al* 2025 on "burnout" probabilities.

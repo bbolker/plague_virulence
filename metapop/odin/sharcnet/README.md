@@ -4,10 +4,11 @@ Submit all jobs from this directory (`metapop/odin/sharcnet/`).
 Before the first submission: `mkdir -p logs outputs`
 
 Need to install all the required packages (this takes a while):
+* Once per user
 
 ```
 module load r/4.5.0
-module load gsl ## not sure about this, maybe required for some packages?
+module load gsl ## gnu scientific library; needed for burnout package; may not be necessary now? 2026 Jul 06 (Mon)
 Rscript --vanilla get_pkgs.R  ## in metapop/ dir
 ```
 
