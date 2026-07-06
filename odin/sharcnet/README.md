@@ -8,8 +8,8 @@ Need to install all the required packages (this takes a while):
 
 ```
 module load r/4.5.0
-module load gsl ## gnu scientific library; needed for burnout package; may not be necessary now? 2026 Jul 06 (Mon)
-Rscript --vanilla get_pkgs.R  ## in metapop/ dir
+module load gsl ## gnu scientific library; needed for burnout package
+Rscript --vanilla get_pkgs.R  ## in head dir
 ```
 
 The `plagueMetapop` package must be installed on the cluster:

@@ -1,6 +1,6 @@
 ---
 title: "Eco-evolutionary dynamics of plague virulence"
-bibliography: ../../virulence.bib
+bibliography: ../virulence.bib
 format:
   revealjs:
     embed-resources: true

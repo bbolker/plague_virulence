@@ -1,3 +1,15 @@
+*.rds
+*.png
+*.pdf
+
+# but keep these in outputs/ directories
+!outputs/**/*.rds
+!outputs/**/*.png
+!outputs/**/*.pdf
+
+# ignore .claude directories anywhere (including root)
+.claude/
+
 *~
 \#*
 .#*

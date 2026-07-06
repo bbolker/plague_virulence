@@ -1,3 +1,5 @@
+## these packages are needed for all repo operations
+## not strictly necessary for installing plagueMetapop
 options(repos = (CRAN = "https://cloud.r-project.org"))
 pkgs <- c(
   "arrow"
