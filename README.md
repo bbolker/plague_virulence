@@ -3,7 +3,7 @@ title: "speculative modeling of plague virulence evolution"
 bibliography: virulence.bib
 ---
 
-2026 Jul 06 (Mon) Working mostly in metapop/, see metapop/README
+2026 Jul 06 (Mon) Working mostly in `metapop/`, see	[`metapop/README.md`](./metapop/README.md)
 
 ## overview
 
@@ -14,7 +14,7 @@ This repo is highly organic, reflecting evolution from a collection of ideas abo
 
 Stuff in `metapop/`, from newest to oldest:
 
-* `odin`: mostly continuous-time simulations with [odin](https://mrc-ide.github.io/odin/) (and also comparable implementations with [macpan2](https://canmod.github.io/macpan2/)
+* `odin`: mostly continuous-time simulations with [odin](https://mrc-ide.github.io/odin/) (and also comparable implementations with [macpan2](https://canmod.github.io/macpan2/). The `sharcnet` subdirectory has machinery for submitting large jobs as SLURM job arrays (and reassembling the results when finished).
 * `plagueMetapop`: mini-R package implementing the functionality used in the `odin` runs
 * `parameters`: discussion of estimating/guessing orders of magnitude for parameters
 * `poisson`: a single-strain, stochastic model driven by rat colonization limitation (colonization uses Poisson deviates)

@@ -1,25 +1,26 @@
-## odin (and other) subdirectory
+## odin-based models
 
-This directory contains run and plot scripts for plague virulence simulations.
+This directory contains run and plot scripts for stochastic plague virulence simulations.
 Core simulation infrastructure (model definitions, platform backends, dispatcher)
 lives in the [`plagueMetapop`](../plagueMetapop/) R package; all scripts load it
-via `library(plagueMetapop)`.
+via `library(plagueMetapop)`. Install via:
 
-There is a sharcnet/ subdirectory that BB is leaning on right now.
+```r
+remotes::install_github(
+             "bbolker/plague_virulence/metapop/plagueMetapop",
+             dependencies = TRUE
+         )
+```
 
-## 2026 May 27 (Wed)
+The current simulations are at the scale of disease generations (or smaller). We have given up for now on the annual (or pseudo-annual) time scale because of conceptual problems in linking scales (particularly rat and flea movement).
 
-the current simulations are at the scale of disease generations (or smaller). We have given up for now on the annual (or pseudo-annual) time scale because of conceptual problems in linking scales (particularly rat and flea movement).
-
-Using an Euler step with “some” hazard calculations. Started with Reed-Frost (meaning fixed-length generations; everyone recovers or dies at the end of each time step). Things that start with discrete (rather than Euler) are left over from that.
+The default model uses an Euler step with some hazard corrections. Started with Reed-Frost (meaning fixed-length generations; everyone recovers or dies at the end of each time step); these models are denoted `discrete_`; newer model (allowing for a geometric distribution of infectious period) are denoted `euler_`
 
 Reed-Frost leads to _lots_ of burnout: JD suggested possibly leaning in to this, since it might lead to more coexistence tradeoffs. Bellman-Harris and Crump–Mode–Jagers (CMJ) are more general words for “branching process” without the exponential assumption. Back now to geometric distribution (~5-10 Euler steps per disease generation.
 
 An interesting observation: replacing “leaky bucket” (standard replenishment) dynamics with logistic (survivor-based replenishment) is expected to favor relatively more burnout at higher R values. This is apparently reflected in [a burnout plot you can make](euler_onepatch_onestrain_extinct.png). 
 
 Also true that ε is much larger here (Ben says ~ 0.02), but the logisticity seems like a larger problem. Todd asks whether we can examine what the rat troughs look like across these simulations.
-
-Ben wants to do pairwise invasion plots, panelled by α (patch-linkage) and K (rat carrying capacity per patch).
 
 Right now, we're doing mass-action (in JD terms B(N) = βN/K). Should consider other functional forms (one example would be β(N/K)̂^φ).
 
@@ -69,7 +70,6 @@ Submit all jobs from the `sharcnet/` directory after `mkdir -p logs outputs`.
 | `euler_onepatch_onestrain_extinct_run.R` | Grid run over R0 × K; `--lineargrowth` (linear demography), `--reedfrost` (Reed-Frost dynamics), `--mini` flags * |
 | `euler_onepatch_onestrain_extinct_plot.R` | Raster plots of extinction results from the euler one-strain grid |
 | `euler_onestrain_run.R` | Multi-patch grid run over R0 × K × alpha; supports `--mini` flag via optparse  * |
-| `odin_twostrain_run.R` | Two-strain run script; grid over R01 x R02 x K x alpha *: `meta_euler_twostrain`|
 | `euler_twostrain_example_pars.csv` | 6 curated `(K, alpha, R01, R02)` parameter sets with descriptions (e.g. "conventional invasion"), illustrating specific outcomes rather than a grid sweep |
 | `euler_twostrain_singlepatchintro_examples.R` | Runs all 6 parameter sets locally with singlepatchintro settings matching `sharcnet/euler_twostrain_run_array.R` (`n_patch=200`, `nsim=500`, `dt=0.1`, `nt=5000`, `stop_both_extinct`); chunks simulations (25 at a time) to bound memory; saves per-step Arrow summaries to `outputs/euler_twostrain_singlepatchintro_examples.rds`. Corresponding SLURM array version: `sharcnet/euler_twostrain_examples_run_array.R` * |
 | `euler_twostrain_singlepatchintro_examples_plot.R` | Plots the per-step summaries (patches occupied, mean, sd) from the examples run, faceted by parameter set |
@@ -83,3 +83,4 @@ Submit all jobs from the `sharcnet/` directory after `mkdir -p logs outputs`.
 | `odin_twostrain_run0.R` | Early two-strain run script; superseded by `plagueMetapop` framework |
 | `odin_invasion_run.R` | Invasion experiment: resident run to quasi-equilibrium then invader seeded |
 | `discrete_onespecies_sim.R` | Single-species (no strains) simulation; exploratory |
+| `odin_twostrain_run.R` | Two-strain run script; grid over R01 x R02 x K x alpha *: `meta_euler_twostrain`|

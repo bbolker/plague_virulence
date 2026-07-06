@@ -3,13 +3,20 @@ title: "overview of plague metapopulation model"
 bibliography: "../virulence.bib"
 ---
 
-See also TODO.md
+See also `TODO.md`
 
-The package is a subdirectory of this subdirectory: plagueMetapop/
+The package is a subdirectory of this subdirectory: `plagueMetapop/`
+
+```r
+remotes::install_github(
+             "bbolker/plague_virulence/metapop/plagueMetapop",
+             dependencies = TRUE
+         )
+```
 
 ## 2026 Jul 06 (Mon)
 
-Currently active in the odin/ subdirectory; see odin/README.md
+Currently active in the odin/ subdirectory; see `odin/README.md`
 
 ## 2026 May 20 (Wed)
 
