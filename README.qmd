@@ -14,18 +14,18 @@ From newest to oldest:
 
 * `odin`: mostly continuous-time simulations with [odin](https://mrc-ide.github.io/odin/) (and also comparable implementations with [macpan2](https://canmod.github.io/macpan2/). The `sharcnet` subdirectory has machinery for submitting large jobs as SLURM job arrays (and reassembling the results when finished).
 * `plagueMetapop`: mini-R package implementing the functionality used in the `odin` runs
+* `talks`: BMB talks for Canadian Society of Ecology and Evolution, May 2026, and Statistical Society of Canada, June 2026
 * `parameters`: discussion of estimating/guessing orders of magnitude for parameters
 * `poisson`: a single-strain, stochastic model driven by rat colonization limitation (colonization uses Poisson deviates)
 * `two_strain`: a two-strain version of the Poisson model (PIP computations)
-* `talks`: BMB talks for Canadian Society of Ecology and Evolution, May 2026, and Statistical Society of Canada, June 2026
 * `stochastic`: stochastic model with burnout 
 * `two_strain_burnout_probability`: calculations of burnout probability in two-strain (coinfected) patches
 * `3d`: Levins model, state variables {average host pop size in S patches; average host pop size in I patches; fraction of patches infected}
-`within_season_transmission`: ?
-`report_for_summer`: YZ's report
-`fixedns`: : 2D model Levins model, state variables: {average host pop size; fraction of patches infected}
-`averaging_all_patches`: ?
-`outputs`
+* `within_season_transmission`: ?
+* `report_for_summer`: YZ's report
+* `fixedns`: : 2D model Levins model, state variables: {average host pop size; fraction of patches infected}
+* `averaging_all_patches`: ?
+* `outputs`
 * `abstract2.qmd`, `main.qmd`, `notes/notes_*` are from our early discussions of the verbal model
 
 ## references 

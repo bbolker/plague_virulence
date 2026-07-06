@@ -1,4 +1,4 @@
-## This is plague_virulence/metapop/odin
+## This is plague_virulence/odin
 
 current: target
 -include target.mk
@@ -15,7 +15,7 @@ OUTDIR=sharcnet/outputs
 euler_twostrain_singlepatchintro_examples_plot.Rout: euler_twostrain_singlepatchintro_examples_plot.R outputs/euler_twostrain_singlepatchintro_examples.rds
 	$(pipeR)
 
-outputs/euler_twostrain_singlepatchintro_examples.res: euler_twostrain_singlepatchintro_examples.R
+outputs/euler_twostrain_singlepatchintro_examples.rds: euler_twostrain_singlepatchintro_examples.R
 	$(pipeR)
 
 compare_platforms.Rout: compare_platforms.R

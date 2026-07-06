@@ -5,8 +5,8 @@ library(ggplot2); theme_set(theme_bw())
 rot_strips <-   theme(strip.text.y = element_text(angle = 0))
 zmargin <- theme(panel.spacing = grid::unit(0, "lines"))
 
-pars <- read.csv(here::here("metapop/odin/euler_twostrain_example_pars.csv"))
-dd <- readRDS(here::here("metapop/odin/outputs/euler_twostrain_singlepatchintro_examples.rds"))
+pars <- read.csv(here::here("odin/euler_twostrain_example_pars.csv"))
+dd <- readRDS(here::here("odin/outputs/euler_twostrain_singlepatchintro_examples.rds"))
 
 m <- attr(dd, "metadata")
 

@@ -3,9 +3,9 @@ library(dplyr)
 library(arrow)
 library(ggplot2); theme_set(theme_minimal())
 ## download big file:
-##  scp nibi.sharcnet.ca:~/project/bolker/plague_virulence/metapop/odin/sharcnet/outputs/euler_twostrain_examples_task_000003.rds .
+##  scp nibi.sharcnet.ca:~/project/bolker/plague_virulence/odin/sharcnet/outputs/euler_twostrain_examples_task_000003.rds .
 
-fn <- "metapop/odin/outputs/euler_twostrain_examples_task_000003.rds"
+fn <- "odin/outputs/euler_twostrain_examples_task_000003.rds"
 system.time(x <- readRDS(here::here(fn)))
 
 dt <- 0.1

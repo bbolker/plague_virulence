@@ -3,7 +3,7 @@ library(dplyr)
 library(patchwork)
 
 plot_height <- 8; plot_width <- 10
-res <- readRDS(here::here("metapop/odin/outputs/ode_trough.rds"))
+res <- readRDS(here::here("odin/outputs/ode_trough.rds"))
 
 res2 <- res |>
   mutate(across(c(t_Imin, Imin),

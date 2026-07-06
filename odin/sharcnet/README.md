@@ -1,10 +1,11 @@
 # sharcnet — Alliance Canada (Nibi) job array scripts
 
-Submit all jobs from this directory (`metapop/odin/sharcnet/`).  
+Submit all jobs from this directory (`odin/sharcnet/`).  
 Before the first submission: `mkdir -p logs outputs`
 
-Need to install all the required packages (this takes a while):
-* Once per user
+Need to install all the required packages **on a login node**. This takes a while, e.g. 45 minutes; must be done on a login node rather than via batch job because we need internet connectivity. Need to install packages from source rather than via `r2u`/Debian package management because we don't have root access on these machines.
+
+* Once per user:
 
 ```
 module load r/4.5.0
@@ -12,9 +13,13 @@ module load gsl ## gnu scientific library; needed for burnout package
 Rscript --vanilla get_pkgs.R  ## in head dir
 ```
 
-The `plagueMetapop` package must be installed on the cluster:
+You also need to install (the current version of) the  `plagueMetapop` package on the cluster:
 ```
-R CMD INSTALL ../../plagueMetapop
+R CMD INSTALL ../plagueMetapop
+```
+or equivalently
+```
+Rscript -e "install.packages('../plagueMetapop', repos = NULL)"
 ```
 
 ---

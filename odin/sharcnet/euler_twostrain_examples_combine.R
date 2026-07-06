@@ -1,5 +1,5 @@
 ## Combine per-task outputs from euler_twostrain_examples_run_array.R
-## Run from the metapop/odin/sharcnet directory.
+## Run from the odin/sharcnet directory.
 ## Saves a list of 6 thinned tibbles (one per parameter set) matching the
 ## format of euler_twostrain_singlepatchintro_examples.R.
 library(dplyr)

@@ -7,7 +7,7 @@ via `library(plagueMetapop)`. Install via:
 
 ```r
 remotes::install_github(
-             "bbolker/plague_virulence/metapop/plagueMetapop",
+             "bbolker/plague_virulence/plagueMetapop",
              dependencies = TRUE
          )
 ```

@@ -7,7 +7,7 @@ r <- 0.125
 K <- 1e6
 I_init <- c(10, 10)
 
-odin_fn <- here::here("metapop/odin", "odin_twostrain1.R")
+odin_fn <- here::here("odin", "odin_twostrain1.R")
 twostrain_generator <- odin::odin(odin_fn)
 
 odin_fn <- twostrain_generator$new(beta = c(beta_vec[1], beta_vec[2]),

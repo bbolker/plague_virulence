@@ -4,7 +4,7 @@ library(patchwork)
 library(optparse)
 zmargin <- theme(panel.spacing=grid::unit(0,"lines"))
 
-h <- function(x) here::here("metapop/odin", x)
+h <- function(x) here::here("odin", x)
 
 fits <- c("logistic_continuous", "logistic_reedfrost",
            "linear_continuous",   "linear_reedfrost")

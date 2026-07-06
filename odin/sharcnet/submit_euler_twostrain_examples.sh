@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --output=logs/euler_twostrain_examples_%A_%a.out
 
-# Submit from the metapop/odin/sharcnet directory.
+# Submit from the odin/sharcnet directory.
 # Before first submission: mkdir -p logs outputs
 
 module load r/4.5.0

@@ -18,7 +18,7 @@ stop_cond     <- stop_both_extinct
 I_init        <- cbind(rep(10, n_patch),
                        c(10, rep(0, n_patch - 1L)))
 
-pars <- read.csv(here::here("metapop/odin/euler_twostrain_example_pars.csv"))
+pars <- read.csv(here::here("odin/euler_twostrain_example_pars.csv"))
 
 summarise_runs <- function(runs_chunk) {
   lapply(runs_chunk, function(x) {
@@ -75,4 +75,4 @@ plan(sequential)
 attr(results, "metadata") <- pars
 
 saveRDS(results,
-        here::here("metapop/odin/outputs/euler_twostrain_singlepatchintro_examples.rds"))
+        here::here("odin/outputs/euler_twostrain_singlepatchintro_examples.rds"))

@@ -15,7 +15,7 @@ if (!opt$combo %in% valid)
   stop("--combo must be one of: ", paste(valid, collapse = ", "))
 
 base_fn <- paste0("euler_onepatch_onestrain_extinct_", opt$combo)
-fn <- here::here("metapop/odin", "sharcnet/outputs",
+fn <- here::here("odin", "sharcnet/outputs",
                  paste0(base_fn, ".rds"))
 dat <- readRDS(fn) |>
   mutate(log10K = log10(K))
