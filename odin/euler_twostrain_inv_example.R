@@ -4,12 +4,13 @@ library(dplyr)
 library(ggplot2); theme_set(theme_bw())
 
 ## lower right panel of PIP plot, purple area (resident fine, invader loses)
-R01 <- 1.1
+R01 <- 4
 R02 <- 4
 K <- 1e4
 alpha <- 1e-5
 n_patch   <- 200
-n_sim     <- 100L
+#n_sim     <- 100L
+n_sim <- 20L
 dt        <- 0.1
 stop_cond <- stop_both_extinct
 strain2_delay <- round(100 / dt)
@@ -17,7 +18,8 @@ nt <- round(500/dt)
 I_init <- cbind(rep(10, n_patch),
                 c(10, rep(0, n_patch - 1L)))
 
-plan(multicore(workers=20))
+# plan(multicore(workers=20))
+plan(sequential)
 set.seed(101)
 runs <- discrete_run(beta_vec      = c(R01, R02),
                      K             = K,
@@ -31,15 +33,26 @@ runs <- discrete_run(beta_vec      = c(R01, R02),
                      def_file      = "euler_odin_def.R",
                      strain2_delay = strain2_delay,
                      stop_cond     = stop_cond,
+                     chunk         = strain2_delay + 1L,
                      nsim          = n_sim,
                      platform      = "odin")
 
 runs_x <- sum_runs(runs) |> dplyr::filter(var == "pop") |>
   mutate(across(value, ~ . /n_patch))
+# 
+# ggplot(runs_x, aes(step, value, colour = type)) +
+#   geom_line(aes(group = interaction(run, type)), alpha = 0.4) +
+#   scale_y_log10()
+# 
+# sumfun_discrete(runs, strain2_delay = strain2_delay)
 
-ggplot(runs_x, aes(step, value, colour = type)) +
+p <- ggplot(runs_x, aes(step, value, colour = type)) +
   geom_line(aes(group = interaction(run, type)), alpha = 0.4) +
   scale_y_log10()
 
-sumfun_discrete(runs, strain2_delay = strain2_delay)
+print(p)
 
+dir.create("odin/outputs", showWarnings = FALSE)
+ggsave("odin/outputs/euler_twostrain_inv_example.png", p, width = 8, height = 5)
+
+sumfun_discrete(runs, strain2_delay = strain2_delay)
