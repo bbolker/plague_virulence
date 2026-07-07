@@ -55,6 +55,6 @@ print(p)
 
 outdir <- here::here("odin/outputs")
 dir.create(outdir, showWarnings = FALSE)
-ggsave(file.path(outdir, "euler_twostrain_inv_example.png",
+ggsave(file.path(outdir, "euler_twostrain_inv_example.png"),
                  p, width = 8, height = 5)
 sumfun_discrete(runs, strain2_delay = strain2_delay)
