@@ -5,3 +5,9 @@ K,alpha,R01,R02,description
 1.00E+04,1.00E-04,3.5,2,low-R0 invasion
 1.00E+04,1.00E-05,3,1.5,strong low-R0 invasion
 1.00E+05,1.00E-03,3.8,3,everyone persists?
+1.00E+04,1.00E-05,1.1,4,"high-R0 invader transient outbreak then dies; resident persists"
+1.00E+04,1.00E-05,3,4,"high-R0 invader establishes at low abundance; resident persists"
+1.00E+04,1.00E-05,4,1.1,"resident extinct before invasion; low-R0 invader establishes in empty system"
+1.00E+04,1.00E-05,4,4,"resident extinct before invasion; invader transient outbreak then dies (strain-2 extinction time is NA, recorded as 100% persistence in PIP; needs fixing)"
+1.00E+03,1.00E-05,2.5,2.5,"low-K equal-R0 case; stochastic fadeout dominates"
+1.00E+04,1.00E-05,2.5,2.5,"equal-R0 coexistence; invader persists at low abundance"
