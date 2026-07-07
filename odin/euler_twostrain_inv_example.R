@@ -5,9 +5,9 @@ library(here)
 library(ggplot2); theme_set(theme_bw())
 
 ## lower right panel of PIP plot, purple area (resident fine, invader loses)
-R01 <- 4
-R02 <- 4
-K <- 1e4
+R01 <- 2.5
+R02 <- 2.5
+K <- 1e3
 alpha <- 1e-5
 n_patch   <- 200
 #n_sim     <- 100L
@@ -53,8 +53,29 @@ p <- ggplot(runs_x, aes(step, value, colour = type)) +
 
 print(p)
 
+fmt <- function(x) {
+  x <- format(x, scientific = FALSE, trim = TRUE)
+  x <- gsub("\\.", "p", x)
+  x <- gsub("-", "m", x)
+  x
+}
+
+out_file <- sprintf(
+  "euler_twostrain_inv_example_R01_%s_R02_%s_K_%s_alpha_%s.pdf",
+  fmt(R01), fmt(R02), fmt(K), fmt(alpha)
+)
+
 outdir <- here::here("odin/outputs")
-dir.create(outdir, showWarnings = FALSE)
-ggsave(file.path(outdir, "euler_twostrain_inv_example.png"),
-                 p, width = 8, height = 5)
+dir.create(outdir, showWarnings = FALSE, recursive = TRUE)
+
+ggsave(
+  file.path(outdir, out_file),
+  p,
+  width = 8,
+  height = 5,
+  device = "pdf"
+)
+
+message("Saved plot to: ", file.path(outdir, out_file))
+
 sumfun_discrete(runs, strain2_delay = strain2_delay)
