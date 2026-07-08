@@ -175,10 +175,17 @@ Rscript euler_twostrain_combine.R
 ```
 
 **Singlepatchintro (SLURM array — same grid as full, strain 2 seeded to patch 1 only):**
+
+8100 tasks exceeds the account's `MaxSubmitJobsPerUser` (1000 on Nibi, pending+running combined —
+array tasks each count individually and a `%N` throttle does *not* help, since throttled tasks are
+still instantiated as pending records). Submit in chunks instead:
 ```bash
-sbatch submit_euler_twostrain_singlepatchintro.sh
+bash submit_chunked.sh submit_euler_twostrain_singlepatchintro.sh 1 8100
 Rscript euler_twostrain_combine.R --singlepatchintro
 ```
+`submit_chunked.sh` polls `squeue` and waits for queue headroom before submitting each chunk
+(default chunk size 900, cap 950 in queue) — run it under `tmux`/`screen` or `nohup` since it can
+take hours to drain. See the script header for tunable arguments.
 
 Outputs: `outputs/euler_twostrain[_mini|_mini2|_singlepatchintro]_task_NNNNNN.rds`  
 Combined: `euler_twostrain[_mini|_mini2|_singlepatchintro].rds`
