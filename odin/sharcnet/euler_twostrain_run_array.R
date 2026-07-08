@@ -110,6 +110,7 @@ runs <- discrete_run(beta_vec      = c(row$R01, row$R02),
                      def_file      = "euler_odin_def.R",
                      strain2_delay = strain2_delay,
                      stop_cond     = stop_cond,
+                     chunk         = strain2_delay + 1L,
                      nsim          = n_sim,
                      platform      = "odin")
 plan(sequential)
