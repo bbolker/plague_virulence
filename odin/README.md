@@ -73,6 +73,7 @@ Submit all jobs from the `sharcnet/` directory after `mkdir -p logs outputs`.
 | `euler_twostrain_example_pars.csv` | 6 curated `(K, alpha, R01, R02)` parameter sets with descriptions (e.g. "conventional invasion"), illustrating specific outcomes rather than a grid sweep |
 | `euler_twostrain_singlepatchintro_examples.R` | Runs all 6 parameter sets locally with singlepatchintro settings matching `sharcnet/euler_twostrain_run_array.R` (`n_patch=200`, `nsim=500`, `dt=0.1`, `nt=5000`, `stop_both_extinct`); chunks simulations (25 at a time) to bound memory; saves per-step Arrow summaries to `outputs/euler_twostrain_singlepatchintro_examples.rds`. Corresponding SLURM array version: `sharcnet/euler_twostrain_examples_run_array.R` * |
 | `euler_twostrain_singlepatchintro_examples_plot.R` | Plots the per-step summaries (patches occupied, mean, sd) from the examples run, faceted by parameter set |
+| `euler_twostrain_plot.R` | Plots PIP from the singlepatchintro batch output (should be renamed `euler_twostrain_singlepatchintro_plot.R` ?) |
 
 ### Run and plot scripts (older/exploratory)
 
