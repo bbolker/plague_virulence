@@ -28,10 +28,15 @@ hybrid_metric_fun <- function(extinction_rate,
   )
 }
 
+resident_ok_cutoff <- 0.9
+
 dd <- readRDS(file.path(input_dir, input_fn)) |>
-  mutate(time_after_invasion = mean_ext_time.I2*dt - invade_start,
-         hybrid_metric = hybrid_metric_fun(ext_prob.I2,
-                                       time_after_invasion))
+  mutate(
+    time_after_invasion = mean_ext_time.I2 * dt - invade_start,
+    resident_valid = resident_alive_at_intro_prob >= resident_ok_cutoff,
+    hybrid_metric_raw = hybrid_metric_fun(ext_prob.I2, time_after_invasion),
+    hybrid_metric = ifelse(resident_valid, hybrid_metric_raw, NA_real_)
+  )
 
 params_grid <- unique(dd[, c("alpha", "K")])
 
@@ -43,6 +48,7 @@ plot_fun <- function(sub_dat, facet = FALSE, title = NULL) {
                 linetype = "dashed", color = "white", alpha = 0.7) +
     scale_fill_viridis_c(
       option = "magma",
+      na.value = "grey80",
       limits = c(0, 2),
       breaks = c(
         0,

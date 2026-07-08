@@ -65,6 +65,38 @@ if (opt$singlepatchintro) {
   I_init <- c(10, 10)
 }
 
+intro_diag <- function(runs, intro_time = 100) {
+  if (!is.list(runs) || inherits(runs, "data.frame")) {
+    runs <- list(runs)
+  }
+
+  vals <- lapply(runs, function(x) {
+    a <- sum_run1(x, "wide") |>
+      dplyr::arrange(step)
+
+    k <- which(a$step >= intro_time)[1]
+
+    if (is.na(k)) {
+      return(c(
+        intro_observed = FALSE,
+        resident_alive_at_intro = FALSE
+      ))
+    }
+
+    c(
+      intro_observed = TRUE,
+      resident_alive_at_intro = a$I1_pop[k] > 0
+    )
+  })
+
+  vals <- do.call(rbind, vals)
+
+  data.frame(
+    intro_observed_prob = mean(vals[, "intro_observed"]),
+    resident_alive_at_intro_prob = mean(vals[, "resident_alive_at_intro"])
+  )
+}
+
 plan(multicore(workers = as.integer(Sys.getenv("SLURM_CPUS_PER_TASK", 1L))))
 runs <- discrete_run(beta_vec      = c(row$R01, row$R02),
                      K             = row$K,
@@ -82,7 +114,13 @@ runs <- discrete_run(beta_vec      = c(row$R01, row$R02),
                      platform      = "odin")
 plan(sequential)
 
-out <- dplyr::bind_cols(row, as.data.frame(as.list(sumfun_discrete(runs, strain2_delay = strain2_delay))))
+diag <- intro_diag(runs, intro_time = strain2_delay * dt)
+
+out <- dplyr::bind_cols(
+  row,
+  as.data.frame(as.list(sumfun_discrete(runs, strain2_delay = strain2_delay))),
+  diag
+)
 
 dir.create("outputs", showWarnings = FALSE)
 saveRDS(out, sprintf("outputs/%s_task_%06d.rds", base_fn, task_id))
