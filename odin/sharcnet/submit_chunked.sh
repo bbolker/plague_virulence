@@ -25,7 +25,7 @@ fi
 wait_for_room () {
     needed=$1
     while true; do
-        n_queued=$(squeue -u "$USER" -h -t pending,running | wc -l)
+        n_queued=$(squeue -u "$USER" -h -r -t pending,running | wc -l)
         if [ "$((n_queued + needed))" -le "$max_in_queue" ]; then
             return
         fi
@@ -45,9 +45,12 @@ while [ "$start" -le "$last" ]; do
     wait_for_room "$chunk_n"
 
     echo "$(date '+%F %T'): submitting --array=${start}-${end} (${chunk_n} tasks)"
-    sbatch --array="${start}-${end}" "$submit_script"
-
-    start=$((end + 1))
+    if sbatch --array="${start}-${end}" "$submit_script"; then
+        start=$((end + 1))
+    else
+        echo "$(date '+%F %T'): sbatch failed for --array=${start}-${end}; will retry after a pause"
+        sleep "$poll_seconds"
+    fi
 done
 
 echo "$(date '+%F %T'): all chunks submitted (${first}-${last})."
