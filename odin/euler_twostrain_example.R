@@ -19,7 +19,7 @@ runs <- discrete_run(beta_vec  = c(2, 2.5),
                     strain2_delay = round(50/dt),
                     dt        = dt,
                     def_file  = "euler_odin_def.R",
-                    stop_cond = stop_both_extinct,
+                    stop_cond = stop_both_extinct(),
                     nsim      = nsim,
                     platform  = "odin")
 plan(sequential)

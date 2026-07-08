@@ -53,7 +53,8 @@ make_I_ini_mat <- function(I_init, n_patch, n_strain = 2L,
 ##' @param chunk steps per chunk for early stopping (odin only; ignored if stop_cond is NULL)
 ##' @param stop_cond function(row) -> logical; called on the last row of each
 ##'   chunk; return TRUE to halt early. Use stop_either_extinct() or
-##'   stop_both_extinct(), or supply a custom function.
+##'   stop_both_extinct() (both factories — call them to get the closure), or
+##'   supply a custom function.
 ##'   NULL runs all nt steps. Only supported for platform = "odin".
 ##' @param def_file odin DSL filename in inst/odin/ (odin platform only).
 ##'   \code{"discrete_odin_def.R"}: stochastic discrete-time model (default).
@@ -96,7 +97,7 @@ discrete_run <- function(beta_vec = c(1.5, 2.5),
                           seed = NULL,
                           nsim = 1,
                           chunk = NULL,
-                          stop_cond = stop_both_extinct,
+                          stop_cond = stop_both_extinct(),
                           def_file = "discrete_odin_def.R",
                           dt = 1,
                           platform = c("odin", "macpan2", "pureR")) {

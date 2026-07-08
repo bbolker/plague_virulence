@@ -43,7 +43,7 @@ runs <- discrete_run(beta_vec        = c(row$R0, 0),
                      logistic_growth = logistic_growth,
                      reedfrost       = reedfrost,
                      def_file        = "euler_odin_def.R",
-                     stop_cond       = stop_both_extinct,
+                     stop_cond       = stop_both_extinct(require_seeded = FALSE),
                      nsim            = nsim,
                      platform        = "odin")
 plan(sequential)

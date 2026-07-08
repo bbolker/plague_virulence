@@ -8,7 +8,7 @@ alpha <- 1e-3
 n_patch   <- 10
 n_sim     <- 1L
 dt        <- 0.1
-stop_cond <- stop_both_extinct
+stop_cond <- stop_both_extinct()
 strain2_delay <- round(100 / dt)
 nt <- round(500/dt)
 I_init <- cbind(rep(10, n_patch),

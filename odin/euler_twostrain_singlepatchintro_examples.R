@@ -14,7 +14,7 @@ n_sim         <- 500L
 dt            <- 0.1
 strain2_delay <- round(100 / dt)
 nt            <- round(500 / dt)
-stop_cond     <- stop_both_extinct
+stop_cond     <- stop_both_extinct()
 I_init        <- cbind(rep(10, n_patch),
                        c(10, rep(0, n_patch - 1L)))
 

@@ -37,7 +37,7 @@ Right now, we're doing mass-action (in JD terms B(N) = βN/K). Should consider o
 | `inst/odin/euler_det_odin_def.R` | Deterministic Euler-step version of `euler_odin_def.R` (uses `update()`; explicit `dt`; same step-by-step structure as the stochastic model) |
 | `inst/odin/ode_odin_def.R` | Deterministic ODE version using `deriv()` (no explicit `dt`; integrated by odin's ODE solver; no `strain2_delay` or `reedfrost`; supports `logistic_growth`) |
 | `inst/tinytest/test_platforms.R` | Tests: platform correctness, parallel execution, summary statistics |
-| `inst/tinytest/test_stop_conditions.R` | Tests: `stop_either_extinct()` factory and pre-seeding behaviour |
+| `inst/tinytest/test_stop_conditions.R` | Tests: `stop_either_extinct()` and `stop_both_extinct()` factories and pre-seeding behaviour |
 | `inst/tinytest/test_discrete-vs-euler.R` | Tests: euler with `reedfrost=1, gamma=1, dt=1` matches discrete model |
 
 Run package tests with `tinytest::test_package("plagueMetapop")`.
@@ -71,7 +71,7 @@ Submit all jobs from the `sharcnet/` directory after `mkdir -p logs outputs`.
 | `euler_onepatch_onestrain_extinct_plot.R` | Raster plots of extinction results from the euler one-strain grid |
 | `euler_onestrain_run.R` | Multi-patch grid run over R0 × K × alpha; supports `--mini` flag via optparse  * |
 | `euler_twostrain_example_pars.csv` | 6 curated `(K, alpha, R01, R02)` parameter sets with descriptions (e.g. "conventional invasion"), illustrating specific outcomes rather than a grid sweep |
-| `euler_twostrain_singlepatchintro_examples.R` | Runs all 6 parameter sets locally with singlepatchintro settings matching `sharcnet/euler_twostrain_run_array.R` (`n_patch=200`, `nsim=500`, `dt=0.1`, `nt=5000`, `stop_both_extinct`); chunks simulations (25 at a time) to bound memory; saves per-step Arrow summaries to `outputs/euler_twostrain_singlepatchintro_examples.rds`. Corresponding SLURM array version: `sharcnet/euler_twostrain_examples_run_array.R` * |
+| `euler_twostrain_singlepatchintro_examples.R` | Runs all 6 parameter sets locally with singlepatchintro settings matching `sharcnet/euler_twostrain_run_array.R` (`n_patch=200`, `nsim=500`, `dt=0.1`, `nt=5000`, `stop_both_extinct()`); chunks simulations (25 at a time) to bound memory; saves per-step Arrow summaries to `outputs/euler_twostrain_singlepatchintro_examples.rds`. Corresponding SLURM array version: `sharcnet/euler_twostrain_examples_run_array.R` * |
 | `euler_twostrain_singlepatchintro_examples_plot.R` | Plots the per-step summaries (patches occupied, mean, sd) from the examples run, faceted by parameter set |
 | `euler_twostrain_plot.R` | Plots PIP from the singlepatchintro batch output (should be renamed `euler_twostrain_singlepatchintro_plot.R` ?) |
 

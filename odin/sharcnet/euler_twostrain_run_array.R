@@ -40,7 +40,7 @@ if (opt$mini) {
   n_patch   <- 200
   n_sim     <- 200L
   dt        <- 0.1
-  stop_cond <- stop_both_extinct
+  stop_cond <- stop_both_extinct()
 } else {
   dd <- expand.grid(R01   = seq(1.1, 4, by = 0.1),
                     R02   = seq(1.1, 4, by = 0.1),
@@ -49,7 +49,7 @@ if (opt$mini) {
   n_patch   <- 200
   n_sim     <- 200L
   dt        <- 0.1
-  stop_cond <- stop_both_extinct
+  stop_cond <- stop_both_extinct()
 }
 
 row           <- dd[task_id, ]

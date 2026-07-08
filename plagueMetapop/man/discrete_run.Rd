@@ -20,7 +20,7 @@ discrete_run(
   seed = NULL,
   nsim = 1,
   chunk = NULL,
-  stop_cond = stop_both_extinct,
+  stop_cond = stop_both_extinct(),
   def_file = "discrete_odin_def.R",
   dt = 1,
   platform = c("odin", "macpan2", "pureR")
@@ -63,7 +63,8 @@ share the same rounded \code{I_init} values.}
 
 \item{stop_cond}{function(row) -> logical; called on the last row of each
 chunk; return TRUE to halt early. Use stop_either_extinct() or
-stop_both_extinct(), or supply a custom function.
+stop_both_extinct() (both factories — call them to get the closure), or
+supply a custom function.
 NULL runs all nt steps. Only supported for platform = "odin".}
 
 \item{def_file}{odin DSL filename in inst/odin/ (odin platform only).

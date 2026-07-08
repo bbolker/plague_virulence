@@ -46,16 +46,65 @@ f(make_row(10, 10))
 expect_true(f(make_row(0, 0)),
             info = "both extinct after strain 2 seen: returns TRUE")
 
-## --- stop_both_extinct() unit tests (regression) ---
+## --- stop_both_extinct() unit tests ---
 
-expect_false(stop_both_extinct(make_row(10, 10)),
+f <- stop_both_extinct()
+expect_true(is.function(f),
+            info = "stop_both_extinct() returns a function (factory pattern)")
+
+## both present: no stop
+f <- stop_both_extinct()
+expect_false(f(make_row(10, 10)),
              info = "stop_both_extinct: both present returns FALSE")
-expect_false(stop_both_extinct(make_row(0, 10)),
+
+## only strain 1 extinct: no stop
+f <- stop_both_extinct()
+f(make_row(10, 10))          ## strain 2 observed
+expect_false(f(make_row(0, 10)),
              info = "stop_both_extinct: only strain 1 extinct returns FALSE")
-expect_false(stop_both_extinct(make_row(10, 0)),
+
+## only strain 2 extinct (after being seen): no stop
+f <- stop_both_extinct()
+f(make_row(10, 10))          ## strain 2 observed
+expect_false(f(make_row(10, 0)),
              info = "stop_both_extinct: only strain 2 extinct returns FALSE")
-expect_true(stop_both_extinct(make_row(0, 0)),
-            info = "stop_both_extinct: both extinct returns TRUE")
+
+## both extinct, but strain 2 never seen (pre-seeding fade-out of strain 1):
+## must NOT stop, since strain 2 hasn't been introduced yet
+f <- stop_both_extinct()
+expect_false(f(make_row(0, 0)),
+             info = "stop_both_extinct: I2=0 never observed (pre-seeding): returns FALSE")
+
+## both extinct after strain 2 was seen: stop
+f <- stop_both_extinct()
+f(make_row(10, 10))          ## strain 2 observed
+expect_true(f(make_row(0, 0)),
+            info = "stop_both_extinct: both extinct after strain 2 seen: returns TRUE")
+
+## require_seeded = FALSE restores the old unconditional behaviour, for
+## genuinely single-strain runs where strain 2 is never introduced
+f <- stop_both_extinct(require_seeded = FALSE)
+expect_true(f(make_row(0, 0)),
+            info = "stop_both_extinct(require_seeded=FALSE): fires without ever seeing strain 2")
+expect_false(f(make_row(10, 0)),
+             info = "stop_both_extinct(require_seeded=FALSE): strain 1 still present returns FALSE")
+
+## --- integration test: stop_both_extinct() must not fire before seeding ---
+## strain 1 has R0 < 1 (beta=0.5, gamma=1) so it fades out well before
+## strain2_delay=30; without the fix the run would halt at the first chunk
+## boundary at/after strain-1 extinction, long before strain 2 is seeded.
+set.seed(42)
+mod2 <- make_simulator_odin(
+  beta_vec      = c(0.5, 2.5),
+  K             = 1e4,
+  n_patch       = 1L,
+  nt            = 500L,
+  I_ini_mat     = make_I_ini_mat(c(10, 20), n_patch = 1L, method = "fixed"),
+  strain2_delay = 30
+)
+run2 <- run_simulator_odin(mod2, chunk = 5, stop_cond = stop_both_extinct())
+expect_true(max(run2[, 1]) >= 30,
+            info = "stop_both_extinct(): simulation runs at least to step 30 (strain-2 seeding) even if strain 1 fades out first")
 
 ## --- integration test ---
 ## With strain2_delay=30 and chunk=5, the stop condition is evaluated at steps

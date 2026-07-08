@@ -104,8 +104,9 @@ Combined: `euler_onestrain[_mini|_batch2].rds`
 
 Multi-patch, two-strain PIP grid: varies R01 × R02 × K × alpha.  
 Strain 1 runs alone for `strain2_delay = round(100/dt)` steps before strain 2 is seeded.
-Full and mini2 runs stop when both strains are simultaneously extinct (`stop_both_extinct`);
-mini stops when either strain goes extinct (`stop_either_extinct()`).
+Full and mini2 runs stop when both strains are simultaneously extinct (`stop_both_extinct()`,
+gated so it can't fire before strain 2 is seeded); mini stops when either strain goes extinct
+(`stop_either_extinct()`).
 
 The full run uses **META-Farm** (dynamic load balancing) rather than a SLURM array;
 the mini test still uses a plain SLURM array.
@@ -121,9 +122,9 @@ the mini test still uses a plain SLURM array.
 | `euler_twostrain_run_array.R` | shared R script (`--mini` / `--mini2` / `--singlepatchintro` flags) |
 | `euler_twostrain_combine.R` | combine outputs (`--mini` / `--mini2` / `--singlepatchintro` flags, short: `-m` / `-2`) |
 
-Grid (full/singlepatchintro): `R01 = R02 = seq(1.1, 4, by=0.1)` × `K = 10^seq(3, 5)` × `alpha = 10^seq(-5, -3)` — 8100 tasks; uses `stop_both_extinct`  
+Grid (full/singlepatchintro): `R01 = R02 = seq(1.1, 4, by=0.1)` × `K = 10^seq(3, 5)` × `alpha = 10^seq(-5, -3)` — 8100 tasks; uses `stop_both_extinct()`  
 Grid (mini):  `R01 = R02 = seq(1.1, 3, by=0.5)` × `K = 10^seq(3, 5)` × `alpha = 10^seq(-5, -4)` — 96 tasks  
-Grid (mini2): `R01 = R02 = seq(1.1, 4, by=0.1)` × `K = 1e4` × `alpha = 10^-5.5` — 900 tasks; uses `stop_both_extinct`  
+Grid (mini2): `R01 = R02 = seq(1.1, 4, by=0.1)` × `K = 1e4` × `alpha = 10^-5.5` — 900 tasks; uses `stop_both_extinct()`  
 Parameters (full/mini2): `nsim=200`, `dt=0.1`, `n_patch=200`; full run: `nt=500/dt=5000` steps; mini2: `nt=200/dt=2000` steps  
 Parameters (mini): `nsim=50`, `dt=0.2`, `n_patch=50`; `nt=200/dt=1000` steps  
 Parameters (singlepatchintro): same grid and `n_patch`/`dt`/`nt` as full, but `nsim=500`; strain 2 seeded into **patch 1 only** (Poisson mean 10) at `strain2_delay`; all other patches start at 0
