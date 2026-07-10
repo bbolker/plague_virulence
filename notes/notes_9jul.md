@@ -13,7 +13,7 @@ We may need add seasonality to make this work (we were thinking about seasonalit
 
 ## dynamical scenario
 
-My mental model for how a low-$R_0$ mutant strain can invade a high-$R_0$ wild-type/resident strain in a metapopulation context is that there are enough empty patches (where both strains have gone extinct) that the mutant often finds itself colonizing empty patches alone. Its low $R_0$ allows it to persist (avoid burnout), where a wild-type colonizer would burn out. (If the two strains co-colonize then the mutant will be caught in the wild-type-induced burnout ...)
+My mental model for how a low-$R_0$ mutant strain can invade a high-$R_0$ wild-type/resident strain in a metapopulation context is that there are enough empty patches (where both strains have gone extinct) that the mutant often finds itself colonizing empty patches alone. Its low $R_0$ allows it to persist (avoid burnout), where a wild-type colonizer would burn out. (If the two strains co-colonize then the mutant will either be out-competed (if the wild-type persists) or be caught in the wild-type-induced burnout ...)
 
 
 ## what's wrong with our current invasion sims
