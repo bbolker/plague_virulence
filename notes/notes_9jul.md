@@ -1,5 +1,7 @@
 ## brain dump on metapopulation dynamics
 
+<!-- LaTeX formatting on GitHub is ugly, need various workarounds that I probably won't bother with. See e.g. https://nschloe.github.io/2022/06/27/math-on-github-follow-up.html . Back-ticks inside $ might help, i.e. $`...`$. For non-whitespace-adjacent stuff, the hacky workaround is $\text{higher-}R_0$ instead of higher-$R_0$ ... -->
+
 Figured out a lot of things (I think) talking with Yuyang today. The take-home messages, I think, are:
 
 * our current approach to simulating/testing evolutionary invasion is probably wrong
@@ -32,10 +34,11 @@ A *distribution* of patch sizes might also be important -- I think an implicit a
 
 ## recurrent epidemics/fadeouts
 
-As mentioned above, we may need to find a regime with asynchronous fadeouts (i.e. spontaneous local extinctions, not necessarily after a 'virgin soil' epidemic [i.e. one starting from low prevalence, $S(0) \approx K$). The endemic equilibrium prevalence in a population of size $K$, with scaled disease generation time $\epsilon$ (i.e. relative to replenishment rate/host generation time) is $I^* = K \epsilon(1-1/R_0)$; stochastic fluctuations are of order $\sqrt{I^*}$ (or, the coefficient of variance is of order $1/\sqrt{I^*}$). If the CV is much smaller than 1/2, then we're unlikely ever to get spontaneous stochastic extinction from an endemic equilibrium.
+As mentioned above, we may need to find a regime with asynchronous fadeouts (i.e. spontaneous local extinctions, not necessarily after a 'virgin soil' epidemic [i.e. one starting from low prevalence, $S(0) \approx K$). The endemic equilibrium prevalence in a population of size $K$, with scaled disease generation time $\epsilon$ (i.e. relative to replenishment rate/host generation time) is $I^* = K \epsilon(1-1/R_0)$; stochastic fluctuations are of order $\sqrt{I^{*}}$ (or, the coefficient of variance is of order $1/\sqrt{I^{*}}$). If the CV is much smaller than 1/2, then we're unlikely ever to get spontaneous stochastic extinction from an endemic equilibrium.
 
 However, two phenomena -- *Bartlett cycles* (interaction between stochastic fluctuations and the damped oscillations of the deterministic model) and *seasonal forcing* can both maintain a much higher degree of variation (and hence higher extinction probability) than the endemic equilibrium would suggest (e.g. see pp. 24 and following of https://bbolker.github.io/math4mb/notes/epi1.pdf ).
 
 We had previously thought that we might need to worry about seasonality and synchrony/asynchrony: @krauerInfluenceTemperatureSeasonality2021 (see `../virulence.bib`) show that European plague epidemics during the second pandemic typically occurred Aug-Nov (and @bacaerModelKermackMcKendrick2012 points out that the 1906 Bombay plague epidemic was probably seasonal). Seasonality is two-edged here; it increases variation (making local extinction more likely) but also increases synchrony (making recolonization/rescue effect less likely) ...  It would be easy enough to add (e.g.) sinusoidal variation in transmission rate (or host demography, or ...), at the cost of one more parameter (amplitude), but we should think before we do it. We have also considered some kind of hybrid model where we simulate until the end of an epidemic "season" and then jump to the beginning of the next -- but we would need to decide what assumptions to make about the dynamics of that interseason jump ...
 
 (Biological note: what if recurrent plague epidemics represent recolonization events from some disease focus [i.e. a persistent reservoir] rather than metapopulation dynamics? Then all of this is out the window ...)
+
