@@ -3,9 +3,10 @@
 Figured out a lot of things (I think) talking with Yuyang today. The take-home messages, I think, are:
 
 * our current approach to simulating/testing evolutionary invasion is probably wrong
-* matching our intuition (or my intuition, anyway) for how a low (within-patch) $R_0$ strain can invade a higher-$R_0$ resident will probably need a scenario where:
+* matching our intuition (or my intuition, anyway) for how a low (within-patch) $R_0$ strain can invade a higher-$ R_0$ resident will probably need a scenario where:
    * patch dynamics are asynchronous
    * recurrent exinctions are frequent
+   
 We may need add seasonality to make this work (we were thinking about seasonality anyway, to increase realism, but it may also be required to get the kind of dynamics we have in mind)
 
 ## dynamical scenario
