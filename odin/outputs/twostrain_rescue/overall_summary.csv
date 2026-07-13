@@ -1,0 +1,2 @@
+"strain1_globally_persistent","strain2_persistent_after_intro","min_I1_occupied_patches","mean_I1_occupied_patches","min_I2_occupied_patches_after_intro","mean_I2_occupied_patches_after_intro","total_I1_local_extinctions","total_I1_recolonizations","total_I2_local_extinctions_after_intro","total_I2_recolonizations_after_intro"
+TRUE,FALSE,8,29.8584283143371,0,16.215696075981,544,379,176,224

@@ -4,10 +4,10 @@ library(dplyr)
 library(here)
 library(ggplot2); theme_set(theme_bw())
 
-## lower right panel of PIP plot, purple area (resident fine, invader loses)
-R01 <- 3.8
-R02 <- 3
-K <- 1e5
+## lower middle panel of PIP plot,yellow area (resident fine, invader loses)
+R01 <- 2
+R02 <- 3.8
+K <- 1e3
 alpha <- 1e-3
 n_patch   <- 200
 #n_sim     <- 100L
