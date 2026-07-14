@@ -12,6 +12,7 @@ This repo started with a collection of ideas about how to *verbally* explain the
 
 From newest to oldest:
 
+* `fadeout`: simulations exploring one-strain metapopulation extinction dynamics
 * `odin`: mostly continuous-time simulations with [odin](https://mrc-ide.github.io/odin/) (and also comparable implementations with [macpan2](https://canmod.github.io/macpan2/). The `sharcnet` subdirectory has machinery for submitting large jobs as SLURM job arrays (and reassembling the results when finished).
 * `plagueMetapop`: mini-R package implementing the functionality used in the `odin` runs
 * `talks`: BMB talks for Canadian Society of Ecology and Evolution, May 2026, and Statistical Society of Canada, June 2026
