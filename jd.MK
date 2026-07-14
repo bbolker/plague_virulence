@@ -1,6 +1,6 @@
 ## This is a PERSONAL MAKEFILE for plague_virulence
 ## It is version-controlled as jd.MK and linked and used as extras.mk
-## make jd.extras to use
+## `make jd.extras` to use
 
 current: target
 -include target.mk
@@ -37,6 +37,19 @@ burnout5.Rout: metapop/burnout5.R
 ## See alsometapop/stochastic/sim_batch1.R
 metapop/stochastic/sim_batch0.rds: metapop/stochastic/sim_batch0.R
 	cd $(dir $<) && R --vanilla < $(notdir $<)
+
+######################################################################
+
+plagueMetapop.pkg: %.pkg: %/NAMESPACE
+	R CMD INSTALL $*
+	$(touch)
+
+######################################################################
+
+autopipeR = defined
+
+## fadeout/single_strain_metapop.Rout: fadeout/single_strain_metapop.R
+## fadeout/seasonal_single_strain_metapop.Rout: fadeout/seasonal_single_strain_metapop.R
 
 ######################################################################
 
