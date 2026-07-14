@@ -21,7 +21,6 @@ n_patch <- 200
 dt <- 0.1
 t_max <- 500
 
-I0 <- 300
 
 seed <- 101
 
@@ -29,23 +28,107 @@ seed <- 101
 ## Run one stochastic trajectory
 ## ------------------------------------------------------------
 
+# set.seed(seed)
+# 
+# runs <- discrete_run(
+#   beta_vec  = c(R0, 0),
+#   K         = K,
+#   r         = r,
+#   n_patch   = n_patch,
+#   nt        = round(t_max / dt),
+#   alpha     = alpha,
+#   I_init    = c(I0, 0),
+#   gamma     = c(gamma, gamma),
+#   dt        = dt,
+#   def_file  = "euler_odin_def.R",
+#   stop_cond = NULL,
+#   nsim      = 1,
+#   platform  = "odin"
+# )
+
+
 set.seed(seed)
 
-runs <- discrete_run(
-  beta_vec  = c(R0, 0),
-  K         = K,
-  r         = r,
-  n_patch   = n_patch,
-  nt        = round(t_max / dt),
-  alpha     = alpha,
-  I_init    = c(I0, 0),
-  gamma     = c(gamma, gamma),
-  dt        = dt,
-  def_file  = "euler_odin_def.R",
-  stop_cond = NULL,
-  nsim      = 1,
-  platform  = "odin"
+## Compute deterministic endemic equilibrium
+
+eq <- ode_eq(
+  beta = R0,
+  gamma = gamma,
+  K = K,
+  r = r,
+  logistic_growth = 1
 )
+
+S_star <- unname(eq["eq_S"])
+I_star <- unname(eq["eq_I"])
+
+cat("Deterministic equilibrium:\n")
+cat("S* =", S_star, "\n")
+cat("I* =", I_star, "\n")
+
+## Every patch starts exactly at the deterministic equilibrium
+
+# S_ini <- rep(round(S_star), n_patch)
+#
+# I_ini <- cbind(
+#   rep(round(I_star), n_patch),
+#   rep(0, n_patch)
+# )
+
+I_outbreak <- 10
+
+u <- runif(n_patch, min = 0, max = 1)
+
+S_ini <- round(
+  K * u + S_star * (1 - u)
+)
+
+I1_ini <- round(
+  I_outbreak * u + I_star * (1 - u)
+)
+
+I_ini <- cbind(
+  I1_ini,
+  rep(0, n_patch)
+)
+
+## Compile and run the same odin model with explicit S and I initial values
+
+gen <- compile_odin("euler_odin_def.R")
+
+sim <- gen$new(
+  beta = c(R0, 0),
+  gamma = c(gamma, gamma),
+  dt = dt,
+  r = rep(r, n_patch),
+  K = rep(K, n_patch),
+  S_ini = S_ini,
+  I_ini = I_ini,
+  I2_ini = rep(0, n_patch),
+  alpha = alpha,
+  n_patch = n_patch,
+  strain2_delay = as.integer(.Machine$integer.max),
+  logistic_growth = 1,
+  reedfrost = 0
+)
+
+raw_runs <- sim$run(seq.int(0L, round(t_max / dt)))
+raw_runs[, "step"] <- raw_runs[, "step"] * dt
+runs <- conv_odin(raw_runs)
+
+## Verify actual initial values
+
+initial_check <- runs |>
+  filter(step == 0, state %in% c("S", "I1")) |>
+  group_by(state) |>
+  summarise(
+    min = min(value),
+    mean = mean(value),
+    max = max(value),
+    .groups = "drop"
+  )
+
+print(initial_check)
 
 ## ------------------------------------------------------------
 ## Extract strain-1 prevalence
@@ -145,7 +228,9 @@ p_raster <- ggplot(
   geom_raster() +
   scale_fill_manual(
     values = c("0" = "white", "1" = "black"),
-    labels = c("uninfected", "infected"),
+    breaks = c("0", "1"),
+    labels = c("0" = "uninfected", "1" = "infected"),
+    drop = FALSE,
     name = NULL
   ) +
   labs(
