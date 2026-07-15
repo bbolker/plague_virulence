@@ -40,6 +40,7 @@ metapop/stochastic/sim_batch0.rds: metapop/stochastic/sim_batch0.R
 
 ######################################################################
 
+Ignore += plagueMetapop.pkg
 plagueMetapop.pkg: %.pkg: %/NAMESPACE
 	R CMD INSTALL $*
 	$(touch)
