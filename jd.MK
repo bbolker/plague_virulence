@@ -51,6 +51,7 @@ autopipeR = defined
 
 ## fadeout/single_strain_metapop.Rout: fadeout/single_strain_metapop.R
 ## fadeout/seasonal_single_strain_metapop.Rout: fadeout/seasonal_single_strain_metapop.R
+## odin/euler_onepatch_onestrain_extinct_plot.Rout: odin/euler_onepatch_onestrain_extinct_plot.R
 
 ######################################################################
 

@@ -1,0 +1,46 @@
+---
+title: more notes on metapop patch occupancy dynamics
+---
+
+How did we calibrate final size earlier, when we were doing it by brute force fo r two-strain models? See `two_strain/ode_test_proc.R`: quadratic polynomial. Here, I think we might be better off with a spline fit.
+
+```{r}
+library("here")
+library("dplyr")
+library("ggplot2"); theme_set(theme_bw())
+library("patchwork")
+library("mgcv")
+dd <- (readRDS(here::here("odin/sharcnet/outputs/",
+                          "euler_onepatch_onestrain_extinct_logistic_continuous.rds"))
+    |> select(R0, K, ext_prob.I1)
+)
+```
+
+```{r plot}
+gg0 <- ggplot(dd, aes(R0, K, fill = ext_prob.I1)) +
+    geom_raster() +
+    scale_y_log10(expand = c(0,0)) +
+    scale_fill_viridis_c() +
+    scale_x_continuous(expand = c(0,0))
+```
+
+```{r}
+## using default 'cr' basis; increased k as much as I can given grid resolution
+gam_fit <- gam(ext_prob.I1 ~ te(R0, K, k = c(12, 12)),data = dd)
+dd <- within(dd, {
+    fit <- predict(gam_fit)
+    err <- fit - ext_prob.I1
+})
+gg_fit <- gg0 + dd + aes(fill = fit)
+gg_err <- gg0 + dd + aes(fill = err)
+gg0 + gg_fit + gg_err
+```
+
+Good enough?
+
+Could store this as an object and use it to predict patch occupancy dynamics
+
+Once we have this, I think we should be able to replicate the patch occupancy curve pretty well from first principles.
+
+Much harder (and more of intellectual than practical interest); repeat perturbation analysis from burnout paper for logistic host dynamics ...
+
