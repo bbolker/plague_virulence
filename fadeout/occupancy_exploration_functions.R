@@ -73,6 +73,235 @@ summarize_fadeout_occupancy <- function(runs, n_patch) {
   list(infected = infected, meta_summary = meta_summary)
 }
 
+add_established_occupancy <- function(infected, tau, dt) {
+  required <- c("step", "patch", "I")
+  missing <- setdiff(required, names(infected))
+  if (length(missing) > 0L) {
+    stop("Patch trajectories are missing columns: ",
+         paste(missing, collapse = ", "))
+  }
+  if (length(tau) != 1L || !is.finite(tau) || tau < 0) {
+    stop("tau must be one finite, non-negative value")
+  }
+  if (length(dt) != 1L || !is.finite(dt) || dt <= 0) {
+    stop("dt must be one finite, positive value")
+  }
+
+  window_steps <- as.integer(round(tau / dt))
+  if (!isTRUE(all.equal(window_steps * dt, tau, tolerance = 1e-8))) {
+    stop("tau must be an integer multiple of dt; got tau=", tau,
+         " and dt=", dt)
+  }
+
+  infected |>
+    dplyr::select(dplyr::all_of(required)) |>
+    dplyr::arrange(patch, step) |>
+    dplyr::group_by(patch) |>
+    dplyr::group_modify(function(.x, .y) {
+      n <- nrow(.x)
+      established <- rep(NA_integer_, n)
+      valid <- seq_len(max(0L, n - window_steps))
+      if (length(valid) > 0L) {
+        zero_cumulative <- c(0L, cumsum(.x$I <= 0))
+        window_end <- valid + window_steps
+        zero_count <- zero_cumulative[window_end + 1L] -
+          zero_cumulative[valid]
+        established[valid] <- as.integer(zero_count == 0L)
+      }
+      .x$occupied_raw <- as.integer(.x$I > 0)
+      .x$occupied_established <- established
+      .x
+    }) |>
+    dplyr::ungroup() |>
+    dplyr::mutate(tau = tau, window_steps = window_steps)
+}
+
+summarize_established_occupancy <- function(infected, n_patch, tau, dt) {
+  if (length(n_patch) != 1L || n_patch <= 0) {
+    stop("n_patch must be one positive value")
+  }
+
+  established <- add_established_occupancy(infected, tau = tau, dt = dt)
+  established |>
+    dplyr::group_by(step, tau) |>
+    dplyr::summarise(
+      occupied_patches_raw = sum(occupied_raw),
+      occupancy_fraction_raw = occupied_patches_raw / n_patch,
+      occupied_patches_established = if (all(is.na(occupied_established))) {
+        NA_integer_
+      } else {
+        sum(occupied_established, na.rm = TRUE)
+      },
+      patches_with_complete_window = sum(!is.na(occupied_established)),
+      occupancy_fraction_established = if (
+        patches_with_complete_window == 0L
+      ) {
+        NA_real_
+      } else {
+        occupied_patches_established / patches_with_complete_window
+      },
+      global_I = sum(I),
+      .groups = "drop"
+    )
+}
+
+classify_infection_episodes <- function(infected, tau, dt) {
+  ## Classify complete contiguous I>0 episodes retrospectively. If any time in
+  ## an episode satisfies the established forward-window criterion, the whole
+  ## episode is persistent from its first infected observation. An episode
+  ## near the trajectory boundary that never has a complete qualifying window
+  ## is classified as transient; callers should document this right-censoring
+  ## limitation.
+  classified <- add_established_occupancy(infected, tau = tau, dt = dt) |>
+    dplyr::group_by(patch) |>
+    dplyr::arrange(step, .by_group = TRUE) |>
+    dplyr::mutate(
+      episode_start = occupied_raw == 1L &
+        dplyr::lag(occupied_raw, default = 0L) == 0L,
+      episode_id = cumsum(episode_start)
+    ) |>
+    dplyr::ungroup()
+
+  episode_types <- classified |>
+    dplyr::filter(occupied_raw == 1L) |>
+    dplyr::group_by(patch, episode_id) |>
+    dplyr::summarise(
+      episode_persistent = any(occupied_established == 1L, na.rm = TRUE),
+      episode_start_time = min(step),
+      episode_end_time = max(step),
+      .groups = "drop"
+    )
+
+  classified |>
+    dplyr::left_join(episode_types, by = c("patch", "episode_id")) |>
+    dplyr::mutate(
+      episode_type = dplyr::case_when(
+        occupied_raw == 0L ~ "uninfected",
+        episode_persistent ~ "persistent",
+        TRUE ~ "transient"
+      )
+    )
+}
+
+summarize_transient_patch_contribution <- function(infected, n_patch, tau, dt) {
+  classified <- classify_infection_episodes(infected, tau = tau, dt = dt)
+
+  classified |>
+    dplyr::group_by(step) |>
+    dplyr::summarise(
+      total_I = sum(I),
+      persistent_I = sum(I[episode_type == "persistent"]),
+      transient_I = sum(I[episode_type == "transient"]),
+      infected_patches = sum(occupied_raw),
+      persistent_patches = sum(episode_type == "persistent"),
+      transient_patches = sum(episode_type == "transient"),
+      transient_fraction_I = dplyr::if_else(
+        total_I > 0, transient_I / total_I, NA_real_
+      ),
+      persistent_fraction_I = dplyr::if_else(
+        total_I > 0, persistent_I / total_I, NA_real_
+      ),
+      transient_patch_fraction = dplyr::if_else(
+        infected_patches > 0,
+        transient_patches / infected_patches,
+        NA_real_
+      ),
+      persistent_patch_fraction = dplyr::if_else(
+        infected_patches > 0,
+        persistent_patches / infected_patches,
+        NA_real_
+      ),
+      persistent_occupancy_fraction = persistent_patches / n_patch,
+      .groups = "drop"
+    )
+}
+
+classify_infection_episodes_with_censoring <- function(infected, tau, dt) {
+  ## Corrected audit classification. Episodes are independent within a patch.
+  ## A qualifying episode is persistent from its beginning; a completed
+  ## non-qualifying episode is transient; an episode still infected at the
+  ## simulation boundary without a complete qualifying window is censored.
+  classified <- add_established_occupancy(infected, tau = tau, dt = dt) |>
+    dplyr::group_by(patch) |>
+    dplyr::arrange(step, .by_group = TRUE) |>
+    dplyr::mutate(
+      episode_start = occupied_raw == 1L &
+        dplyr::lag(occupied_raw, default = 0L) == 0L,
+      episode_id = cumsum(episode_start)
+    ) |>
+    dplyr::ungroup()
+
+  simulation_end <- max(classified$step)
+  episode_types <- classified |>
+    dplyr::filter(occupied_raw == 1L) |>
+    dplyr::group_by(patch, episode_id) |>
+    dplyr::summarise(
+      episode_persistent = any(occupied_established == 1L, na.rm = TRUE),
+      episode_start_time = min(step),
+      episode_end_time = max(step),
+      episode_right_censored = episode_end_time == simulation_end,
+      .groups = "drop"
+    ) |>
+    dplyr::mutate(
+      episode_type = dplyr::case_when(
+        episode_persistent ~ "persistent",
+        episode_right_censored ~ "censored",
+        TRUE ~ "transient"
+      )
+    )
+
+  classified |>
+    dplyr::left_join(episode_types, by = c("patch", "episode_id")) |>
+    dplyr::mutate(
+      episode_type = dplyr::if_else(
+        occupied_raw == 0L, "uninfected", episode_type
+      )
+    )
+}
+
+summarize_transient_source_pressure <- function(infected, n_patch, tau, dt) {
+  classified <- classify_infection_episodes_with_censoring(
+    infected, tau = tau, dt = dt
+  )
+
+  classified |>
+    dplyr::group_by(step) |>
+    dplyr::summarise(
+      transient_I = sum(I[episode_type == "transient"]),
+      persistent_I = sum(I[episode_type == "persistent"]),
+      censored_I = sum(I[episode_type == "censored"]),
+      classifiable_I = transient_I + persistent_I,
+      total_I = classifiable_I + censored_I,
+      transient_source_share = dplyr::if_else(
+        classifiable_I > 0, transient_I / classifiable_I, NA_real_
+      ),
+      persistent_source_share = dplyr::if_else(
+        classifiable_I > 0, persistent_I / classifiable_I, NA_real_
+      ),
+      transient_share_of_total_I = dplyr::if_else(
+        total_I > 0, transient_I / total_I, NA_real_
+      ),
+      censored_share_of_total_I = dplyr::if_else(
+        total_I > 0, censored_I / total_I, NA_real_
+      ),
+      infected_patches = sum(occupied_raw),
+      transient_patches = sum(episode_type == "transient"),
+      persistent_patches = sum(episode_type == "persistent"),
+      censored_patches = sum(episode_type == "censored"),
+      transient_patch_fraction = dplyr::if_else(
+        infected_patches > 0, transient_patches / infected_patches, NA_real_
+      ),
+      persistent_patch_fraction = dplyr::if_else(
+        infected_patches > 0, persistent_patches / infected_patches, NA_real_
+      ),
+      censored_patch_fraction = dplyr::if_else(
+        infected_patches > 0, censored_patches / infected_patches, NA_real_
+      ),
+      persistent_occupancy_fraction = persistent_patches / n_patch,
+      .groups = "drop"
+    )
+}
+
 summarize_occupancy_curve <- function(meta_summary, early_window = 100) {
   global_min_index <- which.min(meta_summary$occupied_patches)
   early_rows <- which(meta_summary$step <= early_window)
