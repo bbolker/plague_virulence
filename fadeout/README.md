@@ -1,169 +1,194 @@
 # Fadeout and patch-occupancy analyses
 
-This directory contains exploratory scripts for local infection fadeout,
-recolonization, and metapopulation patch occupancy. The current main workflow is
-the non-seasonal, single-strain occupancy exploration and its analytical
-comparison. Seasonal and two-strain scripts are retained as related exploratory
-work.
+This directory contains the non-seasonal single-strain patch-occupancy
+workflow, its analytical approximations, and older related fadeout scripts.
+Occupancy means `I > 0` unless explicitly described as established occupancy.
 
-Unless noted otherwise, occupancy is defined patch by patch as
-`1` when the number of infected hosts is greater than zero (`I > 0`) and `0`
-when `I = 0`.
+The current occupancy analyses fix `r = 0.125` and vary one of `R0`, `K`, or
+`alpha` at a time. Figures are saved as PDF. Run commands from the repository
+root.
 
-The simulations use functions from the [`plagueMetapop`](../plagueMetapop/)
-package. The main non-seasonal stochastic model is
-[`euler_odin_def.R`](../plagueMetapop/inst/odin/euler_odin_def.R).
+## Current main workflow
 
-## Current patch-occupancy workflow
-
-Run these commands from the repository root:
+### 1. Stochastic patch occupancy
 
 ```bash
-Rscript fadeout/run_occupancy_exploration.R
-Rscript fadeout/compare_patch_occupancy_approximation.R
+Rscript fadeout/run_stochastic_occupancy.R
 ```
 
-The first command runs a small one-factor-at-a-time collection of representative
-trajectories. It is not a high-dimensional parameter sweep. The second command
-reads those saved trajectories and compares each one with the analytical
-post-burnout approximation; it does not rerun the metapopulation simulations.
+This runs one existing-seed stochastic trajectory for each retained parameter
+value, using 200 patches, `dt=0.1`, `t_max=2000`, and virgin-soil initial
+conditions `S(0)=K-10`, `I(0)=10` in every patch. Use `--plot-only` to rebuild
+the saved data and figures from existing trajectories without rerunning the
+simulations.
 
 | File | Purpose |
 |---|---|
-| [`run_occupancy_exploration.R`](run_occupancy_exploration.R) | Defines the baseline parameter set and the separate `R0`, `K`, `r`, and `alpha` series, runs one stochastic trajectory per parameter value, applies the display-only absorbing boundary at full occupancy, and saves comparison plots and data under `output/patch_occupancy/`. |
-| [`occupancy_exploration_functions.R`](occupancy_exploration_functions.R) | Reusable helpers for explicit fadeout initial conditions, running the odin model, calculating raw and forward-window established occupancy, curve summaries, applying the full-occupancy absorbing rule, and making grouped comparison plots. The current baseline uses virgin-soil initialization: 10 infected hosts and `K - 10` susceptible hosts in every patch. The original `summarize_fadeout_occupancy()` behavior is unchanged. |
-| [`patch_occupancy_dynamics.md`](patch_occupancy_dynamics.md) | Short derivation of the logistic post-burnout approximation, with growth rate `lambda = alpha * I_star * P1`. |
-| [`compare_patch_occupancy_approximation.R`](compare_patch_occupancy_approximation.R) | Compares all saved one-factor-at-a-time trajectories with the analytical approximation. It estimates `P1` from the existing single-patch extinction data with the GAM used in the project notes, obtains `I_star` from the implemented deterministic model, aligns time zero to the simulated occupancy minimum, and writes PDFs plus pointwise diagnostics to `output/patch_occupancy_approximation/`. |
+| [`run_stochastic_occupancy.R`](run_stochastic_occupancy.R) | Defines the baseline and the `R0`, `K`, and `alpha` one-factor-at-a-time scenarios. |
+| [`occupancy_functions.R`](occupancy_functions.R) | Simulation, raw occupancy, established occupancy, episode classification, summary, and absorbing-display helpers. |
+| [`output/stochastic_patch_occupancy/`](output/stochastic_patch_occupancy/) | Direct raw `I>0` stochastic patch-occupancy results, compact CSV files, and three parameter-scan PDFs. |
 
-### Current occupancy outputs
+Main stochastic figures:
 
-All current fadeout results are kept below [`output/`](output/). New plots for
-this work should be saved as PDF.
+- `output/stochastic_patch_occupancy/figures/stochastic_patch_occupancy_compare_R0.pdf`
+- `output/stochastic_patch_occupancy/figures/stochastic_patch_occupancy_compare_K.pdf`
+- `output/stochastic_patch_occupancy/figures/stochastic_patch_occupancy_compare_alpha.pdf`
 
-| File or directory | Contents |
-|---|---|
-| [`output/patch_occupancy/data/occupancy_results.rds`](output/patch_occupancy/data/occupancy_results.rds) | Complete R object containing parameters, raw summaries, displayed trajectories, and per-run summaries for the occupancy exploration. |
-| [`output/patch_occupancy/data/occupancy_curves_absorbing.csv`](output/patch_occupancy/data/occupancy_curves_absorbing.csv) | Long-format trajectories after applying the display-only rule that occupancy remains at 1 after recovery reaches full occupancy. |
-| [`output/patch_occupancy/data/curve_summaries.csv`](output/patch_occupancy/data/curve_summaries.csv) | One-row summaries of the trough, trough time, recovery, and stopping information for every parameter value. |
-| [`output/patch_occupancy/figures/occupancy_compare_R0.pdf`](output/patch_occupancy/figures/occupancy_compare_R0.pdf) | All `R0` trajectories on one panel, with the other parameters fixed at their baseline values. |
-| [`output/patch_occupancy/figures/occupancy_compare_K.pdf`](output/patch_occupancy/figures/occupancy_compare_K.pdf) | All `K` trajectories on one panel. |
-| [`output/patch_occupancy/figures/occupancy_compare_r.pdf`](output/patch_occupancy/figures/occupancy_compare_r.pdf) | All host-growth-rate (`r`) trajectories on one panel. |
-| [`output/patch_occupancy/figures/occupancy_compare_alpha.pdf`](output/patch_occupancy/figures/occupancy_compare_alpha.pdf) | All between-patch transmission (`alpha`) trajectories on one panel. |
-| `output/patch_occupancy/figures/occupancy_compare_{R0,K,r,alpha}.png` | Older PNG copies of the four comparison figures. The PDF files are the preferred outputs. |
-| [`output/patch_occupancy_approximation/patch_occupancy_approximation_compare_R0.pdf`](output/patch_occupancy_approximation/patch_occupancy_approximation_compare_R0.pdf) | Simulated and analytical post-burnout curves for the `R0` series. |
-| [`output/patch_occupancy_approximation/patch_occupancy_approximation_compare_K.pdf`](output/patch_occupancy_approximation/patch_occupancy_approximation_compare_K.pdf) | Simulated and analytical post-burnout curves for the `K` series. |
-| [`output/patch_occupancy_approximation/patch_occupancy_approximation_compare_r.pdf`](output/patch_occupancy_approximation/patch_occupancy_approximation_compare_r.pdf) | Simulated and analytical post-burnout curves for the `r` series. The analytical formula has no direct `r` term, although `r` can affect the simulation and assumptions behind the approximation. |
-| [`output/patch_occupancy_approximation/patch_occupancy_approximation_compare_alpha.pdf`](output/patch_occupancy_approximation/patch_occupancy_approximation_compare_alpha.pdf) | Simulated and analytical post-burnout curves for the `alpha` series. |
-| [`output/patch_occupancy_approximation/patch_occupancy_approximation_diagnostics.csv`](output/patch_occupancy_approximation/patch_occupancy_approximation_diagnostics.csv) | Parameters, estimated `P1`, equilibrium `I_star`, alignment time, RMSE, maximum absolute deviation, and correlation for every comparison. |
-
-The single-patch data used to estimate `P1` are in
-[`odin/sharcnet/outputs/euler_onepatch_onestrain_extinct_logistic_continuous.rds`](../odin/sharcnet/outputs/euler_onepatch_onestrain_extinct_logistic_continuous.rds).
-The estimate inherits that experiment's Poisson introduction and 200-generation
-extinction horizon, so it is a preliminary proxy for successful persistent
-recolonization rather than an exact match to every receiving-patch state.
-
-## Established-occupancy workflow
-
-Raw `I > 0` occupancy can count short-lived introductions. The alternative
-established statistic requires uninterrupted infection over a fixed forward
-window of 50 disease generations. See
-[`established_occupancy_analysis.md`](established_occupancy_analysis.md) for the
-definition, interpretation, and limitations.
+### 2. Original one-state approximation
 
 ```bash
-Rscript fadeout/run_established_occupancy_exploration.R
-Rscript fadeout/compare_established_occupancy_approximation.R
+Rscript fadeout/compare_one_state_occupancy.R
 ```
+
+The one-state model tracks persistent occupancy $p(t)$:
+
+$$
+\frac{dp}{dt}=\alpha I^*P_1p(1-p).
+$$
+
+It assumes that (1) the initial epidemic and first burnout are rapid relative
+to recolonization, (2) patches surviving that burnout persist thereafter,
+(3) persistent patches rapidly reach the deterministic endemic infected
+abundance $I^*$, and (4) empty patches rapidly recover to $S=K$. Thus the
+infection pressure on an empty patch is
+
+$$
+c(t)=\alpha I^*p(t),
+$$
+
+and a new colonization establishes persistence with probability $P_1$. With
+$p(0)=P_1$ and $\lambda=\alpha I^*P_1$, the logistic solution is
+
+$$
+p(t)=\frac{1}{
+1+\dfrac{1-P_1}{P_1}\exp\!\left(-\alpha I^*P_1t\right)
+}.
+$$
+
+`P1` is predicted as a function of `R0` and `K` by the existing GAM fitted to
+the single-patch extinction data; those data use `r=0.125`. `I_star` comes from
+`plagueMetapop::ode_eq()`. The stochastic comparison target is established
+occupancy with `tau=50`, while the common post-burnout time origin is the raw
+occupancy minimum.
 
 | File | Purpose |
 |---|---|
-| [`run_established_occupancy_exploration.R`](run_established_occupancy_exploration.R) | Repeats the same 21 seeded scenarios as the raw occupancy runner without changing the odin model, calculates raw and established summaries at the fixed `tau=50`, and writes only to `output/patch_occupancy_established/`. |
-| [`compare_established_occupancy_approximation.R`](compare_established_occupancy_approximation.R) | Primary analysis comparing `tau=50` established stochastic occupancy with the unchanged analytical approximation. Each established curve is aligned to its own minimum, while the analytical curve still starts at `P1`. It reads the compact RDS and does not rerun simulations or use raw occupancy in the primary overlays. |
-| [`established_occupancy_analysis.md`](established_occupancy_analysis.md) | Scientific rationale, exact fixed-window definition, instructions, and caveats about future information, rescue, and repeated immigration. |
+| [`compare_one_state_occupancy.R`](compare_one_state_occupancy.R) | Produces the one-state comparisons and diagnostics without rerunning metapopulation simulations. |
+| [`output/one_state_occupancy/`](output/one_state_occupancy/) | Three `tau=50` PDFs and the diagnostic CSV. |
 
-All figures retained by this workflow are PDF files. The compact outputs are:
+Main one-state figures:
 
-| File or directory | Contents |
-|---|---|
-| [`output/patch_occupancy_established/data/established_occupancy_results.rds`](output/patch_occupancy_established/data/established_occupancy_results.rds) | Scenario parameters and raw/established occupancy summaries at `tau=50`; full patch-level trajectories are not saved. |
-| [`output/patch_occupancy_established/data/established_occupancy_curves.csv`](output/patch_occupancy_established/data/established_occupancy_curves.csv) | Long-format compact occupancy curves. |
-| [`output/patch_occupancy_established/data/established_occupancy_diagnostics.csv`](output/patch_occupancy_established/data/established_occupancy_diagnostics.csv) | Trough, final nonmissing occupancy, raw-minus-established difference, trough time, and available-window diagnostics by scenario and `tau`. |
-| [`output/patch_occupancy_established/analytical_comparison/data/established_occupancy_approximation_diagnostics.csv`](output/patch_occupancy_established/analytical_comparison/data/established_occupancy_approximation_diagnostics.csv) | `P1`, equilibrium, established minimum/alignment, RMSE, early RMSE, maximum deviation, correlation, threshold-time, and nonmissing-point diagnostics for 21 scenarios at `tau=50`. |
-| [`output/patch_occupancy_established/analytical_comparison/data/established_occupancy_approximation_curves.csv`](output/patch_occupancy_established/analytical_comparison/data/established_occupancy_approximation_curves.csv) | Exact established stochastic and analytical curve values used in the primary plots. It contains no raw occupancy trajectory. |
-| `output/patch_occupancy_established/analytical_comparison/figures/analytical_vs_established_{R0,K,r,alpha}_tau_50.pdf` | Four primary trajectory overlays: solid established stochastic occupancy and dashed analytical approximation. Colour legends give every scanned value; subtitles state all fixed biological, simulation, and initialization parameters. |
+- `output/one_state_occupancy/one_state_established_tau50_compare_R0.pdf`
+- `output/one_state_occupancy/one_state_established_tau50_compare_K.pdf`
+- `output/one_state_occupancy/one_state_established_tau50_compare_alpha.pdf`
 
-## Transient infection-episode contribution
-
-This diagnostic quantifies the share of `sum(I)` and currently infected patches
-coming from transient rather than persistent infection episodes. It uses the
-same fixed `tau=50` persistence criterion as the established workflow. Because
-the established output did not retain patch-level trajectories, the runner
-reproduces the same 21 seeded trajectories in memory without changing the model
-or adding simulation replicates.
+### 3. Current two-state approximation
 
 ```bash
-Rscript fadeout/run_transient_patch_analysis.R
+Rscript fadeout/compare_two_state_occupancy.R
 ```
 
-To regenerate the figures from the corrected saved time series without
-rerunning the metapopulation simulations, use:
+The current model distinguishes persistent occupancy $p(t)$ from transient
+occupancy $q(t)$:
 
-```bash
-Rscript fadeout/run_transient_patch_analysis.R --plot-only
-```
+$$
+B(t)=\alpha\left[I^*p(t)+\bar I_Tq(t)\right]
+\left[1-p(t)-q(t)\right],
+$$
 
-The two retained transient-analysis figures compare the representative
-`R0=2.5` and `R0=3` scenarios and omit the final `tau=50` time units, where
-episode outcomes are necessarily censored. The component figure uses a
-linear-scale stacked area display: transient and persistent areas add to
-`classifiable_I`, and the black upper boundary is `total_I` (identical over the
-displayed interval because `censored_I=0`).
+$$
+\frac{dp}{dt}=P_1B(t),
+$$
 
-| File or directory | Purpose |
-|---|---|
-| [`run_transient_patch_analysis.R`](run_transient_patch_analysis.R) | Reproduces the existing one-factor-at-a-time scenarios, classifies independent contiguous `I>0` episodes as persistent, transient, or censored, and writes the corrected source-pressure decomposition to `output/transient_patch_analysis/`. |
-| [`transient_source_pressure_audit.md`](transient_source_pressure_audit.md) | Current audited methods and results. Distinguishes estimable pooled source pressure from unidentifiable realized source-target ancestry and documents the censoring correction. |
-| [`transient_patch_analysis.md`](transient_patch_analysis.md) | Pre-audit analysis report retained for provenance. Its terminal non-qualifying episodes were treated as transient; use the source-pressure audit above for current interpretation. |
-| [`output/transient_patch_analysis/data/transient_source_pressure_timeseries.csv`](output/transient_patch_analysis/data/transient_source_pressure_timeseries.csv) | Corrected instantaneous `transient_I`, `persistent_I`, `censored_I`, classifiable/total `I`, and source-share summaries. |
-| [`output/transient_patch_analysis/data/transient_source_pressure_timeseries.rds`](output/transient_patch_analysis/data/transient_source_pressure_timeseries.rds) | RDS version of the corrected time-series table. |
-| [`output/transient_patch_analysis/data/transient_source_pressure_summary.csv`](output/transient_patch_analysis/data/transient_source_pressure_summary.csv) | Scenario diagnostics including cumulative transient/persistent pressures and their verified integrated source share. |
-| [`output/transient_patch_analysis/figures/`](output/transient_patch_analysis/figures/) | Two representative PDFs for `R0=2.5` versus `R0=3`: the transient source share and the linear-scale stacked infected-host components. Both show only `t=0--1950`. |
+$$
+\frac{dq}{dt}=(1-P_1)B(t)-\frac{q(t)}{T_T}.
+$$
 
-## Seasonal single-strain workflow
+Persistent source patches contribute $I^*$. Transient source patches
+contribute the deterministic invasion-trajectory average
+
+$$
+\bar I_T=\frac{1}{T_T}\int_0^{T_T}I(t)\,dt,
+$$
+
+where
+
+$$
+T_T=cT_{\mathrm{osc}},\qquad c=0.5.
+$$
+
+The deterministic invasion begins at `S(0)=K-10`, `I(0)=10`. The provisional
+oscillation closure uses `mu=r` and `rho=gamma`; this is an approximation
+because the repository model has logistic susceptible recruitment rather than
+standard constant-turnover SIR demography. $p(0)=P_1$; $q(0)$ is the observed
+episode-classified transient occupancy at the aligned raw minimum.
 
 | File | Purpose |
 |---|---|
-| [`seasonal_model_metapop.R`](seasonal_model_metapop.R) | Stand-alone odin model definition for a stochastic Euler metapopulation with synchronous sinusoidal forcing of transmission. Its between-patch force of infection has the same mean-field normalization as the non-seasonal model. |
-| [`seasonal_single_strain_metapop.R`](seasonal_single_strain_metapop.R) | Runs a ten-year, single-strain seasonal metapopulation simulation from explicit initial conditions; calculates occupancy, extinction/recolonization, seasonal `R0`, and patch population summaries; and writes the results listed below. |
+| [`two_state_functions.R`](two_state_functions.R) | Computes `T_osc`, `T_T`, `Ibar_T`, and solves the current two-state ODE. |
+| [`compare_two_state_occupancy.R`](compare_two_state_occupancy.R) | Compares stochastic and current deterministic persistent, transient, and total occupancy for 16 retained scenarios. |
+| [`output/two_state_occupancy/`](output/two_state_occupancy/) | Deterministic invasion data, comparison curves, diagnostics, and three PDFs. |
 
-Files currently in [`output/single_strain/`](output/single_strain/) are generated
-by `seasonal_single_strain_metapop.R`:
+Main current two-state figures:
 
-| File | Contents |
-|---|---|
-| [`trajectory.rds`](output/single_strain/trajectory.rds) | Converted full stochastic trajectory. |
-| [`patch_state.csv`](output/single_strain/patch_state.csv) | Long-format susceptible, infected, population, and occupancy states by patch and time. |
-| [`metapop_summary.csv`](output/single_strain/metapop_summary.csv) | Time series of metapopulation totals, occupancy, turnover events, seasonal transmission, and seasonal `R0`. |
-| [`patch_summary.csv`](output/single_strain/patch_summary.csv) | Patch-level extinction, recolonization, and occupancy summaries. |
-| [`overall_summary.csv`](output/single_strain/overall_summary.csv) | Overall parameter and trajectory summary. |
-| [`occupancy_raster.pdf`](output/single_strain/occupancy_raster.pdf) | Patch-by-time occupancy raster. |
-| [`occupied_patches.pdf`](output/single_strain/occupied_patches.pdf) | Number of infected patches through time. |
-| [`occupancy_seasonal_R0.pdf`](output/single_strain/occupancy_seasonal_R0.pdf) | Occupancy overlaid with seasonally varying `R0`. |
-| [`extinction_recolonization.pdf`](output/single_strain/extinction_recolonization.pdf) | Local extinction and recolonization counts through time. |
-| [`mean_patch_population.pdf`](output/single_strain/mean_patch_population.pdf) | Mean host population per patch through time. |
+- `output/two_state_occupancy/figures/two_state_occupancy_compare_R0.pdf`
+- `output/two_state_occupancy/figures/two_state_occupancy_compare_K.pdf`
+- `output/two_state_occupancy/figures/two_state_occupancy_compare_alpha.pdf`
 
-## Other exploratory scripts
+The figures show only the stochastic trajectory and the current deterministic
+approximation. The original one-state curve is retained in the two-state CSV
+for quantitative comparison but is not drawn.
 
-| File | Purpose and output location |
-|---|---|
-| [`single_strain_metapop.R`](single_strain_metapop.R) | Earlier non-seasonal single-trajectory analysis with explicit susceptible and infected initial values, occupancy, and local turnover. It currently writes to `odin/outputs/onestrain_rescue/`, not to `fadeout/output/`. Its initialization and occupancy calculations were the template for the current occupancy workflow. |
-| [`two_strain_metapop.R`](two_strain_metapop.R) | Two-strain rescue/invasion example: strain 1 begins near its endemic equilibrium and strain 2 is introduced later into one patch. It analyzes four patch states, strain-specific occupancy, prevalence, extinction, and recolonization, and writes to `odin/outputs/twostrain_rescue/`. |
-| [`stochastic_SIR.R`](stochastic_SIR.R) | Single-patch demographic SIR prototype comparing a Gillespie stochastic trajectory with the corresponding deterministic solution and endemic equilibrium. It displays plots interactively and does not save files. |
-| [`stochastic_seasonal.R`](stochastic_seasonal.R) | Single-patch extension using piecewise-constant high- and low-risk seasons; compares stochastic Gillespie and deterministic seasonal dynamics. It displays plots interactively and does not save files. This is separate from the sinusoidally forced metapopulation model above. |
+## Supporting established and episode occupancy
 
-## Maintenance convention
+```bash
+Rscript fadeout/run_stochastic_episode_occupancy.R
+```
 
-When a fadeout script, derived data file, or figure is added, removed, renamed, or
-changes purpose, update this README in the same change. Keep generated results
-under `fadeout/output/`, prefer PDF for figures, and avoid overwriting existing
-simulation data unless regeneration is explicitly intended.
+[`run_stochastic_episode_occupancy.R`](run_stochastic_episode_occupancy.R)
+runs the 16 retained scenarios and produces established occupancy plus
+persistent, transient, and censored episode classifications. Patch $i$ is
+established at time $t$ when
+
+$$
+I_i(s)>0
+\quad\text{for every recorded }s\in[t,t+\tau],
+\qquad \tau=50.
+$$
+
+This is an offline, forward-looking definition: the final 50 time units are
+`NA`, and with `dt=0.1` the window contains 500 stored steps. A qualifying
+episode is persistent from its beginning; an episode ending before it qualifies
+is transient; an unresolved terminal episode is censored.
+
+Let $I_T(t)$ and $I_P(t)$ be infected hosts in transient and persistent
+episodes. The primary source-pressure diagnostic is
+
+$$
+\operatorname{transient\ source\ share}(t)
+=\frac{I_T(t)}{I_T(t)+I_P(t)}.
+$$
+
+Censored infected hosts are excluded from this denominator. Because odin uses
+the pooled immigration rate `alpha*sum(I)/n_patch`, this share is the expected
+transient contribution to pooled colonization pressure, not realized
+source-target ancestry. The cumulative share is
+
+$$
+C_T=\int \frac{\alpha I_T(t)}{n_{\mathrm{patch}}}\,dt,
+\qquad
+C_P=\int \frac{\alpha I_P(t)}{n_{\mathrm{patch}}}\,dt,
+$$
+
+with cumulative transient share
+
+$$
+\frac{C_T}{C_T+C_P}.
+$$
+
+Outputs are under `output/stochastic_episode_occupancy/`; figures omit the final
+censored window and show times 0--1950. At the occupancy minimum, transient
+source shares are 70.5% for `R0=2.5` and 98.0% for `R0=3`; cumulative shares are
+3.42% and 37.4%, respectively. These single-trajectory results support a
+transient-pressure explanation for part of the `R0=3` one-state
+underprediction, but do not identify transmission ancestry.
