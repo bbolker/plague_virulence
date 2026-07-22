@@ -7,6 +7,9 @@
 !outputs/**/*.png
 !outputs/**/*.pdf
 
+# Keep generated fadeout analysis figures (this workflow uses output/, singular)
+!fadeout/output/**/*.pdf
+
 # ignore .claude directories anywhere (including root)
 .claude/
 
