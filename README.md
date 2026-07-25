@@ -32,6 +32,7 @@ From newest to oldest:
   SLURM job arrays (and reassembling the results when finished).
 - `plagueMetapop`: mini-R package implementing the functionality used in
   the `odin` runs
+    - to install: `Rscript -e 'install.packages("plagueMetapop", dependencies = TRUE, repos = NULL, type = "source")'`
 - `talks`: BMB talks for Canadian Society of Ecology and Evolution, May
   2026, and Statistical Society of Canada, June 2026
 - `parameters`: discussion of estimating/guessing orders of magnitude

@@ -1,6 +1,6 @@
 ## notes on analytic approximation
 
-* get $P_1(R0, K)$ [persistence through first trough] from GAM fit (tensor product smooth) to
+* get $P_1(R0, K)$ [persistence through first trough] from GAM fit (tensor product smooth) to grid of one-patch, one-strain stochastic sim extinction probabilities
    * could in principle get it by repeating the Parsons et al perturbation analysis for logistic demography?
 * assume $P_i \approx 1$ for $i > 1$ (i.e., permanent persistence conditional on non-fizzle/non-burnout in the first trough)
 * assume that patches that persist rapidly reach deterministic $I^*$ (joint demog/epi equilibrium)
