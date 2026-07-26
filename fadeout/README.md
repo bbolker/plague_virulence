@@ -180,7 +180,7 @@ Let $I_T(t)$ and $I_P(t)$ be infected hosts in transient and persistent
 episodes. The primary source-pressure diagnostic is
 
 $$
-\operatorname{transient\ source\ share}(t)
+\textrm{transient\ source\ share}(t)
 =\frac{I_T(t)}{I_T(t)+I_P(t)}.
 $$
 
@@ -190,9 +190,9 @@ transient contribution to pooled colonization pressure, not realized
 source-target ancestry. The cumulative share is
 
 $$
-C_T=\int \frac{\alpha I_T(t)}{n_{\mathrm{patch}}}\,dt,
+C_T=\int \frac{\alpha I_T(t)}{n_{\mathrm{patch}}} \, dt,
 \qquad
-C_P=\int \frac{\alpha I_P(t)}{n_{\mathrm{patch}}}\,dt,
+C_P=\int \frac{\alpha I_P(t)}{n_{\mathrm{patch}}} \, dt,
 $$
 
 with cumulative transient share
