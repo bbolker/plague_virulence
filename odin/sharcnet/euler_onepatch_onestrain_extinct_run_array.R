@@ -10,7 +10,9 @@ opt <- parse_args(OptionParser(option_list = list(
   make_option(c("-l", "--lineargrowth"), action = "store_true", default = FALSE,
               help = "use linear restoring force demography (logistic_growth=0)"),
   make_option(c("-r", "--reedfrost"), action = "store_true", default = FALSE,
-              help = "use Reed-Frost (100%% removal per step) dynamics")
+              help = "use Reed-Frost (100%% removal per step) dynamics"),
+  make_option(c("-g", "--demog_grid"), action = "store_true", default = FALSE,
+              help = "also expand grid over r = c(0.05, 0.1, 0.125, 0.2, 0.4)")
 )))
 
 task_id <- as.integer(Sys.getenv("SLURM_ARRAY_TASK_ID"))
@@ -25,27 +27,37 @@ base_fn <- paste("euler_onepatch_onestrain_extinct",
                  if (opt$lineargrowth) "linear" else "logistic",
                  if (opt$reedfrost) "reedfrost" else "continuous",
                  sep = "_")
+if (opt$demog_grid) base_fn <- paste0(base_fn, "_demoggrid")
 
-dd <- expand.grid(R0 = seq(1.1, 5, by = 0.1),
-                  K  = 10^seq(3, 6, by = 0.25))
+if (opt$demog_grid) {
+  dd <- expand.grid(R0 = seq(1.1, 5, by = 0.1),
+                    K  = 10^seq(3, 6, by = 0.25),
+                    r  = c(0.05, 0.1, 0.125, 0.2, 0.4))
+} else {
+  dd <- expand.grid(R0 = seq(1.1, 5, by = 0.1),
+                    K  = 10^seq(3, 6, by = 0.25))
+}
 
 row <- dd[task_id, ]
 
+run_args <- list(beta_vec        = c(row$R0, 0),
+                 K               = row$K,
+                 n_patch         = 1,
+                 nt              = round(200 / dt),
+                 alpha           = 0,
+                 I_init          = c(10, 0),
+                 gamma           = c(1, 1),
+                 dt              = dt,
+                 logistic_growth = logistic_growth,
+                 reedfrost       = reedfrost,
+                 def_file        = "euler_odin_def.R",
+                 stop_cond       = stop_both_extinct(require_seeded = FALSE),
+                 nsim            = nsim,
+                 platform        = "odin")
+if (opt$demog_grid) run_args$r <- row$r
+
 plan(multicore(workers = as.integer(Sys.getenv("SLURM_CPUS_PER_TASK", 1L))))
-runs <- discrete_run(beta_vec        = c(row$R0, 0),
-                     K               = row$K,
-                     n_patch         = 1,
-                     nt              = round(200 / dt),
-                     alpha           = 0,
-                     I_init          = c(10, 0),
-                     gamma           = c(1, 1),
-                     dt              = dt,
-                     logistic_growth = logistic_growth,
-                     reedfrost       = reedfrost,
-                     def_file        = "euler_odin_def.R",
-                     stop_cond       = stop_both_extinct(require_seeded = FALSE),
-                     nsim            = nsim,
-                     platform        = "odin")
+runs <- do.call(discrete_run, run_args)
 plan(sequential)
 
 out <- dplyr::bind_cols(row, as.data.frame(as.list(sumfun_discrete(runs))))

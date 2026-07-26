@@ -38,14 +38,17 @@ Four combinations of demography (logistic / linear restoring force) × dynamics 
 | `submit_euler_extinct_linear_continuous.sh` | linear demography, continuous Euler (520 tasks, 5 min) |
 | `submit_euler_extinct_linear_reedfrost.sh` | linear demography, Reed-Frost (520 tasks, 5 min) |
 | `submit_euler_extinct_mini.sh` | mini test (32 tasks, coarser grid) |
-| `euler_onepatch_onestrain_extinct_run_array.R` | shared array script (`--lineargrowth`, `--reedfrost` flags) |
+| `submit_euler_extinct_logistic_continuous_demoggrid.sh` | logistic, continuous Euler, + r grid (2600 tasks, 5 min) |
+| `euler_onepatch_onestrain_extinct_run_array.R` | shared array script (`--lineargrowth`, `--reedfrost`, `--demog_grid` flags) |
 | `euler_onepatch_onestrain_extinct_run_array_mini.R` | mini array script (separate parameters) |
 | `euler_onepatch_onestrain_extinct_combine.R` | combine outputs for one combination (takes combination name as argument) |
 | `euler_onepatch_onestrain_extinct_mini_combine.R` | combine mini outputs |
 
 Grid (full): `R0 = seq(1.1, 5, by=0.1)` × `K = 10^seq(3, 6, by=0.25)` — 40 × 13 = 520 tasks  
 Grid (mini): `R0 = seq(1.1, 5, by=0.5)` × `K = 10^seq(3, 6)` — 32 tasks  
-Parameters: `nsim=1000`, `n_patch=1`; `dt=0.1` (continuous), `dt=1` (Reed-Frost)
+Grid (demog_grid): full grid × `r = c(0.05, 0.1, 0.125, 0.2, 0.4)` — 40 × 13 × 5 = 2600 tasks  
+Parameters: `nsim=1000`, `n_patch=1`; `dt=0.1` (continuous), `dt=1` (Reed-Frost)  
+Observed per-task wall time (sacct, logistic_continuous): max ~1:22 — the 5 min budget has ample margin, and demog_grid doesn't change per-task cost, only task count.
 
 ```bash
 sbatch submit_euler_extinct_logistic_continuous.sh   # logistic demography, continuous Euler
@@ -60,8 +63,14 @@ Rscript euler_onepatch_onestrain_extinct_combine.R linear_continuous
 Rscript euler_onepatch_onestrain_extinct_combine.R linear_reedfrost
 ```
 
-Outputs: `outputs/euler_onepatch_onestrain_extinct_{logistic|linear}_{continuous|reedfrost}_task_NNNN.rds`  
-Combined: `outputs/euler_onepatch_onestrain_extinct_{logistic|linear}_{continuous|reedfrost}.rds`
+**demog_grid variant (logistic_continuous + r grid, 2600 tasks — exceeds the 1000-job account cap, so submit via `submit_chunked.sh`):**
+```bash
+bash submit_chunked.sh submit_euler_extinct_logistic_continuous_demoggrid.sh 1 2600
+Rscript euler_onepatch_onestrain_extinct_combine.R logistic_continuous_demoggrid
+```
+
+Outputs: `outputs/euler_onepatch_onestrain_extinct_{logistic|linear}_{continuous|reedfrost}[_demoggrid]_task_NNNN.rds`  
+Combined: `outputs/euler_onepatch_onestrain_extinct_{logistic|linear}_{continuous|reedfrost}[_demoggrid].rds`
 
 ---
 

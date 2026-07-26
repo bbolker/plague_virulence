@@ -1,11 +1,14 @@
 ## Combine per-task outputs from euler_onepatch_onestrain_extinct_run_array.R
 ## Usage: Rscript euler_onepatch_onestrain_extinct_combine.R <combination>
 ## <combination> is one of: logistic_continuous, logistic_reedfrost,
-##                           linear_continuous, linear_reedfrost
+##                           linear_continuous, linear_reedfrost,
+##                           logistic_continuous_demoggrid
+##                           (demoggrid: grid also expanded over r)
 library(dplyr)
 
 valid <- c("logistic_continuous", "logistic_reedfrost",
-           "linear_continuous",   "linear_reedfrost")
+           "linear_continuous",   "linear_reedfrost",
+           "logistic_continuous_demoggrid")
 
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) != 1 || !args[1] %in% valid)
