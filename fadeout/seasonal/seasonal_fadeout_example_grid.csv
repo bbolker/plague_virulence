@@ -1,0 +1,2 @@
+combo_id,R0,gamma,r,K,alpha,seasonal_amp,season_period,peak_day,n_patch,dt,t_max,n_reps,base_seed,threshold_multiplier
+baseline,2.5,0.2,0.02,3000,0.0001,0.4,365,15,50,1,1095,2,101,1.5

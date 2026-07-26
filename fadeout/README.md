@@ -147,10 +147,12 @@ Rscript fadeout/check_P1_initial_I.R
 
 [`check_P1_initial_I.R`](check_P1_initial_I.R) checks the baseline
 single-patch persistence probability at several Poisson mean initial infected
-counts, from 10 to the endemic equilibrium infected count $I^*$. It uses the
+counts from 1 to 300. It uses the
 same logistic Euler model and extinction horizon ($t=200$) as the existing
-$P_1$ calibration data. The single figure is saved directly as
-`output/P1_initial_I_effect.pdf`.
+$P_1$ calibration data. Results and their 95% binomial intervals are cached in
+`output/P1_initial_I/P1_initial_I_results.csv`; future runs simulate only
+missing initial-count values. The figure is
+`output/P1_initial_I/P1_by_initial_I_to300.pdf`.
 
 ## Supporting established and episode occupancy
 
@@ -205,3 +207,13 @@ source shares are 70.5% for `R0=2.5` and 98.0% for `R0=3`; cumulative shares are
 3.42% and 37.4%, respectively. These single-trajectory results support a
 transient-pressure explanation for part of the `R0=3` one-state
 underprediction, but do not identify transmission ancestry.
+
+## Seasonal recurrent fade-out
+
+The reusable seasonal workflow is documented in
+[`seasonal/README.md`](seasonal/README.md). It extracts infection episodes,
+classifies post-burnout fade-out using a configurable multiple of the
+non-seasonal intrinsic period, calculates annual occupancy diagnostics, and
+produces full and conditional Kaplan-Meier episode-survival curves. It supports
+explicitly seeded replicates and parameter-grid CSV files; outputs are written
+under `output/seasonal_fadeout/<run-id>/`.

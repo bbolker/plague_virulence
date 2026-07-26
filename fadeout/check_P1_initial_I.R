@@ -6,7 +6,6 @@
 library(future)
 library(ggplot2)
 library(here)
-library(mgcv)
 library(plagueMetapop)
 
 R0 <- 2.5
@@ -16,41 +15,13 @@ gamma <- 1
 dt <- 0.1
 t_max <- 200
 nsim <- 1000L
-I0_values <- c(10, 30, 100, 300)
+I0_values <- c(1, 2, 3, 4, 5, 10, 30, 100, 300)
 
-single_patch_file <- here(
-  "odin", "sharcnet", "outputs",
-  "euler_onepatch_onestrain_extinct_logistic_continuous.rds"
-)
-output_file <- here("fadeout", "output", "P1_initial_I_effect.pdf")
+output_dir <- here("fadeout", "output", "P1_initial_I")
+cache_file <- file.path(output_dir, "P1_initial_I_results.csv")
+output_file <- file.path(output_dir, "P1_by_initial_I_to300.pdf")
 
-if (!file.exists(single_patch_file)) {
-  stop("Required single-patch data not found: ", single_patch_file)
-}
-dir.create(dirname(output_file), recursive = TRUE, showWarnings = FALSE)
-
-single_patch <- readRDS(single_patch_file)
-required_columns <- c("R0", "K", "ext_prob.I1")
-if (!all(required_columns %in% names(single_patch))) {
-  stop("Single-patch data must contain: ",
-       paste(required_columns, collapse = ", "))
-}
-
-gam_fit <- mgcv::gam(
-  ext_prob.I1 ~ te(R0, K, k = c(12, 12)),
-  data = single_patch,
-  method = "REML"
-)
-P1_gam <- 1 - as.numeric(predict(
-  gam_fit,
-  newdata = data.frame(R0 = R0, K = K),
-  type = "response"
-))
-
-I_star <- unname(plagueMetapop::ode_eq(
-  beta = R0, gamma = gamma, K = K, r = r, logistic_growth = 1
-)[["eq_I"]])
-I0_values[length(I0_values)] <- round(I_star)
+dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
 ## Match the existing P1 calibration workflow: Poisson initial infected count,
 ## logistic continuous-time Euler model, and extinction assessed by t = 200.
@@ -58,7 +29,8 @@ I0_values[length(I0_values)] <- round(I_star)
 ## serialized to multisession workers. The single-patch runs remain lightweight.
 future::plan(future::sequential)
 
-estimate_one <- function(I0, index) {
+estimate_one <- function(I0) {
+  seed <- 120000L + as.integer(I0)
   runs <- plagueMetapop::discrete_run(
     beta_vec = c(R0, 0),
     K = K,
@@ -75,7 +47,7 @@ estimate_one <- function(I0, index) {
     def_file = "euler_odin_def.R",
     stop_cond = plagueMetapop::stop_both_extinct(require_seeded = FALSE),
     nsim = nsim,
-    seed = 1200L + index,
+    seed = seed,
     platform = "odin"
   )
   persistence <- 1 - unname(
@@ -85,45 +57,96 @@ estimate_one <- function(I0, index) {
   interval <- stats::binom.test(survived, nsim)$conf.int
   data.frame(
     I0 = I0,
+    nsim = nsim,
+    survived = survived,
+    extinct = nsim - survived,
     P1 = persistence,
     lower = interval[1],
-    upper = interval[2]
+    upper = interval[2],
+    seed = seed,
+    R0 = R0,
+    K = K,
+    r = r,
+    gamma = gamma,
+    dt = dt,
+    t_max = t_max,
+    initialization = "Poisson"
   )
 }
 
-results <- do.call(
-  rbind,
-  Map(estimate_one, I0_values, seq_along(I0_values))
+cache_columns <- c(
+  "I0", "nsim", "survived", "extinct", "P1", "lower", "upper", "seed",
+  "R0", "K", "r", "gamma", "dt", "t_max", "initialization"
 )
+cache <- if (file.exists(cache_file)) {
+  cached <- read.csv(cache_file, stringsAsFactors = FALSE)
+  missing <- setdiff(cache_columns, names(cached))
+  if (length(missing)) {
+    stop("Cache is missing required columns: ", paste(missing, collapse = ", "))
+  }
+  cached[cache_columns]
+} else {
+  as.data.frame(setNames(replicate(
+    length(cache_columns), logical(0), simplify = FALSE
+  ), cache_columns))
+}
 
-P1_at_10 <- results$P1[results$I0 == 10]
-P1_at_Istar <- results$P1[results$I0 == round(I_star)]
-difference <- P1_at_Istar - P1_at_10
+is_compatible <- function(dat, I0) {
+  if (!nrow(dat)) return(logical(0))
+  dat$I0 == I0 &
+    dat$nsim == nsim &
+    dat$seed == 120000L + as.integer(I0) &
+    dat$R0 == R0 &
+    dat$K == K &
+    dat$r == r &
+    dat$gamma == gamma &
+    dat$dt == dt &
+    dat$t_max == t_max &
+    dat$initialization == "Poisson"
+}
 
-annotation <- sprintf(
-  "P1 at E[I(0)]=10: %.3f\nP1 at E[I(0)]=I*=%.0f: %.3f\nDifference: %+.3f",
-  P1_at_10, I_star, P1_at_Istar, difference
-)
+result_list <- vector("list", length(I0_values))
+new_results <- list()
+for (index in seq_along(I0_values)) {
+  I0 <- I0_values[index]
+  cached_rows <- cache[is_compatible(cache, I0), , drop = FALSE]
+  if (nrow(cached_rows)) {
+    result_list[[index]] <- cached_rows[nrow(cached_rows), , drop = FALSE]
+    cat("Reusing cached result for E[I(0)] = ", I0, "\n", sep = "")
+  } else {
+    cat("Simulating missing result for E[I(0)] = ", I0, "\n", sep = "")
+    result_list[[index]] <- estimate_one(I0)
+    new_results[[length(new_results) + 1L]] <- result_list[[index]]
+  }
+}
+results <- do.call(rbind, result_list)
+results <- results[order(results$I0), , drop = FALSE]
+
+if (length(new_results)) {
+  cache <- rbind(cache, do.call(rbind, new_results))
+  cache <- cache[!duplicated(
+    cache[c(
+      "I0", "nsim", "seed", "R0", "K", "r", "gamma", "dt", "t_max",
+      "initialization"
+    )],
+    fromLast = TRUE
+  ), , drop = FALSE]
+  cache <- cache[order(cache$R0, cache$K, cache$r, cache$gamma,
+                       cache$I0), , drop = FALSE]
+  write.csv(cache, cache_file, row.names = FALSE)
+}
 
 p <- ggplot(results, aes(I0, P1)) +
-  geom_hline(
-    yintercept = P1_gam, colour = "#D55E00", linewidth = 0.7,
-    linetype = "dashed"
-  ) +
-  geom_errorbar(
-    aes(ymin = lower, ymax = upper), width = 0.08,
+  geom_linerange(
+    aes(ymin = lower, ymax = upper),
     colour = "#0072B2", linewidth = 0.6
   ) +
   geom_line(colour = "#0072B2", linewidth = 0.7) +
   geom_point(colour = "#0072B2", size = 2.5) +
-  annotate(
-    "label", x = max(I0_values), y = 0.16,
-    label = annotation, hjust = 1, vjust = 0.5, size = 3.6
-  ) +
   scale_x_log10(breaks = I0_values) +
-  coord_cartesian(ylim = c(0, max(results$upper, P1_gam) + 0.035)) +
+  coord_cartesian(ylim = c(0, max(results$upper) + 0.035)) +
   labs(
-    title = "Initial infected count has limited effect on P1",
+    title = "Sensitivity of P1 to the initial infected count",
     subtitle = sprintf(
       "R0 = %.1f; K = %g; r = %.3f; gamma = %g; %d simulations per point",
       R0, K, r, gamma, nsim
@@ -131,8 +154,8 @@ p <- ggplot(results, aes(I0, P1)) +
     x = "Mean initial infected count, E[I(0)] (Poisson)",
     y = "Persistence probability, P1",
     caption = sprintf(
-      "Points: persistence to t = %g (95%% binomial CI). Dashed line: existing GAM prediction P1 = %.3f.",
-      t_max, P1_gam
+      "Points: persistence to t = %g (95%% binomial CI).",
+      t_max
     )
   ) +
   theme_bw(base_size = 11) +
@@ -142,13 +165,9 @@ ggsave(output_file, p, width = 8, height = 5.4)
 
 cat(sprintf(
   paste0(
-    "Parameters: R0=%.1f, K=%g, r=%.3f, gamma=%g, I*=%.1f\n",
-    "Existing GAM P1: %.3f\n",
-    "Direct P1 at E[I(0)]=10: %.3f\n",
-    "Direct P1 at E[I(0)]=I*: %.3f\n",
-    "Difference (I* minus 10): %+.3f\n",
-    "Output: %s\n"
+    "Parameters: R0=%.1f, K=%g, r=%.3f, gamma=%g\n",
+    "Data: %s\n",
+    "Figure: %s\n"
   ),
-  R0, K, r, gamma, I_star, P1_gam,
-  P1_at_10, P1_at_Istar, difference, output_file
+  R0, K, r, gamma, cache_file, output_file
 ))
