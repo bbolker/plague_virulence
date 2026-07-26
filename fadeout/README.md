@@ -139,6 +139,19 @@ The figures show only the stochastic trajectory and the current deterministic
 approximation. The original one-state curve is retained in the two-state CSV
 for quantitative comparison but is not drawn.
 
+### Initial-infection sensitivity of P1
+
+```bash
+Rscript fadeout/check_P1_initial_I.R
+```
+
+[`check_P1_initial_I.R`](check_P1_initial_I.R) checks the baseline
+single-patch persistence probability at several Poisson mean initial infected
+counts, from 10 to the endemic equilibrium infected count $I^*$. It uses the
+same logistic Euler model and extinction horizon ($t=200$) as the existing
+$P_1$ calibration data. The single figure is saved directly as
+`output/P1_initial_I_effect.pdf`.
+
 ## Supporting established and episode occupancy
 
 ```bash
