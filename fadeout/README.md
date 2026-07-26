@@ -117,11 +117,14 @@ $$
 T_T=cT_{\mathrm{osc}},\qquad c=0.5.
 $$
 
-The deterministic invasion begins at `S(0)=K-10`, `I(0)=10`. The provisional
-oscillation closure uses `mu=r` and `rho=gamma`; this is an approximation
-because the repository model has logistic susceptible recruitment rather than
-standard constant-turnover SIR demography. $p(0)=P_1$; $q(0)$ is the observed
+where $T_{\textrm{osc}}$ is the (approximate) oscillation period of the SIR model with vital dynamics.
+The provisional oscillation closure uses `mu=r` and `rho=gamma`; this is an approximation
+because we're modeling logistic susceptible recruitment rather than
+standard constant-turnover SIR demography (i.e., linear demography). 
+
+$p(0)=P_1$; $q(0)$ is the observed
 episode-classified transient occupancy at the aligned raw minimum.
+The deterministic invasion begins at `S(0)=K-10`, `I(0)=10`. 
 
 | File | Purpose |
 |---|---|
