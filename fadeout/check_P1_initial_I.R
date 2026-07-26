@@ -29,7 +29,7 @@ dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 ## serialized to multisession workers. The single-patch runs remain lightweight.
 future::plan(future::sequential)
 
-estimate_one <- function(I0) {
+estimate_one <- function(I0, return_runs = FALSE) {
   seed <- 120000L + as.integer(I0)
   runs <- plagueMetapop::discrete_run(
     beta_vec = c(R0, 0),
@@ -49,7 +49,8 @@ estimate_one <- function(I0) {
     nsim = nsim,
     seed = seed,
     platform = "odin"
-  )
+    )
+  if (return_runs) return(runs)
   persistence <- 1 - unname(
     plagueMetapop::sumfun_discrete(runs)[["ext_prob.I1"]]
   )
@@ -171,3 +172,24 @@ cat(sprintf(
   ),
   R0, K, r, gamma, cache_file, output_file
 ))
+
+### quick runs to see what's going on
+
+## what's important is not I ~ I*, but S ~ S* ...
+r1 <- estimate_one(I0=10, return_runs = TRUE)
+req <- estimate_one(I0=300, return_runs = TRUE)
+collapse_fun <- function(x, thin = 10) {
+  ret <- purrr::map_dfr(x, .id = "run",
+                        \(z) { dplyr::filter(z, state=="I1") |> dplyr::select(step, value) })
+  if (!thin) return(ret)
+  ret |> dplyr::slice(seq(1, nrow(ret), thin))
+}
+  
+r_comb <- purrr::map_dfr(list(r1 = r1, req = req),
+               .id = "rval",
+               collapse_fun)
+
+ggplot(r_comb, aes(step, value, colour = rval)) +
+  geom_line(aes(group=interaction(rval, run)),
+            alpha = 0.1) +
+  theme_bw()
