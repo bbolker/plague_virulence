@@ -19,7 +19,8 @@ baseline <- list(
 parameter_values <- list(
   R0 = c(1.5, 2, 2.5, 3, 4, 5),
   K = c(1000, 3000, 10000, 30000, 100000),
-  alpha = c(1e-5, 3e-5, 1e-4, 3e-4, 1e-3)
+  alpha = c(1e-5, 3e-5, 1e-4, 3e-4, 1e-3),
+  r = c(0.05, 0.1, 0.125, 0.2, 0.4)
 )
 tau <- 50
 
@@ -74,28 +75,71 @@ dir.create(datadir, recursive = TRUE, showWarnings = FALSE)
 dir.create(figdir, recursive = TRUE, showWarnings = FALSE)
 
 plot_only <- "--plot-only" %in% commandArgs(trailingOnly = TRUE)
+curve_rds_file <- file.path(datadir, "transient_source_pressure_timeseries.rds")
+curve_csv_file <- file.path(datadir, "transient_source_pressure_timeseries.csv")
+summary_file <- file.path(datadir, "transient_source_pressure_summary.csv")
+established_file <- file.path(datadir, "established_occupancy_results.rds")
+trajectory_dir <- here::here(
+  "fadeout", "output", "stochastic_patch_occupancy", "data",
+  "full_trajectories"
+)
 
 if (plot_only) {
-  curves <- readRDS(file.path(
-    datadir, "transient_source_pressure_timeseries.rds"
-  ))
-  summary_data <- read.csv(file.path(
-    datadir, "transient_source_pressure_summary.csv"
-  ))
+  curves <- readRDS(curve_rds_file)
+  summary_data <- read.csv(summary_file)
   message("Plot-only mode: using existing episode-occupancy data")
 } else {
   scenarios <- make_scenarios(baseline, parameter_values)
-  gen <- compile_odin("euler_odin_def.R")
-  results <- vector("list", length(scenarios))
+  scenario_keys <- vapply(
+    scenarios,
+    function(x) occupancy_scenario_key(x$varied_parameter, x$parameter_value),
+    character(1)
+  )
+  existing_files <- c(curve_rds_file, summary_file, established_file)
+  if (any(file.exists(existing_files)) && !all(file.exists(existing_files))) {
+    stop("Episode-occupancy cache is incomplete; expected all of: ",
+         paste(existing_files, collapse = ", "))
+  }
+  if (all(file.exists(existing_files))) {
+    curves <- readRDS(curve_rds_file)
+    summary_data <- read.csv(summary_file)
+    established_results <- readRDS(established_file)
+  } else {
+    curves <- data.frame()
+    summary_data <- data.frame()
+    established_results <- list()
+  }
+  existing_keys <- vapply(established_results, function(x) {
+    occupancy_scenario_key(x$varied_parameter, x$parameter_value)
+  }, character(1))
+  if (anyDuplicated(existing_keys)) {
+    stop("Duplicate scenarios in established-occupancy cache")
+  }
+
+  new_results <- list()
 
   for (i in seq_along(scenarios)) {
     scenario <- scenarios[[i]]
+    key <- scenario_keys[i]
+    if (key %in% existing_keys) {
+      message(sprintf(
+        "Reusing transient source-pressure audit: %s = %g (%d/%d)",
+        scenario$varied_parameter, scenario$parameter_value,
+        i, length(scenarios)
+      ))
+      next
+    }
     message(sprintf(
-      "Running transient source-pressure audit: %s = %g (%d/%d)",
+      "Deriving transient source-pressure audit: %s = %g (%d/%d)",
       scenario$varied_parameter, scenario$parameter_value, i, length(scenarios)
     ))
-    simulation <- run_fadeout_occupancy(
-      scenario$params, gen = gen, keep_patch_data = TRUE
+    trajectory_file <- occupancy_trajectory_file(
+      trajectory_dir, scenario$varied_parameter, scenario$parameter_value
+    )
+    simulation <- read_occupancy_trajectory(
+      trajectory_file,
+      expected_parameter = scenario$varied_parameter,
+      expected_value = scenario$parameter_value
     )
     contribution <- summarize_transient_source_pressure(
       simulation$infected,
@@ -109,7 +153,7 @@ if (plot_only) {
       tau = tau,
       dt = scenario$params$dt
     )
-    results[[i]] <- list(
+    new_results[[length(new_results) + 1L]] <- list(
       varied_parameter = scenario$varied_parameter,
       parameter_value = scenario$parameter_value,
       params = scenario$params,
@@ -121,12 +165,13 @@ if (plot_only) {
     invisible(gc())
   }
 
-  curves <- bind_rows(lapply(seq_along(results), function(i) {
-    x <- results[[i]]
+  first_new_id <- length(established_results)
+  new_curves <- bind_rows(lapply(seq_along(new_results), function(i) {
+    x <- new_results[[i]]
     x$contribution |>
       rename(time = step) |>
       mutate(
-        result_id = i,
+        result_id = first_new_id + i,
         varied_parameter = x$varied_parameter,
         parameter_value = x$parameter_value,
         R0 = x$params$R0, K = x$params$K, r = x$params$r,
@@ -135,8 +180,8 @@ if (plot_only) {
       )
   }))
 
-  summary_data <- bind_rows(lapply(seq_along(results), function(i) {
-    x <- results[[i]]
+  new_summary <- bind_rows(lapply(seq_along(new_results), function(i) {
+    x <- new_results[[i]]
     z <- x$contribution
     ## Post-burnout time zero is the minimum retrospective persistent occupancy.
     minimum_index <- which.min(z$persistent_occupancy_fraction)
@@ -163,7 +208,7 @@ if (plot_only) {
       NA_real_
     }
     data.frame(
-      result_id = i,
+      result_id = first_new_id + i,
       varied_parameter = x$varied_parameter,
       parameter_value = x$parameter_value,
       R0 = x$params$R0, K = x$params$K, r = x$params$r,
@@ -195,23 +240,7 @@ if (plot_only) {
     )
   }))
 
-  write.csv(
-    curves,
-    file.path(datadir, "transient_source_pressure_timeseries.csv"),
-    row.names = FALSE
-  )
-  saveRDS(curves, file.path(
-    datadir, "transient_source_pressure_timeseries.rds"
-  ))
-  write.csv(
-    summary_data,
-    file.path(datadir, "transient_source_pressure_summary.csv"),
-    row.names = FALSE
-  )
-
-  ## Save the established target in the same list structure expected by the
-  ## analytical comparison scripts.
-  established_results <- lapply(results, function(x) {
+  new_established <- lapply(new_results, function(x) {
     list(
       varied_parameter = x$varied_parameter,
       parameter_value = x$parameter_value,
@@ -219,6 +248,46 @@ if (plot_only) {
       occupancy_summary = x$occupancy_summary
     )
   })
+  curves <- bind_rows(curves, new_curves)
+  summary_data <- bind_rows(summary_data, new_summary)
+  established_results <- c(established_results, new_established)
+
+  ## Reorder every cache to the declared scenario order and keep result_id
+  ## synchronized across raw, established, and transient comparison inputs.
+  combined_keys <- vapply(established_results, function(x) {
+    occupancy_scenario_key(x$varied_parameter, x$parameter_value)
+  }, character(1))
+  positions <- match(scenario_keys, combined_keys)
+  if (anyNA(positions)) stop("Could not assemble every declared episode scenario")
+  established_results <- established_results[positions]
+  key_to_id <- setNames(seq_along(scenario_keys), scenario_keys)
+  curve_keys <- occupancy_scenario_key(
+    curves$varied_parameter, curves$parameter_value
+  )
+  summary_keys <- occupancy_scenario_key(
+    summary_data$varied_parameter, summary_data$parameter_value
+  )
+  curves <- curves[curve_keys %in% scenario_keys, , drop = FALSE]
+  summary_data <- summary_data[
+    summary_keys %in% scenario_keys, , drop = FALSE
+  ]
+  curves$result_id <- unname(key_to_id[
+    occupancy_scenario_key(curves$varied_parameter, curves$parameter_value)
+  ])
+  summary_data$result_id <- unname(key_to_id[
+    occupancy_scenario_key(
+      summary_data$varied_parameter, summary_data$parameter_value
+    )
+  ])
+  curves <- curves |> arrange(result_id, time)
+  summary_data <- summary_data |> arrange(result_id)
+
+  write.csv(curves, curve_csv_file, row.names = FALSE)
+  saveRDS(curves, curve_rds_file)
+  write.csv(summary_data, summary_file, row.names = FALSE)
+
+  ## Save the established target in the same list structure expected by the
+  ## analytical comparison scripts.
   established_curves <- bind_rows(lapply(established_results, function(x) {
     x$occupancy_summary |>
       mutate(
@@ -228,8 +297,7 @@ if (plot_only) {
         alpha = x$params$alpha, .before = 1
       )
   }))
-  saveRDS(established_results,
-    file.path(datadir, "established_occupancy_results.rds"))
+  saveRDS(established_results, established_file)
   write.csv(established_curves,
     file.path(datadir, "established_occupancy_curves.csv"), row.names = FALSE)
 }

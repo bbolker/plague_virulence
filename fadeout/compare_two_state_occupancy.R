@@ -11,12 +11,13 @@ library(plagueMetapop)
 library(tidyr)
 
 source(here::here("fadeout", "two_state_functions.R"))
+source(here::here("fadeout", "occupancy_functions.R"))
 theme_set(theme_bw())
 
 c_transient <- 0.5
 probability_tolerance <- 1e-6
 single_patch_file <- here::here("odin", "sharcnet", "outputs",
-  "euler_onepatch_onestrain_extinct_logistic_continuous.rds")
+  "euler_onepatch_onestrain_extinct_logistic_continuous_demoggrid.rds")
 raw_file <- here::here("fadeout", "output", "stochastic_patch_occupancy", "data",
   "stochastic_patch_occupancy_results.rds")
 established_file <- here::here("fadeout", "output",
@@ -39,15 +40,14 @@ established_results <- readRDS(established_file)
 transient_series <- read.csv(transient_file)
 required_transient <- c("result_id", "time", "transient_patches",
   "persistent_patches", "infected_patches")
-if (any(!c("R0", "K", "ext_prob.I1") %in% names(single_patch)))
-  stop("Single-patch data lack R0, K, or ext_prob.I1")
+if (any(!c("R0", "K", "r", "ext_prob.I1") %in% names(single_patch)))
+  stop("Single-patch data lack R0, K, r, or ext_prob.I1")
 if (any(!required_transient %in% names(transient_series)))
   stop("Transient analysis lacks required episode-classified columns")
 if (length(raw_results) != length(established_results))
   stop("Raw and established result counts differ")
 
-gam_fit <- mgcv::gam(ext_prob.I1 ~ te(R0, K, k = c(12, 12)),
-  data = single_patch, method = "REML")
+estimate_P1 <- make_P1_demoggrid_estimator(single_patch)
 
 metric <- function(observed, predicted) {
   ok <- is.finite(observed) & is.finite(predicted)
@@ -96,8 +96,8 @@ analyse_one <- function(i) {
     mutate(time_post_burnout = step - time_shift)
   if (!nrow(simulation)) stop("No aligned transient data for result ", i)
 
-  P1_raw <- 1 - as.numeric(predict(gam_fit,
-    newdata = data.frame(R0=params$R0, K=params$K), type="response"))
+  P1_estimate <- estimate_P1(params$R0, params$K, params$r)
+  P1_raw <- P1_estimate$P1_raw
   P1 <- pmin(pmax(P1_raw, probability_tolerance), 1-probability_tolerance)
   I_star <- unname(plagueMetapop::ode_eq(params$R0, params$gamma,
     params$K, params$r, 1)[["eq_I"]])
@@ -131,14 +131,13 @@ analyse_one <- function(i) {
   m_new_q <- metric(cmp$stochastic_transient, cmp$new_q)
   m_new_zero_p <- metric(cmp$stochastic_persistent, new_zero_q0$p)
   m_new_zero_total <- metric(cmp$stochastic_total, new_zero_q0$total)
-  exact_row <- single_patch |>
-    filter(R0 == params$R0, K == params$K)
   diag <- data.frame(
     result_id=i, varied_parameter=raw$varied_parameter,
     parameter_value=raw$parameter_value, R0=params$R0, K=params$K,
     r=params$r, alpha=params$alpha, gamma=params$gamma,
-    I0=params$I_outbreak, P1=P1, P1_GAM_raw=P1_raw,
-    P1_exact_grid=if(nrow(exact_row)==1) 1-exact_row$ext_prob.I1 else NA,
+    I0=params$I_outbreak, P1=P1, P1_raw=P1_raw,
+    P1_exact_grid=P1_estimate$P1_exact_grid,
+    P1_source=P1_estimate$source,
     I_star=I_star, I_peak=transient$I_peak,
     time_of_I_peak=transient$time_of_I_peak,
     T_osc=transient$T_osc, T_osc_approx=transient$T_osc_approx,

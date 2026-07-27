@@ -350,3 +350,137 @@ run_fadeout_occupancy <- function(params, gen = NULL, keep_patch_data = FALSE) {
     curve_summary = summarize_occupancy_curve(occupancy$meta_summary)
   )
 }
+
+occupancy_scenario_key <- function(parameter, value) {
+  if (length(parameter) == 1L && length(value) > 1L) {
+    parameter <- rep(parameter, length(value))
+  }
+  if (length(value) == 1L && length(parameter) > 1L) {
+    value <- rep(value, length(parameter))
+  }
+  if (length(parameter) != length(value)) {
+    stop("parameter and value must have compatible lengths")
+  }
+  value_text <- vapply(
+    value,
+    function(x) format(x, digits = 17, scientific = TRUE, trim = TRUE),
+    character(1)
+  )
+  paste(parameter, value_text, sep = "|")
+}
+
+occupancy_trajectory_file <- function(directory, parameter, value) {
+  safe_value <- gsub("[^0-9A-Za-z.+-]", "_",
+                     format(value, digits = 17, scientific = TRUE))
+  file.path(directory, sprintf("%s_%s.rds", parameter, safe_value))
+}
+
+save_occupancy_trajectory <- function(simulation, file, varied_parameter,
+                                      parameter_value) {
+  if (is.null(simulation$infected)) {
+    stop("Cannot cache a simulation without patch-level infected history")
+  }
+  dir.create(dirname(file), recursive = TRUE, showWarnings = FALSE)
+  saveRDS(
+    list(
+      varied_parameter = varied_parameter,
+      parameter_value = parameter_value,
+      params = simulation$params,
+      equilibrium = simulation$equilibrium,
+      initial = simulation$initial,
+      infected = simulation$infected
+    ),
+    file
+  )
+}
+
+read_occupancy_trajectory <- function(file, expected_parameter = NULL,
+                                      expected_value = NULL) {
+  if (!file.exists(file)) stop("Full stochastic trajectory not found: ", file)
+  trajectory <- readRDS(file)
+  required <- c("varied_parameter", "parameter_value", "params", "infected")
+  missing <- setdiff(required, names(trajectory))
+  if (length(missing)) {
+    stop("Invalid full-trajectory cache; missing: ", paste(missing, collapse = ", "))
+  }
+  if (!is.null(expected_parameter) &&
+      !identical(trajectory$varied_parameter, expected_parameter)) {
+    stop("Full-trajectory cache has the wrong varied parameter: ", file)
+  }
+  if (!is.null(expected_value) &&
+      !isTRUE(all.equal(trajectory$parameter_value, expected_value))) {
+    stop("Full-trajectory cache has the wrong parameter value: ", file)
+  }
+  trajectory
+}
+
+## Build a persistence-probability estimator from the R0 x K x r
+## single-patch extinction grid. Exact grid values are used whenever possible;
+## otherwise interpolation is restricted to a two-dimensional R0 x K GAM at
+## an observed r value. This avoids unstable out-of-range predictions from a
+## single three-dimensional Gaussian GAM.
+make_P1_demoggrid_estimator <- function(single_patch, k = c(12, 12),
+                                        tolerance = 1e-8) {
+  required <- c("R0", "K", "r", "ext_prob.I1")
+  missing <- setdiff(required, names(single_patch))
+  if (!is.data.frame(single_patch) || !nrow(single_patch) || length(missing)) {
+    stop("P1 demography grid must be a non-empty data frame with columns: ",
+         paste(required, collapse = ", "))
+  }
+  if (any(!is.finite(single_patch$ext_prob.I1)) ||
+      any(single_patch$ext_prob.I1 < 0 | single_patch$ext_prob.I1 > 1)) {
+    stop("P1 demography grid contains invalid extinction probabilities")
+  }
+
+  r_values <- sort(unique(single_patch$r))
+  slice_models <- setNames(lapply(r_values, function(r_value) {
+    slice <- single_patch[
+      abs(single_patch$r - r_value) <= tolerance, , drop = FALSE
+    ]
+    mgcv::gam(
+      ext_prob.I1 ~ te(R0, K, k = k),
+      data = slice,
+      method = "REML"
+    )
+  }), format(r_values, scientific = FALSE, trim = TRUE))
+
+  function(R0, K, r) {
+    r_index <- which(abs(r_values - r) <= tolerance)
+    if (length(r_index) != 1L) {
+      stop(
+        "Requested r = ", r,
+        " is not one of the calibrated demography-grid values: ",
+        paste(r_values, collapse = ", ")
+      )
+    }
+    exact <- single_patch[
+      abs(single_patch$R0 - R0) <= tolerance &
+        abs(single_patch$K - K) <= tolerance * max(1, abs(K)) &
+        abs(single_patch$r - r) <= tolerance,
+      , drop = FALSE
+    ]
+    if (nrow(exact) > 1L) {
+      stop("Duplicate exact P1 grid rows for R0=", R0, ", K=", K, ", r=", r)
+    }
+    if (nrow(exact) == 1L) {
+      extinction <- exact$ext_prob.I1
+      source <- "empirical_exact_grid"
+      exact_P1 <- 1 - extinction
+    } else {
+      model_name <- format(r_values[r_index], scientific = FALSE, trim = TRUE)
+      extinction <- as.numeric(stats::predict(
+        slice_models[[model_name]],
+        newdata = data.frame(R0 = R0, K = K),
+        type = "response"
+      ))
+      source <- "two_dimensional_r_slice_GAM"
+      exact_P1 <- NA_real_
+    }
+    list(
+      P1_raw = 1 - extinction,
+      P1_exact_grid = exact_P1,
+      source = source,
+      calibrated_r = r_values[r_index]
+    )
+  }
+}

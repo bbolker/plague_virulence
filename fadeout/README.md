@@ -4,9 +4,9 @@ This directory contains the non-seasonal single-strain patch-occupancy
 workflow, its analytical approximations, and older related fadeout scripts.
 Occupancy means `I > 0` unless explicitly described as established occupancy.
 
-The current occupancy analyses fix `r = 0.125` and vary one of `R0`, `K`, or
-`alpha` at a time. Figures are saved as PDF. Run commands from the repository
-root.
+The current occupancy analyses vary one of `R0`, `K`, `alpha`, or `r` at a
+time, with all other parameters held at their baseline values. Figures are
+saved as PDF. Run commands from the repository root.
 
 ## Current main workflow
 
@@ -18,21 +18,26 @@ Rscript fadeout/run_stochastic_occupancy.R
 
 This runs one existing-seed stochastic trajectory for each retained parameter
 value, using 200 patches, `dt=0.1`, `t_max=2000`, and virgin-soil initial
-conditions `S(0)=K-10`, `I(0)=10` in every patch. Use `--plot-only` to rebuild
-the saved data and figures from existing trajectories without rerunning the
-simulations.
+conditions `S(0)=K-10`, `I(0)=10` in every patch. Each simulation saves its
+full patch-level infected history under `data/full_trajectories/`. Raw
+occupancy and the episode/establishment analysis are derived from this common
+realization, so the metapopulation model is not run twice. Legacy summary-only
+caches are still readable, but running the script normally will regenerate
+them once to create the full trajectory. Use `--plot-only` to rebuild figures
+from existing summary data without rerunning simulations.
 
 | File | Purpose |
 |---|---|
-| [`run_stochastic_occupancy.R`](run_stochastic_occupancy.R) | Defines the baseline and the `R0`, `K`, and `alpha` one-factor-at-a-time scenarios. |
+| [`run_stochastic_occupancy.R`](run_stochastic_occupancy.R) | Defines the baseline and the `R0`, `K`, `alpha`, and `r` one-factor-at-a-time scenarios, runs each stochastic realization once, and caches its full infected history. |
 | [`occupancy_functions.R`](occupancy_functions.R) | Simulation, raw occupancy, established occupancy, episode classification, summary, and absorbing-display helpers. |
-| [`output/stochastic_patch_occupancy/`](output/stochastic_patch_occupancy/) | Direct raw `I>0` stochastic patch-occupancy results, compact CSV files, and three parameter-scan PDFs. |
+| [`output/stochastic_patch_occupancy/`](output/stochastic_patch_occupancy/) | Full stochastic trajectories, direct raw `I>0` occupancy results, compact CSV files, and four parameter-scan PDFs. |
 
 Main stochastic figures:
 
 - `output/stochastic_patch_occupancy/figures/stochastic_patch_occupancy_compare_R0.pdf`
 - `output/stochastic_patch_occupancy/figures/stochastic_patch_occupancy_compare_K.pdf`
 - `output/stochastic_patch_occupancy/figures/stochastic_patch_occupancy_compare_alpha.pdf`
+- `output/stochastic_patch_occupancy/figures/stochastic_patch_occupancy_compare_r.pdf`
 
 ### 2. Original one-state approximation
 
@@ -65,22 +70,24 @@ p(t)=\frac{1}{
 }.
 $$
 
-`P1` is predicted as a function of `R0` and `K` by the existing GAM fitted to
-the single-patch extinction data; those data use `r=0.125`. `I_star` comes from
-`plagueMetapop::ode_eq()`. The stochastic comparison target is established
-occupancy with `tau=50`, while the common post-burnout time origin is the raw
-occupancy minimum.
+`P1` is estimated as a function of `R0`, `K`, and `r` from the single-patch
+demography-grid extinction data. Exact grid values are preferred; an
+`R0`-by-`K` GAM within the matching observed `r` slice is used only when
+interpolation is required. `I_star` comes from `plagueMetapop::ode_eq()`. The
+stochastic comparison target is established occupancy with `tau=50`, while
+the common post-burnout time origin is the raw occupancy minimum.
 
 | File | Purpose |
 |---|---|
 | [`compare_one_state_occupancy.R`](compare_one_state_occupancy.R) | Produces the one-state comparisons and diagnostics without rerunning metapopulation simulations. |
-| [`output/one_state_occupancy/`](output/one_state_occupancy/) | Three `tau=50` PDFs and the diagnostic CSV. |
+| [`output/one_state_occupancy/`](output/one_state_occupancy/) | Four `tau=50` PDFs and the diagnostic CSV. |
 
 Main one-state figures:
 
 - `output/one_state_occupancy/one_state_established_tau50_compare_R0.pdf`
 - `output/one_state_occupancy/one_state_established_tau50_compare_K.pdf`
 - `output/one_state_occupancy/one_state_established_tau50_compare_alpha.pdf`
+- `output/one_state_occupancy/one_state_established_tau50_compare_r.pdf`
 
 ### 3. Current two-state approximation
 
@@ -129,14 +136,15 @@ The deterministic invasion begins at `S(0)=K-10`, `I(0)=10`.
 | File | Purpose |
 |---|---|
 | [`two_state_functions.R`](two_state_functions.R) | Computes `T_osc`, `T_T`, `Ibar_T`, and solves the current two-state ODE. |
-| [`compare_two_state_occupancy.R`](compare_two_state_occupancy.R) | Compares stochastic and current deterministic persistent, transient, and total occupancy for 16 retained scenarios. |
-| [`output/two_state_occupancy/`](output/two_state_occupancy/) | Deterministic invasion data, comparison curves, diagnostics, and three PDFs. |
+| [`compare_two_state_occupancy.R`](compare_two_state_occupancy.R) | Compares stochastic and current deterministic persistent, transient, and total occupancy for 21 retained scenarios. |
+| [`output/two_state_occupancy/`](output/two_state_occupancy/) | Deterministic invasion data, comparison curves, diagnostics, and four PDFs. |
 
 Main current two-state figures:
 
 - `output/two_state_occupancy/figures/two_state_occupancy_compare_R0.pdf`
 - `output/two_state_occupancy/figures/two_state_occupancy_compare_K.pdf`
 - `output/two_state_occupancy/figures/two_state_occupancy_compare_alpha.pdf`
+- `output/two_state_occupancy/figures/two_state_occupancy_compare_r.pdf`
 
 The figures show only the stochastic trajectory and the current deterministic
 approximation. The original one-state curve is retained in the two-state CSV
@@ -164,8 +172,10 @@ Rscript fadeout/run_stochastic_episode_occupancy.R
 ```
 
 [`run_stochastic_episode_occupancy.R`](run_stochastic_episode_occupancy.R)
-runs the 16 retained scenarios and produces established occupancy plus
-persistent, transient, and censored episode classifications. Patch $i$ is
+does not run the odin model. It reads the full trajectories saved by
+`run_stochastic_occupancy.R` and derives established occupancy plus persistent,
+transient, and censored episode classifications for the 21 retained
+scenarios. Patch $i$ is
 established at time $t$ when
 
 $$

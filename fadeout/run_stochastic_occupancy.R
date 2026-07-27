@@ -27,7 +27,8 @@ baseline <- list(
 parameter_values <- list(
   R0 = c(1.5, 2, 2.5, 3, 4, 5),
   K = c(1000, 3000, 10000, 30000, 100000),
-  alpha = c(1e-5, 3e-5, 1e-4, 3e-4, 1e-3)
+  alpha = c(1e-5, 3e-5, 1e-4, 3e-4, 1e-3),
+  r = c(0.05, 0.1, 0.125, 0.2, 0.4)
 )
 
 make_scenarios <- function(baseline, parameter_values) {
@@ -72,36 +73,75 @@ fixed_parameter_subtitle <- function(varied_parameter, baseline) {
 outdir <- here::here("fadeout", "output", "stochastic_patch_occupancy")
 figdir <- file.path(outdir, "figures")
 datadir <- file.path(outdir, "data")
+trajectory_dir <- file.path(datadir, "full_trajectories")
 dir.create(figdir, recursive = TRUE, showWarnings = FALSE)
 dir.create(datadir, recursive = TRUE, showWarnings = FALSE)
+dir.create(trajectory_dir, recursive = TRUE, showWarnings = FALSE)
 
 scenarios <- make_scenarios(baseline, parameter_values)
+result_file <- file.path(datadir, "stochastic_patch_occupancy_results.rds")
 plot_only <- "--plot-only" %in% commandArgs(trailingOnly = TRUE)
 if (plot_only) {
-  result_file <- file.path(datadir, "stochastic_patch_occupancy_results.rds")
   if (!file.exists(result_file)) stop("Existing occupancy results not found: ", result_file)
   results <- readRDS(result_file)
   results <- Filter(function(x) x$varied_parameter %in% names(parameter_values), results)
-  message("Plot-only mode: reusing existing R0, K, and alpha trajectories")
+  message("Plot-only mode: reusing existing R0, K, alpha, and r trajectories")
 } else {
   gen <- compile_odin("euler_odin_def.R")
-  results <- vector("list", length(scenarios))
+  existing <- if (file.exists(result_file)) readRDS(result_file) else list()
 
   for (i in seq_along(scenarios)) {
     scenario <- scenarios[[i]]
-    message(sprintf(
-      "Running %s = %g (%d/%d)",
-      scenario$varied_parameter,
-      scenario$parameter_value,
-      i,
-      length(scenarios)
-    ))
+    trajectory_file <- occupancy_trajectory_file(
+      trajectory_dir, scenario$varied_parameter, scenario$parameter_value
+    )
+    matches <- which(vapply(existing, function(x) {
+      identical(x$varied_parameter, scenario$varied_parameter) &&
+        isTRUE(all.equal(x$parameter_value, scenario$parameter_value))
+    }, logical(1)))
+    if (length(matches) > 1L) {
+      stop("Duplicate saved stochastic scenario: ",
+           scenario$varied_parameter, " = ", scenario$parameter_value)
+    }
+    if (length(matches) == 1L && file.exists(trajectory_file)) {
+      message(sprintf(
+        "Reusing full trajectory: %s = %g (%d/%d)",
+        scenario$varied_parameter, scenario$parameter_value,
+        i, length(scenarios)
+      ))
+      next
+    }
+    if (length(matches) == 1L) {
+      message(sprintf(
+        "Legacy summary has no full trajectory; regenerating %s = %g (%d/%d)",
+        scenario$varied_parameter, scenario$parameter_value,
+        i, length(scenarios)
+      ))
+    } else {
+      message(sprintf(
+        "Running %s = %g (%d/%d)",
+        scenario$varied_parameter,
+        scenario$parameter_value,
+        i,
+        length(scenarios)
+      ))
+    }
 
-    result <- run_fadeout_occupancy(scenario$params, gen = gen)
+    ## This is the only metapopulation simulation step in the occupancy
+    ## workflow. Save the full patch-level I history once; raw occupancy and
+    ## all episode/establishment summaries are derived from this same
+    ## realization.
+    result <- run_fadeout_occupancy(
+      scenario$params, gen = gen, keep_patch_data = TRUE
+    )
+    save_occupancy_trajectory(
+      result, trajectory_file,
+      scenario$varied_parameter, scenario$parameter_value
+    )
     displayed <- apply_full_occupancy_absorbing_boundary(result$meta_summary)
     absorption_step <- attr(displayed, "absorption_step")
 
-    results[[i]] <- list(
+    result_summary <- list(
       varied_parameter = scenario$varied_parameter,
       parameter_value = scenario$parameter_value,
       params = scenario$params,
@@ -110,7 +150,22 @@ if (plot_only) {
       absorption_step = absorption_step,
       raw_curve_summary = result$curve_summary
     )
+    if (length(matches) == 1L) {
+      existing[[matches]] <- result_summary
+    } else {
+      existing[[length(existing) + 1L]] <- result_summary
+    }
+    rm(result)
+    invisible(gc())
   }
+  results <- lapply(scenarios, function(scenario) {
+    matches <- which(vapply(existing, function(x) {
+      identical(x$varied_parameter, scenario$varied_parameter) &&
+        isTRUE(all.equal(x$parameter_value, scenario$parameter_value))
+    }, logical(1)))
+    if (length(matches) != 1L) stop("Could not uniquely assemble scenario results")
+    existing[[matches]]
+  })
 }
 
 occupancy_data <- bind_rows(lapply(results, function(x) {
@@ -201,6 +256,6 @@ write.csv(
   file.path(datadir, "stochastic_patch_occupancy_summaries.csv"),
   row.names = FALSE
 )
-saveRDS(results, file.path(datadir, "stochastic_patch_occupancy_results.rds"))
+saveRDS(results, result_file)
 
 message("Finished. Outputs saved in: ", outdir)

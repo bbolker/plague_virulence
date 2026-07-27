@@ -8,11 +8,12 @@ library(here)
 library(mgcv)
 library(plagueMetapop)
 
+source(here::here("fadeout", "occupancy_functions.R"))
 theme_set(theme_bw())
 
 single_patch_file <- here::here(
   "odin", "sharcnet", "outputs",
-  "euler_onepatch_onestrain_extinct_logistic_continuous.rds"
+  "euler_onepatch_onestrain_extinct_logistic_continuous_demoggrid.rds"
 )
 metapop_file <- here::here(
   "fadeout", "output", "stochastic_patch_occupancy", "data",
@@ -31,7 +32,7 @@ for (filename in c(single_patch_file, metapop_file, established_file)) {
 dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
 
 single_patch <- readRDS(single_patch_file)
-required_single <- c("R0", "K", "ext_prob.I1")
+required_single <- c("R0", "K", "r", "ext_prob.I1")
 missing_single <- setdiff(required_single, names(single_patch))
 if (!is.data.frame(single_patch) || nrow(single_patch) == 0L) {
   stop("Single-patch input must be a non-empty data frame")
@@ -51,13 +52,9 @@ if (!is.list(established_results) ||
   stop("Established and raw metapopulation inputs must be equal-length lists")
 }
 
-## Follow notes/notes_16jul.rmd. This emulator and all retained metapopulation
-## scenarios use r=0.125; P1 varies with R0 and K.
-gam_fit <- mgcv::gam(
-  ext_prob.I1 ~ te(R0, K, k = c(12, 12)),
-  data = single_patch,
-  method = "REML"
-)
+## Exact R0 x K x r grid values are preferred. Non-grid R0/K combinations use
+## the two-dimensional GAM fitted within the matching observed r slice.
+estimate_P1 <- make_P1_demoggrid_estimator(single_patch)
 
 probability_tolerance <- 1e-6
 
@@ -71,11 +68,21 @@ format_parameter <- function(name, value) {
 
 fixed_parameter_subtitle <- function(group, params) {
   fixed <- setdiff(c("R0", "K", "r", "alpha"), group)
-  paste(vapply(
-    fixed,
-    function(name) format_parameter(name, params[[name]]),
-    character(1)
-  ), collapse = "; ")
+  paste0(
+    paste(vapply(
+      fixed,
+      function(name) format_parameter(name, params[[name]]),
+      character(1)
+    ), collapse = "; "),
+    sprintf(
+      "; gamma = %g; n_patch = %d; dt = %g; t_max = %g\n",
+      params$gamma, params$n_patch, params$dt, params$t_max
+    ),
+    sprintf(
+      "initialization = %s; S(0) = K - %g; I(0) = %g per patch; tau = 50",
+      params$initialization, params$I_outbreak, params$I_outbreak
+    )
+  )
 }
 
 first_time_at_or_above <- function(time, value, level) {
@@ -113,23 +120,11 @@ analyse_one <- function(result, established, result_id) {
     stop("No tau=50 established occupancy for result ", result_id)
   }
 
-  extinction_prediction <- as.numeric(predict(
-    gam_fit,
-    newdata = data.frame(R0 = params$R0, K = params$K),
-    type = "response"
-  ))
-  P1_GAM_raw <- 1 - extinction_prediction
-  P1 <- pmin(pmax(P1_GAM_raw, probability_tolerance),
+  P1_estimate <- estimate_P1(params$R0, params$K, params$r)
+  P1_raw <- P1_estimate$P1_raw
+  P1 <- pmin(pmax(P1_raw, probability_tolerance),
              1 - probability_tolerance)
-  P1_was_bounded <- !isTRUE(all.equal(P1_GAM_raw, P1))
-
-  exact_row <- single_patch |>
-    filter(R0 == params$R0, K == params$K)
-  P1_exact_grid <- if (nrow(exact_row) == 1L) {
-    1 - exact_row$ext_prob.I1
-  } else {
-    NA_real_
-  }
+  P1_was_bounded <- !isTRUE(all.equal(P1_raw, P1))
 
   equilibrium <- plagueMetapop::ode_eq(
     beta = params$R0,
@@ -200,10 +195,11 @@ analyse_one <- function(result, established, result_id) {
     gamma = params$gamma,
     alpha = params$alpha,
     tau = 50,
-    P1_GAM_raw = P1_GAM_raw,
+    P1_raw = P1_raw,
     P1_used = P1,
     P1_was_bounded = P1_was_bounded,
-    P1_exact_grid = P1_exact_grid,
+    P1_exact_grid = P1_estimate$P1_exact_grid,
+    P1_source = P1_estimate$source,
     I_star = I_star,
     lambda = lambda,
     simulation_established_at_shift = post_burnout$occupancy_simulation[1],
@@ -267,7 +263,7 @@ for (group_name in groups) {
 
   fixed_params <- analyses[[group_rows$result_id[1]]]$params
   bounded_note <- if (any(group_rows$P1_was_bounded)) {
-    " GAM predictions outside [0,1] were bounded for calculation."
+    " P1 estimates at 0 or 1 were bounded for numerical calculation."
   } else {
     ""
   }
@@ -317,19 +313,29 @@ for (group_name in groups) {
     outdir,
     sprintf("one_state_established_tau50_compare_%s.pdf", group_name)
   )
-  ggsave(plot_file, p, width = 11, height = 6.5)
+  tryCatch(
+    ggsave(plot_file, p, width = 11, height = 6.5),
+    error = function(e) {
+      warning(
+        "Could not write ", plot_file,
+        " (it may be open in another program): ", conditionMessage(e)
+      )
+    }
+  )
 }
 
 write.csv(all_diagnostics, diagnostic_file, row.names = FALSE)
 
-cat("Single-patch P1 source: GAM fitted to extinction by t=200; ",
+cat("Single-patch P1 source: R0 x K x r extinction grid at t=200; ",
     "Poisson initial infected count with mean 10.\n", sep = "")
-cat("P1 emulator calibration and all retained scenarios use r=0.125.\n")
+cat("Exact grid values are preferred; non-grid R0/K values use a matching-r ",
+    "two-dimensional GAM.\n", sep = "")
 cat("Stochastic target: established occupancy with tau=50; alignment: raw occupancy minimum.\n")
 cat("Probability bound used for analytical calculation: ",
     probability_tolerance, " to ", 1 - probability_tolerance, "\n", sep = "")
 cat("Scenarios analysed: ", nrow(all_diagnostics), "\n", sep = "")
-cat("GAM predictions bounded: ", sum(all_diagnostics$P1_was_bounded), "\n", sep = "")
+cat("P1 values bounded for numerical calculation: ",
+    sum(all_diagnostics$P1_was_bounded), "\n", sep = "")
 cat("Median RMSE: ", median(all_diagnostics$RMSE), "\n", sep = "")
 cat("Median first-500 RMSE: ", median(all_diagnostics$RMSE_first_500), "\n", sep = "")
 cat("Outputs: ", outdir, "\n", sep = "")
