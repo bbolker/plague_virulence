@@ -221,6 +221,90 @@ source shares are 70.5% for `R0=2.5` and 98.0% for `R0=3`; cumulative shares are
 transient-pressure explanation for part of the `R0=3` one-state
 underprediction, but do not identify transmission ancestry.
 
+## Extinction time versus oscillation period
+
+```bash
+Rscript fadeout/analyze_extinction_Tosc_relationship.R
+```
+
+[`analyze_extinction_Tosc_relationship.R`](analyze_extinction_Tosc_relationship.R)
+compares the current two-state oscillation-period approximation
+
+$$
+T_{\mathrm{osc}}=
+\frac{2\pi}{
+\sqrt{r\gamma(R_0-1)-r^2R_0^2/4}
+}
+$$
+
+with `mean_ext_time.I1` from the existing 2600-cell one-patch
+$R_0\times K\times r$ stochastic grid. A period is defined only when the
+quantity under the square root is positive. The current formula depends on
+$R_0$ and $r$, not $K$, so all 13 $K$ values at fixed $R_0,r$ have the same
+$T_{\mathrm{osc}}$ and remain as separate vertically aligned points. The first
+regression is an unweighted fit of
+
+$$
+\log_{10}\!\left(\overline T_{\mathrm{ext}}\right)
+=a+b\log_{10}\!\left(T_{\mathrm{osc}}\right)
+$$
+
+over all valid grid cells; $K$ is shown by point colour but is not included as
+a predictor or averaged out. The regression and figures are restricted to
+$0<T_{\mathrm{osc}}<50$ disease generations. Longer periods are not used
+because extinction is observed only through `t_max=200`, so their conditional
+mean extinction times are especially vulnerable to finite-window selection.
+All 2600 grid cells remain in the cleaned output table, with a flag identifying
+whether they satisfy this period-window restriction.
+
+`sumfun_discrete()` stores the mean row index of first extinction among runs
+that became extinct. Because row 1 is time zero and rows are `dt=0.1` apart,
+the analysis uses
+
+$$
+\overline T_{\mathrm{ext}}
+=\left(\mathtt{mean\_ext\_time.I1}-1\right)dt.
+$$
+
+This is the conditional mean extinction time among runs that went extinct
+within `t_max=200`, not a replicate-level extinction-time distribution. The
+combined data contain only grid-cell summaries. This first analysis does not
+separate early fizzles from post-outbreak burnout, which is especially
+important near $R_0=1$.
+
+Outputs are under `output/extinction_Tosc_relationship/`: the full 2600-row
+cleaned grid, regression and ratio-summary CSV files, and two PDF figures in
+the `figures/` subdirectory.
+
+## One-patch extinction: one parameter at a time
+
+```bash
+Rscript fadeout/analyze_onepatch_extinction_sensitivity.R
+```
+
+[`analyze_onepatch_extinction_sensitivity.R`](analyze_onepatch_extinction_sensitivity.R)
+uses the existing one-patch, one-strain logistic continuous-Euler extinction
+grid to show how the stochastic summaries change around the baseline
+$R_0=2.5$, $K=10^4$, and $r=0.125$. Exactly three sweeps are retained: vary
+$R_0$, vary $K$, or vary $r$, while holding the other two parameters fixed.
+There is no $\alpha$ sweep because this is a one-patch dataset with
+$\alpha=0$.
+
+Each two-panel figure shows the conditional mean extinction time above and the
+probability of extinction by `t_max=200` below. The latter indicates where
+conditioning and finite-window censoring make the mean harder to interpret.
+As above, the time conversion is
+
+$$
+\overline T_{\mathrm{ext}}
+=\left(\mathtt{mean\_ext\_time.I1}-1\right)dt,
+\qquad dt=0.1,
+$$
+
+in disease generations. Outputs are under
+`output/onepatch_extinction_sensitivity/`: a cleaned full-grid CSV, three sweep CSV
+files, and exactly three PDF figures.
+
 ## Seasonal recurrent fade-out
 
 The reusable seasonal workflow is documented in

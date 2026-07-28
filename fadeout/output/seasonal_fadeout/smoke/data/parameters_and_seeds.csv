@@ -1,0 +1,2 @@
+"combo_id","R0","gamma","r","K","alpha","seasonal_amp","season_period","peak_day","n_patch","dt","t_max","n_reps","base_seed","threshold_multiplier","replicate","seed","beta","S_star","I_star","T0","omega0","eigen_omega0","fadeout_threshold"
+"smoke",2.5,0.2,0.02,3000,1e-04,0.4,365,15,200,1,3650,1,101,1.5,1,101,0.5,1200,72,128.684649154444,0.0488262224629348,0.0488262224629348,193.026973731666
