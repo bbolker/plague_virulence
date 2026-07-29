@@ -14,6 +14,7 @@ source(here::here("fadeout", "two_state_functions.R"))
 source(here::here("fadeout", "occupancy_functions.R"))
 theme_set(theme_bw())
 
+hybrid_duration <- "--hybrid-duration" %in% commandArgs(trailingOnly = TRUE)
 c_transient <- 0.5
 probability_tolerance <- 1e-6
 single_patch_file <- here::here("odin", "sharcnet", "outputs",
@@ -24,8 +25,11 @@ established_file <- here::here("fadeout", "output",
   "stochastic_episode_occupancy", "data", "established_occupancy_results.rds")
 transient_file <- here::here("fadeout", "output", "stochastic_episode_occupancy",
   "data", "transient_source_pressure_timeseries.csv")
-outdir <- here::here("fadeout", "output",
-  "two_state_occupancy")
+outdir <- here::here(
+  "fadeout", "output",
+  if (hybrid_duration) "two_state_occupancy_hybrid_TT" else
+    "two_state_occupancy"
+)
 datadir <- file.path(outdir, "data")
 figdir <- file.path(outdir, "figures")
 for (f in c(single_patch_file, raw_file, established_file, transient_file)) {
@@ -65,7 +69,9 @@ fixed_subtitle <- function(group, p) {
   fixed <- setdiff(c("R0", "K", "r", "alpha"), group)
   paste0(paste(vapply(fixed, function(x) format_parameter(x, p[[x]]),
     character(1)), collapse = "; "),
-    sprintf("; gamma = %g; c = %g; tau = 50\n", p$gamma, c_transient),
+    if (hybrid_duration)
+      sprintf("; gamma = %g; hybrid T_T; tau = 50\n", p$gamma) else
+      sprintf("; gamma = %g; c = %g; tau = 50\n", p$gamma, c_transient),
     sprintf("n_patch = %d; dt = %g; t_max = %g; S(0)=K-%g; I(0)=%g",
       p$n_patch, p$dt, p$t_max, p$I_outbreak, p$I_outbreak))
 }
@@ -101,9 +107,20 @@ analyse_one <- function(i) {
   P1 <- pmin(pmax(P1_raw, probability_tolerance), 1-probability_tolerance)
   I_star <- unname(plagueMetapop::ode_eq(params$R0, params$gamma,
     params$K, params$r, 1)[["eq_I"]])
-  transient <- compute_transient_outbreak_summary(params$R0, params$K,
-    params$r, params$gamma, params$I_outbreak, c_transient)
-  if (!transient$oscillatory)
+  transient <- if (hybrid_duration) {
+    compute_transient_outbreak_summary_I1(
+      params$R0, params$K, params$r, params$I_outbreak
+    )
+  } else {
+    compute_transient_outbreak_summary(
+      params$R0, params$K, params$r, params$gamma,
+      params$I_outbreak, c_transient
+    )
+  }
+  if (hybrid_duration && !transient$endpoint_found)
+    stop("No hybrid transient endpoint for result ", i,
+      ": ", transient$status)
+  if (!hybrid_duration && !transient$oscillatory)
     stop("Non-oscillatory closure for result ", i,
       ": argument=", transient$exact_argument)
 
@@ -140,14 +157,31 @@ analyse_one <- function(i) {
     P1_source=P1_estimate$source,
     I_star=I_star, I_peak=transient$I_peak,
     time_of_I_peak=transient$time_of_I_peak,
-    T_osc=transient$T_osc, T_osc_approx=transient$T_osc_approx,
-    c=c_transient, T_T=transient$T_T, integral_I=transient$integral_I,
+    duration_method=if (hybrid_duration) "I1_or_first_trough" else
+      "half_Tosc",
+    endpoint_type=if (hybrid_duration) transient$transient_endpoint else
+      "half_Tosc",
+    endpoint_status=if (hybrid_duration) transient$status else
+      "success_half_Tosc",
+    I_first_trough=if (hybrid_duration) transient$I_first_trough else
+      NA_real_,
+    time_of_first_trough=if (hybrid_duration)
+      transient$time_of_first_trough else NA_real_,
+    T_osc=if (hybrid_duration) transient$T_osc_old else transient$T_osc,
+    T_osc_approx=if (hybrid_duration) NA_real_ else
+      transient$T_osc_approx,
+    c=if (hybrid_duration) NA_real_ else c_transient,
+    T_T=transient$T_T, integral_I=transient$integral_I,
     Ibar_T=transient$Ibar_T,
     Ibar_T_over_I_star=transient$Ibar_T/I_star,
     I_peak_over_I_star=transient$I_peak/I_star,
-    oscillation_argument=transient$exact_argument,
-    exact_oscillation_valid=transient$oscillatory,
-    turnover_mapping=transient$mapping,
+    oscillation_argument=if (hybrid_duration) NA_real_ else
+      transient$exact_argument,
+    exact_oscillation_valid=if (hybrid_duration)
+      transient$endpoint_found else transient$oscillatory,
+    turnover_mapping=if (hybrid_duration)
+      "normalized logistic deterministic invasion; hybrid endpoint" else
+      transient$mapping,
     p0=p0, q0=q0_observed, q0_source="observed episode-classified transient occupancy at raw minimum",
     time_shift=time_shift,
     stochastic_persistent_at_shift=cmp$stochastic_persistent[1],
@@ -218,11 +252,22 @@ for (group_name in unique(diagnostics$varied_parameter)) {
     labs(x="Time since each simulated raw-occupancy minimum",
       y="Fraction of patches",colour=paste("Varied parameter:",group_name),
       linetype=NULL,
-      title=paste("Transient infected-load two-state approximation: varying",group_name),
+      title=paste(
+        if (hybrid_duration)
+          "Hybrid-duration two-state approximation: varying" else
+          "Transient infected-load two-state approximation: varying",
+        group_name
+      ),
       subtitle=fixed_subtitle(group_name,analyses[[rows$result_id[1]]]$params),
-      caption="p(0)=P1; q(0)=observed episode-classified transient occupancy at the aligned minimum. Ibar_T is deterministic, not fitted.")+
+      caption=paste0(
+        "p(0)=P1; q(0)=observed episode-classified transient occupancy at ",
+        "the aligned minimum. Ibar_T is deterministic, not fitted.",
+        if (hybrid_duration)
+          " T_T uses the I=1-or-first-trough hybrid endpoint." else ""
+      ))+
     theme(legend.position="right",plot.subtitle=element_text(size=9),
-      plot.caption=element_text(hjust=0,size=8))
+      plot.caption=element_text(hjust=0,size=8),
+      plot.margin=margin(8,8,8,160,unit="pt"))
   ggsave(file.path(figdir,sprintf("two_state_occupancy_compare_%s.pdf",
     group_name)),p,width=12,height=10)
 }

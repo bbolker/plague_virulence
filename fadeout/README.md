@@ -136,8 +136,9 @@ The deterministic invasion begins at `S(0)=K-10`, `I(0)=10`.
 | File | Purpose |
 |---|---|
 | [`two_state_functions.R`](two_state_functions.R) | Computes `T_osc`, `T_T`, `Ibar_T`, and solves the current two-state ODE. |
-| [`compare_two_state_occupancy.R`](compare_two_state_occupancy.R) | Compares stochastic and current deterministic persistent, transient, and total occupancy for 21 retained scenarios. |
+| [`compare_two_state_occupancy.R`](compare_two_state_occupancy.R) | Compares stochastic and deterministic persistent, transient, and total occupancy for 21 retained scenarios. Its default mode uses the original half-period duration; `--hybrid-duration` uses the separate $I=1$-or-first-trough duration. |
 | [`output/two_state_occupancy/`](output/two_state_occupancy/) | Deterministic invasion data, comparison curves, diagnostics, and four PDFs. |
+| [`output/two_state_occupancy_hybrid_TT/`](output/two_state_occupancy_hybrid_TT/) | Separate curves, diagnostics, and four PDFs generated with the hybrid transient duration; the original results are not overwritten. |
 
 Main current two-state figures:
 
@@ -149,6 +150,73 @@ Main current two-state figures:
 The figures show only the stochastic trajectory and the current deterministic
 approximation. The original one-state curve is retained in the two-state CSV
 for quantitative comparison but is not drawn.
+
+### Alternative transient-duration closure
+
+The existing two-state implementation remains unchanged and uses the
+provisional closure
+
+$$
+T_T=0.5T_{\mathrm{osc}}.
+$$
+
+[`compute_transient_outbreak_summary_I1()`](two_state_functions.R) provides a
+separate deterministic hybrid alternative. It solves the normalized logistic model
+
+$$
+\frac{dS}{dt}=rS\left(1-\frac{S}{K}\right)-R_0\frac{SI}{K},
+\qquad
+\frac{dI}{dt}=R_0\frac{SI}{K}-I,
+$$
+
+from $S(0)=K-I_0$, $I(0)=I_0$. The first peak and following trough are
+identified by the downward and upward crossings, respectively, of
+$S=K/R_0$. If the first-trough infected count is at most one, $T_T$ is the
+post-peak downward crossing of $I=1$; otherwise $T_T$ is the first trough:
+
+$$
+T_T=
+\begin{cases}
+t_{\downarrow,I=1}, & I(t_{\mathrm{trough}})\leq 1,\\
+t_{\mathrm{trough}}, & I(t_{\mathrm{trough}})>1.
+\end{cases}
+$$
+
+All event times are linearly interpolated between solver outputs, and the
+integration horizon is extended adaptively when needed. If no post-peak trough
+is found, the function returns `T_T=NA` with a clear status.
+
+Both closures use the same infected-load calculation
+
+$$
+\bar I_T=\frac{1}{T_T}\int_0^{T_T}I(t)\,dt.
+$$
+
+The $I=1$ boundary approximates stochastic fade-out; it is not literal
+deterministic extinction. The trough branch prevents a deterministic trajectory
+whose first trough remains above one from having an undefined duration.
+Susceptible population growth remains logistic, not linear demographic
+turnover, and all times are in disease generations.
+
+Run the comparison with:
+
+```bash
+Rscript fadeout/compare_transient_duration_methods.R
+```
+
+Outputs are saved under `output/transient_duration_methods/`, including the
+baseline trajectory and comparison table, three one-parameter-at-a-time PDF
+diagnostics, and an endpoint-type summary. Each OFAT PDF shows the old and
+hybrid $T_T$, the old and hybrid $\bar I_T$, the first-trough infected count,
+and the selected hybrid endpoint.
+No existing occupancy script uses this new closure by default.
+
+To run the same two-state occupancy comparison with the hybrid closure without
+overwriting the original outputs:
+
+```bash
+Rscript fadeout/compare_two_state_occupancy.R --hybrid-duration
+```
 
 ### Initial-infection sensitivity of P1
 

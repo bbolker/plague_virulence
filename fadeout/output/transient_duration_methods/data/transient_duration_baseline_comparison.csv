@@ -1,0 +1,3 @@
+"method","endpoint_type","T_T","integral_I","Ibar_T","I_peak","time_of_I_peak","endpoint_found","time_of_first_trough","I_first_trough"
+"old_half_Tosc","half_Tosc",7.77931962402032,8863.51312198428,1139.36867880017,2556.5066614152,4.95,TRUE,21.0822175525708,4.16041970502662
+"I1_or_first_trough","first_trough",21.0822175525708,10161.2200825715,481.980610305031,2556.50283440887,4.95060466857504,TRUE,21.0822175525708,4.16041970502662
