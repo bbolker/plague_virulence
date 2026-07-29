@@ -4,6 +4,9 @@ This directory contains the non-seasonal single-strain patch-occupancy
 workflow, its analytical approximations, and older related fadeout scripts.
 Occupancy means `I > 0` unless explicitly described as established occupancy.
 
+The separate exploratory logistic boundary-layer burnout approximation is
+documented in [`logistic_burnout/README.md`](logistic_burnout/README.md).
+
 The current occupancy analyses vary one of `R0`, `K`, `alpha`, or `r` at a
 time, with all other parameters held at their baseline values. Figures are
 saved as PDF. Run commands from the repository root.
