@@ -31,8 +31,13 @@ dir.create(figdir, recursive = TRUE, showWarnings = FALSE)
 
 grid_file <- file.path(datadir, "extinction_Tosc_grid.csv")
 regression_file <- file.path(datadir, "extinction_Tosc_regression.csv")
+regression_by_r_file <- file.path(
+  datadir, "extinction_Tosc_regression_by_r.csv"
+)
 ratio_file <- file.path(datadir, "extinction_Tosc_ratio_summary.csv")
-main_figure <- file.path(figdir, "extinction_time_vs_Tosc_loglog.pdf")
+main_figure <- file.path(
+  figdir, "extinction_time_vs_Tosc_by_r_regressions.pdf"
+)
 ratio_figure <- file.path(figdir, "extinction_Tosc_ratio.pdf")
 
 required_files <- c(input_file, run_script, summary_script, two_state_script)
@@ -306,6 +311,28 @@ facet_levels <- as.character(expected_r)
 plot_data <- valid |>
   mutate(r_facet = factor(as.character(r), levels = facet_levels))
 
+## Fit each r stratum separately. The faceted figure is intended to show
+## within-r relationships, so repeating the pooled regression in every panel
+## would incorrectly suggest that its R-squared applies to each stratum.
+per_r_fits <- lapply(split(plot_data, plot_data$r_facet), function(z) {
+  fit_r <- lm(log10_mean_T_ext ~ log10_T_osc, data = z)
+  sm_r <- summary(fit_r)
+  ci_r <- confint(fit_r, level = 0.95)
+  data.frame(
+    r = z$r[1],
+    intercept = coef(fit_r)[["(Intercept)"]],
+    slope = coef(fit_r)[["log10_T_osc"]],
+    slope_conf_low = ci_r["log10_T_osc", 1],
+    slope_conf_high = ci_r["log10_T_osc", 2],
+    r_squared = sm_r$r.squared,
+    adjusted_r_squared = sm_r$adj.r.squared,
+    residual_standard_error = sm_r$sigma,
+    n_grid_cells = nrow(z)
+  )
+})
+per_r_regression <- bind_rows(per_r_fits)
+write.csv(per_r_regression, regression_by_r_file, row.names = FALSE)
+
 x_range <- range(valid$T_osc)
 x_values <- 10^seq(log10(x_range[1]), log10(x_range[2]), length.out = 200)
 reference_data <- expand.grid(
@@ -320,14 +347,36 @@ reference_data <- expand.grid(
       levels = c("c = 0.25", "c = 0.5", "c = 1", "c = 2")
     )
   )
-regression_data <- expand.grid(
-  T_osc = x_values,
-  r_facet = factor(facet_levels, levels = facet_levels)
-) |>
-  mutate(
+regression_data <- bind_rows(lapply(split(plot_data, plot_data$r_facet),
+                                    function(z) {
+  fit_r <- lm(log10_mean_T_ext ~ log10_T_osc, data = z)
+  xr <- 10^seq(log10(min(z$T_osc)), log10(max(z$T_osc)), length.out = 200)
+  data.frame(
+    T_osc = xr,
     mean_T_ext = 10^predict(
-      fit, newdata = data.frame(log10_T_osc = log10(T_osc))
-    )
+      fit_r, newdata = data.frame(log10_T_osc = log10(xr))
+    ),
+    r_facet = z$r_facet[1]
+  )
+}))
+
+regression_annotations <- per_r_regression |>
+  mutate(
+    r_facet = factor(as.character(r), levels = facet_levels),
+    label = sprintf("slope = %.3f\nR^2 = %.3f; n = %d",
+                    slope, r_squared, n_grid_cells)
+  ) |>
+  left_join(
+    plot_data |>
+      group_by(r_facet) |>
+      summarise(
+        label_x = max(T_osc) / 1.04,
+        label_y = min(
+          plot_data$mean_T_ext, 0.25 * plot_data$T_osc
+        ) * 1.08,
+        .groups = "drop"
+      ),
+    by = "r_facet"
   )
 
 reference_colours <- c(
@@ -348,6 +397,12 @@ p_main <- ggplot(plot_data, aes(T_osc, mean_T_ext)) +
     data = regression_data,
     colour = "black", linewidth = 0.9, linetype = "dashed"
   ) +
+  geom_label(
+    data = regression_annotations,
+    aes(x = label_x, y = label_y, label = label),
+    inherit.aes = FALSE, hjust = 1, vjust = 0, size = 3.0,
+    fill = "white", alpha = 0.85, linewidth = 0
+  ) +
   geom_point(aes(fill = log10K), shape = 21, size = 1.7, alpha = 0.62,
              colour = "black", stroke = 0.12) +
   facet_wrap(
@@ -365,7 +420,7 @@ p_main <- ggplot(plot_data, aes(T_osc, mean_T_ext)) +
     title = "Conditional mean extinction time versus deterministic oscillation period",
     subtitle = paste0(
       "Each point is one R0-K-r grid cell; K is not included in the regression\n",
-      "Dashed black line: overall unweighted log-log regression; T_osc < 50"
+      "Dashed black lines and annotations: separate unweighted log-log regressions within each r; T_osc < 50"
     ),
     caption = paste0(
       "T_osc depends on R0 and r under the current two-state formula, not K; ",

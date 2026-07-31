@@ -313,15 +313,19 @@ $R_0\times K\times r$ stochastic grid. A period is defined only when the
 quantity under the square root is positive. The current formula depends on
 $R_0$ and $r$, not $K$, so all 13 $K$ values at fixed $R_0,r$ have the same
 $T_{\mathrm{osc}}$ and remain as separate vertically aligned points. The first
-regression is an unweighted fit of
+regression model is
 
 $$
 \log_{10}\!\left(\overline T_{\mathrm{ext}}\right)
 =a+b\log_{10}\!\left(T_{\mathrm{osc}}\right)
 $$
 
-over all valid grid cells; $K$ is shown by point colour but is not included as
-a predictor or averaged out. The regression and figures are restricted to
+The faceted figure fits this model separately within each value of $r$ and
+prints the corresponding slope, $R^2$, and sample size in each panel. The
+pooled fit across all $r$ values is retained only as a separate overall
+diagnostic in the original regression CSV. In both cases, $K$ is shown by
+point colour but is not included as a predictor or averaged out. The
+regressions and figures are restricted to
 $0<T_{\mathrm{osc}}<50$ disease generations. Longer periods are not used
 because extinction is observed only through `t_max=200`, so their conditional
 mean extinction times are especially vulnerable to finite-window selection.
@@ -344,8 +348,8 @@ separate early fizzles from post-outbreak burnout, which is especially
 important near $R_0=1$.
 
 Outputs are under `output/extinction_Tosc_relationship/`: the full 2600-row
-cleaned grid, regression and ratio-summary CSV files, and two PDF figures in
-the `figures/` subdirectory.
+cleaned grid, pooled and per-$r$ regression CSV files, the ratio-summary CSV,
+and two PDF figures in the `figures/` subdirectory.
 
 ## One-patch extinction: one parameter at a time
 
