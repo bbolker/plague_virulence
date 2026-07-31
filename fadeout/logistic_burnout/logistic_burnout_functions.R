@@ -404,3 +404,147 @@ simulate_logistic_lineage <- function(
     seed = seed, terminal_time = terminal_time
   )
 }
+
+## Find sequential post-peak downward y=y_star boundary entries.
+find_all_logistic_boundary_entries <- function(
+    trajectory, R0, r, K, max_troughs = 5L, tolerance = 1e-8) {
+  eq <- logistic_endemic_equilibrium(R0, r, K)
+  if (!is.data.frame(trajectory) ||
+      any(!c("time", "S", "I", "x", "y") %in% names(trajectory))) {
+    stop("trajectory must contain time, S, I, x, and y")
+  }
+  if (max_troughs < 1) stop("max_troughs must be positive")
+  empty <- data.frame(
+    trough_index=integer(), t_peak=numeric(), I_peak=numeric(),
+    y_peak=numeric(), t_in=numeric(), x_in=numeric(), y_in=numeric(),
+    S_in=numeric(), I_in=numeric(), y_BL=numeric(), I_BL=numeric(),
+    dy_dt_in=numeric(), peak_above_boundary=logical(),
+    entry_found=logical(), status=character()
+  )
+  peak_idx <- which(head(trajectory$x,-1)>eq$x_star &
+                      tail(trajectory$x,-1)<=eq$x_star)
+  if (!length(peak_idx)) {
+    attr(empty,"search_status") <- "no_epidemic_peak"
+    return(empty)
+  }
+  entry_idx <- which(head(trajectory$y,-1)>eq$y_star &
+                       tail(trajectory$y,-1)<=eq$y_star)
+  rows <- list(); used_entry <- 0L; search_status <- "horizon_incomplete"
+  for (k in seq_along(peak_idx)) {
+    peak <- .interpolate_crossing(trajectory,peak_idx[k],"x",eq$x_star)
+    peak_above <- peak$y > eq$y_star + tolerance*max(1,eq$y_star)
+    if (!peak_above) { search_status <- "peak_below_boundary"; break }
+    next_peak <- if (k<length(peak_idx)) peak_idx[k+1L] else Inf
+    candidates <- entry_idx[entry_idx>=peak_idx[k] &
+                              entry_idx<next_peak & entry_idx>used_entry]
+    if (!length(candidates)) {
+      search_status <- if (is.finite(next_peak))
+        "no_further_macroscopic_wave" else "horizon_incomplete"
+      break
+    }
+    eidx <- candidates[1L]
+    entry <- .interpolate_crossing(trajectory,eidx,"y",eq$y_star)
+    dy <- (R0*entry$x-1)*entry$y
+    valid <- entry$time>peak$time && dy<0 &&
+      abs(entry$y-eq$y_star)<=tolerance*max(1,eq$y_star)
+    if (!valid) { search_status <- "invalid_interpolated_entry"; break }
+    rows[[length(rows)+1L]] <- data.frame(
+      trough_index=length(rows)+1L,t_peak=peak$time,I_peak=peak$I,
+      y_peak=peak$y,t_in=entry$time,x_in=entry$x,y_in=entry$y,
+      S_in=entry$S,I_in=entry$I,y_BL=eq$y_star,I_BL=K*eq$y_star,
+      dy_dt_in=dy,peak_above_boundary=peak_above,
+      entry_found=TRUE,status="success"
+    )
+    used_entry <- eidx
+    if (length(rows)>=max_troughs) {search_status<-"requested_troughs_found";break}
+  }
+  ans <- if(length(rows)) do.call(rbind,rows) else empty
+  attr(ans,"search_status") <- search_status
+  ans
+}
+
+## Adaptively extend one deterministic trajectory until troughs are resolved.
+solve_logistic_SI_until_troughs <- function(
+    R0,r,K,I0=1,max_troughs=5L,initial_tmax=100,
+    maximum_tmax=5000,dt=0.02,equilibrium_tolerance=1e-8,
+    rtol=1e-9,atol=1e-11) {
+  horizon <- initial_tmax; trajectory <- NULL; entries <- NULL
+  repeat {
+    trajectory <- solve_logistic_SI(R0,r,K,I0,horizon,dt,rtol,atol)
+    entries <- find_all_logistic_boundary_entries(
+      trajectory,R0,r,K,max_troughs,equilibrium_tolerance)
+    status <- attr(entries,"search_status")
+    if (nrow(entries)>=max_troughs) break
+    eq <- logistic_endemic_equilibrium(R0,r,K)
+    tail_n <- min(100L,nrow(trajectory))
+    near_eq <- max(abs(tail(trajectory$x,tail_n)-eq$x_star),
+                   abs(tail(trajectory$y,tail_n)-eq$y_star)) <
+      equilibrium_tolerance
+    if (status %in% c("peak_below_boundary","no_further_macroscopic_wave") ||
+        near_eq || horizon>=maximum_tmax) {
+      status <- if (near_eq) "converged_without_further_macroscopic_wave"
+        else if(horizon>=maximum_tmax && status=="horizon_incomplete")
+          "maximum_horizon_reached" else status
+      break
+    }
+    horizon <- min(maximum_tmax,2*horizon)
+  }
+  list(trajectory=trajectory,entries=entries,deterministic_converged=TRUE,
+       requested_troughs=max_troughs,troughs_found=nrow(entries),
+       final_horizon=horizon,termination_status=status)
+}
+
+## Calculate conditional and cumulative probabilities for sequential troughs.
+logistic_multitrough_probabilities <- function(
+    R0,r,K,I0=1,max_troughs=5L,
+    lineage_count_method=c("round","continuous","floor","ceiling"),
+    initial_tmax=100,maximum_tmax=5000,dt=0.02,rtol=1e-9,atol=1e-11,
+    rel.tol=1e-8,abs.tol=0,subdivisions=500L,keep_trajectory=FALSE) {
+  lineage_count_method <- match.arg(lineage_count_method)
+  sol <- solve_logistic_SI_until_troughs(
+    R0,r,K,I0,max_troughs,initial_tmax,maximum_tmax,dt,1e-8,rtol,atol)
+  tab <- sol$entries
+  if (nrow(tab)) {
+    m_raw <- tab$y_BL*K
+    m_used <- switch(lineage_count_method,
+      round=pmax(1,round(m_raw)),floor=pmax(1,floor(m_raw)),
+      ceiling=pmax(1,ceiling(m_raw)),continuous=m_raw)
+    ints <- lapply(tab$x_in,function(x) logistic_lineage_extinction_probability(
+      R0,r,x,rel.tol,abs.tol,subdivisions))
+    q <- vapply(ints,`[[`,numeric(1),"q1")
+    logQ <- m_used*log(q); Q <- exp(logQ)
+    P <- -expm1(logQ)
+    logP <- ifelse(P==0,-Inf,log(P))
+    logC <- cumsum(logP); C <- exp(logC)
+    Cprev <- c(1,head(C,-1)); E <- Cprev*Q
+    tab <- cbind(data.frame(R0=R0,r=r,K=K,I0=I0),tab,
+      m_raw=m_raw,m_used=m_used,lineage_count_method=lineage_count_method,
+      J=vapply(ints,`[[`,numeric(1),"J"),q_lineage=q,
+      log_Q_burnout=logQ,Q_burnout=Q,P_persistence=P,
+      log_P_persistence=logP,log_cumulative_persistence=logC,
+      cumulative_persistence=C,burnout_at_this_trough=E,
+      integration_converged=vapply(ints,`[[`,logical(1),"converged"),
+      entry_status=tab$status,
+      integration_message=vapply(ints,`[[`,character(1),"message"))
+    identity_error <- abs(sum(tab$burnout_at_this_trough)+
+                            tail(tab$cumulative_persistence,1)-1)
+    if(identity_error>1e-8) stop("Multi-trough probability identity failed")
+    old <- logistic_burnout_probability(
+      R0,r,K,I0,lineage_count_method,initial_tmax,maximum_tmax,dt,
+      rtol,atol,rel.tol,abs.tol,subdivisions)
+    ## Compare whenever the legacy wrapper found a valid first entry. For very
+    ## slow near-threshold epidemics the legacy wrapper can stop before the
+    ## first peak; the multi-trough adaptive solver may legitimately find it
+    ## after extending the horizon.
+    if(isTRUE(old$boundary_entry_found) &&
+       (!isTRUE(all.equal(tab$x_in[1],old$x_in,tolerance=2e-7)) ||
+        !isTRUE(all.equal(tab$q_lineage[1],old$q1,tolerance=2e-7)) ||
+        !isTRUE(all.equal(tab$Q_burnout[1],old$P_burnout,tolerance=2e-7))))
+      stop("First-trough backward-compatibility check failed")
+  }
+  list(R0=R0,r=r,K=K,I0=I0,requested_troughs=max_troughs,
+       troughs_found=nrow(tab),termination_status=sol$termination_status,
+       deterministic_converged=sol$deterministic_converged,
+       all_integrations_converged=if(nrow(tab))all(tab$integration_converged) else NA,
+       trough_table=tab,trajectory=if(keep_trajectory)sol$trajectory else NULL)
+}

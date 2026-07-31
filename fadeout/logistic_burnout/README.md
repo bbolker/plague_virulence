@@ -382,19 +382,106 @@ The deterministic $I_0=1$ trajectory is conditioned conceptually on following
 the major-outbreak path. Early stochastic extinction is absent from the ODE and
 from the plotted probability.
 
-## 11. Implementation and validation
+## 11. Extension to later epidemic troughs
+
+The same calculation can be repeated for successive deterministic epidemic
+waves. Let \(t_{\mathrm{peak},j}\) be the \(j\)th downward crossing of
+\(x=x^*=1/R_0\), and let \(t_{\mathrm{in},j}\) be the first subsequent
+downward crossing of \(y=y_{\mathrm{BL}}\) before the next epidemic peak.
+Each trough therefore has its own susceptible density
+
+$$
+x_{\mathrm{in},j}=x(t_{\mathrm{in},j}).
+$$
+
+The boundary-layer susceptible trajectory for trough \(j\) is
+
+$$
+x_j(u)=
+\frac{1}
+{1+\left(\frac{1-x_{\mathrm{in},j}}{x_{\mathrm{in},j}}\right)e^{-ru}},
+\qquad u\ge0.
+$$
+
+Using this trajectory in the same numerical Kendall integral gives \(J_j\)
+and the extinction probability of one lineage,
+
+$$
+q_j=\frac{J_j}{1+J_j}.
+$$
+
+With \(m=\max[1,\operatorname{round}(Ky_{\mathrm{BL}})]\) infected lineages at
+boundary entry, define
+
+$$
+Q_j=q_j^m
+$$
+
+as the probability of burnout at trough \(j\), conditional on infection
+having persisted to that trough. The corresponding conditional persistence
+probability is
+
+$$
+P_j=1-Q_j.
+$$
+
+These conditional probabilities must not be confused with cumulative
+persistence from the initial epidemic. The probability of reaching beyond
+trough \(j\) is
+
+$$
+C_j=\prod_{k=1}^j P_k,\qquad C_0=1,
+$$
+
+and the probability of burning out specifically at trough \(j\) is
+
+$$
+E_j=C_{j-1}Q_j.
+$$
+
+Consequently,
+
+$$
+\sum_{k=1}^j E_k+C_j=1.
+$$
+
+All of these quantities remain conditional on the deterministic trajectory
+having escaped early stochastic fizzle. Early establishment is not included.
+If the deterministic trajectory converges without producing a later
+macroscopic wave and boundary entry, the corresponding later \(P_j\), \(Q_j\),
+\(C_j\), and \(E_j\) are undefined and stored as missing, not imputed as zero
+or one.
+
+The first-trough calculation is backward compatible with the original wrapper
+whenever that wrapper finds a valid boundary entry. For very slow,
+near-threshold epidemics, the adaptive multi-trough solver can find a first
+peak after the original wrapper's maximum horizon; this is an extension of
+the search horizon rather than a change in the first-trough definition.
+
+## 12. Implementation and validation
 
 | File | Purpose |
 |---|---|
 | `logistic_burnout_functions.R` | Deterministic trajectory, interpolated boundary entry, logistic recovery, stable $H(t)$, Kendall integral, burnout wrapper, and exact thinning simulator. |
 | `validate_logistic_burnout.R` | Formula checks, integration convergence checks, and direct nonhomogeneous branching-process validation. |
 | `plot_burnout_surface.R` | Generates the $R_0$-$r$ burnout surface and boundary-entry diagnostic. |
+| `validate_multitrough_burnout.R` | Checks trough ordering, probability identities, monotonic recovery, and first-trough compatibility for representative cases. |
+| `plot_multitrough_surfaces.R` | Computes the 41 by 41 multi-trough grid and plots conditional persistence through trough 5. Use `--recompute` to replace its cached grid. |
 | `outputs/validation_results.csv` | Detailed results of all validation checks. |
 | `outputs/logistic_burnout_R0_r_grid.csv` | Complete 41 by 41 parameter grid, including failures and integration diagnostics. |
 | `outputs/logistic_burnout_status_summary.csv` | Counts of successful and failed grid cells. |
+| `outputs/multitrough_validation_results.csv` | Representative multi-trough validation results. |
+| `outputs/logistic_multitrough_R0_r_grid.csv` | Long-format \(P_j,Q_j,C_j,E_j\) results through trough 5. |
+| `outputs/logistic_multitrough_status_summary.csv` | Number of grid cells reaching each deterministic trough and each termination status. |
 | `figures/validation_q1.png` | Analytical $q_1$ versus thinning simulation. |
 | `figures/logistic_burnout_R0_r_heatmap.{png,pdf}` | Main post-epidemic burnout surface. |
 | `figures/logistic_boundary_xin_heatmap.{png,pdf}` | Diagnostic surface for $x_{\mathrm{in}}$. |
+| `figures/logistic_Pj_R0_r_facets.{png,pdf}` | Main comparison of conditional persistence \(P_1,\ldots,P_5\). |
+| `figures/logistic_P1_R0_r_heatmap.{png,pdf}` | First-trough conditional persistence. |
+| `figures/logistic_P2_R0_r_heatmap.{png,pdf}` | Second-trough conditional persistence. |
+| `figures/logistic_P3_R0_r_heatmap.{png,pdf}` | Third-trough conditional persistence. |
+| `figures/logistic_log10_Qj_R0_r_facets.{png,pdf}` | Burnout probability on a log scale, retaining differences near \(P_j=1\). |
+| `figures/logistic_Pj_by_trough_selected_R0.{png,pdf}` | \(P_j\) by trough for selected \(R_0\) values across \(r\). |
 
 The validation suite compares the explicit logistic recovery with numerical
 ODE solutions, compares $H(t)$ with direct quadrature, tightens the improper
@@ -405,7 +492,7 @@ a homogeneous Gillespie approximation. Surviving lineages are followed until
 $I=300$ or 500 disease generations. This validates the boundary-layer
 birth-death calculation, not the full stochastic logistic S-I approximation.
 
-## 12. Current exploratory surface
+## 13. Current exploratory surfaces
 
 The current grid fixes
 
@@ -439,6 +526,20 @@ Agreement with the boundary-layer branching simulation does not establish that
 the boundary scale $y_{\mathrm{BL}}=y^*$ is asymptotically correct or that the
 approximation agrees with full stochastic logistic S-I simulations.
 
+For the multi-trough extension, valid conditional persistence estimates are
+available at 1656, 1649, 1630, 1612, and 1589 grid cells for troughs 1 through
+5, respectively. The reduced counts at later troughs reflect trajectories that
+converge or cease to cross the boundary, not numerical substitutions.
+
+Conditional persistence is nondecreasing from one trough to the next at every
+grid cell where both values are defined. Later-trough persistence is often
+close to one, but not uniformly so. At trough 2, 385 of 1649 defined cells have
+\(P_2<0.9\); at trough 3, 260 of 1630 have \(P_3<0.9\). These exceptions are
+concentrated at slow host recovery (especially small \(r\)) and moderate to
+large \(R_0\), where deterministic oscillations remain deep for several waves.
+Thus the later-trough extension cannot generally be replaced by the assertion
+that all persistence after the first trough is certain.
+
 ## Reproducibility
 
 Required R packages are `deSolve` and `ggplot2`.
@@ -448,6 +549,8 @@ From the repository root:
 ```bash
 Rscript fadeout/logistic_burnout/validate_logistic_burnout.R
 Rscript fadeout/logistic_burnout/plot_burnout_surface.R
+Rscript fadeout/logistic_burnout/validate_multitrough_burnout.R
+Rscript fadeout/logistic_burnout/plot_multitrough_surfaces.R --recompute
 ```
 
 To load only the functions:

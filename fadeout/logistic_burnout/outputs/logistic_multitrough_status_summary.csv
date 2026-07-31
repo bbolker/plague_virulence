@@ -1,0 +1,10 @@
+"troughs_found","termination_status","n_grid_cells"
+0,"converged_without_further_macroscopic_wave",25
+1,"converged_without_further_macroscopic_wave",7
+2,"converged_without_further_macroscopic_wave",17
+3,"converged_without_further_macroscopic_wave",17
+4,"converged_without_further_macroscopic_wave",22
+2,"peak_below_boundary",2
+3,"peak_below_boundary",1
+4,"peak_below_boundary",1
+5,"requested_troughs_found",1589

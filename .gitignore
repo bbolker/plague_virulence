@@ -10,6 +10,10 @@
 # Keep generated fadeout analysis figures (this workflow uses output/, singular)
 !fadeout/output/**/*.pdf
 
+# Keep the documented logistic-burnout figures
+!fadeout/logistic_burnout/figures/*.png
+!fadeout/logistic_burnout/figures/*.pdf
+
 # ignore .claude directories anywhere (including root)
 .claude/
 
