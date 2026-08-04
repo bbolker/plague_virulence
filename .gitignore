@@ -13,6 +13,8 @@
 # Keep the documented logistic-burnout figures
 !fadeout/logistic_burnout/figures/*.png
 !fadeout/logistic_burnout/figures/*.pdf
+!fadeout/logistic_burnout/stochastic_validation/figures/*.png
+!fadeout/logistic_burnout/stochastic_validation/figures/*.pdf
 
 # ignore .claude directories anywhere (including root)
 .claude/

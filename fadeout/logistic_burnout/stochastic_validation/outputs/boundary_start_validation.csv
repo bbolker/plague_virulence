@@ -1,0 +1,8 @@
+"R0","r","K","I0","x_in","y_star","m_raw","m_used","n_sim","n_extinction","n_boundary_exit","n_unresolved","Q_boundary_start_sim","Q_boundary_start_se","Q_boundary_start_ci_low","Q_boundary_start_ci_high","Q_approx","error","abs_error","engine","dt","seed","tmax","analytical_status"
+1.02,0.1,1000,1,NA,0.00192233756247597,1.92233756247597,2,1000,0,0,1000,NA,NA,NA,NA,NA,NA,NA,"tau_leap",0.02,20723828,200,"no_epidemic_peak"
+1.02518,0.1,1000,1,NA,0.00239582711449847,2.39582711449847,2,1000,0,0,1000,NA,NA,NA,NA,NA,NA,NA,"tau_leap",0.02,20725395,200,"no_epidemic_peak"
+1.0317,0.1,1000,1,NA,0.00297819000061152,2.97819000061152,3,1000,0,0,1000,NA,NA,NA,NA,NA,NA,NA,"tau_leap",0.02,20727364,200,"no_epidemic_peak"
+1.03992,0.1,1000,1,NA,0.00369139628764545,3.69139628764545,4,1000,0,0,1000,NA,NA,NA,NA,NA,NA,NA,"tau_leap",0.02,20729843,200,"no_epidemic_peak"
+1.05,0.1,1000,1,NA,0.00453514739229025,4.53514739229025,5,1000,0,0,1000,NA,NA,NA,NA,NA,NA,NA,"tau_leap",0.02,20732880,200,"no_epidemic_peak"
+1.05026,0.1,1000,1,NA,0.00455647334017113,4.55647334017113,5,1000,0,0,1000,NA,NA,NA,NA,NA,NA,NA,"tau_leap",0.02,20732971,200,"no_epidemic_peak"
+1.06328,0.1,1000,1,NA,0.00559720457573554,5.59720457573555,6,1000,0,0,1000,NA,NA,NA,NA,NA,NA,NA,"tau_leap",0.02,20736890,200,"no_epidemic_peak"

@@ -467,6 +467,7 @@ the search horizon rather than a change in the first-trough definition.
 | `plot_burnout_surface.R` | Generates the $R_0$-$r$ burnout surface and boundary-entry diagnostic. |
 | `validate_multitrough_burnout.R` | Checks trough ordering, probability identities, monotonic recovery, and first-trough compatibility for representative cases. |
 | `plot_multitrough_surfaces.R` | Computes the 41 by 41 multi-trough grid and plots conditional persistence through trough 5. Use `--recompute` to replace its cached grid. |
+| `stochastic_validation/` | Full stochastic single-patch validation of the first-trough approximation, including tau-leap, boundary-start, and Gillespie checks. |
 | `outputs/validation_results.csv` | Detailed results of all validation checks. |
 | `outputs/logistic_burnout_R0_r_grid.csv` | Complete 41 by 41 parameter grid, including failures and integration diagnostics. |
 | `outputs/logistic_burnout_status_summary.csv` | Counts of successful and failed grid cells. |

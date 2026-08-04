@@ -1,0 +1,2 @@
+"mode","engine","dt","delta","cells_completed","total_realizations","unresolved_fraction_max","late_extinction_fraction_max","mean_abs_error_unconditional","max_abs_error_unconditional","git_sha"
+"main","tau_leap",0.02,1e-06,124,620000,0.052,0.3454,0.0445867250487689,0.149296242882425,"47050abfce788214ba6213964062ba0a07f65b02"
