@@ -16,8 +16,14 @@
 !fadeout/logistic_burnout/stochastic_validation/figures/*.png
 !fadeout/logistic_burnout/stochastic_validation/figures/*.pdf
 
+# Raw stochastic-validation simulation output: local-only, not published
+fadeout/logistic_burnout/stochastic_validation/outputs/
+
 # ignore .claude directories anywhere (including root)
 .claude/
+
+# local AI assistant instructions, not for the public repo
+/CLAUDE.md
 
 *~
 \#*

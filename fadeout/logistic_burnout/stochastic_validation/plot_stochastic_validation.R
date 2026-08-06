@@ -98,6 +98,59 @@ main_plot <- ggplot2::ggplot(
   theme_validation()
 save_plot(main_plot, "validation_unconditional_probability_scale_legend")
 
+cond_plot <- ggplot2::ggplot(
+  main_r, ggplot2::aes(R0_minus_1, P_cond_sim_established)
+) +
+  ggplot2::geom_line(ggplot2::aes(
+    y = P_cond_approx,
+    colour = "Analytical approximation (round m)"
+  ), linewidth = 0.7) +
+  ggplot2::geom_line(ggplot2::aes(
+    y = P_cond_approx_continuous,
+    colour = "Analytical approximation (continuous m)"
+  ), linewidth = 0.5, linetype = "22") +
+  ggplot2::geom_errorbar(
+    ggplot2::aes(ymin = P_cond_sim_established_ci_low,
+                 ymax = P_cond_sim_established_ci_high),
+    width = 0
+  ) +
+  ggplot2::geom_point(
+    ggplot2::aes(colour = "Stochastic simulation"),
+    size = 1.8
+  ) +
+  ggplot2::scale_colour_manual(
+    name = NULL,
+    values = c(
+      "Stochastic simulation" = "#2c7fb8",
+      "Analytical approximation (round m)" = "black",
+      "Analytical approximation (continuous m)" = "#d95f02"
+    ),
+    breaks = c(
+      "Stochastic simulation",
+      "Analytical approximation (round m)",
+      "Analytical approximation (continuous m)"
+    )
+  ) +
+  ggplot2::facet_wrap(~K_factor) +
+  ggplot2::scale_x_log10() +
+  ggplot2::coord_cartesian(ylim = c(0, 1)) +
+  ggplot2::labs(
+    x = "R0 - 1 (log scale)",
+    y = "Persistence probability, conditional on not fizzling",
+    title = "Stochastic validation conditional on escaping early fizzle",
+    subtitle = "Non-seasonal single-patch logistic S-I model; r = 0.1; I0 = 1",
+    caption = paste(
+      "P_cond_sim_established = n_persistence / (n_total - n_fizzle).",
+      "Points and intervals are stochastic adaptive tau-leap estimates",
+      "with 95% Wilson Monte Carlo CI. The dashed orange curve uses the",
+      "unrounded m = K*y* directly as the exponent (Eq. 22/26/27 of",
+      "Parsons et al. 2024), instead of rounding m to the nearest integer",
+      "(solid black curve, the default used elsewhere in this repository)."
+    )
+  ) +
+  theme_validation()
+save_plot(cond_plot, "validation_conditional_probability_round_vs_continuous")
+
 if (!is.null(engine) && nrow(engine)) {
   engine$label <- ifelse(
     engine$engine == "tau_leap",

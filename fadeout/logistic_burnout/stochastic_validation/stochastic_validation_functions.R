@@ -74,10 +74,21 @@ tau_delta <- function(R0, I0 = 1, delta = 1e-6) {
   log(numerator / denominator) / (R0 - 1)
 }
 
-analytical_validation_quantities <- function(R0, r, K, I0 = 1) {
+## lineage_count_method controls only which m is used for the *primary*
+## columns (m_used, Q_approx, P_cond_approx, P_uncond_approx), which in turn
+## set I_BL for the stochastic simulation engines (I_BL must be an integer,
+## since it counts actual infected individuals in the simulated process).
+## The "_continuous" columns always report the unrounded-m analytical curve
+## (m_raw used directly as an exponent, matching Parsons et al.'s q(x_in)^{ny*}
+## with no rounding) so both variants can be compared against the same
+## simulated points without rerunning the simulation.
+analytical_validation_quantities <- function(
+    R0, r, K, I0 = 1,
+    lineage_count_method = c("round", "floor", "ceiling", "continuous")) {
+  lineage_count_method <- match.arg(lineage_count_method)
   ans <- logistic_burnout_probability(
     R0 = R0, r = r, K = K, I0 = I0,
-    lineage_count_method = "round",
+    lineage_count_method = lineage_count_method,
     initial_tmax = 50, maximum_tmax = 1600, dt = 0.02,
     rtol = 1e-9, atol = 1e-11,
     rel.tol = 1e-8, subdivisions = 500
@@ -88,8 +99,24 @@ analytical_validation_quantities <- function(R0, r, K, I0 = 1) {
   P_uncond <- p_est * P_cond
   m_used <- ans$m_used
   if (!is.finite(m_used)) {
-    m_used <- max(1, round(ans$m_raw))
+    m_used <- switch(
+      lineage_count_method,
+      round = max(1, round(ans$m_raw)),
+      floor = max(1, floor(ans$m_raw)),
+      ceiling = max(1, ceiling(ans$m_raw)),
+      continuous = ans$m_raw
+    )
   }
+
+  ## Unrounded (continuous-m) companion curve, following Eq. 22/26/27 of
+  ## Parsons et al. (2024), which use n*y_star directly as a real-valued
+  ## exponent with no rounding step.
+  q1 <- ans$q1
+  m_raw <- ans$m_raw
+  Q_cont <- if (is.finite(q1) && is.finite(m_raw)) q1^m_raw else NA_real_
+  P_cond_cont <- if (is.finite(Q_cont)) 1 - Q_cont else NA_real_
+  P_uncond_cont <- if (is.finite(P_cond_cont)) p_est * P_cond_cont else NA_real_
+
   data.frame(
     x_in = ans$x_in,
     y_star = ans$y_star,
@@ -100,6 +127,10 @@ analytical_validation_quantities <- function(R0, r, K, I0 = 1) {
     P_cond_approx = P_cond,
     p_est_approx = p_est,
     P_uncond_approx = P_uncond,
+    Q_approx_continuous = Q_cont,
+    P_cond_approx_continuous = P_cond_cont,
+    P_uncond_approx_continuous = P_uncond_cont,
+    lineage_count_method = lineage_count_method,
     analytical_status = ans$status,
     boundary_entry_found = ans$boundary_entry_found,
     integration_converged = ans$integration_converged,
@@ -644,6 +675,9 @@ make_full_summary <- function(status, n_total, R0, r, K, I0, delta, td, seed,
     P_cond_approx = analytical$P_cond_approx,
     p_est_approx = analytical$p_est_approx,
     P_uncond_approx = analytical$P_uncond_approx,
+    Q_approx_continuous = analytical$Q_approx_continuous,
+    P_cond_approx_continuous = analytical$P_cond_approx_continuous,
+    P_uncond_approx_continuous = analytical$P_uncond_approx_continuous,
     error_unconditional = ci_uncond[["estimate"]] - analytical$P_uncond_approx,
     abs_error_unconditional = abs(ci_uncond[["estimate"]] - analytical$P_uncond_approx),
     error_conditional_established = ci_cond_est[["estimate"]] - analytical$P_cond_approx,

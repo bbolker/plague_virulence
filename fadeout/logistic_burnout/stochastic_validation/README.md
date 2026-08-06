@@ -177,6 +177,7 @@ simulation counts.
 | `outputs/validation_status_summary.csv` | Completed-cell and error summary. |
 | `outputs/smoke_test_results.csv` | Smoke-test full simulation results. |
 | `figures/validation_unconditional_probability_scale_legend.{png,pdf}` | Fig.-4-style unconditional persistence comparison, with explicit legend. |
+| `figures/validation_conditional_probability_round_vs_continuous.{png,pdf}` | Persistence conditional on escaping fizzle (`P_cond_sim_established` vs. `P_cond_approx`), with the rounded-`m` and continuous-`m` analytical curves overlaid. |
 | `figures/validation_simulator_sensitivity.{png,pdf}` | Tau-leap and Gillespie comparison. |
 
 Additional CSV outputs retain conditional, boundary-start, error, and
@@ -207,6 +208,82 @@ uses deterministic \(x_{\mathrm{in}}\) and neglects susceptible stochasticity
 inside the boundary layer. Near \(R_0=1\), the distinction among fizzle, a
 major epidemic, and burnout is weak. Small \(Ky^*\) is expected to reduce
 accuracy. Finite simulations cannot resolve arbitrarily small probabilities.
+
+Two follow-up checks (not in the original committed run) narrow down where
+the small-\(K\)/high-\(R_0\) discrepancy comes from:
+
+- **Rounding \(m=Ky^*\) to an integer is not the cause.** `analytical_validation_quantities()`
+  now also returns a continuous-\(m\) analytical curve (\(q_1^{m_{\mathrm{raw}}}\),
+  matching Eq. 22/26/27 of Parsons et al. 2024, which do not round), stored in
+  `Q_approx_continuous`/`P_cond_approx_continuous`/`P_uncond_approx_continuous`
+  and plotted in `validation_conditional_probability_round_vs_continuous`. The
+  rounded and continuous curves are visually indistinguishable at every \(K\)
+  tested; the discrepancy with simulation must come from elsewhere (most
+  likely the neglected susceptible-recovery stochasticity noted above).
+- **The plotted conditional-persistence curve pins the discrepancy to the
+  post-peak, high-\(R_0\) transition specifically** (roughly \(R_0>2\)), not to
+  the fizzle-dominated low-\(R_0\) region or the near-1 plateau, both of which
+  match simulation closely once fizzle-escape uncertainty (wide CIs from small
+  samples) is accounted for.
+- Near \(R_0=1\), a nontrivial fraction of full-trajectory simulations end the
+  run still classified `unresolved` rather than `persistence`/`fizzle`,
+  because near-critical growth from \(I_0=1\) can take
+  \(\sim\!\ln(K)/(R_0-1)\) disease generations to reach the boundary-layer
+  scale — longer than `tmax=200` for \(R_0\) within roughly \(\ln(K)/t_{\max}\)
+  of 1. This inflates the apparent gap between simulated and reference
+  unconditional persistence right at the left edge of each panel; it is a
+  simulation-horizon artifact, not a tau-leap step-size (`dt`) error. Rerunning
+  the affected cells (\(R_0\lesssim1.06\) at \(K=10{,}000\) and \(30{,}000\))
+  with \(t_{\max}\) set to roughly \(4\times\ln(K)/(R_0-1)\) reduces the
+  maximum unresolved fraction across the whole grid from 0.052 to 0.0016.
+- Separately, the deterministic ODE used to locate the epidemic peak can be
+  genuinely **overdamped** rather than merely slow when \(R_0\) is close
+  enough to 1 (specifically when \(r(R_0-1) < r^2R_0^2/4\), the same
+  discriminant as the \(T_{\mathrm{osc}}\) closure elsewhere in this
+  repository): \(x(t)\) then approaches \(x_*\) monotonically and never
+  crosses it, however long the ODE is integrated (checked out to \(t=25{,}600\)
+  for \(R_0=1.02\), \(K\in\{1000,30000\}\)). `logistic_burnout_probability()`'s
+  analytical curve is therefore undefined there for a structural reason, not
+  merely a short integration horizon — extending `initial_tmax`/`maximum_tmax`
+  recovers the analytical curve only for cells above this overdamped threshold
+  (confirmed for \(R_0=1.05\), where the peak appears once the horizon reaches
+  ~200 generations, since the current retry loop only re-extends the horizon
+  when a peak was found but no post-peak crossing was, not when no peak was
+  found at all).
+- With the unresolved-fraction artifact removed, unconditional persistence in
+  the fully resolved near-\(R_0=1\) simulations still comes in systematically
+  **below** the early-establishment reference \(p_{\mathrm{est}}=1-(1/R_0)^{I_0}\)
+  (e.g. 0.0010 vs. 0.0196 at \(R_0=1.02\), \(K=30{,}000\); 0.0426 vs. 0.0476 at
+  \(R_0=1.05\); gap shrinking quickly as \(R_0\) moves away from 1). This is
+  consistent with \(p_{\mathrm{est}}\) implicitly assuming a permanently
+  supercritical branching environment at the DFE, whereas \(x(t)\) actually
+  drifts down toward \(x_*\) (and, in the overdamped regime, never back up),
+  so the effective local reproduction number \(R_0x(t)\) relaxes toward
+  exactly 1 — a genuinely critical, not supercritical, branching process,
+  which is null-recurrent (extinguishes with probability 1 given enough time).
+  \(p_{\mathrm{est}}\) is therefore an overestimate of true escape probability
+  near \(R_0=1\), not just an approximation with unmodelled noise.
+- **The genuinely-\(0\)-looking simulated points at small \(K\) (e.g.
+  \(K=1000\), \(R_0\lesssim1.1\)) are real, resolved results, not an
+  artifact** — but they reveal that comparing against the *first-trough-only*
+  analytical curve (what this module validates) is the wrong comparison at
+  small \(K\), not that the simulator is broken. E.g. at \(K=1000\),
+  \(R_0=1.1\): \(m_{\mathrm{used}}=8\) is small enough that each boundary-layer
+  encounter only has \(\approx35\%\) conditional persistence probability
+  (`logistic_multitrough_probabilities()`), and successive encounters recur
+  roughly every 75 generations; cumulative persistence through 4 troughs
+  drops to 0.016, vs. 0.346 after the first trough alone — a 20-fold gap
+  documented in `../validate_multitrough_burnout.R`'s own output, not
+  discovered here for the first time. The single-trough
+  \(P_{\mathrm{uncond,approx}}=0.0315\) reported by this module's
+  `analytical_validation_quantities()` is the *first-trough* quantity; the
+  simulation (which runs until true extinction or `tmax`, i.e. implicitly
+  through as many troughs as occur) is closer to the multi-trough cumulative
+  quantity. This module does not yet compare against the multi-trough
+  cumulative persistence — doing so would likely close most of the apparent
+  small-\(K\) gap and is a natural extension (`logistic_multitrough_probabilities()`
+  already exists in `../logistic_burnout_functions.R`; it would need wiring
+  into `analytical_validation_quantities()`/the plotting scripts here).
 
 ## Generated results
 
