@@ -264,26 +264,97 @@ the small-\(K\)/high-\(R_0\) discrepancy comes from:
   \(p_{\mathrm{est}}\) is therefore an overestimate of true escape probability
   near \(R_0=1\), not just an approximation with unmodelled noise.
 - **The genuinely-\(0\)-looking simulated points at small \(K\) (e.g.
-  \(K=1000\), \(R_0\lesssim1.1\)) are real, resolved results, not an
-  artifact** — but they reveal that comparing against the *first-trough-only*
-  analytical curve (what this module validates) is the wrong comparison at
-  small \(K\), not that the simulator is broken. E.g. at \(K=1000\),
-  \(R_0=1.1\): \(m_{\mathrm{used}}=8\) is small enough that each boundary-layer
-  encounter only has \(\approx35\%\) conditional persistence probability
-  (`logistic_multitrough_probabilities()`), and successive encounters recur
-  roughly every 75 generations; cumulative persistence through 4 troughs
-  drops to 0.016, vs. 0.346 after the first trough alone — a 20-fold gap
-  documented in `../validate_multitrough_burnout.R`'s own output, not
-  discovered here for the first time. The single-trough
-  \(P_{\mathrm{uncond,approx}}=0.0315\) reported by this module's
-  `analytical_validation_quantities()` is the *first-trough* quantity; the
-  simulation (which runs until true extinction or `tmax`, i.e. implicitly
-  through as many troughs as occur) is closer to the multi-trough cumulative
-  quantity. This module does not yet compare against the multi-trough
-  cumulative persistence — doing so would likely close most of the apparent
-  small-\(K\) gap and is a natural extension (`logistic_multitrough_probabilities()`
-  already exists in `../logistic_burnout_functions.R`; it would need wiring
-  into `analytical_validation_quantities()`/the plotting scripts here).
+  \(K=1000\), \(R_0=1.1\)) trace to a real classification bug, not a
+  multi-trough effect.** (An earlier version of this note attributed the gap
+  to needing to survive several successive troughs; that diagnosis was wrong
+  and is superseded by this bullet and the next.) `simulate_adaptive_tau_full()`
+  /`_one()` only start tracking `above_boundary` once `phase != "early"`, i.e.
+  once \(t\ge\tau_\delta\) (`tau_delta()`, Eq. 76 of Parsons et al. 2024). But
+  \(\tau_\delta\) is a *time* threshold calibrated for high confidence
+  (\(\delta=10^{-6}\)) against a constant-environment branching process; it
+  does not track when a trajectory has actually reached \(I_{\mathrm{BL}}\).
+  For \(K=1000\), \(R_0=1.1\): \(\tau_\delta\approx114\) generations, but a
+  direct simulation trace shows the median time to first exceed
+  \(I_{\mathrm{BL}}=8\) is only \(t\approx3.2\) — almost all genuine
+  up-crossings happen while the code is still (wrongly) treating the
+  trajectory as "early", so they go unrecorded, and the trajectory would need
+  a *second* independent up-crossing after \(\tau_\delta\) to ever be
+  classified `persistence`. Removing the `phase != "early"` gate from
+  `above_boundary`/`entered_boundary`/`below_after_entry` tracking (keeping
+  \(\tau_\delta\) only inside `classify_extinction()`, where it is used
+  purely to label *why* a non-persisting trajectory died, not to gate whether
+  persistence can be detected) is justified on its own terms: the
+  up-cross/down-cross/up-cross sequence is exactly Parsons et al.'s
+  definition of surviving the first trough (\(\mathcal P_1\), Eq. 27) and
+  needs no time threshold to be well defined. This is **not yet applied** to
+  `stochastic_validation_functions.R` — only checked with standalone copies
+  of the loop. For \(K=1000\), \(R_0=1.1\) it raises simulated \(\mathcal P_1\)
+  from 0/5000 to 715/5000 (14.3%); the gate has essentially no effect by
+  \(K=10{,}000\)–\(30{,}000\) (matches to 3 decimal places), consistent with
+  \(I_{\mathrm{BL}}\) reaching its own threshold faster than \(\tau_\delta\)
+  once \(K\) (and so \(I_{\mathrm{BL}}\)) is large enough.
+- **Even after that fix, simulated \(\mathcal P_1\) at \(K=1000\), \(R_0=1.1\)
+  (14.3%) overshoots the single-trough analytical value (3.15%), and this is
+  expected, not a residual bug.** `logistic_burnout_probability()`'s \(q_1\)
+  calculation is a matched-asymptotics/boundary-layer approximation that
+  requires the deterministic epidemic peak to be well separated from
+  \(I_{\mathrm{BL}}\) (\(y_{\mathrm{peak}}/y_{\mathrm{BL}}\gg1\)); at
+  \(K=1000\), \(R_0=1.1\) the deterministic peak itself is only
+  \(I_{\mathrm{peak}}=10.2\) against \(I_{\mathrm{BL}}=8\) — ratio 1.23, i.e.
+  essentially no separation, so the two-stage decomposition (deterministic
+  rise to \(x_{\mathrm{in}}\), then a birth–death process started there) is
+  not expected to be accurate. This ratio is a genuine property of the
+  approximation's validity, not of persistence being ill-defined — see
+  *Peak/boundary-layer scale separation* below for the full characterization
+  (it is essentially \(K\)-independent, and is controlled by \(r\), exactly
+  analogous to Parsons et al.'s \(\varepsilon\)).
+
+### Peak/boundary-layer scale separation (\(y_{\mathrm{peak}}/y_{\mathrm{BL}}\))
+
+Both this repository's logistic model and Parsons et al.'s linear model rest
+on a matched-asymptotics argument that needs the deterministic epidemic peak
+to be much larger than the boundary-layer scale. This ratio was checked
+directly (not part of the committed pipeline; reproducible from
+`logistic_burnout_functions.R` and the classical SIR peak-prevalence formula,
+Eq. 21 of Parsons et al.):
+
+- **The ratio is independent of population size**, in both models. Fixing
+  \(r\) (or \(\varepsilon\)) and \(R_0\) and varying \(K\) (or \(n\)) from
+  \(10^3\) to \(10^7\) changes the ratio by under 2%, converging quickly (the
+  only way population size enters the normalized ODEs is through the
+  \(I_0=1\Rightarrow y(0)=1/K\) initial condition, and for large \(K\) the
+  trajectory converges to the unique unstable-manifold solution leaving the
+  DFE, independent of exactly how small \(y(0)\) is).
+- **The ratio is controlled entirely by the demographic parameter** (\(r\)
+  here, \(\varepsilon\) in Parsons et al.), growing roughly like \(1/r\) (resp.
+  \(1/\varepsilon\)) as demography slows down, because the deterministic peak
+  density approaches the classical no-demography SIR value
+  \(\bar y_0(R_0)=1-x_*(1+\ln(1/x_*))\) (Eq. 21) as \(r\to0\) — the same
+  formula applies to both models in this limit, since the demographic term
+  vanishes from the fast epidemic-rise phase regardless of whether the slow
+  regrowth afterward is linear or logistic — while the boundary-layer density
+  (\(y_*=r(R_0-1)/R_0^2\), resp. \(\varepsilon(1-1/R_0)\)) shrinks linearly
+  with \(r\)/\(\varepsilon\).
+- **This repository's baseline \(r=0.1\) gives dramatically worse scale
+  separation than the \(\varepsilon\) values Parsons et al. validate against
+  for real diseases.** At \(R_0=1.1\): our \(r=0.1\) gives ratio 1.23; their
+  Table 2 diseases have \(\varepsilon\) from \(7\times10^{-4}\) (measles) to
+  \(1.9\times10^{-2}\) (HIV), and even a middling \(\varepsilon=10^{-3}\) gives
+  ratio 47.5 — about 40\(\times\) better separated. At \(R_0=3\) (well inside
+  this repository's "good agreement" region), \(r=0.1\) gives ratio 14.3
+  versus 451 at \(\varepsilon=10^{-3}\) — a 31\(\times\) gap. So the accuracy
+  problem here is not specifically "\(R_0\) close to 1"; it is that this
+  repository's whole validated range sits at much worse scale separation than
+  Parsons et al.'s own worked examples, because the host demographic
+  turnover rate \(r\) relevant to a rodent/flea system is intrinsically much
+  faster than \(\mu\) for the (mostly human, long-lived-host) diseases in
+  their Table 2.
+- Figures (not part of the committed pipeline; regenerate from the scratch
+  scripts of the same name if needed): `scratch_peak_boundary_ratio_vs_R0.png`
+  (ratio vs. \(R_0-1\) at \(r=0.1\), flagging the documented large-error
+  cells) and `scratch_ratio_logistic_vs_linear.png` (this repository's curve
+  against Parsons et al.'s at \(\varepsilon=0.01\) and \(0.001\), same \(R_0\)
+  axis) in `figures/`.
 
 ## Generated results
 
