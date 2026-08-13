@@ -18,6 +18,7 @@
 
 # Raw stochastic-validation simulation output: local-only, not published
 fadeout/logistic_burnout/stochastic_validation/outputs/
+burnout_extension/validation/data/
 
 # ignore .claude directories anywhere (including root)
 .claude/
