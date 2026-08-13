@@ -13,10 +13,21 @@ Ignore += extras.mk
 
 ######################################################################
 
+Sources += $(wildcard *.md)
+
 Ignore += *.pdf
 Ignore += *.docx
 Ignore += *.html
 Ignore += *_files/
+
+######################################################################
+
+## How to extrapolate between linear and logistic dynamics
+
+## scalingNotes.gh.html: scalingNotes.md
+%.gh.html: %.md
+	$(rmdh_r)
+
 
 ######################################################################
 
@@ -72,9 +83,8 @@ makestuff:
 
 -include makestuff/texj.mk
 -include makestuff/pipeR.mk
+## -include makestuff/pandoc.mk
+-include makestuff/rmd.mk
 
 -include makestuff/git.mk
 -include makestuff/visual.mk
-
-
-
