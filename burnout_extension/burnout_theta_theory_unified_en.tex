@@ -1,0 +1,632 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=0.92in]{geometry}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{longtable}
+\hypersetup{colorlinks=true,linkcolor=blue!55!black,citecolor=blue!55!black,urlcolor=blue!55!black}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.30em}
+\setlength{\emergencystretch}{2em}
+
+\newcommand{\Rzero}{\mathcal R_0}
+\newcommand{\Afun}{\mathcal A_\theta}
+\newcommand{\Jfun}{\mathcal J_\theta}
+\newcommand{\Cfun}{C_\theta}
+\newcommand{\Dfun}{D_\theta}
+\newcommand{\BL}{y_{\rm BL}}
+\newcommand{\xin}{x_{\rm in}}
+\newcommand{\xf}{x_f}
+\newcommand{\xs}{x_*}
+\newcommand{\Pone}{P_1}
+\newcommand{\Pburn}{P_{\rm burn}}
+
+\title{Epidemic Burnout under General Susceptible Recruitment\\
+\large A Unified Asymptotic Theory from Phase-Plane Matching to Second-Order $x_{\rm in}$ and Kendall Persistence Probability}
+\author{Unified theory note}
+\date{2026-08-13}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We develop a self-contained asymptotic framework for the probability of pathogen burnout or persistence after the first epidemic wave. We consider
+\[
+\frac{dx}{d\sigma}=\rho(1-x)x^\theta-\Rzero xy,
+\qquad
+\frac{dy}{d\sigma}=(\Rzero x-1)y,
+\qquad 0\leq\theta\leq1.
+\]
+The central problem is to estimate the susceptible fraction $\xin$ when the post-peak infectious fraction first falls to a low-prevalence matching line $y=\BL$, without integrating the full two-dimensional epidemic ODE, and then to use that estimate to calculate the probability $\Pone$ that the pathogen survives the first epidemic trough.
+
+Following the matched-asymptotic phase-plane architecture of Parsons and Earn, we extend standard linear susceptible replenishment to the family $h_\theta(x)=(1-x)x^\theta$. The zero-demography epidemic geometry first gives a universal outer trajectory $F(x)$ and its final-size root $x_f$. We then directly expand the exact phase-plane equation in the fixed-$\Rzero>1$, $\rho\to0$ limit. The first-order correction develops a logarithmic singularity near $x_f$; its finite part defines the general-$\theta$ refined matching amplitude $C_\theta$, which reduces exactly to the refined Parsons et al. burnout prefactor when $\theta=0$. Continuing the same expansion to $O(\rho^2)$ yields a second matching constant $D_\theta$ and the next corner switchback. Re-expressing the corner expansion in terms of the action primitive $\mathcal A_\theta$ gives a stable second-order action-resummed scalar equation for $x_{\rm in}$.
+
+Finally, $x_{\rm in}$ feeds directly into Kendall's time-inhomogeneous birth--death formula. A high-accuracy version requires only a one-dimensional Kendall integral; when the action is sufficiently large, Laplace's method gives a fully asymptotic closed form. We also distinguish several boundaries of validity: no boundary-layer entry, scale merging as $\Rzero\to1^+$, small-action Laplace failure, a high-$\Rzero$ distinguished limit, and finite-$K$ stochastic-entry fluctuations. These are validity limits of the asymptotic regime rather than missing pieces of the main derivation.
+\end{abstract}
+
+\section{The problem: from a deterministic epidemic tail to stochastic burnout}
+We consider the dimensionless SIR-type dynamics in a single patch
+\begin{equation}
+\label{eq:model}
+\frac{dx}{d\sigma}=\rho h_\theta(x)-\Rzero xy,
+\qquad
+\frac{dy}{d\sigma}=(\Rzero x-1)y,
+\end{equation}
+where
+\begin{equation}
+\label{eq:h}
+h_\theta(x)=(1-x)x^\theta,
+\qquad 0\leq\theta\leq1.
+\end{equation}
+Here $x$ and $y$ are the susceptible and infectious fractions, respectively, $\Rzero>1$ is the basic reproduction number, and $\rho$ controls the slow time scale of susceptible replenishment. The case $\theta=0$ gives the standard linear replenishment model, while $\theta=1$ gives logistic replenishment; intermediate values interpolate continuously between the two.
+
+At low susceptible density,
+\[
+h_\theta(x)\sim x^\theta,
+\qquad x\to0,
+\]
+so $\theta$ may be interpreted as the low-density elasticity of recruitment with respect to the current susceptible fraction. The range $0\leq\theta\leq1$ therefore includes both the Parsons model and the logistic limit.
+
+Define the epidemic growth threshold
+\begin{equation}
+\label{eq:xstar}
+\xs=\frac1{\Rzero}.
+\end{equation}
+The endemic equilibrium satisfies $x=\xs$ and
+\begin{equation}
+\label{eq:ystar}
+y^*=\rho h_\theta(\xs)
+=\rho(\Rzero-1)\Rzero^{-(1+\theta)}.
+\end{equation}
+
+Let $K$ denote the characteristic host population size of one patch. After the first epidemic wave, the number of infectious individuals falls from a macroscopic level into a stochastic branching regime. To match the deterministic epidemic tail to the low-count stochastic process, we use the practical matching height
+\begin{equation}
+\label{eq:ybl}
+\BL=\sqrt{\frac{y^*}{K}}.
+\end{equation}
+When $Ky^*\gg1$,
+\[
+\frac1K\ll\BL\ll y^*\sim\rho,
+\]
+so $\BL$ lies in an overlap region between the one-infectious-individual scale and the deterministic endemic prevalence.
+
+We define $\xin$ as the susceptible fraction at the first downward crossing of $y=\BL$ after the first epidemic peak. Our goal is to construct the map
+\[
+(\Rzero,\rho,\theta,K)
+\longrightarrow \xin
+\longrightarrow \Pone,
+\]
+without integrating the full two-dimensional system~\eqref{eq:model} for every parameter set.
+
+\section{The Parsons framework and the logic of the present extension}
+Parsons and Earn constructed matched asymptotic approximations for the standard SIR model with vital dynamics, including the epidemic outer solution, the left corner, the $x$-axis boundary layer, and an additional boundary layer required in a joint high-$\Rzero$ limit\cite{PE2024}. Parsons et al. then connected this phase-plane construction to a time-inhomogeneous branching process to obtain the probability of burnout during the first epidemic trough\cite{PNAS2024}.
+
+The present work uses the same singular-perturbation architecture but relies only on two structural facts:
+\begin{enumerate}[leftmargin=2.2em]
+\item when $\rho=0$, the geometry of the first epidemic wave is independent of $h_\theta$;
+\item when $y$ is small, susceptible replenishment enters the slow basin dynamics through $h_\theta(x)$.
+\end{enumerate}
+Hence the same outer/corner hierarchy can be extended from standard linear replenishment to the whole family $h_\theta(x)=(1-x)x^\theta$.
+
+The main asymptotic regime considered here is
+\begin{equation}
+\label{eq:limit}
+\rho\to0,
+\qquad \Rzero>1\ \text{fixed},
+\qquad K\ \text{large enough that }1/K\ll\BL\ll\rho.
+\end{equation}
+The joint high-$\Rzero$ limit and finite-$K$ stochastic entry are treated separately as boundaries of validity.
+
+\section{Leading order: universal epidemic geometry}
+Set $\rho=0$. Equation~\eqref{eq:model} gives
+\[
+\frac{dy}{dx}=\frac1{\Rzero x}-1.
+\]
+Starting from a naive invasion $(x,y)=(1,0^+)$, the first-wave outer trajectory is
+\begin{equation}
+\label{eq:F}
+F(x)=1-x+\xs\log x,
+\qquad y=F(x).
+\end{equation}
+The epidemic peak occurs at $x=\xs$. The zero-demography final susceptible fraction $\xf$ is the smaller root of $F(\xf)=0$:
+\begin{equation}
+\label{eq:xf}
+\xf=-\frac1{\Rzero}W_0(-\Rzero e^{-\Rzero}),
+\end{equation}
+where $W_0$ is the principal branch of the Lambert $W$ function.
+
+The point $\xf$ is the anchor of the corner matching, but it cannot be used directly as the finite-$\rho$ value of $\xin$. The reason is that the later burnout probability depends on an action scaled by $1/\rho$; even if $\xin-\xf\to0$, that difference may still be exponentially amplified. A systematic matched correction to $\xin$ is therefore required.
+
+\section{Exact phase-plane equation and the direct perturbation hierarchy}
+From~\eqref{eq:model}, the exact phase-plane equation is
+\begin{equation}
+\label{eq:phase}
+\frac{dy}{dx}
+=\frac{(\Rzero x-1)y}{\rho h_\theta(x)-\Rzero xy}.
+\end{equation}
+In the first-wave outer region, write the direct expansion
+\begin{equation}
+\label{eq:Yexp}
+y=F(x)+\rho Y_1(x)+\rho^2Y_2(x)+O(\rho^3).
+\end{equation}
+Substituting~\eqref{eq:Yexp} into~\eqref{eq:phase} and equating successive powers of $\rho$ gives
+\begin{equation}
+\label{eq:Y1}
+Y_1'(x)
+=-\frac{h_\theta(x)(\Rzero x-1)}{\Rzero^2x^2F(x)},
+\qquad Y_1(1)=0,
+\end{equation}
+and
+\begin{equation}
+\label{eq:Y2}
+Y_2'(x)
+=\frac{h_\theta(x)(\Rzero x-1)}{\Rzero^2x^2F(x)^2}
+\left[Y_1(x)-\frac{h_\theta(x)}{\Rzero x}\right],
+\qquad Y_2(1)=0.
+\end{equation}
+The apparent singularities at $x=1$ are removable. Up to second order, the outer correction is therefore determined by two one-dimensional coefficient equations.
+
+An equivalent bookkeeping device uses the first integral of the $\rho=0$ SIR system,
+\[
+H=x+y-\frac1{\Rzero}\log x.
+\]
+Along the full model,
+\[
+\frac{dH}{d\sigma}
+=\rho h_\theta(x)\left(1-\frac1{\Rzero x}\right).
+\]
+If one writes $H=1+\rho H_1+\rho^2H_2+\cdots$, then $H_1=Y_1$ and $H_2=Y_2$. Thus the conserved-quantity formulation is simply an equivalent organization of the same direct phase-plane hierarchy, not a separate approximation route.
+
+\section{First-order matching: the logarithmic singularity and $C_\theta$}
+\subsection{Relation to the Parsons notation}
+Let
+\[
+\epsilon=\frac\rho{\Rzero},
+\qquad
+G_\theta=\Rzero Y_1.
+\]
+Then
+\begin{equation}
+\label{eq:Gprime}
+G_\theta'(x)
+=\frac{(\xs-x)h_\theta(x)}{x^2F(x)}.
+\end{equation}
+Define
+\begin{equation}
+\label{eq:atilde}
+\widetilde a_\theta
+=\frac{h_\theta(\xf)}{\xf}
+=(1-\xf)\xf^{\theta-1}.
+\end{equation}
+Because
+\[
+F'(\xf)=\frac{\xs-\xf}{\xf},
+\]
+we have, as $x\to\xf^+$,
+\[
+G_\theta'(x)\sim\frac{\widetilde a_\theta}{x-\xf}.
+\]
+Thus the first-order outer correction necessarily contains a logarithmic singularity.
+
+\subsection{The regularized finite part}
+Define the regularized integral
+\begin{equation}
+\label{eq:Jtheta}
+\Jfun
+=\int_{\xf}^{1}
+\left[
+\frac{(\xs-u)h_\theta(u)}{u^2F(u)}
+-\frac{\widetilde a_\theta}{u-\xf}
+\right]du.
+\end{equation}
+The two singular terms cancel at $u=\xf$, so~\eqref{eq:Jtheta} is a smooth one-dimensional integral. It yields the refined first-order matching amplitude
+\begin{equation}
+\label{eq:Ctheta}
+\Cfun
+=\frac{(1-\xf)(\xs-\xf)}{\xf}
+\exp\!\left(\frac{\Jfun}{\widetilde a_\theta}\right).
+\end{equation}
+The constant $C_\theta$ depends only on $(\Rzero,\theta)$ and is independent of $(\rho,K)$.
+
+When $\theta=0$,~\eqref{eq:Jtheta} reduces to the regularized integral in the refined Parsons et al. burnout estimate, and~\eqref{eq:Ctheta} reduces to its first-order prefactor\cite{PNAS2024}. Hence $C_\theta$ is a direct generalization of the standard burnout matching constant.
+
+\section{Inverse outer expansion and corner scaling}
+Let $X_0(y)$ denote the descending branch satisfying $F(X_0)=y$, and write
+\begin{equation}
+\label{eq:Xexp}
+X(y;\rho)=X_0(y)+\rho X_1(y)+\rho^2X_2(y)+O(\rho^3).
+\end{equation}
+Implicit-function expansion gives
+\begin{equation}
+\label{eq:X1}
+X_1(y)=-\frac{Y_1(X_0)}{F'(X_0)},
+\end{equation}
+and
+\begin{equation}
+\label{eq:X2}
+X_2(y)
+=-\frac{\frac12F''(X_0)X_1^2+Y_1'(X_0)X_1+Y_2(X_0)}{F'(X_0)}.
+\end{equation}
+
+When $y=O(\rho)$, the raw outer series is no longer uniform. Introduce the corner scaling
+\begin{equation}
+\label{eq:corner_scale}
+y=\rho v,
+\qquad
+x=\xf+\rho u_1(v)+\rho^2u_2(v)+\cdots.
+\end{equation}
+Define
+\begin{equation}
+\label{eq:abcd}
+\delta=1-\Rzero\xf,
+\qquad
+h_f=h_\theta(\xf),
+\qquad
+h_f'=h_\theta'(\xf),
+\end{equation}
+and
+\begin{equation}
+\label{eq:abc2}
+a=\frac{h_f}{\delta},
+\qquad
+b=\frac{\Rzero\xf}{\delta},
+\qquad
+c=\delta h_f'+\Rzero h_f,
+\qquad
+\kappa=\frac{h_fc}{2\delta^3}.
+\end{equation}
+For $h_\theta(x)=(1-x)x^\theta$,
+\[
+h_\theta'(x)=x^{\theta-1}\{\theta-(\theta+1)x\}.
+\]
+
+Let
+\begin{equation}
+\label{eq:L}
+L=\log\frac{C_\theta}{y}.
+\end{equation}
+Expanding the exact phase-plane equation~\eqref{eq:phase} directly in the corner gives, at first order,
+\begin{equation}
+\label{eq:u1}
+u_1(v)=aL+bv.
+\end{equation}
+The term $\rho aL$ is the logarithmic switchback, while $by$ is the finite-height correction. Equation~\eqref{eq:u1} is exactly the corner representation of the refined first-order matching obtained above.
+
+\section{Second-order matching: $D_\theta$ and the next switchback}
+Continuing the same corner expansion to $O(\rho^2)$ gives
+\begin{equation}
+\label{eq:u2}
+\begin{split}
+u_2(v)={}&\kappa L^2+D_\theta
++\frac{\Rzero a}{\delta^2}(L+1)v
+-\frac{bc}{\delta^2}v
++\frac{b\Rzero}{2\delta^2}v^2.
+\end{split}
+\end{equation}
+The $L^2$ term is the natural next-order continuation of the first-order logarithmic switchback.
+
+Both $C_\theta$ and the new second-order matching constant $D_\theta$ are uniquely determined by regularized limits of the inverse outer coefficients:
+\begin{equation}
+\label{eq:Climit}
+\log C_\theta
+=\lim_{y\downarrow0}
+\left[\frac{X_1(y)}a+\log y\right],
+\end{equation}
+\begin{equation}
+\label{eq:Dlimit}
+D_\theta
+=\lim_{y\downarrow0}
+\left[
+X_2(y)-\kappa\log^2\!\left(\frac{C_\theta}{y}\right)
+\right].
+\end{equation}
+Equation~\eqref{eq:Climit} gives the same $C_\theta$ as the explicit regularized integral~\eqref{eq:Ctheta}; this is an important internal consistency check between the two representations. The constant $D_\theta$ contains the genuinely new second-order information. In practice, one may integrate the one-dimensional coefficient equations~\eqref{eq:Y1}--\eqref{eq:Y2} and then stably extrapolate~\eqref{eq:Dlimit} after accounting for the known $O(y\log^m y)$ remainder structure.
+
+\section{Action formulation: from the corner expansion to a stable scalar equation}
+\subsection{The action primitive}
+Define
+\begin{equation}
+\label{eq:Adef}
+\Afun'(x)
+=\frac{1-\Rzero x}{h_\theta(x)}
+=\frac{1-\Rzero x}{(1-x)x^\theta}.
+\end{equation}
+In the $x$-axis basin, where $y\ll\rho$, infection-induced depletion of susceptible individuals is of higher order, so
+\[
+\frac{dx}{d\sigma}\simeq\rho h_\theta(x),
+\qquad
+\frac{d\log y}{dx}
+=-\frac1\rho\Afun'(x).
+\]
+Thus $\Afun$ is the natural variable linking deterministic epidemic matching to the later branching-process exponent.
+
+For $\theta\neq1$, one may take
+\begin{equation}
+\label{eq:Ahyper}
+\Afun(x)
+=\frac{x^{1-\theta}}{1-\theta}
+\left[
+\Rzero-(\Rzero-1)
+{}_2F_1(1,1-\theta;2-\theta;x)
+\right].
+\end{equation}
+Important special cases are
+\begin{align}
+\mathcal A_0(x)
+&=\Rzero x+(\Rzero-1)\log(1-x),\\
+\mathcal A_{1/2}(x)
+&=2\Rzero\sqrt{x}-2(\Rzero-1)\operatorname{artanh}(\sqrt{x}),\\
+\mathcal A_1(x)
+&=\log x+(\Rzero-1)\log(1-x).
+\end{align}
+
+\subsection{Refined first-order action equation}
+Rather than truncating $x$ directly, we reinsert~\eqref{eq:u1} into the full action. This gives the practical refined first-order equation
+\begin{equation}
+\label{eq:M1}
+\Afun(x_{\rm in}^{(1)})-\Afun(\xf)
+=\rho L_{\rm BL}+\frac ba\BL,
+\qquad
+L_{\rm BL}=\log\frac{C_\theta}{\BL}.
+\end{equation}
+Because
+\[
+\frac ba=\frac{\Rzero\xf}{h_f},
+\]
+this is exactly the finite-$\BL$ first-order formula.
+
+\subsection{Second-order action-resummed master equation}
+Define
+\begin{equation}
+\label{eq:Q}
+Q=\frac{\Rzero a-bc}{a\delta^2}.
+\end{equation}
+Substitute $x=\xf+\rho u_1+\rho^2u_2$ into $\Afun(x)$ and retain all terms required to second order under the corner scaling. A key simplification is that the $L^2$ term in $u_2$ cancels the quadratic contribution from the Taylor expansion of $\Afun$. The result is
+\begin{equation}
+\label{eq:M2}
+\begin{split}
+\Afun(x_{\rm in}^{(2)})-\Afun(\xf)
+={}&\rho L_{\rm BL}
++\frac ba\BL
++\rho^2\frac{D_\theta}{a}\\
+&+\rho\BL Q(L_{\rm BL}+1)
++\frac{bQ}{2a}\BL^2.
+\end{split}
+\end{equation}
+This is the recommended second-order master equation.
+
+Equation~\eqref{eq:M2} has two important properties. First, it is a systematic higher-order extension of~\eqref{eq:M1}:
+\[
+M_2=M_1+\text{second-order corrections}.
+\]
+Second, it remains only a scalar root-finding problem for $x_{\rm in}^{(2)}$. For fixed $(\Rzero,\theta)$, the constants $C_\theta$ and $D_\theta$ need to be precomputed only once.
+
+It is also important that the practical cutoff satisfies $\BL\ll\rho$ but does not generally satisfy $\BL\ll\rho^2$. Therefore, if one wants uniform second-order accuracy at finite $K$, it is not consistent to retain only the pure $\rho^2D_\theta$ term while discarding the $\rho\BL$ or $\BL^2$ terms.
+
+\section{The Kendall layer: from $x_{\rm in}$ to burnout probability}
+Once the trajectory enters the low-prevalence layer, treat the susceptible path as a deterministic background and neglect the feedback of the rare infection on $x$:
+\[
+\frac{dx}{d\sigma}\simeq\rho h_\theta(x).
+\]
+Each infectious lineage then has birth rate $\Rzero x(\sigma)$ and removal rate $1$. Kendall's result for a time-inhomogeneous linear birth--death process gives the extinction probability of one lineage as
+\begin{equation}
+\label{eq:q}
+q_1=\frac{\mathcal I}{1+\mathcal I},
+\end{equation}
+where
+\begin{equation}
+\label{eq:Kendall}
+\mathcal I(\xin)
+=\int_{\xin}^{1}
+\frac1{\rho h_\theta(X)}
+\exp\!\left[
+\frac{\Afun(X)-\Afun(\xin)}{\rho}
+\right]dX.
+\end{equation}
+If the matching line contains
+\[
+m=K\BL
+\]
+infectious individuals, then the conditional probability of burnout is
+\begin{equation}
+\label{eq:Pburn}
+\Pburn
+\simeq\left(\frac{\mathcal I}{1+\mathcal I}\right)^{K\BL},
+\end{equation}
+and the probability of persistence through the first trough is
+\begin{equation}
+\label{eq:P1}
+\Pone\simeq1-\Pburn.
+\end{equation}
+A numerically more stable quantity is the burnout exponent
+\begin{equation}
+\label{eq:B}
+B=-\log\Pburn
+=K\BL\log\left(1+\frac1{\mathcal I}\right).
+\end{equation}
+
+Hence the high-accuracy semi-analytical pipeline is
+\[
+(\Rzero,\theta)\to(\xf,C_\theta,D_\theta),
+\quad
+(\rho,K)\to\BL,
+\quad
+\eqref{eq:M2}\to x_{\rm in}^{(2)},
+\quad
+\eqref{eq:Kendall}\to B,\Pone.
+\]
+The entire procedure requires only one-dimensional coefficient equations, a scalar root solve, and one one-dimensional Kendall integral; it does not require integrating the full two-dimensional epidemic ODE for each parameter set.
+
+\section{The Laplace layer: a fully asymptotic closed form}
+Define the action
+\begin{equation}
+\label{eq:Lambda}
+\Lambda(\xin)
+=\frac{\Afun(\xs)-\Afun(\xin)}{\rho}.
+\end{equation}
+The stationary point of the exponent in the Kendall integrand is determined by
+\[
+1-\Rzero x=0,
+\]
+so for every $\theta$ the unique internal saddle lies at
+\[
+\xs=\frac1{\Rzero}.
+\]
+Applying Laplace's method around $\xs$ gives
+\begin{equation}
+\label{eq:Ilap}
+\mathcal I
+\sim
+\sqrt{\frac{2\pi}{\Rzero g(\xs)}}e^\Lambda,
+\qquad
+g(\xs)=\rho h_\theta(\xs)=y^*.
+\end{equation}
+Substituting this approximation into~\eqref{eq:B} gives the finite-$m$ Laplace version; if in addition $\mathcal I\gg1$, then
+\begin{equation}
+\label{eq:Blap}
+B
+\sim
+K\BL
+\sqrt{\frac{\Rzero g(\xs)}{2\pi}}
+e^{-\Lambda}.
+\end{equation}
+
+The action-resummed formulation has a further computational advantage. Let $M_2$ denote the right-hand side of~\eqref{eq:M2}, and define
+\[
+\Delta A_f=\Afun(\xs)-\Afun(\xf).
+\]
+Then one need not first solve for $x_{\rm in}^{(2)}$ in order to obtain
+\begin{equation}
+\label{eq:LambdaM2}
+\Lambda^{(2)}
+=\frac{\Delta A_f-M_2}{\rho}.
+\end{equation}
+Thus the fully asymptotic prediction for $P_1$ can be computed directly from the matching constants and the action. The root solve for $x_{\rm in}^{(2)}$ is required only when one wants the exact Kendall integral.
+
+\section{Why both exact Kendall and Laplace versions should be retained}
+Increasing the asymptotic order of $x_{\rm in}$ controls only the deterministic matching error; it cannot repair the saddle-point approximation itself. When
+\[
+\Lambda\gg1,
+\]
+the Kendall integrand is sharply concentrated near $x_*$ and the Laplace formula is accurate. When $\Lambda=O(1)$ or smaller, the Laplace approximation may have substantial error even if $x_{\rm in}$ is already extremely accurate.
+
+The two versions should therefore be viewed as different levels of approximation:
+\begin{enumerate}[leftmargin=2.2em]
+\item \textbf{Primary numerical/semi-analytical prediction}: second-order $x_{\rm in}$ plus the exact one-dimensional Kendall integral;
+\item \textbf{Fully asymptotic closed form}: second-order action plus Laplace's method, valid when the action is sufficiently large.
+\end{enumerate}
+Numerical validation should report ``matching error'' and ``Laplace-only error'' separately.
+
+\section{Domain of validity and identifiable failure modes}
+The present theory addresses deterministic-entry asymptotics for fixed $\Rzero>1$, small $\rho$, and large $K$. Outside that regime, several distinct failure mechanisms can occur.
+
+\subsection{No boundary-layer entry}
+If the first deterministic trough satisfies
+\[
+y_{\min}>\BL,
+\]
+the descending branch of the first epidemic wave never reaches the matching line, so the present definition of $x_{\rm in}$ does not apply. Such parameter values should be labeled \emph{no boundary-layer entry}, rather than assigned a large approximation error.
+
+\subsection{$\Rzero\to1^+$}
+When $\Rzero$ is very close to one, the first epidemic wave becomes weak and the scales associated with $x_f$, $x_*$, the peak, and the trough begin to merge. The fixed-$\Rzero$ outer/corner hierarchy is then no longer uniform; a near-threshold distinguished limit is required.
+
+\subsection{Small-action Laplace breakdown}
+Even with an accurate $x_{\rm in}$, Laplace's approximation may fail if $\Lambda$ is not large. In that regime the correct response is to retain the exact Kendall integral, rather than to increase the formal order of the $x_{\rm in}$ expansion.
+
+\subsection{Joint high-$\Rzero$ limit}
+If $\Rzero$ also becomes large so that $x_f$ competes with $\rho$ or smaller scales, a new boundary layer is required. Since
+\[
+h_\theta(x)\sim x^\theta,
+\qquad x\to0,
+\]
+the local balance between replenishment and infection-induced consumption,
+\[
+\rho x^\theta\sim x,
+\]
+gives the natural scale
+\begin{equation}
+\label{eq:highRscale}
+x\sim\rho^{1/(1-\theta)},
+\end{equation}
+for $0\leq\theta<1$. The case $\theta=1$ corresponds to a different distinguished limit. This is a future high-$\Rzero$ uniformization problem, not simply an omitted ordinary $O(\rho^3)$ term in~\eqref{eq:M2}.
+
+\subsection{Finite-$K$ stochastic entry}
+The present derivation treats $x_{\rm in}$ as deterministic. For finite $K$, the actual entry point is a random variable $X_{\rm in}$, and its fluctuations may be exponentially amplified because
+\[
+\Lambda'(x)
+=-\frac{1-\Rzero x}{\rho h_\theta(x)}.
+\]
+This effect is distinct from deterministic matching error and should be assessed separately through the distribution of entry points in stochastic simulations.
+
+\section{Theoretical chain and computational interface}
+At this stage the large-population deterministic-entry problem forms a closed chain:
+\[
+(\Rzero,\rho,\theta,K)
+\longrightarrow
+(\xf,C_\theta,D_\theta,\BL)
+\longrightarrow
+x_{\rm in}^{(1)},x_{\rm in}^{(2)}
+\longrightarrow
+\mathcal I,\Lambda
+\longrightarrow
+\Pburn,\Pone.
+\]
+
+A practical implementation naturally separates into a precomputation layer and a parameter layer:
+\begin{enumerate}[leftmargin=2.2em]
+\item For each $(\Rzero,\theta)$, compute $\xf$, integrate $Y_1$ and $Y_2$, and obtain $C_\theta$ and $D_\theta$;
+\item for each $(\rho,K)$, compute $y^*$ and $\BL$, and use~\eqref{eq:M1} and~\eqref{eq:M2} to obtain first- and second-order predictions;
+\item for the high-accuracy version, use the exact Kendall integral~\eqref{eq:Kendall};
+\item when a closed form is needed, use the action~\eqref{eq:LambdaM2} and the Laplace approximation~\eqref{eq:Ilap};
+\item record no-entry status, $\Lambda$, and the difference between first and second order as validity diagnostics.
+\end{enumerate}
+
+There are no undefined intermediate quantities left in the theory. The next stage is systematic numerical validation: compare first order, second order, the deterministic ODE benchmark, exact Kendall, Laplace, and full stochastic simulations, and use these comparisons to map the domain of validity quantitatively.
+
+\appendix
+\section{Two equivalent representations of the first-order constant $C_\theta$}
+The first-order matching constant can be obtained explicitly from the singular finite part of $G_\theta$ near $x_f$, which yields~\eqref{eq:Ctheta}, or from the inverse outer coefficient through~\eqref{eq:Climit}. The two are equivalent because
+\[
+Y_1=\frac{G_\theta}{\Rzero}
+\]
+and $X_1$ is the implicit-function inversion of the same first-order correction. This equivalence is useful computationally: the explicit regularized integral gives a stable first-order calculation, while the inverse-coefficient representation connects seamlessly to the second-order $D_\theta$ hierarchy.
+
+\section{Core diagnostics to retain in numerical validation}
+To separate the main sources of approximation error, the numerical study should retain at least
+\[
+\frac{y_{\min}}{\BL},
+\qquad
+\frac{x_{\rm in}^{(1)}-x_{\rm in}^{\rm ODE}}{x_{\rm in}^{\rm ODE}},
+\qquad
+\frac{x_{\rm in}^{(2)}-x_{\rm in}^{\rm ODE}}{x_{\rm in}^{\rm ODE}},
+\]
+\[
+\Delta\Lambda_1,
+\qquad
+\Delta\Lambda_2,
+\qquad
+\Lambda_{\rm ODE},
+\qquad
+B_{\rm Kendall},
+\qquad
+B_{\rm Laplace}.
+\]
+The extraction of $D_\theta$ should also be tested for sensitivity to extrapolation window, extrapolation basis, and numerical precision. The constant $C_\theta$ should be cross-validated using both~\eqref{eq:Ctheta} and~\eqref{eq:Climit}.
+
+\begin{thebibliography}{9}
+\bibitem{PE2024}
+T. L. Parsons and D. J. D. Earn,
+\emph{Uniform Asymptotic Approximations for the Phase Plane Trajectories of the SIR Model with Vital Dynamics},
+SIAM Journal on Applied Mathematics 84(4), 1580--1608 (2024).
+
+\bibitem{PNAS2024}
+T. L. Parsons, B. M. Bolker, J. Dushoff, and D. J. D. Earn,
+\emph{The probability of epidemic burnout in the stochastic SIR model with vital dynamics},
+Proceedings of the National Academy of Sciences 121(5), e2313708120 (2024).
+\end{thebibliography}
+
+\end{document}
