@@ -26,8 +26,8 @@ run_point <- function(R0,rho,theta,K,D=NULL) {
 run_grid <- function(grid,file) {
   keys<-unique(grid[c('R0','theta')]); const<-vector('list',nrow(keys))
   for(i in seq_len(nrow(keys))) {
-    d<-D_extract(keys$R0[i],keys$theta[i]); const[[i]]<-d$D
-    cat('constants',i,'/',nrow(keys),'R0=',keys$R0[i],'theta=',keys$theta[i],'D=',d$D,'\n')
+    d<-D_regularized(keys$R0[i],keys$theta[i]); const[[i]]<-d
+    cat('constants',i,'/',nrow(keys),'R0=',keys$R0[i],'theta=',keys$theta[i],'D=',d,'\n')
   }
   ans<-vector('list',nrow(grid))
   for(i in seq_len(nrow(grid))) {

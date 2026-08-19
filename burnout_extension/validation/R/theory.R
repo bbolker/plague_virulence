@@ -24,10 +24,13 @@ C_explicit <- local({
     if (exists(key,cache,inherits=FALSE)) return(get(key,cache))
     xf <- x_final(R0); xs <- 1/R0; at <- h_theta(xf,theta)/xf
     raw <- function(u) (xs-u)*h_theta(u,theta)/(u^2*F0(u,R0))-at/(u-xf)
-    # Estimate removable endpoint value by Richardson extrapolation.
-    ee <- max(1e-7*xf,1e-9)
-    endpoint <- 2*raw(xf+ee/2)-raw(xf+ee)
-    J <- endpoint*ee/4 + integrate(raw,xf+ee/4,1,rel.tol=2e-10,
+    # Integrate the removable endpoint from a local polynomial fit; evaluating
+    # the subtraction at machine-scale offsets needlessly loses digits.
+    ee <- max(min(1e-4*(1-xf),.03*xf),1e-10)
+    ss <- ee*c(1,1.4,2,2.8,4)
+    fit <- lm.fit(cbind(1,ss,ss^2,ss^3),raw(xf+ss))$coefficients
+    endpoint <- fit[1]*ee+fit[2]*ee^2/2+fit[3]*ee^3/3+fit[4]*ee^4/4
+    J <- endpoint + integrate(raw,xf+ee,1,rel.tol=2e-11,
           abs.tol=2e-11,subdivisions=1000L)$value
     ans <- (1-xf)*(xs-xf)/xf*exp(J/at)
     assign(key,ans,cache); ans
@@ -72,32 +75,86 @@ C_inverse <- function(R0,theta,ys=c(2e-6,1e-6,5e-7,2e-7)) {
   exp(coef(lm(v~I(ys*log(ys))))[1])
 }
 
-D_extract <- function(R0,theta,ys=exp(seq(log(2e-3),log(3e-5),length.out=24)),
-                      basis=c('ylog2','ylog','sqrt'),n=NULL) {
-  basis<-match.arg(basis); xf<-x_final(R0)
-  # Near threshold the zero-order epidemic peak can lie below the default window.
-  ymax <- F0(1/R0,R0)
-  if(max(ys)>=.8*ymax) {
-    hi <- .5*ymax; lo <- hi/70
-    ys <- exp(seq(log(hi),log(lo),length.out=length(ys)))
-  }
-  delta<-1-R0*xf; hf<-h_theta(xf,theta); a<-hf/delta
-  cc<-delta*h_prime(xf,theta)+R0*hf; kappa<-hf*cc/(2*delta^3)
-  C<-C_explicit(R0,theta)
-  inv<-inverse_coefficients_many(ys,R0,theta)
-  val<-inv[,'X2']-kappa*log(C/ys)^2
-  L<-log(ys)
-  X<-switch(basis,ylog2=cbind(1,ys*L^2,ys*L,ys),
-            ylog=cbind(1,ys*L,ys),sqrt=cbind(1,sqrt(ys),ys*L^2,ys*L))
-  fit<-lm.fit(X,val); list(D=unname(fit$coefficients[1]),
-    rmse=sqrt(mean(fit$residuals^2)),ys=ys,raw=val,basis=basis,n=n)
-}
+D_regularized <- local({
+  cache <- new.env(parent=emptyenv())
+  function(R0,theta) {
+    stopifnot(requireNamespace('deSolve',quietly=TRUE))
+    key <- sprintf('%.14g|%.14g',R0,theta)
+    if (exists(key,cache,inherits=FALSE)) return(get(key,cache))
 
-matching <- function(R0,rho,theta,K,D=NULL) {
+    xf <- x_final(R0); span <- 1-xf; delta <- 1-R0*xf
+    hf <- h_theta(xf,theta); hfp <- h_prime(xf,theta)
+    f1 <- delta/(R0*xf); f2 <- -1/(R0*xf^2)
+    alpha <- hf/(R0*xf); a <- hf/delta
+    C <- C_explicit(R0,theta); beta <- alpha*log(f1/C)
+    p0 <- (2*delta*xf*hfp-(1+2*delta)*hf)/(2*R0*delta*xf^2)
+    cc <- delta*hfp+R0*hf; kappa <- hf*cc/(2*delta^3)
+    Am1 <- (hf/xf-cc)/delta^2
+    upper_eps <- 1e-6
+    xhi <- 1-upper_eps
+    upper_slope <- (R0-1.5)/(R0-1)-theta
+    y1hi <- upper_eps/R0+upper_slope*upper_eps^2/(2*R0)
+    beta_s <- min(xf,span)*seq(.002,.016,length.out=10)
+    y1_rhs <- function(x,z,p) list(-h_theta(x,theta)*(R0*x-1)/
+      (R0^2*x^2*F0(x,R0)))
+    pilot <- deSolve::ode(c(Y1=y1hi),c(xhi,sort(xf+beta_s,decreasing=TRUE)),
+      y1_rhs,NULL,method='lsoda',rtol=5e-13,atol=2e-14,maxsteps=1e6)[-1,,drop=FALSE]
+    py <- pilot[match(xf+beta_s,pilot[,1]),'Y1']-alpha*log(beta_s)
+    tt <- beta_s/span
+    beta_ode <- lm.fit(cbind(1,tt,tt^2,tt^3,tt^4,tt^5),py)$coefficients[1]
+    y1_shift <- beta-beta_ode
+    B0 <- beta-alpha
+    B1 <- -hf/(2*R0*delta*xf^2)
+
+    qsing <- function(s) -a*alpha*log(s)/s^2-a*B0/s^2+
+      Am1*alpha*log(s)/s+(Am1*B0-a*B1)/s
+    P2 <- function(s) (a*alpha*log(s)+a*beta)/s+
+      .5*Am1*alpha*log(s)^2+(Am1*B0-a*B1)*log(s)
+
+    # Stop before the endpoint, where direct subtraction loses digits.  The
+    # omitted piece is integrated from its local log-power expansion below.
+    eps <- max(min(4e-4*span,.03*xf),2e-8)
+    sample_s <- eps*c(1,1.35,1.8,2.5,3.4,4.6,6.2,8.4)
+    rhs <- function(x,z,p) {
+      ff <- F0(x,R0); hh <- h_theta(x,theta)
+      y1p <- -hh*(R0*x-1)/(R0^2*x^2*ff)
+      q2 <- hh*(R0*x-1)/(R0^2*x^2*ff^2)*(z[1]+y1_shift-hh/(R0*x))
+      list(c(y1p,q2-qsing(x-xf)))
+    }
+    targets <- sort(unique(c(xf+eps,xf+sample_s)),decreasing=TRUE)
+    # Y1(1-e)=e/R0+O(e^2); the resulting O(e^2) initialization error has an
+    # O(e) effect on the regularized integral.
+    zz <- deSolve::ode(c(Y1=y1hi,Ireg=0),c(xhi,targets),rhs,NULL,method='lsoda',
+      rtol=2e-12,atol=c(2e-14,2e-12),maxsteps=1e6)
+    zz <- zz[-1,,drop=FALSE]
+    ord <- match(xf+sample_s,zz[,1])
+    y1 <- zz[ord,'Y1']+y1_shift; xx <- xf+sample_s
+    q2 <- h_theta(xx,theta)*(R0*xx-1)/(R0^2*xx^2*F0(xx,R0)^2)*
+      (y1-h_theta(xx,theta)/(R0*xx))
+    qr <- q2-qsing(sample_s)
+    X <- cbind(log(sample_s),1,sample_s*log(sample_s),sample_s,
+               sample_s^2*log(sample_s),sample_s^2)
+    cf <- lm.fit(X,qr)$coefficients
+    endpoint <- cf[1]*eps*(log(eps)-1)+cf[2]*eps+
+      cf[3]*eps^2*(log(eps)/2-1/4)+cf[4]*eps^2/2+
+      cf[5]*eps^3*(log(eps)/3-1/9)+cf[6]*eps^3/3
+    I_from_eps <- -zz[match(xf+eps,zz[,1]),'Ireg']
+    # The missing interval (xhi,1) is O(1-xhi) and below the requested accuracy.
+    K2 <- -P2(span)-I_from_eps-endpoint
+    N20 <- K2+alpha*beta*f2/f1^2-(alpha+beta)*p0/f1+
+      f2*beta^2/(2*f1^2)
+    ans <- -N20/f1-kappa*beta^2/alpha^2
+    assign(key,ans,cache); ans
+  }
+})
+
+matching <- function(R0,rho,theta,K,D=NULL,yline=NULL) {
   xf<-x_final(R0); xs<-1/R0; delta<-1-R0*xf; hf<-h_theta(xf,theta)
   a<-hf/delta; b<-R0*xf/delta; cc<-delta*h_prime(xf,theta)+R0*hf
-  C<-C_explicit(R0,theta); if(is.null(D)) D<-D_extract(R0,theta)$D
-  ys<-rho*h_theta(xs,theta); ybl<-sqrt(ys/K); L<-log(C/ybl)
+  C<-C_explicit(R0,theta); if(is.null(D)) D<-D_regularized(R0,theta)
+  ys<-rho*h_theta(xs,theta)
+  if(is.null(yline)) yline<-sqrt(ys/K)
+  ybl<-yline; L<-log(C/ybl)
   Q<-(R0*a-b*cc)/(a*delta^2)
   M1<-rho*L+(b/a)*ybl
   M2<-M1+rho^2*D/a+rho*ybl*Q*(L+1)+(b*Q/(2*a))*ybl^2

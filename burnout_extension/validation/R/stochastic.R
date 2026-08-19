@@ -102,3 +102,26 @@ simulate_point_unconditional <- function(R0,rho,theta,K,n_attempts=10000,seed=1,
              established=established,persistent=persistent,
              P1_hat=persistent/n_attempts,CI_low=ci[1],CI_high=ci[2])
 }
+
+# Reusable-cluster batch for checkpointed scans.  Counts from independent
+# batches add exactly, so a stopped scan can resume without rerunning completed
+# batches.
+simulate_counts_batch <- function(cl,R0,rho,theta,K,n_attempts,seed) {
+  n_workers <- length(cl)
+  chunks <- rep(n_attempts %/% n_workers,n_workers)
+  chunks[seq_len(n_attempts %% n_workers)] <-
+    chunks[seq_len(n_attempts %% n_workers)]+1L
+  parallel::clusterSetRNGStream(cl,iseed=seed)
+  ans <- parallel::parLapply(cl,chunks,function(n,R0,rho,theta,K) {
+    persistent <- established <- unresolved <- 0L
+    for(attempt in seq_len(n)) {
+      z <- one_ctmc(R0,rho,theta,K)
+      if(isTRUE(z['established'])) established <- established+1L
+      if(is.na(z['persist'])) unresolved <- unresolved+1L
+      else if(isTRUE(z['persist'])) persistent <- persistent+1L
+    }
+    c(attempts=n,established=established,persistent=persistent,
+      unresolved=unresolved)
+  },R0=R0,rho=rho,theta=theta,K=K)
+  colSums(do.call(rbind,ans))
+}

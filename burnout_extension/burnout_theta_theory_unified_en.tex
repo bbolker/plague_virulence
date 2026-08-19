@@ -1,12 +1,10 @@
 \documentclass[11pt,a4paper]{article}
 \usepackage[margin=0.92in]{geometry}
-\usepackage{amsmath,amssymb,mathtools}
+\usepackage{amsmath,amssymb}
 \usepackage{booktabs}
 \usepackage{array}
-\usepackage{enumitem}
 \usepackage{xcolor}
 \usepackage{hyperref}
-\usepackage{microtype}
 \usepackage{longtable}
 \hypersetup{colorlinks=true,linkcolor=blue!55!black,citecolor=blue!55!black,urlcolor=blue!55!black}
 \setlength{\parindent}{2em}
@@ -47,6 +45,355 @@ Following the matched-asymptotic phase-plane architecture of Parsons and Earn, w
 
 Finally, $x_{\rm in}$ feeds directly into Kendall's time-inhomogeneous birth--death formula. A high-accuracy version requires only a one-dimensional Kendall integral; when the action is sufficiently large, Laplace's method gives a fully asymptotic closed form. We also distinguish several boundaries of validity: no boundary-layer entry, scale merging as $\Rzero\to1^+$, small-action Laplace failure, a high-$\Rzero$ distinguished limit, and finite-$K$ stochastic-entry fluctuations. These are validity limits of the asymptotic regime rather than missing pieces of the main derivation.
 \end{abstract}
+
+\section{Executive formula sheet: predictions, definitions, and validity conditions}
+\label{sec:executive}
+
+This section is a self-contained statement of the result.  It is intended for a
+reader who wants to implement or assess the approximation without following the
+matched-asymptotic derivation.  The 2024 Parsons--Bolker--Dushoff--Earn burnout
+paper carries the phase-plane matching through the refined term that is called
+\emph{first order} here (the constant $C_0$); it does not contain the
+$D_\theta$ second-order extension derived in this note.
+
+\subsection{Basic inputs and quantities derived from them}
+
+The independent dimensionless inputs are
+\[
+ \Rzero>1,\qquad 0<\rho\ll1,\qquad 0\leq\theta\leq1,
+ \qquad K\gg1.
+\]
+Here $\Rzero$ is the basic reproduction number, $\rho$ is the susceptible
+recruitment rate divided by the infectious removal rate, $\theta$ specifies the
+recruitment law, and $K$ is population size.  Fractions of susceptible and
+infectious hosts are denoted by $x$ and $y$.  Define, in the following order,
+\begin{align*}
+ h_\theta(x)&=(1-x)x^\theta,
+ &F(x)&=1-x+\frac{1}{\Rzero}\log x,\\
+ \xs&=\frac1{\Rzero},
+ &\xf&=-\frac1{\Rzero}W_0(-\Rzero e^{-\Rzero}).
+\end{align*}
+Thus $\xf\in(0,\xs)$ is the nontrivial root of $F(\xf)=0$.  The endemic
+infectious fraction and the standard matching height are
+\begin{equation}
+ y^*=\rho h_\theta(\xs)
+ =\rho(\Rzero-1)\Rzero^{-(1+\theta)},
+ \qquad
+ \BL=\sqrt{\frac{y^*}{K}}.
+ \label{eq:exec-ybl}
+\end{equation}
+The alternative choice $\BL=y^*$ used in some comparison plots may be inserted
+in every formula below, but it is an empirical fallback: because it is
+$O(\rho)$ rather than $o(\rho)$, it does not have the same formal second-order
+error guarantee as~\eqref{eq:exec-ybl}.
+
+The refined first-order constant is obtained entirely from $(\Rzero,\theta)$:
+\begin{align}
+ \widetilde a_\theta&=\frac{h_\theta(\xf)}{\xf},\nonumber\\
+ \Jfun&=\int_{\xf}^{1}\left[
+ \frac{(\xs-u)h_\theta(u)}{u^2F(u)}
+ -\frac{\widetilde a_\theta}{u-\xf}\right]du,\nonumber\\
+ \Cfun&=\frac{(1-\xf)(\xs-\xf)}{\xf}
+ \exp\!\left(\frac{\Jfun}{\widetilde a_\theta}\right).
+ \label{eq:exec-C}
+\end{align}
+The integrand in $J_\theta$ has a removable endpoint singularity.
+
+For the second-order constant, define the coefficient integrands
+\begin{align*}
+ q_1(u)&=-\frac{h_\theta(u)(\Rzero u-1)}
+ {\Rzero^2u^2F(u)},\\
+ q_2(u)&=\frac{h_\theta(u)(\Rzero u-1)}
+ {\Rzero^2u^2F(u)^2}
+ \left[Y_1(u)-\frac{h_\theta(u)}{\Rzero u}\right].
+\end{align*}
+Then the two outer coefficients are the nested one-dimensional integrals
+\begin{equation}
+ \boxed{\qquad
+ Y_1(x)=\int_1^x q_1(u)\,du,
+ \qquad
+ Y_2(x)=\int_1^x q_2(u)\,du.
+ \qquad}
+ \label{eq:exec-Y12}
+\end{equation}
+These are exactly equivalent to $Y_i'=q_i$, $Y_i(1)=0$.  Numerically, an ODE
+integrator is simply an adaptive quadrature engine for these cumulative
+integrals.  The apparent singularity at $u=1$ is removable.  Near $u=\xf$ the
+raw second integral is badly conditioned; the production calculation therefore
+subtracts its known singular part, integrates the finite remainder, and adds
+back the analytic primitive, as detailed in Section~\ref{sec:D-numerics}.
+For $0<y<F(\xs)$ let $X_0(y)\in(\xf,\xs)$ be the descending-branch solution
+of $F(X_0)=y$, and set
+\begin{align*}
+ X_1(y)&=-\frac{Y_1(X_0)}{F'(X_0)},\\
+ X_2(y)&=-\frac{\tfrac12F''(X_0)X_1^2+Y_1'(X_0)X_1+Y_2(X_0)}
+ {F'(X_0)}.
+\end{align*}
+Define the local constants
+\begin{align*}
+ \delta&=1-\Rzero\xf,&h_f&=h_\theta(\xf),
+ &h_f'&=\xf^{\theta-1}\{\theta-(\theta+1)\xf\},\\
+ a&=\frac{h_f}{\delta},&b&=\frac{\Rzero\xf}{\delta},
+ &c&=\delta h_f'+\Rzero h_f,\\
+ \kappa&=\frac{h_fc}{2\delta^3},
+ &f_1&=\frac{\delta}{\Rzero\xf},
+ &f_2&=-\frac1{\Rzero\xf^2},\\
+ \alpha&=\frac{h_f}{\Rzero\xf},
+ &\beta&=\alpha\log\frac{f_1}{C_\theta},
+ &p_0&=\frac{2\delta\xf h_f'-(1+2\delta)h_f}
+ {2\Rzero\delta\xf^2},\\
+ A_{-1}&=\frac{h_f/\xf-c}{\delta^2},
+ &B_0&=\beta-\alpha,
+ &B_1&=-\frac{h_f}{2\Rzero\delta\xf^2}.
+\end{align*}
+For $s>0$, subtract the explicitly known singular part
+\begin{equation}
+ q_{2,\mathrm{sing}}(s)
+ =-\frac{a\alpha\log s+aB_0}{s^2}
+ +\frac{A_{-1}\alpha\log s+A_{-1}B_0-aB_1}{s},
+ \label{eq:exec-q2sing}
+\end{equation}
+and define
+\begin{align}
+ q_{2,\mathrm{reg}}(u)&=q_2(u)-q_{2,\mathrm{sing}}(u-\xf),\nonumber\\
+ P_2(s)&=\frac{a\alpha\log s+a\beta}{s}
+ +\frac{A_{-1}\alpha}{2}\log^2s
+ +(A_{-1}B_0-aB_1)\log s,\nonumber\\
+ K_2&=-P_2(1-\xf)-\int_{\xf}^{1}q_{2,\mathrm{reg}}(u)\,du,\nonumber\\
+ N_{20}&=K_2+\frac{\alpha\beta f_2}{f_1^2}
+ -\frac{(\alpha+\beta)p_0}{f_1}
+ +\frac{f_2\beta^2}{2f_1^2}.
+ \label{eq:exec-D-parts}
+\end{align}
+The production formula for the second-order constant is therefore
+\begin{equation}
+ \boxed{\qquad
+ D_\theta=-\frac{N_{20}}{f_1}-\kappa\frac{\beta^2}{\alpha^2}.
+ \qquad}
+ \label{eq:exec-D}
+\end{equation}
+The integrand $q_{2,\mathrm{reg}}(u)=O(\log(u-\xf))$ is integrable at
+$u=\xf$, so~\eqref{eq:exec-D} requires one finite regularized quadrature and
+no small-$y$ extrapolation.  For general $\theta$ this is the explicit
+semi-analytical expression; an elementary closed form is not available.  The
+implementation stops a short distance from each endpoint and supplies the
+omitted pieces from their local log--power expansions.  It also normalizes the
+numerically integrated $Y_1$ so that its finite part is exactly
+$\beta=\alpha\log(f_1/C_\theta)$.  These are quadrature-stabilization steps
+only: the endpoint distances, fitted local coefficients, and normalization
+shift cancel from the limiting quantity and are not extra parameters in
+$D_\theta$.
+The
+equivalent limit characterization
+\begin{equation}
+ D_\theta=\lim_{y\downarrow0}\left[
+ X_2(y)-\kappa\log^2\!\left(\frac{C_\theta}{y}\right)\right]
+ \label{eq:exec-D-limit}
+\end{equation}
+is useful for the derivation and cross-checking only, not for production
+evaluation.  The cancellation proving equivalence is given in
+Section~\ref{sec:D-numerics}.
+
+\subsection{First- and second-order entry points}
+
+Only differences of the action are needed.  Define them directly by
+\begin{equation}
+ \Afun(x)-\Afun(z)=\int_z^x
+ \frac{1-\Rzero u}{(1-u)u^\theta}\,du,
+ \qquad \xf\leq z,x\leq\xs,
+ \label{eq:exec-action}
+\end{equation}
+and put
+\begin{align*}
+ L_{\rm BL}&=\log(C_\theta/\BL),
+ &Q&=\frac{\Rzero a-bc}{a\delta^2},\\
+ M_1&=\rho L_{\rm BL}+\frac ba\BL,\\
+ M_2&=M_1+\rho^2\frac{D_\theta}{a}
+ +\rho\BL Q(L_{\rm BL}+1)+\frac{bQ}{2a}\BL^2.
+\end{align*}
+The direct corner expansions for the entry point are, explicitly,
+\begin{equation}
+ \boxed{
+ x_{\rm in}^{(1),\,\mathrm{dir}}
+ =\xf+\rho aL_{\rm BL}+b\BL,}
+ \label{eq:exec-xin-direct1}
+\end{equation}
+and
+\begin{equation}
+ \boxed{\begin{aligned}
+ x_{\rm in}^{(2),\,\mathrm{dir}}
+ ={}&\xf+\rho aL_{\rm BL}+b\BL
+ +\rho^2\{\kappa L_{\rm BL}^2+D_\theta\}\\
+ &+\frac{\rho\BL}{\delta^2}
+ \{\Rzero a(L_{\rm BL}+1)-bc\}
+ +\frac{b\Rzero}{2\delta^2}\BL^2.
+ \end{aligned}}
+ \label{eq:exec-xin-direct2}
+\end{equation}
+These two formulas display the asymptotic corrections transparently.  For
+production calculations we recommend the action-resummed versions: they keep
+the same first- or second-order matching information but avoid unnecessarily
+Taylor-expanding the nonlinear action.  The recommended first- and second-order
+entry estimates are therefore the unique admissible roots
+\begin{equation}
+ \boxed{\quad
+ \Afun(x_{\rm in}^{(j)})-\Afun(\xf)=M_j,
+ \qquad \xf<x_{\rm in}^{(j)}<\xs,
+ \quad j=1,2.\quad}
+ \label{eq:exec-xin}
+\end{equation}
+They exist precisely when
+\begin{equation}
+ 0<M_j<\Delta A_f,
+ \qquad \Delta A_f=\Afun(\xs)-\Afun(\xf).
+ \label{eq:exec-admissible}
+\end{equation}
+Failure of~\eqref{eq:exec-admissible} is a validity diagnostic, not a license
+to extrapolate the scalar equation beyond its matching interval.
+
+\subsection{Burnout and persistence probabilities}
+
+For either $x_{\rm in}=x_{\rm in}^{(1)}$ or $x_{\rm in}^{(2)}$, define the exact
+one-dimensional Kendall integral
+\begin{equation}
+ \mathcal I(x_{\rm in})=\int_{x_{\rm in}}^1
+ \frac{1}{\rho(1-X)X^\theta}
+ \exp\!\left\{\frac{\Afun(X)-\Afun(x_{\rm in})}{\rho}\right\}dX.
+ \label{eq:exec-Kendall}
+\end{equation}
+The production calculation evaluates the same integral in the overflow-safe
+form
+\begin{align}
+ \Lambda(x_{\rm in})
+ &=\frac{\Afun(\xs)-\Afun(x_{\rm in})}{\rho},\nonumber\\
+ J(x_{\rm in})
+ &=\int_{x_{\rm in}}^1
+ \frac{1}{\rho(1-X)X^\theta}
+ \exp\!\left\{\frac{\Afun(X)-\Afun(\xs)}{\rho}\right\}dX,\nonumber\\
+ \log\mathcal I&=\Lambda+\log J.
+ \label{eq:exec-Kendall-scaled}
+\end{align}
+Thus $J$ is only a rescaled numerical integral, not an additional
+approximation or an unreported model quantity.
+With $m=K\BL$ infectives at entry, the conditional probabilities are
+\begin{equation}
+ \boxed{\quad P_{\rm burn\mid est}\simeq
+ \left(\frac{\mathcal I}{1+\mathcal I}\right)^{K\BL},
+ \qquad
+ P_{\rm persist\mid est}\simeq1-P_{\rm burn\mid est}.\quad}
+ \label{eq:exec-prob}
+\end{equation}
+Numerically these are evaluated without forming a potentially enormous
+$\mathcal I$:
+\begin{equation}
+ B=m\log\!\left(1+e^{-\log\mathcal I}\right),
+ \qquad
+ P_{\rm persist\mid est}=-\operatorname{expm1}(-B),
+ \qquad P_{\rm burn\mid est}=e^{-B}.
+ \label{eq:exec-prob-stable}
+\end{equation}
+For one initially infectious individual, the early establishment probability
+is $p_{\rm est}\simeq1-1/\Rzero$, so the unconditional first-trough persistence
+probability is
+\begin{equation}
+ P_{\rm persist,uncond}\simeq
+ \left(1-\frac1{\Rzero}\right)P_{\rm persist\mid est}.
+ \label{eq:exec-uncond}
+\end{equation}
+For $I_0$ independent initial lineages, replace the leading factor by
+$1-\Rzero^{-I_0}$.
+
+The optional Laplace closed form uses
+\begin{equation}
+ \Lambda_j=\frac{\Delta A_f-M_j}{\rho},
+ \qquad
+ \mathcal I_{L,j}=\sqrt{\frac{2\pi}{\Rzero y^*}}e^{\Lambda_j},
+ \label{eq:exec-Laplace}
+\end{equation}
+followed by~\eqref{eq:exec-prob} with $\mathcal I_{L,j}$ in place of
+$\mathcal I$.  The further simplification
+$-\log P_{\rm burn\mid est}\sim K\BL/\mathcal I_{L,j}$ additionally requires
+$\mathcal I_{L,j}\gg1$.
+
+\paragraph{Which route requires $x_{\rm in}$?}
+There are two distinct computational pipelines.
+\begin{enumerate}
+ \item \textbf{Exact Kendall (recommended high-accuracy route):}
+ compute $C_\theta,D_\theta$ and $M_j$; solve
+ $\Afun(x_{\rm in}^{(j)})-\Afun(\xf)=M_j$ for $x_{\rm in}^{(j)}$; then use
+ that value as the lower limit in~\eqref{eq:exec-Kendall}.  Thus this route
+ genuinely requires $x_{\rm in}$.
+ \item \textbf{Laplace closed form:} compute the action directly as
+ \[
+ \Lambda_j=\frac{\Delta A_f-M_j}{\rho}.
+ \]
+ Then use~\eqref{eq:exec-Laplace} and~\eqref{eq:exec-prob}.  No root solve for
+ $x_{\rm in}$ and no separate evaluation of $\Afun(x_{\rm in})$ are required,
+ because the matching equation has already supplied their action difference.
+\end{enumerate}
+
+\subsection{Conditions: what is required, and why}
+
+The conditions are best treated as diagnostics rather than as a single vague
+statement that every parameter must be ``small'' or ``large.''
+
+\paragraph{Common to both orders.}
+\begin{enumerate}
+ \item $\rho\ll1$ with fixed $\Rzero>1$, and in practice
+ $(\Rzero-1)/\rho\gg1$.  This separates the fast epidemic wave from slow
+ susceptible replenishment and avoids the nonuniform near-threshold limit.
+ \item $1/K\ll\BL\ll\rho$ (hence $K\BL\gg1$ and $Ky^*\gg1$ for the standard
+ choice).  The first inequality makes deterministic entry concentrated enough
+ to match to a branching process; the second makes infection feedback on the
+ susceptible path negligible in the Kendall layer.
+ \item The deterministic descending trajectory must actually cross
+ $y=\BL$, and~\eqref{eq:exec-admissible} must hold.  Otherwise there is no
+ entry point of the type assumed by the calculation.
+ \item The fixed-$\Rzero$ expansion must not be pushed into the joint
+ high-$\Rzero$ regime.  For $0\leq\theta<1$, a useful warning test is
+ $\xf\gg\rho^{1/(1-\theta)}$; if these scales compete, replenishment changes
+ the final-size corner itself.  The endpoint $\theta=1$ has a different
+ distinguished balance and must not be judged by this formula.
+\end{enumerate}
+
+\paragraph{First-order matching.}
+In addition to the common conditions, the corner displacement must be small:
+\begin{equation}
+ \rho|L_{\rm BL}|+\BL\ll \xs-\xf,
+ \qquad 0<M_1<\Delta A_f.
+ \label{eq:exec-first-cond}
+\end{equation}
+This is the operational requirement that the logarithmic switchback and the
+finite-height correction remain local to the final-size corner.  It is the
+appropriate accuracy level corresponding to the refined formula in the
+original burnout paper when $\theta=0$.
+
+\paragraph{Second-order matching.}
+All first-order conditions remain necessary.  In addition, the nominal
+second-order correction
+\begin{equation}
+ \Delta M_2=M_2-M_1
+ =\rho^2\frac{D_\theta}{a}+\rho\BL Q(L_{\rm BL}+1)
+ +\frac{bQ}{2a}\BL^2
+\end{equation}
+must be hierarchically smaller than the leading displacement, for example
+\begin{equation}
+ |\Delta M_2|\ll |M_1|,
+ \qquad 0<M_2<\Delta A_f.
+ \label{eq:exec-second-cond}
+\end{equation}
+This check explains why a formal second-order curve can be worse than the
+first-order curve at moderate $\rho$: the extra terms are then no longer small
+corrections and may over-correct.  Second order improves deterministic matching
+only; it cannot cure finite-$K$ stochastic-entry error or a poor Laplace
+approximation.
+
+\paragraph{Laplace approximation only.}
+The exact Kendall integral~\eqref{eq:exec-Kendall} needs no saddle-point
+assumption.  Replacing it by~\eqref{eq:exec-Laplace} additionally requires
+$\Lambda_j\gg1$, so that the integrand is sharply localized near $x=\xs$.
+When $\Lambda_j=O(1)$, retain the exact integral even if the entry estimate is
+second order.
 
 \section{The problem: from a deterministic epidemic tail to stochastic burnout}
 We consider the dimensionless SIR-type dynamics in a single patch
@@ -106,7 +453,7 @@ without integrating the full two-dimensional system~\eqref{eq:model} for every p
 Parsons and Earn constructed matched asymptotic approximations for the standard SIR model with vital dynamics, including the epidemic outer solution, the left corner, the $x$-axis boundary layer, and an additional boundary layer required in a joint high-$\Rzero$ limit\cite{PE2024}. Parsons et al. then connected this phase-plane construction to a time-inhomogeneous branching process to obtain the probability of burnout during the first epidemic trough\cite{PNAS2024}.
 
 The present work uses the same singular-perturbation architecture but relies only on two structural facts:
-\begin{enumerate}[leftmargin=2.2em]
+\begin{enumerate}
 \item when $\rho=0$, the geometry of the first epidemic wave is independent of $h_\theta$;
 \item when $y$ is small, susceptible replenishment enters the slow basin dynamics through $h_\theta(x)$.
 \end{enumerate}
@@ -183,11 +530,39 @@ If one writes $H=1+\rho H_1+\rho^2H_2+\cdots$, then $H_1=Y_1$ and $H_2=Y_2$. Thu
 
 \section{First-order matching: the logarithmic singularity and $C_\theta$}
 \subsection{Relation to the Parsons notation}
-Let
+Parsons and Earn use two visually similar small parameters.  Their first
+definition, introduced in the time-parametrized SIR equations, is
 \[
-\epsilon=\frac\rho{\Rzero},
-\qquad
-G_\theta=\Rzero Y_1.
+\varepsilon=\frac{\mu}{\gamma+\mu},
+\]
+the infectious period divided by the host lifetime.  In the standard
+recruitment case $\theta=0$, their equation is
+\[
+ \frac{dx}{d\sigma}=\varepsilon(1-x)-\Rzero xy,
+\]
+whereas ours is $dx/d\sigma=\rho(1-x)-\Rzero xy$.  Therefore the exact
+dictionary is
+\begin{equation}
+ \boxed{\varepsilon=\rho.}
+ \label{eq:eps-vareps-map}
+\end{equation}
+They then introduce the second glyph
+\begin{equation}
+ \boxed{\epsilon=\frac{\varepsilon}{\Rzero}
+ =\frac{\rho}{\Rzero},}
+ \label{eq:eps-map}
+\end{equation}
+because it simplifies the phase-plane equations.  Thus $\varepsilon$ and
+$\epsilon$ are distinct, with $\varepsilon=\Rzero\epsilon$; neither is an
+additional biological parameter.  This note expands directly in $\rho$,
+\[
+ y=F+\rho Y_1+\rho^2Y_2+\cdots,
+\]
+while Parsons and Earn organize the corresponding phase-plane expansion in
+$\epsilon$.  Since $\Rzero$ is fixed, $\epsilon=O(\rho)$ and the asymptotic
+orders agree.  To translate their first-order coefficient to ours, set
+\[
+ G_\theta=\Rzero Y_1.
 \]
 Then
 \begin{equation}
@@ -297,6 +672,7 @@ u_1(v)=aL+bv.
 The term $\rho aL$ is the logarithmic switchback, while $by$ is the finite-height correction. Equation~\eqref{eq:u1} is exactly the corner representation of the refined first-order matching obtained above.
 
 \section{Second-order matching: $D_\theta$ and the next switchback}
+\label{sec:D-numerics}
 Continuing the same corner expansion to $O(\rho^2)$ gives
 \begin{equation}
 \label{eq:u2}
@@ -324,7 +700,82 @@ D_\theta
 X_2(y)-\kappa\log^2\!\left(\frac{C_\theta}{y}\right)
 \right].
 \end{equation}
-Equation~\eqref{eq:Climit} gives the same $C_\theta$ as the explicit regularized integral~\eqref{eq:Ctheta}; this is an important internal consistency check between the two representations. The constant $D_\theta$ contains the genuinely new second-order information. In practice, one may integrate the one-dimensional coefficient equations~\eqref{eq:Y1}--\eqref{eq:Y2} and then stably extrapolate~\eqref{eq:Dlimit} after accounting for the known $O(y\log^m y)$ remainder structure.
+Equation~\eqref{eq:Climit} gives the same $C_\theta$ as the explicit regularized integral~\eqref{eq:Ctheta}; this is an important internal consistency check between the two representations. The constant $D_\theta$ contains the genuinely new second-order information. It can be computed without a small-$y$ extrapolation, as follows.
+
+Put $s=x-\xf$, $f_1=F'(\xf)=\delta/(\Rzero\xf)$,
+$f_2=F''(\xf)=-1/(\Rzero\xf^2)$, and
+\begin{equation}
+\label{eq:Y1local}
+Y_1(x)=\alpha\log s+\beta+p_0s+O(s^2),
+\quad
+\alpha=\frac{h_f}{\Rzero\xf},
+\quad
+\beta=\alpha\log\frac{f_1}{C_\theta},
+\end{equation}
+where
+\[
+p_0=\frac{2\delta\xf h_f'-(1+2\delta)h_f}
+{2\Rzero\delta\xf^2}.
+\]
+Define
+\[
+A_{-1}=\frac{h_f/\xf-c}{\delta^2},
+\qquad B_0=\beta-\alpha,
+\qquad B_1=-\frac{h_f}{2\Rzero\delta\xf^2}.
+\]
+The integrand on the right of~\eqref{eq:Y2}, denoted by $q_2(x)$, has singular part
+\begin{equation}
+\label{eq:q2sing}
+q_{2,{\rm sing}}(s)
+=-\frac{a\alpha\log s+aB_0}{s^2}
++\frac{A_{-1}\alpha\log s+A_{-1}B_0-aB_1}{s}.
+\end{equation}
+Direct expansion of the exact integrand gives
+$q_{2,{\rm reg}}(x):=q_2(x)-q_{2,{\rm sing}}(x-\xf)=O(\log(x-\xf))$,
+so the regularized integrand is integrable at $\xf$.  A convenient singular
+primitive is
+\begin{equation}
+\label{eq:P2}
+P_2(s)=\frac{a\alpha\log s+a\beta}{s}
++\frac{A_{-1}\alpha}{2}\log^2s
++(A_{-1}B_0-aB_1)\log s,
+\end{equation}
+for which direct differentiation gives $P_2'=q_{2,{\rm sing}}$.  Hence
+\begin{equation}
+\label{eq:K2}
+K_2=-P_2(1-\xf)-\int_{\xf}^{1}q_{2,{\rm reg}}(u)\,du,
+\qquad
+Y_2(x)=P_2(x-\xf)+K_2+o(1).
+\end{equation}
+
+For completeness, write $T=\alpha\log s+\beta$.  From~\eqref{eq:X1},
+\[
+X_1=-\frac{T}{f_1}
++s\left(-\frac{p_0}{f_1}+\frac{f_2T}{f_1^2}\right)+O(s^2\log s).
+\]
+Thus the singular part of $Y_1'X_1$ is
+$-\alpha T/(f_1s)=-(a\alpha\log s+a\beta)/s$, which cancels both the
+$(\log s)/s$ and $1/s$ terms in $Y_2$.  The remaining finite numerator in
+~\eqref{eq:X2} has constant part
+\begin{equation}
+\label{eq:N20}
+N_{20}=K_2+\frac{\alpha\beta f_2}{f_1^2}
+-\frac{(\alpha+\beta)p_0}{f_1}
++\frac{f_2\beta^2}{2f_1^2}.
+\end{equation}
+Its logarithmic terms reduce to
+$-f_1\kappa(\log s+\beta/\alpha)^2$; since
+$\log(C_\theta/y)=-\log s-\beta/\alpha+o(1)$, the logarithmic part of $X_2$
+is exactly $\kappa\log^2(C_\theta/y)$.  The finite-quadrature formula is therefore
+\begin{equation}
+\label{eq:Dquadrature}
+D_\theta=-\frac{N_{20}}{f_1}-\kappa\frac{\beta^2}{\alpha^2}.
+\end{equation}
+Equations~\eqref{eq:K2} and~\eqref{eq:Dquadrature} are the recommended numerical
+definition: they require one finite regularized quadrature and prove finiteness
+directly.  Equation~\eqref{eq:Dlimit} remains the equivalent asymptotic
+characterization, but no endpoint extrapolation is needed in the production
+calculation.
 
 \section{Action formulation: from the corner expansion to a stable scalar equation}
 \subsection{The action primitive}
@@ -515,7 +966,7 @@ Increasing the asymptotic order of $x_{\rm in}$ controls only the deterministic 
 the Kendall integrand is sharply concentrated near $x_*$ and the Laplace formula is accurate. When $\Lambda=O(1)$ or smaller, the Laplace approximation may have substantial error even if $x_{\rm in}$ is already extremely accurate.
 
 The two versions should therefore be viewed as different levels of approximation:
-\begin{enumerate}[leftmargin=2.2em]
+\begin{enumerate}
 \item \textbf{Primary numerical/semi-analytical prediction}: second-order $x_{\rm in}$ plus the exact one-dimensional Kendall integral;
 \item \textbf{Fully asymptotic closed form}: second-order action plus Laplace's method, valid when the action is sufficiently large.
 \end{enumerate}
@@ -577,8 +1028,8 @@ x_{\rm in}^{(1)},x_{\rm in}^{(2)}
 \]
 
 A practical implementation naturally separates into a precomputation layer and a parameter layer:
-\begin{enumerate}[leftmargin=2.2em]
-\item For each $(\Rzero,\theta)$, compute $\xf$, integrate $Y_1$ and $Y_2$, and obtain $C_\theta$ and $D_\theta$;
+\begin{enumerate}
+\item For each $(\Rzero,\theta)$, compute $\xf$, $C_\theta$, and $D_\theta$, using the regularized quadrature~\eqref{eq:Dquadrature} for the latter;
 \item for each $(\rho,K)$, compute $y^*$ and $\BL$, and use~\eqref{eq:M1} and~\eqref{eq:M2} to obtain first- and second-order predictions;
 \item for the high-accuracy version, use the exact Kendall integral~\eqref{eq:Kendall};
 \item when a closed form is needed, use the action~\eqref{eq:LambdaM2} and the Laplace approximation~\eqref{eq:Ilap};
@@ -615,7 +1066,7 @@ B_{\rm Kendall},
 \qquad
 B_{\rm Laplace}.
 \]
-The extraction of $D_\theta$ should also be tested for sensitivity to extrapolation window, extrapolation basis, and numerical precision. The constant $C_\theta$ should be cross-validated using both~\eqref{eq:Ctheta} and~\eqref{eq:Climit}.
+The regularized quadrature for $D_\theta$ should also be tested for endpoint-treatment and numerical-precision sensitivity. The constant $C_\theta$ should be cross-validated using both~\eqref{eq:Ctheta} and~\eqref{eq:Climit}.
 
 \begin{thebibliography}{9}
 \bibitem{PE2024}

@@ -1,7 +1,9 @@
 source('validation/R/theory.R')
 
-kendall_quantities <- function(xin,R0,rho,theta,K) {
-  xs<-1/R0; ybl<-sqrt(rho*h_theta(xs,theta)/K)
+kendall_quantities <- function(xin,R0,rho,theta,K,yline=NULL) {
+  xs<-1/R0
+  if(is.null(yline)) yline<-sqrt(rho*h_theta(xs,theta)/K)
+  ybl<-yline
   Lambda<-action_diff(xin,xs,R0,theta)/rho
   scaled<-function(X) {
     vapply(X,function(xx) if(xx>=1) 0 else

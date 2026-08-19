@@ -5,6 +5,9 @@ for(th in c(0,.5,1)) for(x in c(.13,.37,.71)) {
 }
 expected<-c('2'=0.07968023,'3'=0.14061515,'5'=0.16570580)
 for(nm in names(expected)) stopifnot(abs(C_explicit(as.numeric(nm),.5)-expected[nm])<3e-6)
+expected_D<-c('2'=-0.04784,'3'=-0.07927,'5'=-0.02572)
+for(nm in names(expected_D))
+  stopifnot(abs(D_regularized(as.numeric(nm),.5)-expected_D[nm])<8e-5)
 z<-matching(3,.01,.5,1e4,D=-.07962)
 stopifnot(abs(action_diff(z$x_second,1/3,3,.5)/.01-z$Lambda_second)<2e-8)
 cat('theory unit tests passed\n')
