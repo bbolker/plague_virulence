@@ -54,7 +54,11 @@ reader who wants to implement or assess the approximation without following the
 matched-asymptotic derivation.  The 2024 Parsons--Bolker--Dushoff--Earn burnout
 paper carries the phase-plane matching through the refined term that is called
 \emph{first order} here (the constant $C_0$); it does not contain the
-$D_\theta$ second-order extension derived in this note.
+$D_\theta$ second-order extension derived in this note.  At second order, the
+outer calculation identifies $D_\theta$ as the finite part of $X_2$ after its
+known squared-logarithmic term is removed.  Matching the outer and corner
+expansions then fixes the undetermined corner integration constant to this same
+$D_\theta$.
 
 \subsection{Basic inputs and quantities derived from them}
 
@@ -181,18 +185,19 @@ omitted pieces from their local log--power expansions.  It also normalizes the
 numerically integrated $Y_1$ so that its finite part is exactly
 $\beta=\alpha\log(f_1/C_\theta)$.  These are quadrature-stabilization steps
 only: the endpoint distances, fitted local coefficients, and normalization
-shift cancel from the limiting quantity and are not extra parameters in
-$D_\theta$.
-The
-equivalent limit characterization
-\begin{equation}
- D_\theta=\lim_{y\downarrow0}\left[
- X_2(y)-\kappa\log^2\!\left(\frac{C_\theta}{y}\right)\right]
- \label{eq:exec-D-limit}
-\end{equation}
-is useful for the derivation and cross-checking only, not for production
-evaluation.  The cancellation proving equivalence is given in
-Section~\ref{sec:D-numerics}.
+shift do not alter the finite part $D_\theta$ and are not extra model
+parameters.
+More precisely, the local outer calculation in
+Section~\ref{sec:D-numerics} gives
+\[
+X_2(y)=\kappa\log^2\!\left(\frac{C_\theta}{y}\right)+D_\theta+o(1),
+\qquad y\downarrow0,
+\]
+with $D_\theta$ equal to~\eqref{eq:exec-D}.  In the overlap with the corner
+region, this outer expansion is compared with the corner solution containing
+an undetermined integration constant.  Equality of the constant terms fixes
+that corner constant to $D_\theta$, which is why the same quantity appears in
+the entry-point formulas below.
 
 \subsection{First- and second-order entry points}
 
@@ -561,9 +566,10 @@ additional biological parameter.  This note expands directly in $\rho$,
 while Parsons and Earn organize the corresponding phase-plane expansion in
 $\epsilon$.  Since $\Rzero$ is fixed, $\epsilon=O(\rho)$ and the asymptotic
 orders agree.  To translate their first-order coefficient to ours, set
-\[
- G_\theta=\Rzero Y_1.
-\]
+\begin{equation}
+\label{eq:G-Y1}
+G_\theta=\Rzero Y_1.
+\end{equation}
 Then
 \begin{equation}
 \label{eq:Gprime}
@@ -598,36 +604,169 @@ Define the regularized integral
 -\frac{\widetilde a_\theta}{u-\xf}
 \right]du.
 \end{equation}
-The two singular terms cancel at $u=\xf$, so~\eqref{eq:Jtheta} is a smooth one-dimensional integral. It yields the refined first-order matching amplitude
+The two singular terms cancel at $u=\xf$, so~\eqref{eq:Jtheta} is a smooth one-dimensional integral. Its finite part determines the matching amplitude as follows. Since $G_\theta(1)=0$, integration of~\eqref{eq:Gprime} gives
+\begin{equation}
+\label{eq:Gintegral}
+G_\theta(x)=-\int_x^1
+\frac{(\xs-u)h_\theta(u)}{u^2F(u)}\,du.
+\end{equation}
+Adding and subtracting the singular term used in~\eqref{eq:Jtheta}, and then taking $x\to\xf^+$, yields
+\begin{equation}
+\label{eq:Gfinitepart}
+G_\theta(x)
+=\widetilde a_\theta\log\frac{x-\xf}{1-\xf}
+-\Jfun+o(1).
+\end{equation}
+To convert this result from the direct representation $y=y(x;\rho)$ to the
+inverse descending branch $x=X(y;\rho)$, introduce
+\begin{equation}
+\label{eq:Xexp}
+X(y;\rho)=X_0(y)+\rho X_1(y)+\rho^2X_2(y)+O(\rho^3),
+\qquad F(X_0(y))=y.
+\end{equation}
+Substitute~\eqref{eq:Xexp} into the direct outer expansion~\eqref{eq:Yexp}.
+Taylor expansion at fixed $y$ gives, through first order,
+\[
+y
+=F(X_0)+\rho\left[F'(X_0)X_1+Y_1(X_0)\right]
++O(\rho^2).
+\]
+The leading term is $F(X_0)=y$ by definition, so the coefficient of $\rho$
+must vanish. Hence
+\begin{equation}
+\label{eq:X1}
+X_1(y)=-\frac{Y_1(X_0(y))}{F'(X_0(y))}
+=-\frac{G_\theta(X_0(y))}{\Rzero F'(X_0(y))}.
+\end{equation}
+This is the usual first-order inverse-function correction; it requires
+$F'(X_0)\ne0$, which holds on the descending branch sufficiently close to
+$\xf$ because $F'(\xf)>0$. The relation needed below is obtained by
+Taylor-expanding the identity $F(X_0(y))=y$ about $\xf$:
+\[
+y=F(\xf)+F'(\xf)(X_0(y)-\xf)
++O\!\left((X_0(y)-\xf)^2\right).
+\]
+Since $F(\xf)=0$ and $F'(\xf)\ne0$, inversion gives
+\begin{equation}
+\label{eq:X0nearxf}
+X_0(y)-\xf
+=\frac{y}{F'(\xf)}+O(y^2),
+\qquad
+F'(\xf)=\frac{\xs-\xf}{\xf}.
+\end{equation}
+Thus, in~\eqref{eq:Gfinitepart}, setting $x=X_0(y)$ and using
+$X_0(y)-\xf=y/F'(\xf)+O(y^2)$ gives explicitly
+\begin{equation}
+\label{eq:GofX0}
+G_\theta(X_0(y))
+=\widetilde a_\theta
+\log\frac{y}{(1-\xf)F'(\xf)}
+-\Jfun+o(1).
+\end{equation}
+Substituting~\eqref{eq:GofX0} into~\eqref{eq:X1} first gives
+\[
+X_1(y)
+=-\frac{1}{\Rzero F'(\xf)}
+\left[
+\widetilde a_\theta
+\log\frac{y}{(1-\xf)F'(\xf)}-\Jfun
+\right]+o(1),
+\]
+where $F'(X_0(y))=F'(\xf)+O(y)$ has also been used. Expanding the minus sign
+and factoring out $\widetilde a_\theta$ gives
+\[
+X_1(y)
+=\frac{\widetilde a_\theta}{\Rzero F'(\xf)}
+\left[
+\log\frac{(1-\xf)F'(\xf)}{y}
++\frac{\Jfun}{\widetilde a_\theta}
+\right]+o(1).
+\]
+Finally, using $\log A+B=\log(Ae^B)$ gives
+\begin{equation}
+\label{eq:X1Cmatching}
+X_1(y)
+=\frac{\widetilde a_\theta}{\Rzero F'(\xf)}
+\log\!\left[
+\frac{(1-\xf)F'(\xf)
+\exp(\Jfun/\widetilde a_\theta)}{y}
+\right]+o(1).
+\end{equation}
+The numerator inside the logarithm in~\eqref{eq:X1Cmatching} is independent
+of $y$ and is positive. We define this scale to be the first-order matching
+constant
 \begin{equation}
 \label{eq:Ctheta}
 \Cfun
+= (1-\xf)F'(\xf)
+\exp\!\left(\frac{\Jfun}{\widetilde a_\theta}\right)
 =\frac{(1-\xf)(\xs-\xf)}{\xf}
 \exp\!\left(\frac{\Jfun}{\widetilde a_\theta}\right).
+\end{equation}
+Thus $C_\theta$ is the positive scale selected by the finite part of the outer
+solution. Moreover,
+\[
+\frac{\widetilde a_\theta}{\Rzero F'(\xf)}
+=\frac{h_\theta(\xf)}{1-\Rzero\xf}=a.
+\]
+Consequently,~\eqref{eq:X1Cmatching} takes the compact asymptotic form
+\begin{equation}
+\label{eq:X1compact}
+X_1(y)=a\log\frac{C_\theta}{y}+o(1),
+\qquad y\downarrow0.
 \end{equation}
 The constant $C_\theta$ depends only on $(\Rzero,\theta)$ and is independent of $(\rho,K)$.
 
 When $\theta=0$,~\eqref{eq:Jtheta} reduces to the regularized integral in the refined Parsons et al. burnout estimate, and~\eqref{eq:Ctheta} reduces to its first-order prefactor\cite{PNAS2024}. Hence $C_\theta$ is a direct generalization of the standard burnout matching constant.
 
 \section{Inverse outer expansion and corner scaling}
-Let $X_0(y)$ denote the descending branch satisfying $F(X_0)=y$, and write
-\begin{equation}
-\label{eq:Xexp}
-X(y;\rho)=X_0(y)+\rho X_1(y)+\rho^2X_2(y)+O(\rho^3).
-\end{equation}
-Implicit-function expansion gives
-\begin{equation}
-\label{eq:X1}
-X_1(y)=-\frac{Y_1(X_0)}{F'(X_0)},
-\end{equation}
-and
+The inverse descending-branch expansion and its first-order coefficient were
+introduced in~\eqref{eq:Xexp} and~\eqref{eq:X1}. To derive the second-order
+coefficient of the inverse trajectory, substitute
+$X=X_0+\rho X_1+\rho^2X_2+O(\rho^3)$ into the identity
+\[
+y=F(X)+\rho Y_1(X)+\rho^2Y_2(X)+O(\rho^3).
+\]
+Taylor expansion about $X_0$ gives
+\begin{align*}
+F(X)={}&F(X_0)+\rho F'(X_0)X_1\\
+&+\rho^2\left[F'(X_0)X_2+\frac12F''(X_0)X_1^2\right]+O(\rho^3),\\
+\rho Y_1(X)={}&\rho Y_1(X_0)+\rho^2Y_1'(X_0)X_1+O(\rho^3),\\
+\rho^2Y_2(X)={}&\rho^2Y_2(X_0)+O(\rho^3).
+\end{align*}
+Equating coefficients of like powers of $\rho$ gives $F(X_0)=y$ at $O(1)$
+and~\eqref{eq:X1} at $O(\rho)$. Equating the coefficients of $\rho^2$ gives
+\[
+F'(X_0)X_2+\frac12F''(X_0)X_1^2
++Y_1'(X_0)X_1+Y_2(X_0)=0.
+\]
+Solving this equation for $X_2$ gives
 \begin{equation}
 \label{eq:X2}
 X_2(y)
 =-\frac{\frac12F''(X_0)X_1^2+Y_1'(X_0)X_1+Y_2(X_0)}{F'(X_0)}.
 \end{equation}
 
-When $y=O(\rho)$, the raw outer series is no longer uniform. Introduce the corner scaling
+The outer expansion is no longer valid near $y=0$ because the first-order term
+$\rho X_1(y)$ is no longer small relative to the leading displacement
+$X_0(y)-\xf$. Equations~\eqref{eq:X0nearxf} and~\eqref{eq:X1compact} give
+\[
+X_0(y)-\xf\sim\frac{y}{F'(\xf)},
+\qquad
+\rho X_1(y)\sim\rho a\log\frac{C_\theta}{y}.
+\]
+The outer inverse expansion requires the correction $\rho X_1$ to be small
+relative to the leading displacement $X_0-\xf$. Their magnitude ratio behaves
+as
+\[
+\frac{\rho |X_1(y)|}{|X_0(y)-\xf|}
+\sim \frac{\rho aF'(\xf)}{y}
+\left|\log\frac{C_\theta}{y}\right|,
+\]
+which is not small when $y$ reaches the $\rho$-scale and diverges as
+$y\downarrow0$. Thus the actual trajectory remains finite, but the outer
+ordering is no longer uniform near $\xf$. To resolve this region, introduce
+the corner variables
 \begin{equation}
 \label{eq:corner_scale}
 y=\rho v,
@@ -664,46 +803,199 @@ Let
 \label{eq:L}
 L=\log\frac{C_\theta}{y}.
 \end{equation}
-Expanding the exact phase-plane equation~\eqref{eq:phase} directly in the corner gives, at first order,
+To derive the first corner coefficient, invert the exact phase-plane
+equation~\eqref{eq:phase}:
+\begin{equation}
+\label{eq:inversephase}
+\frac{dx}{dy}
+=\frac{\rho h_\theta(x)-\Rzero xy}{(\Rzero x-1)y}.
+\end{equation}
+Under~\eqref{eq:corner_scale}, $y=\rho v$ and
+$x=\xf+\rho u_1(v)+\rho^2u_2(v)+O(\rho^3)$. Holding $\rho$ fixed and
+differentiating both variables with respect to $v$ gives
+\[
+\frac{dy}{dv}=\rho,
+\qquad
+\frac{dx}{dv}
+=\rho u_1'(v)+\rho^2u_2'(v)+O(\rho^3).
+\]
+The chain rule therefore gives
+\[
+\frac{dx}{dy}
+=\frac{dx/dv}{dy/dv}
+=u_1'(v)+\rho u_2'(v)+O(\rho^2)
+=u_1'(v)+O(\rho).
+\]
+The remaining factors in the inverse phase-plane equation satisfy
+\[
+ h_\theta(x)=h_f+O(\rho),
+\quad \Rzero x-1=-\delta+O(\rho).
+\]
+Substitution therefore gives, at leading order,
+\[
+u_1'(v)
+=\frac{h_f-\Rzero\xf v}{-\delta v}
+=b-\frac{a}{v}.
+\]
+Integration yields
+\[
+u_1(v)=bv-a\log v+A(\rho),
+\]
+where the local corner equation does not determine the integration constant
+$A(\rho)$. The outer expansion and the corner expansion are two approximations
+to the same trajectory. In their overlap, both approximations are valid and
+must have the same asymptotic form. The outer expansion already contains the
+constant $C_\theta$, whereas the corner expansion contains the undetermined
+$A(\rho)$; matching the two representations determines $A(\rho)$ in terms of
+$C_\theta$.
+
+In the overlap $\rho\ll y\ll1$ (equivalently, $v=y/\rho\to\infty$ while
+$y\to0$), use $y=\rho v$, $1/F'(\xf)=b$, and~\eqref{eq:X1compact} to express
+the outer expansion in corner variables:
+\[
+x-\xf
+\sim\frac{y}{F'(\xf)}+\rho a\log\frac{C_\theta}{y}
+=\rho\left[bv-a\log v+a\log\frac{C_\theta}{\rho}\right].
+\]
+Comparison with $x-\xf=\rho u_1(v)+\cdots$ gives
+$A(\rho)=a\log(C_\theta/\rho)$. Consequently,
 \begin{equation}
 \label{eq:u1}
-u_1(v)=aL+bv.
+u_1(v)=bv-a\log v+a\log\frac{C_\theta}{\rho}
+=a\log\frac{C_\theta}{\rho v}+bv
+=aL+bv.
 \end{equation}
-The term $\rho aL$ is the logarithmic switchback, while $by$ is the finite-height correction. Equation~\eqref{eq:u1} is exactly the corner representation of the refined first-order matching obtained above.
+The term $\rho aL$ is the logarithmic switchback, while
+$\rho bv=by$ is the finite-height correction. Equation~\eqref{eq:u1} is
+therefore the corner representation of the refined first-order outer result,
+with $C_\theta$ supplied by outer matching.
 
 \section{Second-order matching: $D_\theta$ and the next switchback}
 \label{sec:D-numerics}
-Continuing the same corner expansion to $O(\rho^2)$ gives
+The second corner coefficient follows by retaining one more order in the
+inverse phase-plane equation~\eqref{eq:inversephase}. Denote the numerator and
+denominator on its right-hand side by
+\[
+N(x,y;\rho)=\rho h_\theta(x)-\Rzero xy,
+\qquad
+D(x,y)=(\Rzero x-1)y,
+\]
+so that $dx/dy=N/D$. Substitute
+$x=\xf+\rho u_1+\rho^2u_2+\cdots$ and $y=\rho v$. First,
+\[
+h_\theta(x)=h_f+\rho h_f'u_1+O(\rho^2),
+\]
+and therefore the numerator is
+\begin{align*}
+N(x,y;\rho)
+&=\rho\left[h_f+\rho h_f'u_1+O(\rho^2)\right]
+-\Rzero\left[\xf+\rho u_1+O(\rho^2)\right]\rho v\\
+&=\rho(h_f-\Rzero\xf v)
++\rho^2u_1(h_f'-\Rzero v)+O(\rho^3).
+\end{align*}
+Similarly,
+\begin{align*}
+D(x,y)
+&=\left[-\delta+\rho\Rzero u_1+O(\rho^2)\right]\rho v\\
+&=-\rho\delta v+\rho^2\Rzero u_1v+O(\rho^3).
+\end{align*}
+Write these results as
+\[
+N=\rho N_0+\rho^2N_1+O(\rho^3),
+\qquad
+D=\rho D_0+\rho^2D_1+O(\rho^3),
+\]
+where
+\[
+N_0=h_f-\Rzero\xf v,
+\quad N_1=u_1(h_f'-\Rzero v),
+\quad D_0=-\delta v,
+\quad D_1=\Rzero u_1v.
+\]
+The quotient expansion is
+\[
+\frac ND
+=\frac{N_0}{D_0}
++\rho\left(\frac{N_1}{D_0}-\frac{N_0D_1}{D_0^2}\right)
++O(\rho^2).
+\]
+Its leading term equals $u_1'=N_0/D_0$. Comparing its $O(\rho)$ coefficient
+with $dx/dy=u_1'+\rho u_2'+O(\rho^2)$ gives
+\begin{align*}
+u_2'
+&=\frac{N_1}{D_0}-\frac{N_0D_1}{D_0^2}\\
+&=-\frac{u_1(h_f'-\Rzero v)}{\delta v}
+-\frac{\Rzero u_1(h_f-\Rzero\xf v)}{\delta^2v}.
+\end{align*}
+Using $\delta+\Rzero\xf=1$ and
+$c=\delta h_f'+\Rzero h_f$ reduces this expression to
 \begin{equation}
-\label{eq:u2}
+\label{eq:u2prime}
+u_2'(v)
+=\frac{u_1(v)}{\delta^2}
+\left(\Rzero-\frac{c}{v}\right),
+\qquad c=\delta h_f'+\Rzero h_f.
+\end{equation}
+Substitute $u_1=aL+bv$ and use $dL/dv=-1/v$. Since
+$ac/\delta^2=2\kappa$,~\eqref{eq:u2prime} becomes
+\[
+u_2'
+=-\frac{2\kappa L}{v}
++\frac{\Rzero a}{\delta^2}L
+-\frac{bc}{\delta^2}
++\frac{b\Rzero}{\delta^2}v.
+\]
+Each term now integrates directly:
+\[
+\int-\frac{2\kappa L}{v}\,dv=\kappa L^2,
+\qquad
+\int L\,dv=(L+1)v.
+\]
+Therefore
+\begin{equation}
+\label{eq:u2pre}
 \begin{split}
-u_2(v)={}&\kappa L^2+D_\theta
+u_2(v)={}&\kappa L^2+B_2(\rho)
 +\frac{\Rzero a}{\delta^2}(L+1)v
 -\frac{bc}{\delta^2}v
 +\frac{b\Rzero}{2\delta^2}v^2.
 \end{split}
 \end{equation}
-The $L^2$ term is the natural next-order continuation of the first-order logarithmic switchback.
+The local equation determines every displayed $v$-dependent term, but leaves
+one integration constant, denoted temporarily by $B_2(\rho)$.  The corner
+equation cannot determine this constant; it will be fixed by matching after
+the finite part of the outer second-order coefficient has been calculated.
+The $L^2$ term is the next-order continuation of the first-order logarithmic
+switchback.
 
-Both $C_\theta$ and the new second-order matching constant $D_\theta$ are uniquely determined by regularized limits of the inverse outer coefficients:
-\begin{equation}
-\label{eq:Climit}
-\log C_\theta
-=\lim_{y\downarrow0}
-\left[\frac{X_1(y)}a+\log y\right],
-\end{equation}
-\begin{equation}
-\label{eq:Dlimit}
-D_\theta
-=\lim_{y\downarrow0}
-\left[
-X_2(y)-\kappa\log^2\!\left(\frac{C_\theta}{y}\right)
-\right].
-\end{equation}
-Equation~\eqref{eq:Climit} gives the same $C_\theta$ as the explicit regularized integral~\eqref{eq:Ctheta}; this is an important internal consistency check between the two representations. The constant $D_\theta$ contains the genuinely new second-order information. It can be computed without a small-$y$ extrapolation, as follows.
+We therefore return to the outer expansion and calculate that finite part.
 
-Put $s=x-\xf$, $f_1=F'(\xf)=\delta/(\Rzero\xf)$,
-$f_2=F''(\xf)=-1/(\Rzero\xf^2)$, and
+Introduce the local distance from the final-size root,
+\[
+s=x-\xf.
+\]
+Define
+\[
+f_1:=F'(\xf),
+\qquad
+f_2:=F''(\xf).
+\]
+Since
+\[
+F'(x)=\frac{1-\Rzero x}{\Rzero x},
+\qquad
+F''(x)=-\frac{1}{\Rzero x^2},
+\]
+the definitions give
+\[
+f_1=F'(\xf)=\frac{\delta}{\Rzero\xf},
+\qquad
+f_2=F''(\xf)=-\frac{1}{\Rzero\xf^2}.
+\]
+The first-order equation~\eqref{eq:Y1}, the relation
+$G_\theta=\Rzero Y_1$ in~\eqref{eq:G-Y1}, and the finite-part expansion
+\eqref{eq:Gfinitepart} imply that, as $s\downarrow0$, the first-order outer
+coefficient has the local expansion
 \begin{equation}
 \label{eq:Y1local}
 Y_1(x)=\alpha\log s+\beta+p_0s+O(s^2),
@@ -712,7 +1004,27 @@ Y_1(x)=\alpha\log s+\beta+p_0s+O(s^2),
 \quad
 \beta=\alpha\log\frac{f_1}{C_\theta},
 \end{equation}
-where
+Because $Y_1=G_\theta/\Rzero$, the finite-part
+formula~\eqref{eq:Gfinitepart} gives
+\[
+Y_1(x)=\frac{\widetilde a_\theta}{\Rzero}\log s
+-\frac{\widetilde a_\theta}{\Rzero}\log(1-\xf)
+-\frac{\Jfun}{\Rzero}+o(1).
+\]
+Thus $\alpha=\widetilde a_\theta/\Rzero=h_f/(\Rzero\xf)$. Furthermore,
+the definition~\eqref{eq:Ctheta} implies
+\[
+\log\frac{f_1}{C_\theta}
+=-\log(1-\xf)-\frac{\Jfun}{\widetilde a_\theta},
+\]
+which identifies the constant term as
+$\beta=\alpha\log(f_1/C_\theta)$.  Finally, expanding the right-hand side of
+the differential equation~\eqref{eq:Y1} at $s=0$ gives
+\[
+Y_1'(x)=\frac{\alpha}{s}+p_0+O(s).
+\]
+The constant term in $Y_1'$ is therefore $p_0$; integrating with respect to
+$s$ gives the $p_0s$ term in~\eqref{eq:Y1local}, with
 \[
 p_0=\frac{2\delta\xf h_f'-(1+2\delta)h_f}
 {2\Rzero\delta\xf^2}.
@@ -723,7 +1035,16 @@ A_{-1}=\frac{h_f/\xf-c}{\delta^2},
 \qquad B_0=\beta-\alpha,
 \qquad B_1=-\frac{h_f}{2\Rzero\delta\xf^2}.
 \]
-The integrand on the right of~\eqref{eq:Y2}, denoted by $q_2(x)$, has singular part
+Denote the right-hand side of~\eqref{eq:Y2} by $q_2(x)$. To isolate every
+nonintegrable term, substitute
+\[
+F(x)=f_1s+\frac12f_2s^2+O(s^3),
+\qquad
+Y_1(x)=\alpha\log s+\beta+p_0s+O(s^2)
+\]
+into the exact expression for $q_2$. Expanding the factors $F^{-2}$,
+$h_\theta$, and $\Rzero x-1$ and collecting the $s^{-2}$ and $s^{-1}$ terms
+gives
 \begin{equation}
 \label{eq:q2sing}
 q_{2,{\rm sing}}(s)
@@ -747,35 +1068,145 @@ K_2=-P_2(1-\xf)-\int_{\xf}^{1}q_{2,{\rm reg}}(u)\,du,
 \qquad
 Y_2(x)=P_2(x-\xf)+K_2+o(1).
 \end{equation}
+The boundary condition $Y_2(1)=0$ gives
+\[
+Y_2(x)=-\int_x^1q_2(u)\,du.
+\]
+Since $q_2=P_2'+q_{2,{\rm reg}}$,
+\[
+Y_2(x)=P_2(x-\xf)-P_2(1-\xf)
+-\int_x^1q_{2,{\rm reg}}(u)\,du.
+\]
+Taking $x\to\xf^+$ produces~\eqref{eq:K2}. Thus $K_2$ is precisely the
+finite part left after the known singular primitive $P_2$ is removed.
 
-For completeness, write $T=\alpha\log s+\beta$.  From~\eqref{eq:X1},
+Let $T=\alpha\log s+\beta$. From~\eqref{eq:X1},
 \[
 X_1=-\frac{T}{f_1}
 +s\left(-\frac{p_0}{f_1}+\frac{f_2T}{f_1^2}\right)+O(s^2\log s).
 \]
-Thus the singular part of $Y_1'X_1$ is
-$-\alpha T/(f_1s)=-(a\alpha\log s+a\beta)/s$, which cancels both the
-$(\log s)/s$ and $1/s$ terms in $Y_2$.  The remaining finite numerator in
-~\eqref{eq:X2} has constant part
+This expansion follows by substituting $Y_1=T+p_0s+O(s^2)$ and
+$F'(x)=f_1+f_2s+O(s^2)$ into $X_1=-Y_1/F'$.  Define the numerator in
+the formula~\eqref{eq:X2} for $X_2$ by
+\[
+N_2(s):=\frac12F''(x)X_1^2+Y_1'(x)X_1+Y_2(x).
+\]
+The constant part of $N_2$ can now be obtained term by term.  Since
+$F''(x)=f_2+O(s)$,
+\[
+\frac12F''(x)X_1^2
+=\frac{f_2}{2f_1^2}T^2+O(s\log^2s),
+\]
+whose constant term is $f_2\beta^2/(2f_1^2)$.  Next, using
+$Y_1'=\alpha/s+p_0+O(s)$ gives
+\[
+Y_1'X_1
+=-\frac{\alpha T}{f_1s}
++\left(\frac{\alpha f_2}{f_1^2}-\frac{p_0}{f_1}\right)T
+-\frac{\alpha p_0}{f_1}+O(s\log s).
+\]
+Because $\alpha/f_1=a$, the first term is
+\[
+-\frac{\alpha T}{f_1s}
+=-\frac{a\alpha\log s+a\beta}{s}.
+\]
+It cancels the $s^{-1}\log s$ and $s^{-1}$ terms in $Y_2=P_2(s)+K_2+o(1)$.
+The remaining terms in $Y_1'X_1$ have constant part
+\[
+\frac{\alpha\beta f_2}{f_1^2}
+-\frac{(\alpha+\beta)p_0}{f_1},
+\]
+while the constant part of $Y_2$ is $K_2$.  Therefore the constant part of
+$N_2(s)$ is the following quantity, which we define as $N_{20}$:
 \begin{equation}
 \label{eq:N20}
 N_{20}=K_2+\frac{\alpha\beta f_2}{f_1^2}
 -\frac{(\alpha+\beta)p_0}{f_1}
 +\frac{f_2\beta^2}{2f_1^2}.
 \end{equation}
-Its logarithmic terms reduce to
-$-f_1\kappa(\log s+\beta/\alpha)^2$; since
-$\log(C_\theta/y)=-\log s-\beta/\alpha+o(1)$, the logarithmic part of $X_2$
-is exactly $\kappa\log^2(C_\theta/y)$.  The finite-quadrature formula is therefore
+Collecting the remaining $\log^2s$ and $\log s$ terms and using the
+definitions of $A_{-1}$, $B_0$, $B_1$, and $\kappa$ gives
+\[
+N_2(s)
+=-f_1\kappa\left[(\log s)^2
++2\frac{\beta}{\alpha}\log s\right]+N_{20}+o(1).
+\]
+Because $F'(x)=f_1+O(s)$ and $X_2=-N_2/F'$, it follows that
+\begin{align*}
+X_2(y)
+={}&\kappa\left[(\log s)^2
++2\frac{\beta}{\alpha}\log s\right]
+-\frac{N_{20}}{f_1}+o(1)\\
+={}&\kappa\left(\log s+\frac{\beta}{\alpha}\right)^2
+-\frac{N_{20}}{f_1}
+-\kappa\frac{\beta^2}{\alpha^2}+o(1).
+\end{align*}
+Finally, $y=F(x)=f_1s+O(s^2)$ and
+$\beta/\alpha=\log(f_1/C_\theta)$ give
+\[
+\log\frac{C_\theta}{y}
+=-\log s-\frac{\beta}{\alpha}+o(1).
+\]
+Therefore the squared term above is
+$\log^2(C_\theta/y)+o(1)$, and hence
+\[
+X_2(y)=\kappa\log^2\!\left(\frac{C_\theta}{y}\right)
++\left(-\frac{N_{20}}{f_1}
+-\kappa\frac{\beta^2}{\alpha^2}\right)+o(1).
+\]
+The expression in parentheses is independent of $y$ and is the finite part
+of the outer second-order coefficient.  We define this finite part to be
 \begin{equation}
 \label{eq:Dquadrature}
 D_\theta=-\frac{N_{20}}{f_1}-\kappa\frac{\beta^2}{\alpha^2}.
 \end{equation}
-Equations~\eqref{eq:K2} and~\eqref{eq:Dquadrature} are the recommended numerical
-definition: they require one finite regularized quadrature and prove finiteness
-directly.  Equation~\eqref{eq:Dlimit} remains the equivalent asymptotic
-characterization, but no endpoint extrapolation is needed in the production
-calculation.
+Thus the outer second-order coefficient has the local form
+\begin{equation}
+\label{eq:X2compact}
+X_2(y)=\kappa\log^2\!\left(\frac{C_\theta}{y}\right)+D_\theta+o(1)
+\qquad (y\downarrow0).
+\end{equation}
+
+We next match this outer result to the corner solution and thereby determine
+the undetermined constant $B_2(\rho)$ in~\eqref{eq:u2pre}.  In the overlap
+$\rho\ll y\ll1$, set $y=\rho v$ and retain
+$L=\log(C_\theta/y)=\log(C_\theta/(\rho v))$.  Taylor inversion of
+$y=F(\xf+s)=f_1s+\tfrac12f_2s^2+O(s^3)$ gives
+\[
+X_0(y)-\xf=by+\frac{b\Rzero}{2\delta^2}y^2+O(y^3).
+\]
+Moreover, substitution of $s=by+O(y^2)$ into the local formula for $X_1$
+above, followed by collection of the constant and linear terms in $y$, gives
+\[
+X_1(y)=aL+y\left[
+\frac{\Rzero a}{\delta^2}(L+1)-\frac{bc}{\delta^2}
+\right]+O(y^2\log y).
+\]
+Using these two formulas together with~\eqref{eq:X2compact} in
+$x=X_0+\rho X_1+\rho^2X_2+\cdots$, and then substituting $y=\rho v$, yields
+\begin{align*}
+x-\xf={}&\rho(aL+bv)\\
+&+\rho^2\left[
+\kappa L^2+D_\theta
++\frac{\Rzero a}{\delta^2}(L+1)v
+-\frac{bc}{\delta^2}v
++\frac{b\Rzero}{2\delta^2}v^2
+\right]+o(\rho^2).
+\end{align*}
+The corner expansion is
+$x-\xf=\rho u_1(v)+\rho^2u_2(v)+\cdots$, with
+$u_1=aL+bv$ and $u_2$ given by~\eqref{eq:u2pre}.  All $v$-dependent terms
+already agree, and equality of the remaining constant terms gives
+$B_2(\rho)=D_\theta$.  Therefore the matched second corner coefficient is
+\begin{equation}
+\label{eq:u2}
+\begin{split}
+u_2(v)={}&\kappa L^2+D_\theta
++\frac{\Rzero a}{\delta^2}(L+1)v
+-\frac{bc}{\delta^2}v
++\frac{b\Rzero}{2\delta^2}v^2.
+\end{split}
+\end{equation}
 
 \section{Action formulation: from the corner expansion to a stable scalar equation}
 \subsection{The action primitive}
@@ -1036,16 +1467,12 @@ A practical implementation naturally separates into a precomputation layer and a
 \item record no-entry status, $\Lambda$, and the difference between first and second order as validity diagnostics.
 \end{enumerate}
 
-There are no undefined intermediate quantities left in the theory. The next stage is systematic numerical validation: compare first order, second order, the deterministic ODE benchmark, exact Kendall, Laplace, and full stochastic simulations, and use these comparisons to map the domain of validity quantitatively.
+Systematic numerical validation can compare the first- and second-order
+approximations with the deterministic ODE benchmark, exact Kendall integral,
+Laplace approximation, and full stochastic simulations, thereby mapping the
+domain of validity quantitatively.
 
 \appendix
-\section{Two equivalent representations of the first-order constant $C_\theta$}
-The first-order matching constant can be obtained explicitly from the singular finite part of $G_\theta$ near $x_f$, which yields~\eqref{eq:Ctheta}, or from the inverse outer coefficient through~\eqref{eq:Climit}. The two are equivalent because
-\[
-Y_1=\frac{G_\theta}{\Rzero}
-\]
-and $X_1$ is the implicit-function inversion of the same first-order correction. This equivalence is useful computationally: the explicit regularized integral gives a stable first-order calculation, while the inverse-coefficient representation connects seamlessly to the second-order $D_\theta$ hierarchy.
-
 \section{Core diagnostics to retain in numerical validation}
 To separate the main sources of approximation error, the numerical study should retain at least
 \[
@@ -1066,7 +1493,8 @@ B_{\rm Kendall},
 \qquad
 B_{\rm Laplace}.
 \]
-The regularized quadrature for $D_\theta$ should also be tested for endpoint-treatment and numerical-precision sensitivity. The constant $C_\theta$ should be cross-validated using both~\eqref{eq:Ctheta} and~\eqref{eq:Climit}.
+The regularized quadrature for $D_\theta$ should also be tested for
+endpoint-treatment and numerical-precision sensitivity.
 
 \begin{thebibliography}{9}
 \bibitem{PE2024}
