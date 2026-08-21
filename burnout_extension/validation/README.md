@@ -42,6 +42,22 @@ In Figures 9 and 10, solid analytical curves use the standard matching height
 `sqrt(y*/K)`. Dashed curves show the alternative `y*` matching height over its
 entire admissible-root domain, allowing the two choices to be compared directly.
 
+The paper-facing good-regime validation directly maps the Parsons et al. setup
+to `rho = 0.01`, `theta = 0`, and large `K`:
+
+```r
+Rscript validation/run_good_regime_scan.R
+Rscript validation/plot_good_regime_scan.R
+```
+
+The stochastic results and resumable state are stored separately as
+`data/good_regime_scan_results.csv` and
+`data/good_regime_scan_checkpoint.rds`; dense curves are cached in
+`data/good_regime_scan_analytic.csv`. Figure 11 contains an unconditional page
+and a page conditional on escaping early fizzle. The scan uses adaptive
+tau-leaping with tolerance 0.01, 3,000 attempts per point, and 10,000 where the
+initial Wilson interval is wider than 0.05.
+
 ## Supporting validation checks
 
 These remain active because they support conclusions in the scientific report:
@@ -52,9 +68,10 @@ Rscript validation/run_ode_sensitivity.R
 Rscript validation/run_stochastic.R
 ```
 
-Requirements: R 4.5 or later, `deSolve`, `data.table`, and `ggplot2`.
+Requirements: R 4.5 or later, `deSolve`, `data.table`, `ggplot2`, and
+`adaptivetau`.
 All random experiments use recorded deterministic seeds.
 
 Key files are `R/theory.R`, `R/ode_reference.R`, `R/kendall.R`, `R/scan.R`,
-and `R/stochastic.R`. Generated CSVs are under `data/`, figures under
-`figures/`, and the scientific interpretation is in `validation_report.md`.
+and `R/stochastic.R`. Generated CSVs are under `data/` and figures under
+`figures/`.

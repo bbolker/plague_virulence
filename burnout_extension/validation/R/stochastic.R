@@ -125,3 +125,64 @@ simulate_counts_batch <- function(cl,R0,rho,theta,K,n_attempts,seed) {
   },R0=R0,rho=rho,theta=theta,K=K)
   colSums(do.call(rbind,ans))
 }
+
+# Adaptive tau-leaping counterpart of one_ctmc().  Classification uses the
+# same sequence of susceptible-nullcline crossings as the exact simulator;
+# tau-leaping changes only how the CTMC trajectory is generated.
+one_adaptive_tau <- function(R0,rho,theta,K,tf=max(500,20/rho),
+                             tau_epsilon=.03) {
+  if(!requireNamespace('adaptivetau',quietly=TRUE))
+    stop('Package adaptivetau is required for adaptive tau-leaping.')
+  transitions <- list(c(S=-1,I=1),c(I=-1),c(S=1))
+  rates <- function(z,p,t) {
+    S <- z['S']; I <- z['I']
+    c(infection=p$R0*S*I/p$K,
+      removal=I,
+      recruitment=if(S<p$K) p$K*p$rho*(1-S/p$K)*(S/p$K)^p$theta else 0)
+  }
+  z <- adaptivetau::ssa.adaptivetau(
+    c(S=K-1,I=1),transitions,rates,
+    list(R0=R0,rho=rho,theta=theta,K=K),tf=tf,
+    tl.params=list(epsilon=tau_epsilon,extraChecks=TRUE))
+  S <- z[,'S']; I <- z[,'I']; xs <- 1/R0
+  below <- S/K <= xs
+  peak <- which(!below[-length(below)] & below[-1L] & I[-1L]>0)+1L
+  if(!length(peak)) return(c(established=FALSE,persist=FALSE))
+  first_peak <- peak[1L]
+  if(first_peak>=length(S)) return(c(established=TRUE,persist=NA))
+  after_peak <- seq.int(first_peak+1L,length(S))
+  trough <- after_peak[which(below[after_peak-1L] & !below[after_peak] &
+                               I[after_peak]>0)]
+  extinct <- which(I==0)
+  if(!length(trough)) {
+    if(length(extinct)) return(c(established=TRUE,persist=FALSE))
+    return(c(established=TRUE,persist=NA))
+  }
+  first_trough <- trough[1L]
+  if(length(extinct) && extinct[1L]>first_trough)
+    return(c(established=TRUE,persist=FALSE))
+  next_peak <- peak[peak>first_trough]
+  if(length(next_peak)) return(c(established=TRUE,persist=TRUE))
+  c(established=TRUE,persist=NA)
+}
+
+simulate_counts_batch_tau <- function(cl,R0,rho,theta,K,n_attempts,seed,
+                                      tau_epsilon=.03) {
+  n_workers <- length(cl)
+  chunks <- rep(n_attempts %/% n_workers,n_workers)
+  chunks[seq_len(n_attempts %% n_workers)] <-
+    chunks[seq_len(n_attempts %% n_workers)]+1L
+  parallel::clusterSetRNGStream(cl,iseed=seed)
+  ans <- parallel::parLapply(cl,chunks,function(n,R0,rho,theta,K,tau_epsilon) {
+    persistent <- established <- unresolved <- 0L
+    for(attempt in seq_len(n)) {
+      z <- one_adaptive_tau(R0,rho,theta,K,tau_epsilon=tau_epsilon)
+      if(isTRUE(z['established'])) established <- established+1L
+      if(is.na(z['persist'])) unresolved <- unresolved+1L
+      else if(isTRUE(z['persist'])) persistent <- persistent+1L
+    }
+    c(attempts=n,established=established,persistent=persistent,
+      unresolved=unresolved)
+  },R0=R0,rho=rho,theta=theta,K=K,tau_epsilon=tau_epsilon)
+  colSums(do.call(rbind,ans))
+}
