@@ -992,175 +992,91 @@ f_1=F'(\xf)=\frac{\delta}{\Rzero\xf},
 \qquad
 f_2=F''(\xf)=-\frac{1}{\Rzero\xf^2}.
 \]
-The first-order equation~\eqref{eq:Y1}, the relation
-$G_\theta=\Rzero Y_1$ in~\eqref{eq:G-Y1}, and the finite-part expansion
-\eqref{eq:Gfinitepart} imply that, as $s\downarrow0$, the first-order outer
-coefficient has the local expansion
-\begin{equation}
-\label{eq:Y1local}
-Y_1(x)=\alpha\log s+\beta+p_0s+O(s^2),
-\quad
+From $G_\theta=\Rzero Y_1$, equations~\eqref{eq:Gfinitepart} and
+\eqref{eq:Ctheta} identify the logarithmic coefficient and finite part as
+\[
 \alpha=\frac{h_f}{\Rzero\xf},
-\quad
-\beta=\alpha\log\frac{f_1}{C_\theta},
-\end{equation}
-Because $Y_1=G_\theta/\Rzero$, the finite-part
-formula~\eqref{eq:Gfinitepart} gives
-\[
-Y_1(x)=\frac{\widetilde a_\theta}{\Rzero}\log s
--\frac{\widetilde a_\theta}{\Rzero}\log(1-\xf)
--\frac{\Jfun}{\Rzero}+o(1).
+\qquad
+\beta=\alpha\log\frac{f_1}{C_\theta}.
 \]
-Thus $\alpha=\widetilde a_\theta/\Rzero=h_f/(\Rzero\xf)$. Furthermore,
-the definition~\eqref{eq:Ctheta} implies
-\[
-\log\frac{f_1}{C_\theta}
-=-\log(1-\xf)-\frac{\Jfun}{\widetilde a_\theta},
-\]
-which identifies the constant term as
-$\beta=\alpha\log(f_1/C_\theta)$.  Finally, expanding the right-hand side of
-the differential equation~\eqref{eq:Y1} at $s=0$ gives
-\[
-Y_1'(x)=\frac{\alpha}{s}+p_0+O(s).
-\]
-The constant term in $Y_1'$ is therefore $p_0$; integrating with respect to
-$s$ gives the $p_0s$ term in~\eqref{eq:Y1local}, with
-\[
+To obtain the next local term, substitute
+$F(x)=f_1s+\tfrac12f_2s^2+O(s^3)$ and the Taylor expansions of
+$h_\theta(x)$ and $x^{-2}$ into~\eqref{eq:Y1}. This gives
+\begin{equation}
+Y_1'(x)=\frac{\alpha}{s}+p_0+O(s),
+\qquad
 p_0=\frac{2\delta\xf h_f'-(1+2\delta)h_f}
 {2\Rzero\delta\xf^2}.
-\]
+\label{eq:Y1primelocal}
+\end{equation}
+Integrating~\eqref{eq:Y1primelocal} and using the finite part $\beta$ yields
+\begin{equation}
+Y_1(x)=\alpha\log s+\beta+p_0s+O(s^2).
+\label{eq:Y1local}
+\end{equation}
 Define
 \[
 A_{-1}=\frac{h_f/\xf-c}{\delta^2},
 \qquad B_0=\beta-\alpha,
 \qquad B_1=-\frac{h_f}{2\Rzero\delta\xf^2}.
 \]
-Denote the right-hand side of~\eqref{eq:Y2} by $q_2(x)$. To isolate every
-nonintegrable term, substitute
-\[
-F(x)=f_1s+\frac12f_2s^2+O(s^3),
-\qquad
-Y_1(x)=\alpha\log s+\beta+p_0s+O(s^2)
-\]
-into the exact expression for $q_2$. Expanding the factors $F^{-2}$,
-$h_\theta$, and $\Rzero x-1$ and collecting the $s^{-2}$ and $s^{-1}$ terms
-gives
+Denote the right-hand side of~\eqref{eq:Y2} by $q_2(x)$. Substituting
+\eqref{eq:Y1local} and
+$F(x)=f_1s+\tfrac12f_2s^2+O(s^3)$ into $q_2$, then expanding its remaining
+factors, gives the part whose improper integral diverges at $s=0$:
 \begin{equation}
 \label{eq:q2sing}
 q_{2,{\rm sing}}(s)
 =-\frac{a\alpha\log s+aB_0}{s^2}
 +\frac{A_{-1}\alpha\log s+A_{-1}B_0-aB_1}{s}.
 \end{equation}
-Direct expansion of the exact integrand gives
-$q_{2,{\rm reg}}(x):=q_2(x)-q_{2,{\rm sing}}(x-\xf)=O(\log(x-\xf))$,
-so the regularized integrand is integrable at $\xf$.  A convenient singular
-primitive is
+Define
+$q_{2,{\rm reg}}(x)=q_2(x)-q_{2,{\rm sing}}(x-\xf)$. A convenient explicit
+singular primitive is
 \begin{equation}
 \label{eq:P2}
 P_2(s)=\frac{a\alpha\log s+a\beta}{s}
 +\frac{A_{-1}\alpha}{2}\log^2s
 +(A_{-1}B_0-aB_1)\log s,
 \end{equation}
-for which direct differentiation gives $P_2'=q_{2,{\rm sing}}$.  Hence
+for which $P_2'=q_{2,{\rm sing}}$. Since
+$q_{2,{\rm reg}}(x)=O(\bigl(\log(x-\xf)\bigr)$ is integrable at $\xf$,
 \begin{equation}
 \label{eq:K2}
 K_2=-P_2(1-\xf)-\int_{\xf}^{1}q_{2,{\rm reg}}(u)\,du,
 \qquad
 Y_2(x)=P_2(x-\xf)+K_2+o(1).
 \end{equation}
-The boundary condition $Y_2(1)=0$ gives
-\[
-Y_2(x)=-\int_x^1q_2(u)\,du.
-\]
-Since $q_2=P_2'+q_{2,{\rm reg}}$,
-\[
-Y_2(x)=P_2(x-\xf)-P_2(1-\xf)
--\int_x^1q_{2,{\rm reg}}(u)\,du.
-\]
-Taking $x\to\xf^+$ produces~\eqref{eq:K2}. Thus $K_2$ is precisely the
-finite part left after the known singular primitive $P_2$ is removed.
+The boundary condition $Y_2(1)=0$, together with
+$q_2=P_2'+q_{2,{\rm reg}}$, gives~\eqref{eq:K2} directly.
 
-Let $T=\alpha\log s+\beta$. From~\eqref{eq:X1},
-\[
-X_1=-\frac{T}{f_1}
-+s\left(-\frac{p_0}{f_1}+\frac{f_2T}{f_1^2}\right)+O(s^2\log s).
-\]
-This expansion follows by substituting $Y_1=T+p_0s+O(s^2)$ and
-$F'(x)=f_1+f_2s+O(s^2)$ into $X_1=-Y_1/F'$.  Define the numerator in
-the formula~\eqref{eq:X2} for $X_2$ by
-\[
-N_2(s):=\frac12F''(x)X_1^2+Y_1'(x)X_1+Y_2(x).
-\]
-The constant part of $N_2$ can now be obtained term by term.  Since
-$F''(x)=f_2+O(s)$,
-\[
-\frac12F''(x)X_1^2
-=\frac{f_2}{2f_1^2}T^2+O(s\log^2s),
-\]
-whose constant term is $f_2\beta^2/(2f_1^2)$.  Next, using
-$Y_1'=\alpha/s+p_0+O(s)$ gives
-\[
-Y_1'X_1
-=-\frac{\alpha T}{f_1s}
-+\left(\frac{\alpha f_2}{f_1^2}-\frac{p_0}{f_1}\right)T
--\frac{\alpha p_0}{f_1}+O(s\log s).
-\]
-Because $\alpha/f_1=a$, the first term is
-\[
--\frac{\alpha T}{f_1s}
-=-\frac{a\alpha\log s+a\beta}{s}.
-\]
-It cancels the $s^{-1}\log s$ and $s^{-1}$ terms in $Y_2=P_2(s)+K_2+o(1)$.
-The remaining terms in $Y_1'X_1$ have constant part
-\[
-\frac{\alpha\beta f_2}{f_1^2}
--\frac{(\alpha+\beta)p_0}{f_1},
-\]
-while the constant part of $Y_2$ is $K_2$.  Therefore the constant part of
-$N_2(s)$ is the following quantity, which we define as $N_{20}$:
+Substitute~\eqref{eq:Y1local} and~\eqref{eq:K2} into the inverse coefficient
+formula~\eqref{eq:X2}. Writing its numerator as
+\begin{equation}
+N_2(s)=\frac12F''(x)X_1^2+Y_1'(x)X_1+Y_2(x),
+\label{eq:N2def}
+\end{equation}
+and collecting the logarithmic and constant terms gives
+\begin{equation}
+N_2(s)=-f_1\kappa\left[(\log s)^2
++2\frac{\beta}{\alpha}\log s\right]+N_{20}+o(1),
+\label{eq:N2local}
+\end{equation}
+where the remaining constant term is
 \begin{equation}
 \label{eq:N20}
 N_{20}=K_2+\frac{\alpha\beta f_2}{f_1^2}
 -\frac{(\alpha+\beta)p_0}{f_1}
 +\frac{f_2\beta^2}{2f_1^2}.
 \end{equation}
-Collecting the remaining $\log^2s$ and $\log s$ terms and using the
-definitions of $A_{-1}$, $B_0$, $B_1$, and $\kappa$ gives
-\[
-N_2(s)
-=-f_1\kappa\left[(\log s)^2
-+2\frac{\beta}{\alpha}\log s\right]+N_{20}+o(1).
-\]
-Because $F'(x)=f_1+O(s)$ and $X_2=-N_2/F'$, it follows that
-\begin{align*}
-X_2(y)
-={}&\kappa\left[(\log s)^2
-+2\frac{\beta}{\alpha}\log s\right]
--\frac{N_{20}}{f_1}+o(1)\\
-={}&\kappa\left(\log s+\frac{\beta}{\alpha}\right)^2
--\frac{N_{20}}{f_1}
--\kappa\frac{\beta^2}{\alpha^2}+o(1).
-\end{align*}
-Finally, $y=F(x)=f_1s+O(s^2)$ and
-$\beta/\alpha=\log(f_1/C_\theta)$ give
-\[
-\log\frac{C_\theta}{y}
-=-\log s-\frac{\beta}{\alpha}+o(1).
-\]
-Therefore the squared term above is
-$\log^2(C_\theta/y)+o(1)$, and hence
-\[
-X_2(y)=\kappa\log^2\!\left(\frac{C_\theta}{y}\right)
-+\left(-\frac{N_{20}}{f_1}
--\kappa\frac{\beta^2}{\alpha^2}\right)+o(1).
-\]
-The expression in parentheses is independent of $y$ and is the finite part
-of the outer second-order coefficient.  We define this finite part to be
+Because $X_2=-N_2/F'$ in~\eqref{eq:X2}, define
 \begin{equation}
 \label{eq:Dquadrature}
 D_\theta=-\frac{N_{20}}{f_1}-\kappa\frac{\beta^2}{\alpha^2}.
 \end{equation}
-Thus the outer second-order coefficient has the local form
+Substitute~\eqref{eq:N2local} into~\eqref{eq:X2}. Then
+$y=f_1s+O(s^2)$ and
+$\beta/\alpha=\log(f_1/C_\theta)$ rewrite the result as
 \begin{equation}
 \label{eq:X2compact}
 X_2(y)=\kappa\log^2\!\left(\frac{C_\theta}{y}\right)+D_\theta+o(1)

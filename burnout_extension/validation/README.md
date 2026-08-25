@@ -42,19 +42,21 @@ In Figures 9 and 10, solid analytical curves use the standard matching height
 `sqrt(y*/K)`. Dashed curves show the alternative `y*` matching height over its
 entire admissible-root domain, allowing the two choices to be compared directly.
 
-The paper-facing good-regime validation directly maps the Parsons et al. setup
-to `rho = 0.01`, `theta = 0`, and large `K`:
+Figure 11 scans the extended model at `rho = 0.01`, with
+`theta = {0, 0.5, 1}`, common population sizes
+`K = {10^6, 10^7, 10^8, 10^9}`, and 14 common values of `R0 - 1` from
+0.03 to 5:
 
 ```r
-Rscript validation/run_good_regime_scan.R
-Rscript validation/plot_good_regime_scan.R
+Rscript validation/run_fig11_scan.R
+Rscript validation/plot_fig11_scan.R
 ```
 
 The stochastic results and resumable state are stored separately as
-`data/good_regime_scan_results.csv` and
-`data/good_regime_scan_checkpoint.rds`; dense curves are cached in
-`data/good_regime_scan_analytic.csv`. Figure 11 contains an unconditional page
-and a page conditional on escaping early fizzle. The scan uses adaptive
+`data/fig11_scan_results.csv` and
+`data/fig11_scan_checkpoint.rds`; dense curves are cached in
+`data/fig11_scan_analytic.csv`. Figure 11 contains six pages: unconditional and
+conditional-on-not-fizzling probabilities for each value of `theta`. The scan uses adaptive
 tau-leaping with tolerance 0.01, 3,000 attempts per point, and 10,000 where the
 initial Wilson interval is wider than 0.05.
 
