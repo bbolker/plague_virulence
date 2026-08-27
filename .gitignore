@@ -16,6 +16,10 @@
 !fadeout/logistic_burnout/stochastic_validation/figures/*.png
 !fadeout/logistic_burnout/stochastic_validation/figures/*.pdf
 
+# Keep burnout-extension validation figures, including grouped subdirectories
+!burnout_extension/validation/figures/**/*.png
+!burnout_extension/validation/figures/**/*.pdf
+
 # Raw stochastic-validation simulation output: local-only, not published
 fadeout/logistic_burnout/stochastic_validation/outputs/
 burnout_extension/validation/data/
