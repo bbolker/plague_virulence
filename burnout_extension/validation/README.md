@@ -16,6 +16,8 @@ Rscript -e "source('validation/R/plotting.R'); make_current_plots()"
 
 This produces `data/K_R0_scan.csv` and the current multi-page PDFs in
 `figures/`. Each PDF has five pages for fixed rho values 0.02 through 0.10.
+Within each error map, facet rows compare `sqrt(y*/K)`, the `2/3 compromise`,
+the `3/4 compromise`, and `y*` using the same scales and missing-value treatment.
 Only eight paper-facing figure sets are retained: first- and second-order entry
 errors, first- and second-order action errors, first- and second-order exact-Kendall B errors,
 Laplace-only B error, and the selected stochastic P1 comparison.
@@ -38,9 +40,9 @@ The scan contains 624 parameter combinations with
 `rho = {0.01, 0.02, 0.05, 0.10}`, `theta = {0, 0.5, 1}`, four population sizes,
 and 13 values of `R0 - 1`.
 
-In Figures 9 and 10, solid analytical curves use the standard matching height
-`sqrt(y*/K)`. Dashed curves show the alternative `y*` matching height over its
-entire admissible-root domain, allowing the two choices to be compared directly.
+In Figures 9 and 10, analytical curves compare `sqrt(y*/K)`, `y*`, and the
+intermediate **2/3 compromise** `K^(-1/3) * y*^(2/3)` and **3/4 compromise**
+`K^(-1/4) * y*^(3/4)` over each choice's entire admissible-root domain.
 
 Figure 11 scans the extended model at `rho = 0.01`, with
 `theta = {0, 0.5, 1}`, common population sizes
@@ -59,6 +61,11 @@ The stochastic results and resumable state are stored separately as
 conditional-on-not-fizzling probabilities for each value of `theta`. The scan uses adaptive
 tau-leaping with tolerance 0.01, 3,000 attempts per point, and 10,000 where the
 initial Wilson interval is wider than 0.05.
+
+For legibility, Figures 9, 10, and 11 are directories under `figures/`, each
+containing one PDF per matching height. They use identical axes, analytical
+methods, stochastic points, and uncertainty intervals; no combined overlaid
+version is produced.
 
 ## Supporting validation checks
 

@@ -6,7 +6,7 @@ library(ggplot2)
 
 simulation_file <- 'validation/data/fig11_scan_results.csv'
 analytic_file <- 'validation/data/fig11_scan_analytic.csv'
-output_file <- 'validation/figures/fig11_P1_stochastic_validation.pdf'
+figure_dir <- 'validation/figures'
 K_values <- c(1e6,1e7,1e8,1e9)
 delta_values <- exp(seq(log(.03),log(5),length.out=181))
 grid <- expand.grid(rho=.01,theta=c(0,.5,1),K=K_values,
@@ -15,6 +15,8 @@ row.names(grid) <- NULL
 grid <- grid[order(grid$theta,grid$K,grid$R0),]
 
 analytic <- if(file.exists(analytic_file)) fread(analytic_file) else data.table()
+expected_boundaries <- c('sqrt(y*/K)','2/3 compromise','3/4 compromise','y*')
+if(nrow(analytic) && !all(expected_boundaries %in% analytic$boundary)) analytic <- data.table()
 key <- function(z) paste(z$rho,z$theta,z$K,format(z$R0,digits=17),sep='|')
 if(nrow(analytic)) analytic <- analytic[key(analytic) %in% key(grid)]
 done <- if(nrow(analytic)) unique(key(analytic)) else character()
@@ -42,8 +44,12 @@ if(length(missing)) {
         value=c(q1$P1 %||% NA_real_,q2$P1 %||% NA_real_,
                 q1$P1_L %||% NA_real_,q2$P1_L %||% NA_real_))
     }
-    rbind(transform(calc(NULL,'Standard: sqrt(y*/K)'),rho=rho,theta=theta,K=K,R0=R0),
-          transform(calc(ystar,'Alternative: y*'),rho=rho,theta=theta,K=K,R0=R0))
+    ycomp <- boundary_layer_height(ystar,K,'compromise')
+    ycomp34 <- boundary_layer_height(ystar,K,'compromise_3_4')
+    rbind(transform(calc(NULL,'sqrt(y*/K)'),rho=rho,theta=theta,K=K,R0=R0),
+          transform(calc(ycomp,'2/3 compromise'),rho=rho,theta=theta,K=K,R0=R0),
+          transform(calc(ycomp34,'3/4 compromise'),rho=rho,theta=theta,K=K,R0=R0),
+          transform(calc(ystar,'y*'),rho=rho,theta=theta,K=K,R0=R0))
   }
   blocks <- split(missing,ceiling(seq_along(missing)/40L))
   for(ids in blocks) {
@@ -58,13 +64,25 @@ stopifnot(nrow(sim)==168L,all(sim$attempts>=3000L),all(sim$unresolved==0L))
 analytic[,method:=factor(method,levels=c(
   'Exact Kendall + first-order entry','Exact Kendall + second-order entry',
   'Laplace + first-order entry','Laplace + second-order entry'))]
-analytic[,boundary:=factor(boundary,levels=c('Standard: sqrt(y*/K)','Alternative: y*'))]
+analytic[,boundary:=factor(boundary,levels=c(
+  'sqrt(y*/K)','2/3 compromise','3/4 compromise','y*'))]
 setorder(analytic,theta,K,method,boundary,R0)
 analytic[,segment:=rleid(is.finite(value)),by=.(theta,K,method,boundary)]
 
-draw_page <- function(probability=c('unconditional','conditional'),theta_value) {
+boundary_math_label <- function(x) {
+  labels <- c(
+    'sqrt(y*/K)'='y[BL] == sqrt(y[star]/K)',
+    '2/3 compromise'='y[BL] == K^{-1/3} * y[star]^{2/3}',
+    '3/4 compromise'='y[BL] == K^{-1/4} * y[star]^{3/4}',
+    'y*'='y[BL] == y[star]')
+  parse(text=unname(labels[x]))
+}
+
+draw_page <- function(probability=c('unconditional','conditional'),theta_value,
+                      boundary_value=NULL) {
   probability <- match.arg(probability)
   a <- copy(analytic[theta==theta_value])
+  if(!is.null(boundary_value)) a <- a[boundary==boundary_value]
   s <- copy(sim[theta==theta_value])
   if(probability=='unconditional') {
     a[,value:=value*(1-1/R0)]
@@ -92,12 +110,18 @@ draw_page <- function(probability=c('unconditional','conditional'),theta_value) 
       'Exact Kendall + second-order entry'='#D95F02',
       'Laplace + first-order entry'='grey45',
       'Laplace + second-order entry'='#7570B3'))+
-    scale_linetype_manual(values=c('Standard: sqrt(y*/K)'='solid',
-                                   'Alternative: y*'='22'))+
-    labs(title=title,subtitle=sprintf('rho = 0.01, theta = %g, I0 = 1',theta_value),
+    scale_linetype_manual(values=c('sqrt(y*/K)'='solid',
+                                   '2/3 compromise'='42',
+                                   '3/4 compromise'='44','y*'='22'),
+                          labels=boundary_math_label)+
+    labs(title=title,subtitle=sprintf('rho = 0.01, theta = %g, I0 = 1%s',
+      theta_value,if(is.null(boundary_value)) '' else
+        paste0('; matching height = ',boundary_value)),
       x=expression(R[0]-1~'(log scale)'),y=ylabel,
       colour='Analytical method',linetype='Matching height',
-      caption=paste0('Points and 95% Wilson intervals: adaptive tau-leaping (epsilon = 0.01); 3,000 attempts per point, expanded to 10,000 when needed.\n',
+      caption=paste0('Points and 95% Wilson intervals: adaptive tau-leaping (epsilon = 0.01); 3,000 attempts per point, expanded to 10,000 when needed. ',
+        if(is.null(boundary_value)) '' else
+          paste0('All analytical curves use matching height ',boundary_value,'.'),'\n',
         'Curves use the analytical D_theta expression. Missing curve segments indicate no admissible matching root.'))+
     guides(colour=guide_legend(nrow=2,byrow=TRUE,order=1),
       linetype=guide_legend(nrow=1,order=2))+
@@ -112,11 +136,18 @@ draw_page <- function(probability=c('unconditional','conditional'),theta_value) 
   p
 }
 
-dir.create(dirname(output_file),FALSE,TRUE)
-cairo_pdf(output_file,width=10.5,height=8.4,onefile=TRUE)
-for(theta_value in c(0,.5,1)) {
-  print(draw_page('unconditional',theta_value))
-  print(draw_page('conditional',theta_value))
+fig11_dir <- file.path(figure_dir,'fig11')
+dir.create(fig11_dir,FALSE,TRUE)
+boundary_files <- c('sqrt(y*/K)'='sqrt','2/3 compromise'='2_3_compromise',
+  '3/4 compromise'='3_4_compromise','y*'='ystar')
+for(boundary_value in names(boundary_files)) {
+  split_file <- file.path(fig11_dir,paste0('P1_stochastic_validation_',
+    unname(boundary_files[boundary_value]),'.pdf'))
+  cairo_pdf(split_file,width=10.5,height=8.4,onefile=TRUE)
+  for(theta_value in c(0,.5,1)) {
+    print(draw_page('unconditional',theta_value,boundary_value))
+    print(draw_page('conditional',theta_value,boundary_value))
+  }
+  dev.off()
 }
-dev.off()
-cat('wrote',output_file,'\n')
+cat('Figure 11 boundary-specific PDFs complete\n')

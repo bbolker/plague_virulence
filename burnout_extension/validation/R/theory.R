@@ -1,6 +1,21 @@
 # General-recruitment burnout asymptotics. Base R + deSolve only.
 h_theta <- function(x, theta) (1-x)*x^theta
 h_prime <- function(x, theta) x^(theta-1)*(theta-(theta+1)*x)
+
+# Boundary-layer matching heights.  The logarithmic compromises are
+# y_BL = K^(-1/3) * y_star^(2/3) and K^(-1/4) * y_star^(3/4), with no
+# extra theta correction.
+boundary_layer_height <- function(ystar,K,
+    choice=c('sqrt','compromise','compromise_3_4','ystar')) {
+  choice <- match.arg(choice)
+  switch(choice,sqrt=sqrt(ystar/K),
+    compromise=K^(-1/3)*ystar^(2/3),
+    compromise_3_4=K^(-1/4)*ystar^(3/4),ystar=ystar)
+}
+
+boundary_layer_labels <- c(
+  sqrt='sqrt(y*/K)',compromise='2/3 compromise',
+  compromise_3_4='3/4 compromise',ystar='y*')
 F0 <- function(x, R0) 1-x+log(x)/R0
 Fp <- function(x, R0) 1/(R0*x)-1
 Fpp <- function(x, R0) -1/(R0*x^2)
@@ -153,7 +168,7 @@ matching <- function(R0,rho,theta,K,D=NULL,yline=NULL) {
   a<-hf/delta; b<-R0*xf/delta; cc<-delta*h_prime(xf,theta)+R0*hf
   C<-C_explicit(R0,theta); if(is.null(D)) D<-D_regularized(R0,theta)
   ys<-rho*h_theta(xs,theta)
-  if(is.null(yline)) yline<-sqrt(ys/K)
+  if(is.null(yline)) yline<-boundary_layer_height(ys,K,'sqrt')
   ybl<-yline; L<-log(C/ybl)
   Q<-(R0*a-b*cc)/(a*delta^2)
   M1<-rho*L+(b/a)*ybl

@@ -34,6 +34,8 @@ paper_names <- c(
 
 prepare_metric <- function(d,spec) {
   z<-copy(d)
+  z[,boundary:=factor(boundary,levels=c(
+    'sqrt(y*/K)','2/3 compromise','3/4 compromise','y*'))]
   z[,estimate:=get(spec$estimate)];z[,truth:=get(spec$truth)]
   z[,absolute_error:=abs(estimate-truth)]
   z[,relative_error:=absolute_error/abs(truth)]
@@ -49,7 +51,7 @@ draw_metric_page <- function(z,spec,rho_value) {
   xb<-log10(tick_values)
   xl<-format(tick_values,trim=TRUE,scientific=FALSE)
   one<-function(column,label,show_x) {
-    q<-zz[,.(theta,u,K_f=factor(K,levels=sort(unique(zz$K))),reason,value=get(column))]
+    q<-zz[,.(boundary,theta,u,K_f=factor(K,levels=sort(unique(zz$K))),reason,value=get(column))]
     finite_values<-q[is.finite(value)&value>0,value]
     lower_power<-floor(log10(min(finite_values)))
     upper_power<-ceiling(log10(max(finite_values)))
@@ -64,7 +66,8 @@ draw_metric_page <- function(z,spec,rho_value) {
     exponent_breaks<-seq(lower_power,upper_power,by=exponent_step)
     colour_breaks<-10^exponent_breaks
     ggplot(q,aes(u,K_f,fill=value))+geom_tile()+
-      facet_wrap(~theta,nrow=1,labeller=labeller(theta=function(x) paste0('theta = ',x)))+
+      facet_grid(boundary~theta,labeller=labeller(
+        theta=function(x) paste0('theta = ',x),boundary=label_value))+
       scale_fill_viridis_c(trans='log10',option='viridis',na.value='grey82',
         limits=colour_limits,breaks=colour_breaks,
         labels=scales::label_scientific(digits=2),oob=scales::squish)+
@@ -76,7 +79,7 @@ draw_metric_page <- function(z,spec,rho_value) {
             panel.border=element_rect(colour='grey55',linewidth=.45),
             strip.background=element_blank(),strip.text=element_text(size=9),
             legend.position='right',legend.key.height=unit(1.05,'cm'),
-            axis.text.x=element_text(size=7),aspect.ratio=2.2,
+            axis.text.x=element_text(size=7),aspect.ratio=.54,
             plot.margin=margin(2,3,2,3))
   }
   title_panel<-cowplot::ggdraw()+cowplot::draw_label(
@@ -98,7 +101,7 @@ draw_metric_page <- function(z,spec,rho_value) {
 
 write_metric_pdf <- function(d,name,spec,outdir='validation/figures') {
   z<-prepare_metric(d,spec);file<-file.path(outdir,unname(paper_names[name]))
-  grDevices::cairo_pdf(file,width=11.6,height=12.5,onefile=TRUE)
+  grDevices::cairo_pdf(file,width=11.6,height=21,onefile=TRUE)
   for(rv in c(.02,.04,.06,.08,.10)) print(draw_metric_page(z,spec,rv))
   dev.off();file
 }

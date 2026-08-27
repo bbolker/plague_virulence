@@ -1,8 +1,9 @@
 source('validation/R/theory.R')
 
 ode_reference <- function(R0,rho,theta,K,y0=1e-10,init=c('manifold','finiteK'),
-                          dt=.05,tmax=NULL,trajectory=FALSE) {
-  init<-match.arg(init); xs<-1/R0; ystar<-rho*h_theta(xs,theta); ybl<-sqrt(ystar/K)
+                          dt=.05,tmax=NULL,trajectory=FALSE,yline=NULL) {
+  init<-match.arg(init); xs<-1/R0; ystar<-rho*h_theta(xs,theta)
+  ybl<-if(is.null(yline)) boundary_layer_height(ystar,K,'sqrt') else yline
   if(init=='manifold') x0<-1-R0/(R0-1+rho)*y0 else {x0<-1-1/K;y0<-1/K}
   rhs<-function(t,z,p) list(c(rho*h_theta(z[1],theta)-R0*z[1]*z[2],
                                 (R0*z[1]-1)*z[2]))

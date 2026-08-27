@@ -20,12 +20,15 @@ analytic_grid <- analytic_grid[order(analytic_grid$rho,analytic_grid$theta,
 analytic_grid$row_id <- seq_len(nrow(analytic_grid))
 
 required_columns <- c('K_first','K_second','L_first','L_second',
+  'K_first_compromise','K_second_compromise','L_first_compromise','L_second_compromise',
+  'K_first_compromise_3_4','K_second_compromise_3_4',
+  'L_first_compromise_3_4','L_second_compromise_3_4',
   'K_first_star','K_second_star','L_first_star','L_second_star')
 if(file.exists(analytic_file)) {
   analytic <- fread(analytic_file)
   if(!all(required_columns %in% names(analytic))) analytic <- data.table()
   else {
-    analytic[,row_id.1:=NULL]
+    if('row_id.1' %in% names(analytic)) analytic[,row_id.1:=NULL]
     key <- function(z) do.call(paste,c(z[,c('rho','theta','K','R0')],sep='|'))
     analytic[,row_id:=match(key(analytic),key(analytic_grid))]
     analytic <- analytic[is.finite(row_id)]
@@ -50,6 +53,10 @@ if(length(missing)) {
         D<-D_regularized(R0,theta)
         m<-matching(R0,rho,theta,K,D=D)
         ys<-rho*h_theta(1/R0,theta)
+        yc<-boundary_layer_height(ys,K,'compromise')
+        mc<-matching(R0,rho,theta,K,D=D,yline=yc)
+        yc34<-boundary_layer_height(ys,K,'compromise_3_4')
+        mc34<-matching(R0,rho,theta,K,D=D,yline=yc34)
         ms<-matching(R0,rho,theta,K,D=D,yline=ys)
         probs<-function(mm,yline=NULL) {
           q1<-if(is.finite(mm$x_first)) kendall_quantities(mm$x_first,R0,rho,theta,K,yline) else NULL
@@ -58,17 +65,25 @@ if(length(missing)) {
             L_first=q1$P1_L %||% NA_real_,L_second=q2$P1_L %||% NA_real_)
         }
         keys<-c('K_first','K_second','L_first','L_second')
-        c(probs(m),setNames(probs(ms,ys),paste0(keys,'_star')),
+        c(probs(m),setNames(probs(mc,yc),paste0(keys,'_compromise')),
+          setNames(probs(mc34,yc34),paste0(keys,'_compromise_3_4')),
+          setNames(probs(ms,ys),paste0(keys,'_star')),
           status=ode$status)
       },silent=TRUE)
       if(inherits(p,'try-error')) data.frame(row_id=i,g,
         status=paste0('ERROR:',as.character(p)),K_first=NA_real_,
         K_second=NA_real_,L_first=NA_real_,L_second=NA_real_,
+        K_first_compromise=NA_real_,K_second_compromise=NA_real_,
+        L_first_compromise=NA_real_,L_second_compromise=NA_real_,
+        K_first_compromise_3_4=NA_real_,K_second_compromise_3_4=NA_real_,
+        L_first_compromise_3_4=NA_real_,L_second_compromise_3_4=NA_real_,
         K_first_star=NA_real_,K_second_star=NA_real_,
         L_first_star=NA_real_,L_second_star=NA_real_)
       else data.frame(row_id=i,g,status=unname(p['status']),
-        as.list(as.numeric(p[c(keys,paste0(keys,'_star'))])) |>
-          setNames(c(keys,paste0(keys,'_star'))))
+        as.list(as.numeric(p[c(keys,paste0(keys,'_compromise'),
+          paste0(keys,'_compromise_3_4'),paste0(keys,'_star'))])) |>
+          setNames(c(keys,paste0(keys,'_compromise'),
+            paste0(keys,'_compromise_3_4'),paste0(keys,'_star'))))
     },analytic_grid=analytic_grid)
     analytic <- rbind(analytic,rbindlist(got,fill=TRUE),fill=TRUE)
     setorder(analytic,row_id);fwrite(analytic,analytic_file)
@@ -86,6 +101,16 @@ method_labels <- c(
   L_first='Laplace + first-order entry',
   L_second='Laplace + second-order entry')
 
+boundary_math_label <- function(x) {
+  labels <- c(
+    'sqrt(y*/K)'='y[BL] == sqrt(y[star]/K)',
+    '2/3 compromise'='y[BL] == K^{-1/3} * y[star]^{2/3}',
+    '3/4 compromise'='y[BL] == K^{-1/4} * y[star]^{3/4}',
+    'y*'='y[BL] == y[star]',
+    'Early-establishment reference'="'Early-establishment reference'")
+  parse(text=unname(labels[x]))
+}
+
 make_long <- function(probability=c('unconditional','conditional')) {
   probability <- match.arg(probability)
   a <- copy(analytic)
@@ -95,21 +120,24 @@ make_long <- function(probability=c('unconditional','conditional')) {
   }
   standard <- names(method_labels)
   a <- melt(a,id.vars=c('row_id','rho','theta','K','R0','status'),
-    measure.vars=c(standard,paste0(standard,'_star')),
+    measure.vars=c(standard,paste0(standard,'_compromise'),
+      paste0(standard,'_compromise_3_4'),paste0(standard,'_star')),
     variable.name='variant',value.name='value')
-  a[,boundary:=ifelse(grepl('_star$',variant),'Alternative: y*',
-    'Standard: sqrt(y*/K)')]
-  a[,method_key:=sub('_star$','',variant)]
+  a[,boundary:=fcase(grepl('_compromise_3_4$',variant),'3/4 compromise',
+    grepl('_compromise$',variant),'2/3 compromise',
+    grepl('_star$',variant),'y*',default='sqrt(y*/K)')]
+  a[,method_key:=sub('_(compromise_3_4|compromise|star)$','',variant)]
   a[,method:=factor(method_key,levels=names(method_labels),labels=method_labels)]
-  a[,boundary:=factor(boundary,levels=c('Standard: sqrt(y*/K)',
-    'Alternative: y*'))]
+  a[,boundary:=factor(boundary,levels=c(
+    'sqrt(y*/K)','2/3 compromise','3/4 compromise','y*'))]
   setorder(a,rho,theta,K,method,boundary,R0)
   a[,segment:=data.table::rleid(is.finite(value)),by=.(rho,theta,K,method,boundary)]
   a[is.finite(value)]
 }
 
-draw_page <- function(probability,rho_value,theta_value) {
+draw_page <- function(probability,rho_value,theta_value,boundary_value=NULL) {
   a <- make_long(probability)[rho==rho_value & theta==theta_value]
+  if(!is.null(boundary_value)) a <- a[boundary==boundary_value]
   s <- sim[rho==rho_value & theta==theta_value]
   if(probability=='unconditional') {
     s[,`:=`(estimate=P_unconditional,low=uncond_low,high=uncond_high)]
@@ -136,14 +164,20 @@ draw_page <- function(probability,rho_value,theta_value) {
       'Laplace + first-order entry'='grey35',
       'Laplace + second-order entry'='#7570B3',
       'Early-establishment reference'='grey60'))+
-    scale_linetype_manual(values=c('Standard: sqrt(y*/K)'='solid',
-      'Alternative: y*'='22',
-      'Early-establishment reference'='solid'))+
+    scale_linetype_manual(values=c('sqrt(y*/K)'='solid',
+      '2/3 compromise'='42','y*'='22',
+      '3/4 compromise'='44',
+      'Early-establishment reference'='solid'),labels=boundary_math_label)+
     labs(title=title,
-      subtitle=sprintf('Exact Gillespie CTMC; rho = %.2f, theta = %g; I0 = 1',rho_value,theta_value),
+      subtitle=sprintf('Exact Gillespie CTMC; rho = %.2f, theta = %g; I0 = 1%s',
+        rho_value,theta_value,if(is.null(boundary_value)) '' else
+          paste0('; matching height = ',boundary_value)),
       x=expression(R[0]-1~'(log scale)'),y=ylabel,
       colour='Analytical method',linetype='Matching height',
-      caption=paste0('Points and 95% Wilson intervals are stochastic estimates. Solid curves use the standard sqrt(y*/K) height; dashed curves use the alternative y* height.\n',
+      caption=paste0('Points and 95% Wilson intervals are stochastic estimates. ',
+        if(is.null(boundary_value))
+          'Curves compare sqrt(y*/K), the 2/3 and 3/4 compromises, and y*.'
+        else paste0('All analytical curves use matching height ',boundary_value,'.'),'\n',
         'Each curve stops where its matching equation has no admissible root.'))+
     guides(colour=guide_legend(nrow=2,byrow=TRUE,order=1),
       linetype=guide_legend(nrow=1,order=2))+
@@ -162,15 +196,24 @@ draw_page <- function(probability,rho_value,theta_value) {
   p
 }
 
-write_scan_pdf <- function(probability,file) {
+write_scan_pdf <- function(probability,file,boundary_value=NULL) {
   grDevices::cairo_pdf(file,width=10.5,height=8.4,onefile=TRUE)
   for(rho_value in rho_values) for(theta_value in theta_values)
-    print(draw_page(probability,rho_value,theta_value))
+    print(draw_page(probability,rho_value,theta_value,boundary_value))
   dev.off()
 }
 
-write_scan_pdf('unconditional',file.path(figure_dir,
-  'fig09_P1_unconditional_stochastic_scan.pdf'))
-write_scan_pdf('conditional',file.path(figure_dir,
-  'fig10_P1_conditional_stochastic_scan.pdf'))
+fig09_dir <- file.path(figure_dir,'fig09')
+fig10_dir <- file.path(figure_dir,'fig10')
+dir.create(fig09_dir,FALSE,TRUE)
+dir.create(fig10_dir,FALSE,TRUE)
+boundary_files <- c('sqrt(y*/K)'='sqrt','2/3 compromise'='2_3_compromise',
+  '3/4 compromise'='3_4_compromise','y*'='ystar')
+for(boundary_value in names(boundary_files)) {
+  suffix <- unname(boundary_files[boundary_value])
+  write_scan_pdf('unconditional',file.path(fig09_dir,
+    paste0('P1_unconditional_',suffix,'.pdf')),boundary_value)
+  write_scan_pdf('conditional',file.path(fig10_dir,
+    paste0('P1_conditional_',suffix,'.pdf')),boundary_value)
+}
 cat('stochastic scan PDFs complete\n')
