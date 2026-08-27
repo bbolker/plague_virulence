@@ -12,7 +12,7 @@
 * direct solution of deterministic metapop model??? does it collapse?
 
 * implement non-extinction variant, compare with extinction-allowed (strength of burnout mechanism)
-* implement power-law $R_0(N)$, i.e.  ?
+* implement power-law or saturating $R_0(N)$, i.e.  ?
 * think about an invasibility expression: if we know patch occupancy and S/I distributions of resident, can we calculate invasion, or do extinction dynamics etc. make expectations of instantaneous growth rate irrelevant?
 * sensitivity to $r$?
 * test ODE with euler integrator (pass through to deSolve)? allow switch to disable hazard correction in stoch models?
