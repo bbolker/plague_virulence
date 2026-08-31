@@ -53,95 +53,47 @@ highest choice.
 
 \section{What the existing stochastic comparisons show}
 
-Figures~\ref{fig:smallK} and~\ref{fig:largeK} compare unconditional persistence
-for the four heights in the finite- and large-$K$ scans. Figure~\ref{fig:conditional}
-shows persistence conditional on escaping early fizzle.
+Figures~\ref{fig:accuracy-u} and~\ref{fig:accuracy-c} show that higher boundary
+layers are less accurate than lower boundary layers.
 
-\begin{figure}[p]
+Figures~\ref{fig:coverage-u} and~\ref{fig:coverage-c} show that lower boundary
+layers have a narrower range of applicability than higher boundary layers.
+
+\newcommand{\heightfigure}[6]{%
+\begin{figure}[!htbp]
 \centering
-\begin{minipage}{0.49\textwidth}\centering
-\includegraphics[page=7,trim=15 360 365 70,clip,width=\linewidth]
- {validation/figures/fig09/P1_unconditional_sqrt.pdf}\\
-\footnotesize (a) $\yBL=\sqrt{\ystar/K}$
-\end{minipage}\hfill
-\begin{minipage}{0.49\textwidth}\centering
-\includegraphics[page=7,trim=15 360 365 70,clip,width=\linewidth]
- {validation/figures/fig09/P1_unconditional_2_3_compromise.pdf}\\
-\footnotesize (b) $2/3$ compromise
-\end{minipage}
-
-\vspace{0.7em}
-\begin{minipage}{0.49\textwidth}\centering
-\includegraphics[page=7,trim=15 360 365 70,clip,width=\linewidth]
- {validation/figures/fig09/P1_unconditional_3_4_compromise.pdf}\\
-\footnotesize (c) $3/4$ compromise
-\end{minipage}\hfill
-\begin{minipage}{0.49\textwidth}\centering
-\includegraphics[page=7,trim=15 360 365 70,clip,width=\linewidth]
- {validation/figures/fig09/P1_unconditional_ystar.pdf}\\
-\footnotesize (d) $\yBL=\ystar$
-\end{minipage}
-\caption{Unconditional persistence: Figure 9 subset with $\rho=0.05$,
-$\theta=0$, $K=1000$.}
-\label{fig:smallK}
-\end{figure}
-
-\begin{figure}[p]
-\centering
-\begin{minipage}{0.49\textwidth}\centering
-\includegraphics[page=1,trim=15 360 365 70,clip,width=\linewidth]
+\begin{minipage}{0.42\textwidth}\centering
+\includegraphics[page=#1,trim=#5,clip,width=\linewidth]
  {validation/figures/fig11/P1_stochastic_validation_sqrt.pdf}\\
 \footnotesize (a) $\yBL=\sqrt{\ystar/K}$
 \end{minipage}\hfill
-\begin{minipage}{0.49\textwidth}\centering
-\includegraphics[page=1,trim=15 360 365 70,clip,width=\linewidth]
+\begin{minipage}{0.42\textwidth}\centering
+\includegraphics[page=#1,trim=#5,clip,width=\linewidth]
  {validation/figures/fig11/P1_stochastic_validation_2_3_compromise.pdf}\\
 \footnotesize (b) $2/3$ compromise
 \end{minipage}
 
-\vspace{0.7em}
-\begin{minipage}{0.49\textwidth}\centering
-\includegraphics[page=1,trim=15 360 365 70,clip,width=\linewidth]
+\vspace{0.25em}
+\begin{minipage}{0.42\textwidth}\centering
+\includegraphics[page=#1,trim=#5,clip,width=\linewidth]
  {validation/figures/fig11/P1_stochastic_validation_3_4_compromise.pdf}\\
 \footnotesize (c) $3/4$ compromise
 \end{minipage}\hfill
-\begin{minipage}{0.49\textwidth}\centering
-\includegraphics[page=1,trim=15 360 365 70,clip,width=\linewidth]
+\begin{minipage}{0.42\textwidth}\centering
+\includegraphics[page=#1,trim=#5,clip,width=\linewidth]
  {validation/figures/fig11/P1_stochastic_validation_ystar.pdf}\\
 \footnotesize (d) $\yBL=\ystar$
 \end{minipage}
-\caption{Unconditional persistence: Figure 11 subset with $\rho=0.01$,
-$\theta=0$, $K=10^6$.}
-\label{fig:largeK}
+\caption{#3 for $\rho=0.01$, $\theta=#2$, and $K=#4$. Curves stop where no
+admissible analytical matching root exists.}
+\label{#6}
 \end{figure}
+}
 
-\begin{figure}[p]
-\centering
-\begin{minipage}{0.49\textwidth}\centering
-\includegraphics[page=7,trim=15 360 365 70,clip,width=\linewidth]
- {validation/figures/fig10/P1_conditional_sqrt.pdf}\\
-\footnotesize (a) $\yBL=\sqrt{\ystar/K}$
-\end{minipage}\hfill
-\begin{minipage}{0.49\textwidth}\centering
-\includegraphics[page=7,trim=15 360 365 70,clip,width=\linewidth]
- {validation/figures/fig10/P1_conditional_2_3_compromise.pdf}\\
-\footnotesize (b) $2/3$ compromise
-\end{minipage}
-
-\vspace{0.7em}
-\begin{minipage}{0.49\textwidth}\centering
-\includegraphics[page=7,trim=15 360 365 70,clip,width=\linewidth]
- {validation/figures/fig10/P1_conditional_3_4_compromise.pdf}\\
-\footnotesize (c) $3/4$ compromise
-\end{minipage}\hfill
-\begin{minipage}{0.49\textwidth}\centering
-\includegraphics[page=7,trim=15 360 365 70,clip,width=\linewidth]
- {validation/figures/fig10/P1_conditional_ystar.pdf}\\
-\footnotesize (d) $\yBL=\ystar$
-\end{minipage}
-\caption{Persistence conditional on escaping early fizzle: Figure 10 subset
-with $\rho=0.05$, $\theta=0$, $K=1000$.}
-\label{fig:conditional}
-\end{figure}
+\heightfigure{1}{0}{Unconditional persistence}{10^8}{0 110 350 250}{fig:accuracy-u}
+\heightfigure{2}{0}{Persistence conditional on escaping early fizzle}{10^8}{0 110 350 250}{fig:accuracy-c}
+\clearpage
+\heightfigure{3}{0.5}{Unconditional persistence}{10^6}{0 360 350 60}{fig:coverage-u}
+\heightfigure{4}{0.5}{Persistence conditional on escaping early fizzle}{10^6}{0 360 350 60}{fig:coverage-c}
 
 \end{document}
