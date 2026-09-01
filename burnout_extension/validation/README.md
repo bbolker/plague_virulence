@@ -50,6 +50,13 @@ and conditional curve PDFs to
 BI has no matching-height argument and remains defined wherever the
 finite-boundary curves stop.
 
+The script also writes two conditional display alternatives without replacing
+the linear figure. `fig12_BI_stochastic_validation_cond_logit.pdf` uses
+probability-labelled logit coordinates with explicit clipping at 0.001 and
+0.999; `fig12_BI_stochastic_validation_cond_free.pdf` uses a separate linear
+y range in each K panel. Absolute probability error remains the numerical
+accuracy metric; these transformations affect visualization only.
+
 The scan contains 624 parameter combinations with
 `rho = {0.01, 0.02, 0.05, 0.10}`, `theta = {0, 0.5, 1}`, four population sizes,
 and 13 values of `R0 - 1`.
