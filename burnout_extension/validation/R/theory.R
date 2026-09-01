@@ -2,20 +2,31 @@
 h_theta <- function(x, theta) (1-x)*x^theta
 h_prime <- function(x, theta) x^(theta-1)*(theta-(theta+1)*x)
 
-# Boundary-layer matching heights.  The logarithmic compromises are
+# Boundary-layer matching heights.  The power-law compromises are
 # y_BL = K^(-1/3) * y_star^(2/3) and K^(-1/4) * y_star^(3/4), with no
-# extra theta correction.
+# extra theta correction.  Two configurable inverse-log candidates are kept
+# separate because "a 1/log(K) scale" can mean either an absolute infective
+# fraction or a fraction of the endemic scale y_star.  These are diagnostics;
+# neither logarithmic choice is asserted to be a valid matching height.
 boundary_layer_height <- function(ystar,K,
-    choice=c('sqrt','compromise','compromise_3_4','ystar')) {
+    choice=c('sqrt','compromise','compromise_3_4','ystar',
+             'log_inverse','ystar_log_inverse'),log_constant=1) {
   choice <- match.arg(choice)
+  if(!is.finite(K)||K<=1) stop('inverse-log boundary choices require K > 1')
+  if(!is.finite(log_constant)||log_constant<=0)
+    stop('log_constant must be finite and positive')
   switch(choice,sqrt=sqrt(ystar/K),
     compromise=K^(-1/3)*ystar^(2/3),
-    compromise_3_4=K^(-1/4)*ystar^(3/4),ystar=ystar)
+    compromise_3_4=K^(-1/4)*ystar^(3/4),ystar=ystar,
+    log_inverse=log_constant/log(K),
+    ystar_log_inverse=log_constant*ystar/log(K))
 }
 
 boundary_layer_labels <- c(
   sqrt='sqrt(y*/K)',compromise='2/3 compromise',
-  compromise_3_4='3/4 compromise',ystar='y*')
+  compromise_3_4='3/4 compromise',ystar='y*',
+  log_inverse='c_log/log(K)',
+  ystar_log_inverse='c_log*y*/log(K)')
 F0 <- function(x, R0) 1-x+log(x)/R0
 Fp <- function(x, R0) 1/(R0*x)-1
 Fpp <- function(x, R0) -1/(R0*x^2)
@@ -30,6 +41,28 @@ action_diff <- function(x0,x1,R0,theta) {
   if (x0==x1) return(0)
   integrate(function(z) action_derivative(z,R0,theta),x0,x1,
             rel.tol=2e-11,abs.tol=2e-12,subdivisions=500L,stop.on.error=TRUE)$value
+}
+
+# Boundary-layer-independent leading-order trough/Laplace prediction.  This
+# deliberately has no y_BL argument: strict-overlap matching cancels the
+# arbitrary matching height before the burnout exponent is formed.
+bi_quantities <- function(R0,rho,theta,K,I0=1) {
+  stopifnot(is.finite(R0),R0>1,is.finite(rho),rho>0,
+            is.finite(K),K>0,is.finite(I0),I0>0)
+  xf <- x_final(R0); xs <- 1/R0
+  C <- C_explicit(R0,theta)
+  Delta_A_f <- action_diff(xf,xs,R0,theta)
+  log_y_min <- log(C)-Delta_A_f/rho
+  log_B <- log(K)+log(C)+0.5*log(R0*rho*h_theta(xs,theta)/(2*pi))-
+    Delta_A_f/rho
+  B <- if(log_B>log(.Machine$double.xmax)) Inf else exp(log_B)
+  P_conditional <- if(is.infinite(B)) 1 else -expm1(-B)
+  establishment <- -expm1(-I0*log(R0))
+  list(C=C,Delta_A_f=Delta_A_f,log_y_min=log_y_min,
+       y_min=exp(log_y_min),log_B=log_B,B=B,
+       P_conditional=P_conditional,
+       P_unconditional=establishment*P_conditional,
+       establishment=establishment)
 }
 
 C_explicit <- local({

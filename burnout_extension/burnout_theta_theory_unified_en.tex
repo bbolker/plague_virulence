@@ -320,6 +320,36 @@ $\mathcal I$.  The further simplification
 $-\log P_{\rm burn\mid est}\sim K\BL/\mathcal I_{L,j}$ additionally requires
 $\mathcal I_{L,j}\gg1$.
 
+\paragraph{Boundary-layer-independent leading order.}
+Strict-overlap matching also supplies a closed form in which the arbitrary
+matching height cancels.  Combining
+\begin{equation}
+ \Afun(x_{\rm in})-\Afun(\xf)\sim
+ \rho\log\!\left(\frac{C_\theta}{\BL}\right),
+ \qquad
+ y_{\min}=\BL\exp\!\left\{-\frac{\Afun(\xs)-\Afun(x_{\rm in})}{\rho}\right\}
+\end{equation}
+gives
+\begin{equation}
+ \boxed{\quad y_{\min}^{\rm BI}=C_\theta
+ \exp\!\left(-\frac{\Delta A_f}{\rho}\right).\quad}
+ \label{eq:exec-ymin-BI}
+\end{equation}
+The generalized trough/Laplace burnout approximation is therefore
+\begin{equation}
+ \boxed{\quad B_{\rm BI}=K C_\theta
+ \sqrt{\frac{\Rzero y^*}{2\pi}}
+ \exp\!\left(-\frac{\Delta A_f}{\rho}\right),\qquad
+ P_{\rm persist\mid est}^{\rm BI}=-\operatorname{expm1}(-B_{\rm BI}).\quad}
+ \label{eq:exec-BI}
+\end{equation}
+The unconditional probability multiplies this by $1-1/\Rzero$ for one initial
+infective, or by $1-\Rzero^{-I_0}$ for $I_0$ independent initial infectives.
+This is genuinely boundary-layer-independent at leading order and remains
+defined when the finite-boundary construction reports no entry.  It is an
+additional leading-order prediction, not a presumed replacement for either
+finite-boundary route.
+
 \paragraph{Which route requires $x_{\rm in}$?}
 There are two distinct computational pipelines.
 \begin{enumerate}
@@ -1293,6 +1323,34 @@ K\BL
 e^{-\Lambda}.
 \end{equation}
 
+The generalized trough heuristic of Todd, David, and collaborators writes the
+same local saddle contribution in terms of the curvature at the trough.  In
+the present model
+\[
+ \rho R_{\rm eff}'(\tau_{\min})=\Rzero y^*,
+\]
+so their expression reduces exactly to
+\begin{equation}
+ B\sim K y_{\min}\sqrt{\frac{\Rzero y^*}{2\pi}}.
+ \label{eq:generalized-trough}
+\end{equation}
+Strict-overlap matching makes this result independent of the matching line at
+leading order.  Indeed,
+\[
+ \Afun(x_{\rm in})-\Afun(\xf)
+ \sim\rho\log(C_\theta/\BL),\qquad
+ y_{\min}=\BL\exp\!\left[-\frac{\Afun(\xs)-\Afun(x_{\rm in})}{\rho}\right],
+\]
+and hence
+\begin{equation}
+ y_{\min}^{\rm BI}\sim C_\theta e^{-\Delta A_f/\rho},\qquad
+ B_{\rm BI}\sim K C_\theta\sqrt{\frac{\Rzero y^*}{2\pi}}
+ e^{-\Delta A_f/\rho}.
+ \label{eq:BI-full}
+\end{equation}
+This BI formula is retained alongside, rather than substituted for, the
+finite-boundary exact-Kendall and Laplace approximations.
+
 The action-resummed formulation has a further computational advantage. Let $M_2$ denote the right-hand side of~\eqref{eq:M2}, and define
 \[
 \Delta A_f=\Afun(\xs)-\Afun(\xf).
@@ -1436,8 +1494,9 @@ layers.
  {validation/figures/fig11/P1_stochastic_validation_ystar.pdf}\\
 \footnotesize (d) $\BL=y^*$
 \end{minipage}
-\caption{#3 for $\rho=0.01$, $\theta=#2$, and $K=#4$. Curves stop where no
-admissible analytical matching root exists.}
+\caption{#3 for $\rho=0.01$, $\theta=#2$, and $K=#4$. Finite-boundary curves
+stop where no admissible analytical matching root exists; the BI curve remains
+defined there.}
 \label{#6}
 \end{figure}
 }
@@ -1448,6 +1507,54 @@ admissible analytical matching root exists.}
 \clearpage
 \theoryheightfigure{3}{0.5}{Unconditional persistence}{10^6}{0 360 350 60}{fig:bl-coverage-u}
 \theoryheightfigure{4}{0.5}{Persistence conditional on escaping early fizzle}{10^6}{0 360 350 60}{fig:bl-coverage-c}
+
+\subsection{Boundary-layer-independent validation on the existing grid}
+The BI formula was evaluated on all 624 previously simulated parameter points;
+the stochastic counts, persistence definitions, and Wilson intervals were not
+recomputed.  Its conditional mean absolute probability error is $0.0402$
+(median $0.0046$, maximum $0.5615$), while its unconditional mean absolute
+error is $0.0058$ (median $0.0019$, maximum $0.0523$).  On the 346 points where
+the finite-boundary construction has an entry, BI has conditional and
+unconditional mean absolute errors $0.0067$ and $0.0026$, respectively.  On
+the 278 old \texttt{NO\_ENTRY} points, which are all retained for BI, these
+errors rise to $0.0819$ and $0.0097$.
+
+For comparison on their 345 finite predictions, second-order exact Kendall has
+conditional/unconditional mean absolute errors $0.0127/0.0052$, and
+second-order finite-boundary Laplace has $0.0081/0.0030$.  Thus BI is slightly
+better on the common finite-entry subset, but its all-grid conditional error is
+dominated by no-entry points and it should not be presented as uniformly more
+accurate.  The clearest failures occur for slow replenishment no longer being
+strongly separated ($\rho=0.10$), small $\Rzero-1$, and moderate-to-large $K$;
+there BI systematically underpredicts conditional persistence.
+
+Because that conditional error is substantial, we also used the existing
+deterministic ODE trough cache as a secondary diagnostic.  At $\rho=0.02$ the
+median ratio $y_{\min}^{\rm BI}/y_{\min}^{\rm ODE}$ is close to one across
+$\theta$.  At $\rho=0.10$ it falls from about $0.52$ for $\theta=0$ to $0.81$
+for $\theta=1$, confirming that leading-order trough underprediction is an
+important cause of the persistence error in the weak-separation regime.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[page=13,width=.88\textwidth]
+ {validation/figures/fig12_BI_unconditional_stochastic_validation.pdf}
+\caption{Unconditional BI prediction along $\Rzero-1$ for the original
+Figure~11 large-$K$ validation grid. Blue points and grey bars are the unchanged
+stochastic estimates and 95\% Wilson intervals; the green BI curve remains
+defined through old \texttt{NO\_ENTRY} regions. The accompanying multi-page PDF
+also contains the original Figure~9 grid.}
+\label{fig:BI-validation-uncond}
+\end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[page=13,width=.88\textwidth]
+ {validation/figures/fig13_BI_conditional_stochastic_validation.pdf}
+\caption{Conditional BI prediction on the same large-$K$ grid. The accompanying
+multi-page PDF also contains the original Figure~10 grid.}
+\label{fig:BI-validation-cond}
+\end{figure}
 
 \clearpage
 \appendix

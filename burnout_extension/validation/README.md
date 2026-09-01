@@ -36,6 +36,20 @@ histories in `data/stochastic_scan_diagnostic_trajectories.rds`. Figures 9 and
 10 show unconditional persistence and persistence conditional on escaping early
 fizzle, respectively.
 
+The boundary-layer-independent (BI) leading-order prediction is evaluated on
+those same cached points with:
+
+```r
+Rscript validation/plot_BI_validation.R
+```
+
+This does not rerun stochastic simulations. It writes separate unconditional
+and conditional curve PDFs to
+`figures/fig12_BI_unconditional_stochastic_validation.pdf` and
+`figures/fig13_BI_conditional_stochastic_validation.pdf`.
+BI has no matching-height argument and remains defined wherever the
+finite-boundary curves stop.
+
 The scan contains 624 parameter combinations with
 `rho = {0.01, 0.02, 0.05, 0.10}`, `theta = {0, 0.5, 1}`, four population sizes,
 and 13 values of `R0 - 1`.
@@ -84,3 +98,23 @@ All random experiments use recorded deterministic seeds.
 Key files are `R/theory.R`, `R/ode_reference.R`, `R/kendall.R`, `R/scan.R`,
 and `R/stochastic.R`. Generated CSVs are under `data/` and figures under
 `figures/`.
+
+## First-trough boundary-entry diagnostic
+
+`R/trough_diagnostics.R` measures the first post-epidemic deterministic trough
+at the first upward crossing of the infective nullcline `x = 1/R0`. The crossing
+time is root-refined by the ODE solver rather than read from the output grid.
+It compares the existing four matching heights with two configurable diagnostic
+inverse-log candidates, `c_log/log(K)` and `c_log*y_star/log(K)`. These candidates
+do not replace the matching height used by the burnout calculation.
+
+```r
+Rscript validation/run_trough_diagnostics.R          # representative smoke grid
+Rscript validation/run_trough_diagnostics.R --full   # existing K/R0 grid
+Rscript validation/plot_trough_diagnostics.R validation/data/first_trough_diagnostics.csv
+```
+
+The CSV records trough depth, nullcline residual, boundary ratio, actual downward
+entry coordinate, and first/second-order phase-plane trough approximations. The
+literal `c_log/log(K)` option need not lie below `y_star`; it is retained as a
+clearly labeled interpretation to expose, rather than hide, that ambiguity.
