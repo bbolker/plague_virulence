@@ -26,7 +26,7 @@ Ignore += *_files/
 burnout_extension/burnout_theta_theory_unified_en.pdf: burnout_extension/burnout_theta_theory_unified_en.tex
 	$(makethere)
 
-## Bolker
+## Bolker current comparison figure
 ## burnout_extension/validation/figures/fig13_comb.pdf
 
 ######################################################################
