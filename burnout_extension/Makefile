@@ -11,6 +11,9 @@ $(DATADIR)/stochastic_scan_results.csv: validation/run_stochastic_scan.R
 	mkdir -p $(DATADIR)
 	$(R) $<
 
+######################################################################
+
+## Making these csvs is expensive
 $(DATADIR)/stochastic_scan_analytic.csv: validation/plot_stochastic_scan.R
 	$(R) $<
 
