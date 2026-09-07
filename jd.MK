@@ -24,7 +24,7 @@ Ignore += *_files/
 
 ## This should be run from burnout_extension
 burnout_extension/burnout_theta_theory_unified_en.pdf: burnout_extension/burnout_theta_theory_unified_en.tex
-	$(makethere)
+	$(texThere)
 
 ## Bolker current comparison figure
 ## burnout_extension/validation/figures/fig13_comb.pdf
@@ -92,6 +92,7 @@ makestuff:
 
 -include makestuff/texj.mk
 -include makestuff/pipeR.mk
+-include makestuff/simptex.mk
 ## -include makestuff/pandoc.mk
 -include makestuff/rmd.mk
 
