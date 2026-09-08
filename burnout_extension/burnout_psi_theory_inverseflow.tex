@@ -1,0 +1,1954 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,mathtools,bm}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{longtable}
+\hypersetup{colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\setlist{nosep,leftmargin=*}
+\newcommand{\Rzero}{R_0}
+\newcommand{\hth}{h_\theta}
+\newcommand{\Fpsi}{F_\psi}
+\newcommand{\Apsi}{A_{\theta,\psi}}
+\newcommand{\Cpsi}{C_{\theta,\psi}}
+\newcommand{\Dpsi}{D_{\theta,\psi}}
+\newcommand{\xf}{x_f}
+\newcommand{\xs}{x_*}
+\newcommand{\yin}{y_{\mathrm{BL}}}
+\newcommand{\xin}{x_{\mathrm{in}}}
+\newcommand{\dd}{\,\mathrm{d}}
+\title{Epidemic Burnout under a Susceptible-Recruitment Family and Population-Size-Dependent Transmission\\[0.4em]\large A Unified Asymptotic Theory from Phase-Plane Matching to Second-Order Entry and Kendall Persistence Probability}
+\author{Unified theory note}
+\date{2026-09-05}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We develop a self-contained asymptotic framework for pathogen burnout or persistence after the first epidemic wave in a susceptible-infectious-death model with the susceptible-recruitment family $h_\theta(x)=(1-x)x^\theta$ and population-size-dependent transmission. The normalized deterministic dynamics are
+\[
+\frac{\dd x}{\dd \sigma}=\rho(1-x)x^\theta-\Rzero\frac{xy}{(x+y)^\psi},
+\qquad
+\frac{\dd y}{\dd \sigma}=\left[\Rzero\frac{x}{(x+y)^\psi}-1\right]y,
+\]
+with \(0\leq\theta\leq1\) and fixed \(0\leq\psi<1\). Writing \(\eta=1-\psi\), the zero-recruitment epidemic geometry remains explicit: the total living-host fraction is
+\[
+n_0(x)=\left(1+\frac{\eta}{\Rzero}\log x\right)^{1/\eta},
+\qquad
+\Fpsi(x)=n_0(x)-x.
+\]
+The nontrivial zero \(\xf\) anchors a logarithmic corner. Direct expansion of the exact phase-plane equation gives sequential first- and second-order scalar coefficient equations. Their finite parts define the matching amplitude \(\Cpsi\) and the second-order constant \(\Dpsi\). Inverting the outer trajectory, matching to the corner, and re-expressing the result in the action variable \(\Apsi\) yields action-resummed first- and second-order scalar equations for the deterministic entry point \(\xin\). The resulting entry feeds directly into Kendall's time-inhomogeneous birth-death formula. A one-dimensional Kendall integral gives the high-accuracy semi-analytical prediction, while Laplace's method gives a fully asymptotic closed form and a boundary-layer-independent limit. The theory separates deterministic matching error, saddle-point error, near-threshold loss of uniformity, the singular endpoint \(\psi\to1^-\), and finite-population stochastic-entry fluctuations.
+\end{abstract}
+
+\tableofcontents
+\clearpage
+
+\section{Executive formula sheet: predictions, definitions, and validity conditions}
+
+\subsection{Basic inputs and derived quantities}
+The independent dimensionless inputs are
+\[
+\Rzero>1,\qquad 0<\rho\ll1,\qquad 0\leq\theta\leq1,\qquad 0\leq\psi<1,\qquad K\gg1.
+\]
+Set
+\[
+\eta=1-\psi,\qquad \hth(x)=(1-x)x^\theta,
+\]
+and define
+\[
+n_0(x)=\left(1+\frac{\eta}{\Rzero}\log x\right)^{1/\eta},
+\qquad
+\Fpsi(x)=n_0(x)-x.
+\]
+The post-wave final-size anchor \(\xf\) is the nontrivial root
+\[
+\Fpsi(\xf)=0,
+\]
+while the low-prevalence growth threshold is
+\[
+\xs=\Rzero^{-1/\eta}.
+\]
+At low prevalence the leading endemic infectious fraction is
+\[
+y_*^{(0)}=\rho\hth(\xs),
+\]
+and the standard deterministic-to-stochastic matching height is
+\[
+\yin=\sqrt{\frac{y_*^{(0)}}{K}}.
+\]
+The exact positive equilibrium has
+\[
+x_e=\xs+\rho\frac{\psi\hth(\xs)}{\eta}+O(\rho^2),
+\qquad
+y_e=\rho\hth(\xs)+O(\rho^2).
+\]
+
+The action is used only through finite differences:
+\[
+\Apsi(v)-\Apsi(u)
+=\int_u^v \frac{1-\Rzero z^\eta}{\hth(z)}\dd z.
+\]
+Define
+\[
+\Delta A_f=\Apsi(\xs)-\Apsi(\xf).
+\]
+
+\subsection{Matching constants and local coefficients}
+Let
+\[
+f_j=\Fpsi^{(j)}(\xf),\qquad h_f=\hth(\xf),\qquad h_f'=\hth'(\xf),
+\]
+and define the local transmission quantity
+\[
+q=\Rzero\xf^\eta,\qquad \delta=1-q.
+\]
+Then
+\[
+a=\frac{h_f}{\delta},\qquad b=\frac{q}{\delta},\qquad r=\frac{\eta q}{\xf},
+\]
+\[
+c=\delta h_f'+rh_f,
+\qquad
+\kappa=\frac{h_fc}{2\delta^3}.
+\]
+The first-order matching amplitude \(\Cpsi\) is obtained from the finite part of the first outer coefficient, and the second-order constant \(\Dpsi\) from the constant term of the inverse second-order trajectory:
+\[
+X_1(y)=a\log\frac{\Cpsi}{y}+o(1),
+\]
+\[
+X_2(y)=\kappa\log^2\frac{\Cpsi}{y}+\Dpsi+o(1),
+\qquad y\downarrow0.
+\]
+Equivalently, if \(Z_1=X_1+a\log y\) and \(Z_2=X_2-\kappa L^2\), then \(a\log\Cpsi=Z_1(0^+)\) and \(\Dpsi=Z_2(0^+)\).  Both are obtained from absolutely convergent one-dimensional quadratures; no small-\(y\) extrapolation is required.
+
+\subsection{First- and second-order entry points}
+Set
+\[
+L_{\mathrm{BL}}=\log\frac{\Cpsi}{\yin}.
+\]
+The direct first-order entry point is
+\[
+\xin^{(1),\mathrm{dir}}
+=\xf+\rho aL_{\mathrm{BL}}+b\yin.
+\]
+For second order define
+\[
+Q=\frac{ra-bc}{a\delta^2},
+.
+\]
+Then the matched second-order direct entry formula is
+\[
+\begin{aligned}
+\xin^{(2),\mathrm{dir}}={}&\xf+\rho aL_{\mathrm{BL}}+b\yin
++\rho^2\left(\kappa L_{\mathrm{BL}}^2+\Dpsi\right)\\
+&+\frac{\rho\yin}{\delta^2}
+\left\{ra(L_{\mathrm{BL}}+1)-bc+\frac{\psi qh_f}{\xf}\right\}\\
+&+\frac{\yin^2}{2\delta^2}
+\left\{rb-\frac{\psi q}{\xf}\right\}.
+\end{aligned}
+\]
+
+For production calculations the action-resummed equations are preferred. Define
+\[
+M_1=\rho L_{\mathrm{BL}}+\frac{b}{a}\yin,
+\]
+and
+\[
+\begin{aligned}
+M_2={}&M_1+\rho^2\frac{\Dpsi}{a}
++\rho\yin\left[Q(L_{\mathrm{BL}}+1)+\frac{\psi b}{\xf}\right]\\
+&+\frac{b\yin^2}{2a}
+\left[Q-\frac{\psi}{\xf\delta}\right].
+\end{aligned}
+\]
+The recommended entry estimates are the unique admissible roots
+\[
+\Apsi\!\left(\xin^{(j)}\right)-\Apsi(\xf)=M_j,
+\qquad \xf<\xin^{(j)}<\xs,
+\qquad j=1,2,
+\]
+which exist precisely when
+\[
+0<M_j<\Delta A_f.
+\]
+
+\subsection{Burnout and persistence probabilities}
+For either entry estimate define the exact Kendall integral
+\[
+\mathcal I(\xin)
+=\int_{\xin}^{1}
+\frac{1}{\rho\hth(X)}
+\exp\left\{\frac{\Apsi(X)-\Apsi(\xin)}{\rho}\right\}\dd X.
+\]
+The upper endpoint is integrable.  As \(X\uparrow1\), \(h_\theta(X)\sim1-X\) and \(A_{\theta,\psi}(X)\sim(R_0-1)\log(1-X)\), so the integrand behaves like \(\rho^{-1}(1-X)^{(R_0-1)/\rho-1}\), which is integrable for every \(R_0>1\) and \(\rho>0\).
+With \(m=K\yin\) infectives at entry,
+\[
+P_{\mathrm{burn}\mid\mathrm{est}}
+\simeq\left(\frac{\mathcal I}{1+\mathcal I}\right)^m,
+\qquad
+P_{\mathrm{persist}\mid\mathrm{est}}
+\simeq1-P_{\mathrm{burn}\mid\mathrm{est}}.
+\]
+It is numerically preferable to use
+\[
+B=-\log P_{\mathrm{burn}\mid\mathrm{est}}
+=m\log\left(1+\frac{1}{\mathcal I}\right),
+\qquad
+P_{\mathrm{persist}\mid\mathrm{est}}=1-e^{-B}.
+\]
+For one initial infectious individual the early establishment probability is approximately \(1-1/\Rzero\), so the unconditional first-trough persistence probability is
+\[
+P_{\mathrm{persist,uncond}}
+\simeq\left(1-\frac1{\Rzero}\right)P_{\mathrm{persist}\mid\mathrm{est}}.
+\]
+
+The Laplace saddle lies at \(\xs\). Writing
+\[
+\Lambda_j=\frac{\Delta A_f-M_j}{\rho},
+\]
+we have
+\[
+\mathcal I\sim
+\exp(\Lambda_j)
+\sqrt{\frac{2\pi\xs}{\eta\rho\hth(\xs)}}.
+\]
+
+In the strict first-order overlap the matching height cancels:
+\[
+B_{\mathrm{BI}}^{(1)}
+\sim
+K\Cpsi
+\sqrt{\frac{\eta\rho\hth(\xs)}{2\pi\xs}}
+\exp\left(-\frac{\Delta A_f}{\rho}\right).
+\]
+In the stricter second-order overlap,
+\[
+B_{\mathrm{BI}}^{(2)}
+\sim
+B_{\mathrm{BI}}^{(1)}
+\exp\left(\rho\frac{\Dpsi}{a}\right),
+\]
+before the next Laplace coefficient is included.
+
+\subsection{Validity conditions}
+The common asymptotic regime is
+\[
+\rho\ll1,\qquad \Rzero>1\ \mathrm{fixed},\qquad \psi<1\ \mathrm{fixed},\qquad
+\frac1K\ll\yin\ll\rho.
+\]
+The first-order corner correction must remain local:
+\[
+\rho|L_{\mathrm{BL}}|+\yin\ll\xs-\xf,
+\qquad 0<M_1<\Delta A_f.
+\]
+Second-order matching additionally requires
+\[
+|M_2-M_1|\ll|M_1|,
+\qquad 0<M_2<\Delta A_f.
+\]
+Here ``second order'' is a joint quadratic truncation in \((\rho,y_{\rm BL})\), retaining \(\rho^2L^2\), \(\rho y_{\rm BL}L\), \(\rho y_{\rm BL}\), and \(y_{\rm BL}^2\) without imposing an additional relative ordering among them.
+Laplace's approximation additionally requires \(\Lambda_j\gg1\), equivalently the saddle must be well separated from the lower endpoint, \(x_*-x_{\rm in}\gg\sqrt\rho\), in the present fixed-parameter regime. For the next-order boundary-independent limit one further needs \(y_{\rm BL}\ll\rho^2\); with \(y_{\rm BL}=\sqrt{\rho h_*/K}\), this implies the strong population-size condition\[\boxed{K\gg h_*/\rho^3}.\]
+The construction is nonuniform when \(\Rzero\to1^+\), when \(\psi\to1^-\), or when \(\xf\) becomes comparable with the recruitment-induced corner scale.
+
+\section{The problem: from a deterministic epidemic tail to stochastic burnout}
+
+\subsection{Count-level model and normalization}
+Let \(S\) and \(I\) denote susceptible and infectious counts, \(N=S+I\) the current living-host count, \(K\) a reference population size, \(\gamma\) the infectious removal rate, \(rK\) the scale of susceptible recruitment, and \(\beta\) the transmission parameter. We use the count-level incidence
+\[
+\lambda_{SI}=\frac{\beta}{K}SI\left(\frac{K}{N}\right)^\psi.
+\]
+The deterministic count equations are
+\[
+\frac{\dd S}{\dd t}
+=rK\hth(S/K)-\frac{\beta}{K}SI\left(\frac{K}{S+I}\right)^\psi,
+\]
+\[
+\frac{\dd I}{\dd t}
+=\frac{\beta}{K}SI\left(\frac{K}{S+I}\right)^\psi-\gamma I.
+\]
+Set
+\[
+x=\frac{S}{K},\qquad y=\frac{I}{K},\qquad \sigma=\gamma t,
+\qquad \rho=\frac r\gamma,\qquad \Rzero=\frac\beta\gamma.
+\]
+Since \(N/K=x+y\), division by \(K\gamma\) gives
+\[
+\frac{\dd x}{\dd\sigma}
+=\rho\hth(x)-\Rzero xy(x+y)^{-\psi},
+\]
+\[
+\frac{\dd y}{\dd\sigma}
+=\left[\Rzero x(x+y)^{-\psi}-1\right]y.
+\]
+The deterministic normalized ODE is independent of \(K\); the population size remains in the stochastic matching scale.
+
+The central problem is to estimate the susceptible fraction \(\xin\) at the first downward crossing of a low-prevalence line \(y=\yin\) after the first epidemic peak, then use that deterministic entry point as the initial condition for a time-inhomogeneous branching approximation.
+
+
+\subsection{Line-by-line normalization and the low-prevalence reproduction factor}
+The normalization is recorded explicitly because the population-size factor is the only place where the transmission interpolation enters. With
+\[
+S=Kx,\qquad I=Ky,\qquad N=K(x+y),
+\]
+the incidence becomes
+\[
+\frac{\beta}{K}SI\left(\frac{K}{N}\right)^\psi
+=\frac{\beta}{K}(Kx)(Ky)(x+y)^{-\psi}
+=\beta Kxy(x+y)^{-\psi}.
+\]
+Hence
+\[
+K\frac{\dd x}{\dd t}=rK h_\theta(x)-\beta Kxy(x+y)^{-\psi},
+\]
+and division by \(K\gamma\), with \(\sigma=\gamma t\), gives
+\[
+\frac{\dd x}{\dd\sigma}=\rho h_\theta(x)-R_0xy(x+y)^{-\psi}.
+\]
+Likewise,
+\[
+\frac{\dd y}{\dd\sigma}=R_0xy(x+y)^{-\psi}-y
+=\{R_0x(x+y)^{-\psi}-1\}y.
+\]
+Thus \(K\) cancels exactly from the deterministic fraction equations. It re-enters only when a deterministic infectious fraction is converted to the count \(Ky\) in the stochastic layer.
+
+For \(y/x\to0\),
+\[
+(x+y)^{-\psi}=x^{-\psi}\left(1+\frac{y}{x}\right)^{-\psi}
+=x^{-\psi}\left[1-\psi\frac{y}{x}+O\!\left(\frac{y^2}{x^2}\right)\right].
+\]
+Therefore
+\[
+\frac{1}{y}\frac{\dd y}{\dd\sigma}
+=R_0x^{1-\psi}-1-\psi R_0x^{-\psi}y+O(y^2/x^2).
+\]
+Writing \(\eta=1-\psi\), the leading effective reproduction factor in the basin is
+\[
+R_{\rm eff}(x)=R_0x^\eta.
+\]
+The low-prevalence growth threshold is consequently the unique positive solution of \(R_{\rm eff}=1\):
+\[
+x_*=R_0^{-1/\eta}.
+\]
+
+\subsection{Exact positive equilibrium and the scale used for matching}
+At a positive equilibrium,
+\[
+0=\rho h_\theta(x_e)-R_0x_ey_e(x_e+y_e)^{-\psi},
+\qquad
+0=R_0x_e(x_e+y_e)^{-\psi}-1.
+\]
+The second relation inserted into the first yields the exact identity
+\[
+y_e=\rho h_\theta(x_e),
+\]
+while \(x_e\) is determined implicitly by
+\[
+R_0x_e\{x_e+\rho h_\theta(x_e)\}^{-\psi}=1.
+\]
+To expose the small-\(\rho\) shift, put
+\[
+x_e=x_*+\rho\xi+O(\rho^2),\qquad h_*=h_\theta(x_*).
+\]
+Taking logarithms gives
+\[
+0=\log R_0+\log x_e-\psi\log(x_e+y_e).
+\]
+Using
+\[
+\log x_e=\log x_*+\rho\frac{\xi}{x_*}+O(\rho^2),
+\]
+\[
+\log(x_e+y_e)=\log x_*+\rho\frac{\xi+h_*}{x_*}+O(\rho^2),
+\]
+and \(\log R_0+\eta\log x_*=0\), the \(O(\rho)\) balance is
+\[
+\eta\xi-\psi h_*=0.
+\]
+Hence
+\[
+\boxed{x_e=x_*+\rho\frac{\psi h_*}{\eta}+O(\rho^2)},
+\]
+and then
+\[
+\boxed{y_e=\rho h_*+\rho^2\frac{\psi h_*h_*'}{\eta}+O(\rho^3)}.
+\]
+The leading endemic infectious scale is therefore
+\[
+y_*^{(0)}=\rho h_*.
+\]
+The standard matching line
+\[
+y_{\rm BL}=\sqrt{\frac{y_*^{(0)}}{K}}
+\]
+can lie simultaneously above the one-individual scale and below the demographic scale:
+\[
+K^{-1}\ll y_{\rm BL}\ll\rho,
+\]
+provided \(K\rho\) is sufficiently large.
+
+\subsection{Nested scales and the role of the matching line}
+The three small quantities \(K^{-1}\), \(y_{\rm BL}\), and \(\rho\) have different roles. The inequality \(K^{-1}\ll y_{\rm BL}\) implies \(Ky_{\rm BL}\gg1\), so deterministic entry is concentrated enough to initialize a branching process with many approximately independent lineages. The inequality \(y_{\rm BL}\ll\rho\) implies that after entry the infection term in the susceptible equation is smaller than demographic replenishment. The matching line is therefore not a biological threshold; it is an artificial level chosen in the common domain of validity of the deterministic and stochastic approximations.
+
+A further geometric scale is \(x_*-x_f\). The corner displacement must remain small compared with this gap. At first order this requires
+\[
+\rho\left|\log\frac{C_{\theta,\psi}}{y_{\rm BL}}\right|+y_{\rm BL}\ll x_*-x_f.
+\]
+This condition states that the final-size corner and the later trough remain asymptotically distinct.
+
+The phrase ``second order'' below refers to a joint quadratic truncation in the two small corner variables \(\rho\) and \(y_{\rm BL}\), with logarithms retained as switchback factors. Thus terms of the forms
+\[
+\rho^2L^2,\qquad \rho y_{\rm BL}L,\qquad \rho y_{\rm BL},\qquad y_{\rm BL}^2
+\]
+are all retained. The common assumption \(y_{\rm BL}\ll\rho\) does not impose an ordering between every pair of these quadratic terms; stronger orderings are introduced only when a strict boundary-independent limit is taken.
+
+The matching overlap is nonempty. For example, choose any fixed \(0<\nu<1\) and set \(y=\rho^\nu\). Then as \(\rho\downarrow0\),
+\[
+\rho|\log\rho|\ll \rho^\nu\ll1,
+\]
+so the inverse outer correction remains smaller than the leading outer displacement while \(v=y/\rho=\rho^{\nu-1}\to\infty\), exactly the corner-overlap limit used in the matching calculation.
+
+\section{Asymptotic architecture}
+The calculation uses four nested descriptions of the same trajectory.
+\begin{enumerate}
+\item A zero-recruitment epidemic outer solution determines the first-wave geometry and the final-size anchor \(\xf\).
+\item A direct expansion of the exact phase-plane equation in powers of \(\rho\) gives sequential one-dimensional coefficient equations \(Y_1,Y_2,\ldots\).
+\item Inversion of the descending branch exposes the logarithmic singularity near \(\xf\), selects \(\Cpsi\), and at the next order selects \(\Dpsi\).
+\item A corner scaling resolves the breakdown of the outer inverse expansion and feeds the result into the low-prevalence action, Kendall integral, and Laplace approximation.
+\end{enumerate}
+The main limit is \(\rho\to0\) with \(\Rzero>1\), \(\theta\), and \(\psi<1\) fixed.
+
+\section{Leading order: epidemic geometry}
+Set \(\rho=0\) and write \(n=x+y\). Adding the two ODEs gives
+\[
+\frac{\dd n}{\dd\sigma}=-y.
+\]
+Moreover,
+\[
+\frac{\dd x}{\dd n}
+=\frac{-\Rzero xyn^{-\psi}}{-y}=\Rzero xn^{-\psi}.
+\]
+Hence
+\[
+n^{-\psi}\dd n=\frac{\dd x}{\Rzero x}.
+\]
+Integrating from the naive-wave normalization \((x,n)=(1,1)\) gives
+\[
+\frac{n^\eta-1}{\eta}=\frac1{\Rzero}\log x,
+\]
+so
+\[
+n_0(x)=\left(1+\frac{\eta}{\Rzero}\log x\right)^{1/\eta},
+\qquad
+\Fpsi(x)=n_0(x)-x.
+\]
+The epidemic peak is determined by the zero of the infectious growth rate along the outer trajectory. The low-prevalence threshold is
+\[
+\xs=\Rzero^{-1/\eta}.
+\]
+The final-size anchor \(\xf\) is the nontrivial root of \(\Fpsi(\xf)=0\).
+
+\subsection{Existence and uniqueness of the final-size root}
+The nontrivial root is unique and lies strictly below the threshold. Indeed, for \(x\neq1\), the equation \(F_\psi(x)=0\) is equivalent to
+\[
+\phi(x):=x^\eta-1-\frac{\eta}{R_0}\log x=0.
+\]
+Its derivative is
+\[
+\phi'(x)=\frac{\eta}{x}\left(x^\eta-\frac1{R_0}\right),
+\]
+so \(\phi\) has a unique stationary point at
+\[
+x_*=R_0^{-1/\eta},
+\]
+and this point is a strict minimum. Since \(\phi(1)=0\), \(x_*<1\), \(\phi(x_*)<0\), and \(\phi(x)\to+\infty\) as \(x\downarrow0\), there is exactly one additional root
+\[
+0<x_f<x_*<1.
+\]
+Consequently
+\[
+q=R_0x_f^\eta<1,
+\qquad
+\delta=1-q>0,
+\qquad
+f_1=F_\psi'(x_f)=\frac{\delta}{q}>0.
+\]
+These inequalities justify the inverse-function expansion on the descending branch and the sign conventions used below.
+
+Differentiating
+\[
+n_0^\eta=1+\frac\eta{\Rzero}\log x
+\]
+gives
+\[
+n_0'(x)=\frac{n_0(x)^\psi}{\Rzero x},
+\qquad
+\Fpsi'(x)=\frac{n_0(x)^\psi}{\Rzero x}-1,
+\]
+\[
+n_0''(x)
+=\frac{\psi n_0(x)^{2\psi-1}}{\Rzero^2x^2}
+-\frac{n_0(x)^\psi}{\Rzero x^2},
+\qquad
+\Fpsi''(x)=n_0''(x).
+\]
+
+The same geometry is encoded by the invariant
+\[
+H(x,y)=n^\eta-\frac\eta{\Rzero}\log x.
+\]
+Along the full model,
+\[
+\frac{\dd H}{\dd\sigma}
+=\eta\rho\hth(x)
+\left[n^{-\psi}-\frac1{\Rzero x}\right].
+\]
+Thus \(H\) is conserved at \(\rho=0\) and provides an independent bookkeeping check on the direct phase-plane expansion.
+
+
+\section{Auxiliary phase-plane coefficients and the inverse-flow hierarchy}
+
+The second-order matching calculation is most transparent when the inverse trajectory is expanded directly in the infectious coordinate.  The phase-plane coefficients \(Y_1,Y_2\) remain useful only as auxiliary quantities on a compact interval bounded away from the final-size anchor, where they are regular and provide initialization data for the inverse-flow equations.
+
+\subsection{Auxiliary phase-plane coefficients on the regular outer interval}
+Division of the normalized ODEs gives
+\[
+\frac{\dd y}{\dd x}
+=
+\frac{\{\Rzero x(x+y)^{-\psi}-1\}y}
+{\rho\hth(x)-\Rzero xy(x+y)^{-\psi}}.
+\]
+On a compact interval \([\bar x,1]\) with \(\bar x\in(\xf,\xs)\), write
+\[
+y=\Fpsi(x)+\rho Y_1(x)+\rho^2Y_2(x)+O(\rho^3),
+\qquad
+n=n_0(x)+\rho Y_1(x)+\rho^2Y_2(x)+O(\rho^3).
+\]
+The expansion
+\[
+n^{-\psi}=n_0^{-\psi}
+\left[
+1-\rho\psi\frac{Y_1}{n_0}
++\rho^2\left(
+-\psi\frac{Y_2}{n_0}
++\frac{\psi(\psi+1)}2\frac{Y_1^2}{n_0^2}
+\right)
+\right]+O(\rho^3)
+\]
+leads, after cross-multiplication, to the sequential coefficient equations.  It is convenient to retain the invariant organization
+\[
+W_1=n_0^{-\psi}Y_1,
+\qquad
+W_2=n_0^{-\psi}Y_2-\frac\psi2n_0^{-\psi-1}Y_1^2,
+\]
+for which
+\[
+W_1'
+=\frac{\hth(x)\Fpsi'(x)}{\Rzero x\Fpsi(x)},
+\]
+and
+\[
+\begin{aligned}
+W_2'={}&
+\frac{\hth(x)}{\Rzero^2x^2\Fpsi(x)^2}
+\left[
+\psi n_0(x)^{\psi-1}\Fpsi(x)
+-\{n_0(x)^\psi-\Rzero x\}
+\right]Y_1(x)\\
+&+\frac{\hth(x)^2n_0(x)^\psi\{n_0(x)^\psi-\Rzero x\}}
+{\Rzero^3x^3\Fpsi(x)^2}.
+\end{aligned}
+\]
+Then
+\[
+Y_1=n_0^\psi W_1,
+\qquad
+Y_2=n_0^\psi W_2+\frac\psi{2n_0}Y_1^2.
+\]
+Because the specified recruitment family satisfies \(h_\theta(1)=0\), the endpoint conditions \(Y_1(1)=Y_2(1)=0\) are understood by continuous extension from the interior.  These equations are used only down to \(\bar x>\xf\), so no singular local expansion of \(Y_2\) at \(\xf\) is required.
+
+\subsection{Exact inverse-flow hierarchy}
+Define
+\[
+g(x,y)=\Rzero x(x+y)^{-\psi}.
+\]
+The normalized system can be written as
+\[
+\frac{\dd x}{\dd\sigma}=\rho\hth(x)-g(x,y)y,
+\qquad
+\frac{\dd y}{\dd\sigma}=\{g(x,y)-1\}y.
+\]
+Dividing gives the exact inverse flow
+\[
+\frac{\dd x}{\dd y}
+=
+\frac{\rho\hth(x)-g(x,y)y}{\{g(x,y)-1\}y}
+=\Phi(x,y)+\rho\Theta(x,y),
+\]
+where
+\[
+\Phi(x,y)=-\frac{g(x,y)}{g(x,y)-1},
+\qquad
+\Theta(x,y)=\frac{\hth(x)}{\{g(x,y)-1\}y}.
+\]
+Now expand at fixed \(y\):
+\[
+X(y;\rho)=X_0(y)+\rho X_1(y)+\rho^2X_2(y)+O(\rho^3).
+\]
+The left-hand side is
+\[
+X_0'+\rho X_1'+\rho^2X_2'+O(\rho^3),
+\]
+while Taylor expansion of the right-hand side about \(X_0\) gives
+\[
+\begin{aligned}
+\Phi(X,y)+\rho\Theta(X,y)
+={}&\Phi(X_0,y)\\
+&+\rho\left[\Phi_x(X_0,y)X_1+\Theta(X_0,y)\right]\\
+&+\rho^2\left[
+\Phi_x(X_0,y)X_2
++\frac12\Phi_{xx}(X_0,y)X_1^2
++\Theta_x(X_0,y)X_1
+\right]
++O(\rho^3).
+\end{aligned}
+\]
+Hence
+\[
+\boxed{X_0'=\Phi(X_0,y)},
+\]
+\[
+\boxed{X_1'=\Phi_x(X_0,y)X_1+\Theta(X_0,y)},
+\]
+\[
+\boxed{X_2'=\Phi_x(X_0,y)X_2
++\frac12\Phi_{xx}(X_0,y)X_1^2
++\Theta_x(X_0,y)X_1}.
+\]
+The leading equation is exactly the zero-recruitment descending branch,
+\[
+\Fpsi(X_0(y))=y.
+\]
+The first two corrections are linear first-order scalar ODEs with the same homogeneous coefficient.
+
+The coefficient functions \(X_1,X_2\) themselves are well-defined on \((0,\bar y]\) once data are supplied at \(\bar y\).  What eventually loses uniformity at the corner is the composite series
+\[
+X_0+\rho X_1+\rho^2X_2,
+\]
+not the individual coefficient functions.  Consequently the limits of the regularized coefficient functions introduced below are legitimate limits of well-defined ODE solutions and do not assume uniform validity of the \(\rho\)-series at \(y=O(\rho)\).
+
+\subsection{Analytic normal form near the final-size anchor}
+Set
+\[
+\Psi(x,y)=\frac{\hth(x)}{g(x,y)-1}.
+\]
+Then
+\[
+\Theta(x,y)=\frac{\Psi(x,y)}{y},
+\qquad
+\Theta_x(x,y)=\frac{\Psi_x(x,y)}{y}.
+\]
+The important point is that the displayed factor \(1/y\) is the only singularity in the inverse-flow hierarchy.
+
+Indeed, \(g\) is real-analytic wherever \(x>0\) and \(x+y>0\).  At the final-size anchor,
+\[
+g(\xf,0)=\Rzero\xf^\eta=q<1,
+\]
+so \(g-1\) is bounded away from zero in a sufficiently small neighborhood of \((\xf,0)\).  Hence \(\Phi\), \(\Psi\), and all required \(x\)-derivatives are analytic there.  Since \(\Fpsi(\xf)=0\) and \(\Fpsi'(\xf)=f_1>0\), the analytic inverse-function theorem also gives an analytic inverse branch \(X_0(y)\) with
+\[
+X_0(0)=\xf,
+\qquad
+X_0'(0)=\frac1{f_1}=\frac q\delta=b.
+\]
+Define the composed analytic coefficients
+\[
+\varphi(y)=\Phi_x(X_0(y),y),
+\qquad
+\chi(y)=\frac12\Phi_{xx}(X_0(y),y),
+\]
+\[
+\widetilde\Psi(y)=\Psi(X_0(y),y),
+\qquad
+\omega(y)=\Psi_x(X_0(y),y).
+\]
+Then the hierarchy takes the normal form
+\[
+\boxed{
+X_1'=\varphi(y)X_1+\frac{\widetilde\Psi(y)}{y}},
+\]
+\[
+\boxed{
+X_2'=\varphi(y)X_2+\chi(y)X_1^2+\frac{\omega(y)}{y}X_1},
+\]
+with \(\varphi,\chi,\widetilde\Psi,\omega\) analytic at \(y=0\).
+
+For reference,
+\[
+g_x=g\left(\frac1x-\frac\psi{x+y}\right),
+\]
+\[
+g_{xx}=g_x\left(\frac1x-\frac\psi{x+y}\right)
++g\left(-\frac1{x^2}+\frac\psi{(x+y)^2}\right),
+\]
+\[
+\Phi_x=\frac{g_x}{(g-1)^2},
+\qquad
+\Phi_{xx}=\frac{g_{xx}(g-1)-2g_x^2}{(g-1)^3},
+\]
+\[
+\Psi_x=\frac{h_\theta'(x)(g-1)-h_\theta(x)g_x}{(g-1)^2}.
+\]
+At \((\xf,0)\),
+\[
+g=q,
+\qquad
+g_x=\frac{\eta q}{\xf}=r,
+\qquad
+g_y=-\frac{\psi q}{\xf},
+\qquad
+g_{xx}=-\frac{\psi r}{\xf}.
+\]
+Therefore
+\[
+\boxed{\varphi(0)=\frac r{\delta^2}},
+\]
+\[
+\boxed{
+\chi(0)=\frac{2r^2-\psi r\delta/\xf}{2\delta^3}},
+\]
+\[
+\boxed{\widetilde\Psi(0)=-a},
+\qquad
+\boxed{\omega(0)=-\frac c{\delta^2}},
+\]
+where
+\[
+a=\frac{h_f}{\delta},
+\qquad
+b=\frac q\delta,
+\qquad
+r=\frac{\eta q}{\xf},
+\qquad
+c=\delta h_f'+rh_f.
+\]
+The corner coefficient is
+\[
+\kappa=\frac{h_fc}{2\delta^3}=\frac{ac}{2\delta^2}.
+\]
+
+\subsection{Local zero-order data}
+Introduce
+\[
+e:=rb-\frac{\psi q}{\xf}.
+\]
+Using \(b=q/\delta\), \(\eta+\psi=1\), and \(\delta=1-q\),
+\[
+\boxed{
+e=\frac{q(q-\psi)}{\xf\delta}}.
+\]
+Along the descending branch,
+\[
+g(X_0(y),y)-1=-\delta+ey+O(y^2).
+\]
+The inverse zero-order trajectory has the expansion
+\[
+\boxed{
+X_0(y)=\xf+by+\frac{e}{2\delta^2}y^2+O(y^3)},
+\]
+and equivalently
+\[
+\frac{e}{2\delta^2}
+=\frac{q(q-\psi)}{2\xf\delta^3}.
+\]
+The derivative of the composed numerator \(\widetilde\Psi\) is
+\[
+\widetilde\Psi'(0)
+=\Psi_x(\xf,0)X_0'(0)+\Psi_y(\xf,0),
+\]
+with
+\[
+\Psi_y(\xf,0)=\frac{\psi qh_f}{\xf\delta^2}.
+\]
+Thus
+\[
+\boxed{
+\widetilde\Psi'(0)
+=\frac{-bc+\psi qh_f/\xf}{\delta^2}}.
+\]
+This coefficient will independently recover the corrected finite-height term in the second corner equation.
+
+\subsection{Correct local structure of the first phase-plane coefficient}
+Although the production calculation below no longer needs the singular expansion of \(Y_2\), the local form of \(Y_1\) is useful for initialization and for proving that the old and new definitions of \(C_{\theta,\psi}\) coincide.
+
+Let \(s=x-\xf\).  Since
+\[
+W_1'=\frac{h_\theta F_\psi'}{R_0xF_\psi}
+\]
+has a simple pole at \(s=0\), there exist functions \(P,Q\) analytic near \(s=0\) such that
+\[
+\boxed{
+Y_1(\xf+s)=P(s)\log s+Q(s)},
+\]
+with
+\[
+P(s)=w_{-1}n_0(\xf+s)^\psi,
+\qquad
+w_{-1}=\frac{h_f}{R_0\xf}.
+\]
+Indeed, the residue of \(W_1'\) is
+\[
+\frac{h_fF_\psi'(\xf)}{R_0\xf F_\psi'(\xf)}
+=\frac{h_f}{R_0\xf}=w_{-1},
+\]
+so \(W_1=w_{-1}\log s+\text{analytic}\), and multiplication by the analytic positive factor \(n_0^\psi\) gives the stated form.
+
+Writing
+\[
+\beta_1=P'(0),
+\qquad
+\gamma_1=Q'(0),
+\]
+we obtain
+\[
+\boxed{
+Y_1'(\xf+s)
+=\frac{q_{1,-1}}{s}
++q_{1,\log}\log s
++(\beta_1+\gamma_1)
++O(s\log s)},
+\]
+where
+\[
+\boxed{q_{1,-1}=\frac{h_f}{q}},
+\qquad
+\boxed{q_{1,\log}=\beta_1=\frac{\psi h_f}{q^2\xf}}.
+\]
+The constant \(\gamma_1\) is determined by the global initial-value problem through the analytic part \(Q\); no local closed expression is needed anywhere in the inverse-flow derivation.
+
+The integrable logarithmic term does not affect the finite-part definition of the first matching constant.  If
+\[
+K_1
+=-q_{1,-1}\log(1-\xf)
+-\int_{\xf}^{1}
+\left[Y_1'(u)-\frac{q_{1,-1}}{u-\xf}\right]\dd u,
+\]
+then
+\[
+Y_1(\xf+s)=q_{1,-1}\log s+K_1+O(s\log s).
+\]
+
+\subsection{Exact integrating-factor structure of \texorpdfstring{\(X_1\)}{X1}}
+Define the integrating factor
+\[
+\mathcal E(y)=\exp\left(\int_0^y\varphi(t)\dd t\right).
+\]
+Because \(\varphi\) is analytic, \(\mathcal E\) is analytic with \(\mathcal E(0)=1\) and is positive for sufficiently small \(y\).  Put
+\[
+\mu(y)=\frac{\widetilde\Psi(y)}{\mathcal E(y)}.
+\]
+Then \(\mu\) is analytic and \(\mu(0)=-a\).  Dividing the first inverse-flow equation by \(\mathcal E\),
+\[
+\left(\frac{X_1}{\mathcal E}\right)'
+=\frac{\mu(y)}{y}
+=\frac{\mu(0)}{y}+\frac{\mu(y)-\mu(0)}{y}.
+\]
+Since \(\mu(y)-\mu(0)=O(y)\), the second quotient is analytic.  Define
+\[
+m(y)=\int_0^y\frac{\mu(t)-\mu(0)}{t}\dd t.
+\]
+Then \(m\) is analytic, \(m(0)=0\), and every solution has the exact form
+\[
+\boxed{
+X_1(y)=\alpha(y)\log y+\beta(y)},
+\]
+where
+\[
+\alpha(y)=-a\mathcal E(y),
+\qquad
+\beta(y)=\mathcal E(y)\{C_1+m(y)\}.
+\]
+Thus \(\alpha,\beta\) are analytic at zero,
+\[
+\alpha(0)=-a,
+\qquad
+\beta(0)=C_1.
+\]
+Define \(C_{\theta,\psi}\) by
+\[
+C_1=a\log C_{\theta,\psi},
+\qquad
+L=\log\frac{C_{\theta,\psi}}{y}.
+\]
+This immediately gives the leading first-order form
+\[
+X_1(y)=aL+O(y\log y).
+\]
+
+Expanding one order further,
+\[
+\mathcal E(y)=1+\varphi(0)y+O(y^2),
+\qquad
+m(y)=\mu'(0)y+O(y^2).
+\]
+The quotient rule gives
+\[
+\mu'(0)=\widetilde\Psi'(0)-\widetilde\Psi(0)\mathcal E'(0)
+=\widetilde\Psi'(0)+a\varphi(0).
+\]
+Therefore
+\[
+\boxed{
+X_1(y)
+=aL
++\frac{ra}{\delta^2}y(L+1)
++\frac{-bc+\psi qh_f/\xf}{\delta^2}y
++O(y^2\log y)}.
+\]
+The remainder follows directly from analyticity of \(\alpha\) and \(\beta\): the next omitted terms are \(O(y^2)\log y\) and \(O(y^2)\).
+
+\section{Second-order inverse matching and the constant \texorpdfstring{\(D_{\theta,\psi}\)}{D}}
+
+\subsection{Exact integrating-factor structure of \texorpdfstring{\(X_2\)}{X2}}
+Substitute the exact form
+\[
+X_1=\alpha\log y+\beta
+\]
+into the second inverse-flow equation and divide by the same integrating factor \(\mathcal E\):
+\[
+\left(\frac{X_2}{\mathcal E}\right)'
+=
+A(y)\log^2y+B(y)\log y+C(y)
++\frac{D(y)\log y+G(y)}{y},
+\]
+where
+\[
+A=\frac{\chi\alpha^2}{\mathcal E},
+\qquad
+B=\frac{2\chi\alpha\beta}{\mathcal E},
+\qquad
+C=\frac{\chi\beta^2}{\mathcal E},
+\]
+\[
+D=\frac{\omega\alpha}{\mathcal E},
+\qquad
+G=\frac{\omega\beta}{\mathcal E}.
+\]
+All five coefficient functions are analytic at \(y=0\).  Split
+\[
+D(y)=D_0+y\widetilde D(y),
+\qquad
+G(y)=G_0+y\widetilde G(y),
+\]
+with \(\widetilde D,\widetilde G\) analytic.  The boundary values are
+\[
+D_0=\omega(0)\alpha(0)
+=\left(-\frac c{\delta^2}\right)(-a)
+=\frac{ac}{\delta^2}
+=2\kappa,
+\]
+\[
+G_0=\omega(0)\beta(0)
+=-\frac c{\delta^2}a\log C_{\theta,\psi}
+=-2\kappa\log C_{\theta,\psi}.
+\]
+Hence the complete non-integrable part is
+\[
+\frac{D_0\log y+G_0}{y}
+=\frac{2\kappa\log y-2\kappa\log C_{\theta,\psi}}{y}.
+\]
+But
+\[
+\boxed{
+\frac{\dd}{\dd y}
+\left[
+\kappa\log^2\frac{C_{\theta,\psi}}{y}
+\right]
+=
+\frac{2\kappa\log y-2\kappa\log C_{\theta,\psi}}{y}}.
+\]
+Thus the entire singular part is exactly the derivative of the squared logarithm.  Every remaining term is an analytic coefficient multiplied by at most \(\log^2y\), and is therefore integrable at zero.  Repeated integration by parts gives, for example,
+\[
+\int_0^y t^j\log^2t\,\dd t
+=O(y^{j+1}\log^2y),
+\qquad j\ge0.
+\]
+Consequently every solution satisfies
+\[
+\boxed{
+X_2(y)
+=\kappa\log^2\frac{C_{\theta,\psi}}{y}
++D_{\theta,\psi}
++O(y\log^2y)},
+\qquad y\downarrow0,
+\]
+for a constant \(D_{\theta,\psi}\) fixed by the data at \(\bar y\).
+
+This proof requires no bootstrap and no a-priori assumption on the growth of \(X_2\).  The logarithmic structure is obtained by exact integration of the linear ODE.  It also resolves two compatibility questions automatically:
+
+\begin{enumerate}
+\item The outer coefficient of \(\log^2(C/y)\) is
+\[
+\kappa=\frac12\omega(0)\alpha(0)
+=\frac{ac}{2\delta^2}
+=\frac{h_fc}{2\delta^3},
+\]
+which is exactly the corner coefficient.  Both arise from the same two boundary values \(\widetilde\Psi(0)=-a\) and \(\omega(0)=-c/\delta^2\).
+\item There is no independent single-log compatibility condition to impose.  The term proportional to \(G_0/y\) is exactly the constant needed to complete
+\[
+\kappa\log^2(C/y),
+\]
+because \(G_0=\omega(0)\beta(0)\) and \(\beta(0)=a\log C\).
+\end{enumerate}
+
+The poles that appear in the alternative \(x\)-parameterized formula for \(X_2\) are therefore artifacts of that representation.  In the inverse-flow formulation \(X_1\) and \(X_2\) solve linear ODEs with analytic homogeneous coefficient and carry no poles themselves.
+
+\subsection{Finite definitions of \texorpdfstring{\(C_{\theta,\psi}\)}{C} and \texorpdfstring{\(D_{\theta,\psi}\)}{D}}
+Define
+\[
+Z_1(y)=X_1(y)+a\log y,
+\]
+\[
+Z_2(y)=X_2(y)-\kappa\log^2\frac{C_{\theta,\psi}}{y}.
+\]
+The exact structures derived above imply
+\[
+\boxed{a\log C_{\theta,\psi}=Z_1(0^+)},
+\qquad
+\boxed{D_{\theta,\psi}=Z_2(0^+)}.
+\]
+Moreover
+\[
+Z_1(y)=a\log C_{\theta,\psi}+O(y\log y),
+\]
+\[
+Z_2(y)=D_{\theta,\psi}+O(y\log^2y).
+\]
+Their derivatives can be written in regularized form.  Since \(X_1=Z_1-a\log y\),
+\[
+\boxed{
+Z_1'
+=\varphi(y)\{Z_1-a\log y\}
++\frac{\widetilde\Psi(y)+a}{y}}.
+\]
+The numerator \(\widetilde\Psi(y)+a\) vanishes at zero by analyticity and \(\widetilde\Psi(0)=-a\), so the final quotient is bounded and \(Z_1'=O(\log y)\).
+
+Similarly, with
+\[
+L=\log\frac{C_{\theta,\psi}}y,
+\qquad
+D_0=2\kappa,
+\qquad
+G_0=-2\kappa\log C_{\theta,\psi},
+\]
+we obtain
+\[
+\boxed{
+Z_2'
+=\varphi(y)\{Z_2+\kappa L^2\}
++\chi(y)X_1^2
++\frac{\omega(y)X_1-(D_0\log y+G_0)}{y}}.
+\]
+The last numerator vanishes to the required order after the exact singular pair is subtracted, and \(Z_2'=O(\log^2y)\).  Both derivatives are absolutely integrable at zero.  Hence for any \(\bar y>0\) in the regular outer region,
+\[
+\boxed{
+Z_j(0^+)=Z_j(\bar y)-\int_0^{\bar y}Z_j'(y)\dd y,
+\qquad j=1,2}.
+\]
+These are finite convergent quadratures.  No small-\(y\) extrapolation and no singular primitive for \(Y_2\) is required.
+
+The equations for \(Z_1,Z_2\) are regularized but remain weakly logarithmically singular in their derivatives.  Numerically, one can integrate them directly with an endpoint-aware quadrature or use a change of variables such as \(y=\bar y t^2\).
+
+\subsection{Initialization on a smooth outer interval}
+Choose
+\[
+\bar x\in(\xf,\xs)
+\]
+bounded away from both endpoints and set
+\[
+\bar y=\Fpsi(\bar x).
+\]
+On \([\bar x,1]\), the auxiliary coefficient equations for \(Y_1,Y_2\) are regular.  Integrate them from \(x=1\) to \(x=\bar x\), and convert once using the inverse-function relations
+\[
+\boxed{
+X_1(\bar y)
+=-\frac{Y_1(\bar x)}{\Fpsi'(\bar x)}},
+\]
+\[
+\boxed{
+X_2(\bar y)
+=-\frac{
+\frac12\Fpsi''(\bar x)X_1(\bar y)^2
++Y_1'(\bar x)X_1(\bar y)
++Y_2(\bar x)}
+{\Fpsi'(\bar x)}}.
+\]
+These are the only places in the production calculation where \(Y_1,Y_2\) are required.  Their singular local behavior at \(\xf\) never enters the definition of \(D_{\theta,\psi}\).
+
+A primary diagnostic is independence of the arbitrary initialization point.  Recompute \(C_{\theta,\psi}\) and \(D_{\theta,\psi}\) using several well-separated values of \(\bar x\).  The results should agree to numerical precision.
+
+\subsection{Equivalence with the finite-part definition of \texorpdfstring{\(C_{\theta,\psi}\)}{C}}
+The inverse-flow definition of \(C_{\theta,\psi}\) agrees exactly with the first-order finite-part formula.  From the local zero-order inversion,
+\[
+s=X_0(y)-\xf=\frac{y}{f_1}+O(y^2),
+\]
+so
+\[
+\log s=\log y-\log f_1+O(y).
+\]
+Using
+\[
+Y_1(\xf+s)=q_{1,-1}\log s+K_1+O(s\log s),
+\]
+and
+\[
+X_1(y)=-\frac{Y_1(X_0(y))}{\Fpsi'(X_0(y))},
+\qquad
+\Fpsi'(X_0(y))=f_1+O(y),
+\]
+we obtain
+\[
+X_1(y)
+=-\frac{q_{1,-1}}{f_1}\log y
++\frac{q_{1,-1}}{f_1}\log f_1
+-\frac{K_1}{f_1}
++O(y\log y).
+\]
+Because
+\[
+\frac{q_{1,-1}}{f_1}=a,
+\qquad
+af_1=q_{1,-1},
+\]
+it follows that
+\[
+\boxed{
+Z_1(0^+)=a\log f_1-\frac{K_1}{f_1}},
+\]
+and therefore
+\[
+\boxed{
+C_{\theta,\psi}
+=f_1\exp\left(-\frac{K_1}{q_{1,-1}}\right)}.
+\]
+Thus the old and new computations of \(C_{\theta,\psi}\) must agree to quadrature accuracy.  This provides a mandatory regression test before attempting the new computation of \(D_{\theta,\psi}\).  There is no analogous regression against the previous numerical value of \(D_{\theta,\psi}\), because that value depended on the incomplete local \(Y_1\) ansatz.
+
+\subsection{Corner expansion and independent confirmation of the corrected \texorpdfstring{\(u_2'\)}{u2'}}
+Introduce the corner scaling
+\[
+y=\rho v,
+\qquad
+x=\xf+\rho u_1(v)+\rho^2u_2(v)+\cdots,
+\]
+and set
+\[
+L=\log\frac{C_{\theta,\psi}}{y}
+=\log\frac{C_{\theta,\psi}}{\rho v}.
+\]
+At leading order the inverse phase-plane equation gives
+\[
+u_1'(v)=b-\frac av,
+\]
+and matching with \(X_0+\rho X_1\) fixes
+\[
+\boxed{u_1(v)=aL+bv}.
+\]
+
+The next-order corner equation is
+\[
+\boxed{
+\begin{aligned}
+u_2'(v)={}&
+-\frac{2\kappa L}{v}
++\frac{ra}{\delta^2}L
++\frac{-bc+\psi qh_f/\xf}{\delta^2}\\
+&+\frac{rb-\psi q/\xf}{\delta^2}v.
+\end{aligned}}
+\]
+The constant term contains no additional \(ra/\delta^2\).  Integrating and using \(\dd L/\dd v=-1/v\) gives
+\[
+\boxed{
+\begin{aligned}
+u_2(v)={}&
+\kappa L^2+D_{\theta,\psi}\\
+&+\frac{v}{\delta^2}
+\left[ra(L+1)-bc+\frac{\psi qh_f}{\xf}\right]\\
+&+\frac{v^2}{2\delta^2}
+\left[rb-\frac{\psi q}{\xf}\right].
+\end{aligned}}
+\]
+The integration constant is fixed by the inverse-flow outer limit to be \(D_{\theta,\psi}\).
+
+The corrected constant term can also be checked without re-expanding the corner quotient.  Under \(y=\rho v\), the \(O(y)\) terms of \(\rho X_1\),
+\[
+\rho\left[
+\frac{ra}{\delta^2}y(L+1)
++\frac{-bc+\psi qh_f/\xf}{\delta^2}y
+\right],
+\]
+become exactly the \(O(v)\) terms in \(\rho^2u_2\).  An extra \(ra/\delta^2\) in the constant part of \(u_2'\) would generate a second copy of \(rav/\delta^2\) and destroy the match.  Likewise the \(y^2\) term of \(X_0\),
+\[
+\frac{e}{2\delta^2}y^2,
+\qquad
+e=rb-\frac{\psi q}{\xf},
+\]
+reproduces exactly the \(v^2\) term in \(\rho^2u_2\).
+
+At the matching height \(y=\yin\), with
+\[
+L_{\mathrm{BL}}=\log\frac{C_{\theta,\psi}}{\yin},
+\]
+the direct second-order entry formula remains
+\[
+\begin{aligned}
+\xin^{(2),\mathrm{dir}}={}&\xf+\rho aL_{\mathrm{BL}}+b\yin
++\rho^2\left(\kappa L_{\mathrm{BL}}^2+D_{\theta,\psi}\right)\\
+&+\frac{\rho\yin}{\delta^2}
+\left[ra(L_{\mathrm{BL}}+1)-bc+\frac{\psi qh_f}{\xf}\right]\\
+&+\frac{\yin^2}{2\delta^2}
+\left[rb-\frac{\psi q}{\xf}\right].
+\end{aligned}
+\]
+Only the numerical value and computation of \(D_{\theta,\psi}\) have changed; the matched structure is unchanged.
+
+
+\section{Action formulation: from the corner expansion to an action-resummed scalar equation}
+
+\subsection{The action primitive}
+In the low-prevalence basin, \(y/x\to0\), so
+\[
+\frac{\dd x}{\dd\sigma}=\rho\hth(x)+o(\rho),
+\qquad
+\frac{\dd\log y}{\dd\sigma}=\Rzero x^\eta-1+o(1).
+\]
+Hence
+\[
+\Apsi'(x)=\frac{1-\Rzero x^\eta}{\hth(x)},
+\qquad
+\frac{\dd\log y}{\dd x}
+=-\frac1\rho\Apsi'(x).
+\]
+Thus the action is the natural variable linking deterministic phase-plane matching to the later branching-process exponent.
+
+At \(x=\xf\),
+\[
+\Apsi'(\xf)=\frac1a.
+\]
+A short calculation also gives
+\[
+\Apsi''(\xf)=-\frac{c}{h_f^2}.
+\]
+
+\subsection{Refined first-order action equation}
+Reinsert the first corner approximation into the full action. The action-resummed first-order equation is
+\[
+\Apsi\!\left(\xin^{(1)}\right)-\Apsi(\xf)
+=\rho L_{\mathrm{BL}}+\frac ba\yin
+=:M_1.
+\]
+This retains the first-order matching information without Taylor-truncating the nonlinear action at the final step.
+
+\subsection{Second-order action-resummed master equation}
+Define
+\[
+Q=\frac{ra-bc}{a\delta^2}.
+\]
+Substitute
+\[
+x=\xf+\rho u_1+\rho^2u_2
+\]
+into the Taylor expansion of \(\Apsi(x)\) about \(\xf\). The \(L^2\) contribution in \(u_2\) cancels exactly against the quadratic term generated by \(\frac12\Apsi''(\xf)(\rho aL)^2\). Collecting all terms required at second order gives
+\[
+\begin{aligned}
+\Apsi\!\left(\xin^{(2)}\right)-\Apsi(\xf)
+={}&\rho L_{\mathrm{BL}}+\frac ba\yin+\rho^2\frac{\Dpsi}{a}\\
+&+\rho\yin\left[Q(L_{\mathrm{BL}}+1)+\frac{\psi b}{\xf}\right]\\
+&+\frac{b\yin^2}{2a}
+\left[Q-\frac{\psi}{\xf\delta}\right].
+\end{aligned}
+\]
+This is the recommended second-order master equation. For fixed \((\Rzero,\theta,\psi)\), the constants \(\Cpsi\) and \(\Dpsi\) are precomputed once; varying \((\rho,K)\) then requires only evaluation of \(\yin\) and a scalar root solve.
+
+
+\subsection{Step-by-step conversion from the corner to the action}
+Let
+\[
+\Delta x=\rho u_1+\rho^2u_2.
+\]
+Taylor expansion of the action about \(x_f\) gives
+\[
+A_{\theta,\psi}(x_f+\Delta x)-A_{\theta,\psi}(x_f)
+=A_f'\Delta x+\frac12A_f''\Delta x^2+O(\Delta x^3).
+\]
+From
+\[
+A_{\theta,\psi}'(x)=\frac{1-R_0x^\eta}{h_\theta(x)},
+\]
+we have
+\[
+A_f'=\frac\delta{h_f}=\frac1a.
+\]
+Differentiating once more and evaluating at \(x_f\) gives
+\[
+A_f''=-\frac{c}{h_f^2}.
+\]
+The linear action contribution is
+\[
+A_f'\Delta x=\rho\frac{u_1}a+\rho^2\frac{u_2}a.
+\]
+At the matching line,
+\[
+u_1=aL_{\rm BL}+b\frac{y_{\rm BL}}\rho,
+\]
+so
+\[
+\rho\frac{u_1}a=\rho L_{\rm BL}+\frac ba y_{\rm BL}=M_1.
+\]
+
+At second order, the squared logarithm from the \(u_2\) term is
+\[
+\rho^2\frac\kappa aL_{\rm BL}^2.
+\]
+The quadratic Taylor term contributes
+\[
+\frac12A_f''\rho^2a^2L_{\rm BL}^2.
+\]
+Now
+\[
+\frac\kappa a=\frac{c}{2\delta^2},
+\qquad
+\frac12A_f''a^2=-\frac{c}{2\delta^2},
+\]
+so the \(L_{\rm BL}^2\) terms cancel identically. This cancellation is the main structural reason to formulate the final matching in the action rather than in a directly truncated coordinate.
+
+The remaining terms come from three sources: the constant \(D_{\theta,\psi}\) in \(u_2\), the \(v\)-dependent finite-height terms in \(u_2\), and the cross and square terms in \(u_1^2\). Define
+\[
+Q=\frac{ra-bc}{a\delta^2}.
+\]
+After collecting the \(\rho^2\), \(\rho y_{\rm BL}\), and \(y_{\rm BL}^2\) terms, one obtains
+\[
+\boxed{
+\begin{aligned}
+M_2={}&M_1+\rho^2\frac{D_{\theta,\psi}}a
++\rho y_{\rm BL}\left[Q(L_{\rm BL}+1)+\frac{\psi b}{x_f}\right]\\
+&+\frac{b y_{\rm BL}^2}{2a}
+\left[Q-\frac{\psi}{x_f\delta}\right].
+\end{aligned}}
+\]
+The action-resummed estimates are the roots
+\[
+A_{\theta,\psi}(x_{\rm in}^{(j)})-A_{\theta,\psi}(x_f)=M_j,
+\qquad j=1,2.
+\]
+On \((x_f,x_*)\), \(1-R_0x^\eta>0\), hence \(A_{\theta,\psi}'>0\). The root is therefore unique whenever it exists. Existence is exactly the admissibility condition
+\[
+0<M_j<\Delta A_f,
+\qquad
+\Delta A_f=A_{\theta,\psi}(x_*)-A_{\theta,\psi}(x_f).
+\]
+
+\subsection{Why the action-resummed form is numerically preferable}
+The later branching exponent is
+\[
+\Lambda(x_{\rm in})
+=\frac{A_{\theta,\psi}(x_*)-A_{\theta,\psi}(x_{\rm in})}{\rho}.
+\]
+If a direct approximation to \(x_{\rm in}\) has error \(\delta x\), then to first order
+\[
+\delta\Lambda\simeq-\frac{A_{\theta,\psi}'(x_{\rm in})}{\rho}\delta x.
+\]
+Thus the probability calculation amplifies coordinate errors by a factor of order \(1/\rho\). In contrast, the matching calculation already supplies the action difference \(M_j\). Using it directly avoids inserting a truncated coordinate into another nonlinear transformation before division by \(\rho\).  This is a resummation and conditioning advantage; it does not enlarge the asymptotic domain of validity stated above.
+This is a resummation and numerical-conditioning advantage only; it does not enlarge the asymptotic domain, and the same corner-displacement and admissibility conditions remain necessary.
+
+\section{The Kendall layer: from \texorpdfstring{\(\xin\)}{xin} to burnout probability}
+Once the trajectory enters the low-prevalence layer, the susceptible path is treated as deterministic. A rare infectious lineage has per-capita birth rate
+\[
+b(x)=\Rzero x(x+y)^{-\psi}=\Rzero x^\eta+O(y/x),
+\]
+The accumulated correction from the \(O(y/x)\) term must be assessed only over the low-prevalence interval from the matching line to the trough.  On that delimited stage it is controlled by an integral proportional to \(\int y\,\dd\sigma\), which is dominated by the small entry scale when the deterministic trough is well separated.  This provides a second, branching-process justification for requiring \(y_{\rm BL}\ll\rho\), distinct from the susceptible-equation balance.
+and removal rate \(d(x)=1\). Kendall's time-inhomogeneous linear birth-death result gives the extinction probability of one lineage as
+\[
+q_1=\frac{\mathcal I}{1+\mathcal I},
+\]
+where
+\[
+\mathcal I(\xin)
+=\int_{\xin}^{1}
+\frac{1}{\rho\hth(X)}
+\exp\left\{
+\frac{\Apsi(X)-\Apsi(\xin)}{\rho}
+\right\}\dd X.
+\]
+The replacement \(b(x,y)=R_0x^\eta+O(y/x)\) is asymptotically consistent in the matching layer. Provided \(x\) stays bounded away from zero on the relevant low-prevalence segment, the accumulated correction to the branching exponent is bounded by a constant multiple of \(\int y\,\dd\sigma\). Along the exponentially decaying and recovering rare-infection trajectory this integral is \(O(y_{\rm BL})\), so the omitted correction is small in the same overlap regime used for matching; the condition \(y_{\rm BL}\ll\rho\) also ensures that infection-induced depletion is smaller than demographic replenishment in the susceptible equation.
+
+The apparent singularity of the Kendall integrand at \(X=1\) is integrable. Since
+\[
+h_\theta(X)\sim1-X,
+\qquad
+A_{\theta,\psi}(X)= (R_0-1)\log(1-X)+O(1)
+\quad (X\uparrow1),
+\]
+the integrand behaves like
+\[
+(1-X)^{(R_0-1)/\rho-1},
+\]
+which is integrable for every \(R_0>1\) and \(\rho>0\).
+With \(m=K\yin\) infectives at the matching line,
+\[
+P_{\mathrm{burn}\mid\mathrm{est}}
+\simeq q_1^m,
+\qquad
+P_{\mathrm{persist}\mid\mathrm{est}}
+\simeq1-q_1^m.
+\]
+For numerical stability define
+\[
+B=m\log\left(1+\frac1{\mathcal I}\right),
+\qquad
+P_{\mathrm{persist}\mid\mathrm{est}}=1-e^{-B}.
+\]
+The high-accuracy semi-analytical pipeline therefore consists of one-dimensional coefficient equations, one scalar entry solve, and one one-dimensional Kendall integral.
+
+
+\subsection{Derivation of the Kendall integral from the time-inhomogeneous branching process}
+For a time-inhomogeneous linear birth-death process with per-capita birth rate \(b(\sigma)\) and death rate \(d(\sigma)\), Kendall's formula gives the eventual extinction probability from one lineage as
+\[
+q_1=\left[1+\frac{1}{\displaystyle\int_0^\infty
+\exp\{-\int_0^t[b(s)-d(s)]\dd s\}\,d(t)\dd t}\right]^{-1}.
+\]
+Time has been scaled by the infectious removal rate, so \(d\equiv1\). In the low-prevalence basin,
+\[
+b(\sigma)=R_0x(\sigma)^\eta+o(1).
+\]
+The deterministic rare-infection equation is
+\[
+\frac{\dd\log y}{\dd\sigma}=b(\sigma)-1.
+\]
+Hence
+\[
+\exp\left\{-\int_0^t[b(s)-1]\dd s\right\}
+=\frac{y(0)}{y(t)}.
+\]
+Using the basin approximation
+\[
+\frac{\dd x}{\dd\sigma}=\rho h_\theta(x)+o(\rho),
+\]
+we change variables from time to susceptible fraction:
+\[
+\dd\sigma=\frac{\dd X}{\rho h_\theta(X)}.
+\]
+Also,
+\[
+\int_{x_{\rm in}}^X\frac{R_0z^\eta-1}{\rho h_\theta(z)}\dd z
+=-\frac{A_{\theta,\psi}(X)-A_{\theta,\psi}(x_{\rm in})}{\rho}.
+\]
+The denominator in Kendall's formula is therefore
+\[
+\boxed{
+\mathcal I(x_{\rm in})
+=\int_{x_{\rm in}}^1\frac1{\rho h_\theta(X)}
+\exp\left\{\frac{A_{\theta,\psi}(X)-A_{\theta,\psi}(x_{\rm in})}{\rho}\right\}\dd X
+}.
+\]
+If \(m=Ky_{\rm BL}\) infectives are present at entry and their descendants are approximated as independent, the probability that all lineages eventually disappear is
+\[
+P_{\rm burn\mid est}=q_1^m
+=\left(\frac{\mathcal I}{1+\mathcal I}\right)^m.
+\]
+The numerically stable burnout exponent is
+\[
+B=-\log P_{\rm burn\mid est}
+=m\log\left(1+\frac1{\mathcal I}\right).
+\]
+When \(\log\mathcal I\) is large, this is evaluated as
+\[
+B=m\log\{1+\exp(-\log\mathcal I)\}
+\]
+using stable \texttt{log1p} arithmetic.
+
+\subsection{Early establishment and the meaning of conditional persistence}
+At the naive state \((x,y)=(1,0)\), the rare-lineage birth rate is \(R_0\) and the death rate is one. For one initially infectious individual, the probability of escaping the initial supercritical branching-process fizzle is
+\[
+p_{\rm est}=1-\frac1{R_0}.
+\]
+The post-wave Kendall calculation is conditional on this establishment having occurred. Therefore
+\[
+P_{\rm persist,uncond}
+\simeq\left(1-\frac1{R_0}\right)P_{\rm persist\mid est}.
+\]
+For \(I_0\) independent initial lineages, the establishment factor is \(1-R_0^{-I_0}\). This early factor and first-trough burnout are separate stochastic events and should be reported separately when comparing theory with simulation.
+
+\section{The Laplace layer: a fully asymptotic closed form}
+Define
+\[
+\Lambda(\xin)
+=\frac{\Apsi(\xs)-\Apsi(\xin)}{\rho}.
+\]
+The saddle satisfies \(\Apsi'(\xs)=0\), equivalently
+\[
+\Rzero\xs^\eta=1.
+\]
+At the saddle,
+\[
+\Apsi''(\xs)=-\frac{\eta}{\xs\hth(\xs)}.
+\]
+Therefore
+\[
+\mathcal I
+\sim
+\exp(\Lambda)
+\sqrt{\frac{2\pi\xs}{\eta\rho\hth(\xs)}}.
+\]
+Replacing the finite integration interval by the full Gaussian line also requires the saddle to be many Gaussian widths away from the lower endpoint:
+\[
+x_*-x_{\rm in}\gg\sqrt\rho.
+\]
+In the present fixed-parameter regime this is the local geometric form of the large-action requirement \(\Lambda\gg1\); when the saddle approaches the entry point, the exact Kendall integral should be retained.
+For the action-resummed entry estimates,
+\[
+\Lambda_j=\frac{\Delta A_f-M_j}{\rho},
+\qquad j=1,2,
+\]
+so no separate root solve for \(\xin\) is needed when only the fully asymptotic probability is required.
+
+\subsection{Next saddle coefficient}
+Let
+\[
+h_*=\hth(\xs),\qquad h_*'=\hth'(\xs),\qquad h_*''=\hth''(\xs),
+\]
+and
+\[
+\lambda=-\Apsi''(\xs)=\frac{\eta}{\xs h_*}.
+\]
+The required higher action derivatives are
+\[
+\Apsi'''(\xs)
+=\frac{\eta\{2\xs h_*'+(1-\eta)h_*\}}
+{\xs^2h_*^2},
+\]
+\[
+\Apsi''''(\xs)
+=\frac{\eta}{\xs^3h_*^3}
+\left[
+3\xs^2h_*h_*''-6\xs^2(h_*')^2
++3\xs(\eta-1)h_*h_*'
++(-\eta^2+3\eta-2)h_*^2
+\right].
+\]
+For amplitude \(f=1/\hth\), the standard Gaussian expansion gives
+\[
+\mathcal I
+=e^\Lambda
+\sqrt{\frac{2\pi\xs}{\eta\rho h_*}}
+\left[1+\rho c_L+O(\rho^2)\right],
+\]
+with
+\[
+c_L=
+\frac{
+(2\eta^2-\eta-1)h_*^2
++(\eta-1)\xs h_*h_*'
++2\xs^2(h_*')^2
+-3\xs^2h_*h_*''
+}
+{24\eta h_*\xs}.
+\]
+
+\subsection{Boundary-layer-independent limit}
+In the strict first-order overlap, finite-height terms vanish and
+\[
+M_1/\rho=L_{\mathrm{BL}}+o(1).
+\]
+Thus
+\[
+B_{\mathrm{BI}}^{(1)}
+\sim
+K\Cpsi
+\sqrt{\frac{\eta\rho\hth(\xs)}{2\pi\xs}}
+\exp\left(-\frac{\Delta A_f}{\rho}\right).
+\]
+The corresponding deterministic trough scale is
+\[
+y_{\min}^{\mathrm{BI}}
+\sim
+\Cpsi\exp\left(-\frac{\Delta A_f}{\rho}\right).
+\]
+
+Under the stronger overlap \(\yin\ll\rho^2\),
+\[
+M_2/\rho
+=L_{\mathrm{BL}}+\rho\frac{\Dpsi}{a}+o(\rho),
+\]
+the standard choice \(y_{\rm BL}=\sqrt{\rho h_*/K}\) imposes the additional population-size requirement
+\[
+K\gg \frac{h_*}{\rho^3}.
+\]
+Thus the next-order boundary-independent limit is a substantially stronger asymptotic regime than the finite-boundary second-order matching calculation.
+and therefore
+\[
+y_{\min}^{\mathrm{BI},2}
+\sim
+\Cpsi
+\exp\left[-\frac{\Delta A_f}{\rho}+\rho\frac{\Dpsi}{a}\right].
+\]
+Combining this matching correction with the reciprocal of the next Laplace factor gives the next-order boundary-independent approximation
+\[
+B_{\mathrm{BI}}^{\mathrm{next}}
+=
+K\Cpsi
+\sqrt{\frac{\eta\rho\hth(\xs)}{2\pi\xs}}
+\exp\left[
+-\frac{\Delta A_f}{\rho}
++\rho\left(\frac{\Dpsi}{a}-c_L\right)
+\right].
+\]
+Then
+\[
+P_{\mathrm{persist}\mid\mathrm{est}}^{\mathrm{BI,next}}
+=1-\exp\{-B_{\mathrm{BI}}^{\mathrm{next}}\}.
+\]
+
+
+\subsection{Laplace calculation around the deterministic trough}
+Write
+\[
+\mathcal I=e^{-A_{\theta,\psi}(x_{\rm in})/\rho}
+\int_{x_{\rm in}}^1\frac1{\rho h_\theta(X)}e^{A_{\theta,\psi}(X)/\rho}\dd X.
+\]
+The stationary point satisfies
+\[
+A_{\theta,\psi}'(X)=0
+\quad\Longleftrightarrow\quad
+R_0X^\eta=1,
+\]
+so the unique interior saddle is \(X=x_*\). Differentiating the action and using \(R_0x_*^\eta=1\) gives
+\[
+A_{\theta,\psi}''(x_*)=-\frac{\eta}{x_*h_*}<0,
+\qquad h_*=h_\theta(x_*).
+\]
+Thus the saddle is a strict local maximum.
+
+Set
+\[
+X=x_*+\sqrt\rho\,z.
+\]
+Then
+\[
+A(X)=A(x_*)+\frac12\rho A_*''z^2
++\frac16\rho^{3/2}A_*'''z^3
++\frac1{24}\rho^2A_*''''z^4+\cdots,
+\]
+and
+\[
+\frac1{h(X)}=\frac1{h_*}
++\sqrt\rho\left(\frac1h\right)_*'z
++\frac\rho2\left(\frac1h\right)_*''z^2+\cdots.
+\]
+At leading order, the Gaussian integral gives
+\[
+\int_{-\infty}^{\infty}e^{A_*''z^2/2}\dd z
+=\sqrt{\frac{2\pi}{-A_*''}}
+=\sqrt{\frac{2\pi x_*h_*}{\eta}}.
+\]
+Including the Jacobian and amplitude gives
+\[
+\boxed{
+\mathcal I\sim e^\Lambda
+\sqrt{\frac{2\pi x_*}{\eta\rho h_*}}
+},
+\qquad
+\Lambda=\frac{A(x_*)-A(x_{\rm in})}{\rho}.
+\]
+For an action-resummed entry,
+\[
+\Lambda_j=\frac{\Delta A_f-M_j}{\rho}.
+\]
+
+At next order, odd Gaussian moments vanish. The surviving contributions are the quadratic amplitude term, the product of the linear amplitude and cubic action term, the quartic action term, and the square of the cubic action term. Writing \(f=1/h\) and \(\lambda=-A_*''\), the relative correction is
+\[
+\rho\left[
+\frac{f_*''}{2f_*\lambda}
++\frac{f_*'A_*'''}{2f_*\lambda^2}
++\frac{A_*''''}{8\lambda^2}
++\frac{5(A_*''')^2}{24\lambda^3}
+\right].
+\]
+Substitution of the explicit derivatives yields the coefficient \(c_L\) stated above, so
+\[
+\mathcal I=e^\Lambda\sqrt{\frac{2\pi x_*}{\eta\rho h_*}}
+\{1+\rho c_L+O(\rho^2)\}.
+\]
+
+\subsection{Boundary-layer-independent cancellation at first and next order}
+When \(\mathcal I\gg1\),
+\[
+B=Ky_{\rm BL}\log(1+1/\mathcal I)
+\sim\frac{Ky_{\rm BL}}{\mathcal I}.
+\]
+Using the leading saddle factor gives
+\[
+B\sim Ky_{\rm BL}\sqrt{\frac{\eta\rho h_*}{2\pi x_*}}e^{-\Lambda}.
+\]
+At first order,
+\[
+\Lambda_1=\frac{\Delta A_f}{\rho}
+-L_{\rm BL}-\frac{b y_{\rm BL}}{a\rho}.
+\]
+In the strict overlap \(y_{\rm BL}/\rho\to0\),
+\[
+y_{\rm BL}e^{L_{\rm BL}}
+=y_{\rm BL}\frac{C_{\theta,\psi}}{y_{\rm BL}}
+=C_{\theta,\psi}.
+\]
+Therefore the arbitrary matching height cancels:
+\[
+\boxed{
+B_{\rm BI}^{(1)}
+\sim KC_{\theta,\psi}\sqrt{\frac{\eta\rho h_*}{2\pi x_*}}
+\exp\left(-\frac{\Delta A_f}{\rho}\right)
+}.
+\]
+The same calculation identifies the deterministic trough scale
+\[
+\boxed{y_{\min}^{\rm BI}
+\sim C_{\theta,\psi}\exp(-\Delta A_f/\rho)}.
+\]
+
+For the next matching order, impose \(y_{\rm BL}\ll\rho^2\). Then
+\[
+\frac{M_2}{\rho}=L_{\rm BL}+\rho\frac{D_{\theta,\psi}}a+o(\rho),
+\]
+so
+\[
+y_{\rm BL}e^{M_2/\rho}
+\sim C_{\theta,\psi}\exp\left(\rho\frac{D_{\theta,\psi}}a\right).
+\]
+Consequently
+\[
+y_{\min}^{\rm BI,2}
+\sim C_{\theta,\psi}
+\exp\left[-\frac{\Delta A_f}{\rho}+\rho\frac{D_{\theta,\psi}}a\right].
+\]
+Combining this matching correction with the reciprocal saddle factor \((1+\rho c_L)^{-1}\), and replacing that reciprocal by \(e^{-\rho c_L}\) at the retained order, yields
+\[
+\boxed{
+B_{\rm BI}^{\rm next}
+=KC_{\theta,\psi}\sqrt{\frac{\eta\rho h_*}{2\pi x_*}}
+\exp\left[-\frac{\Delta A_f}{\rho}
++\rho\left(\frac{D_{\theta,\psi}}a-c_L\right)\right]
+}.
+\]
+This combines the next deterministic matching correction and the next saddle correction. It is a next-order boundary-independent approximation rather than a uniform second-order result in every distinguished limit.
+
+\section{Why both exact Kendall and Laplace versions should be retained}
+Increasing the asymptotic order of \(\xin\) controls deterministic matching error only. It does not repair the saddle-point approximation. The two routes therefore represent different approximation levels.
+\begin{enumerate}
+\item \textbf{Primary semi-analytical prediction.} Compute \(\xin^{(2)}\) from the action-resummed second-order master equation and evaluate the exact one-dimensional Kendall integral.
+\item \textbf{Fully asymptotic closed form.} Use \(\Lambda_2=(\Delta A_f-M_2)/\rho\) and Laplace's method. This route is appropriate only when the action is sufficiently large.
+\end{enumerate}
+Numerical validation should report deterministic matching error and Laplace-only error separately.
+
+\section{Domain of validity and identifiable failure modes}
+
+\subsection{No boundary-layer entry}
+If the deterministic first trough remains above \(\yin\), the descending trajectory never reaches the matching line. Such parameter values have no finite-boundary entry point of the assumed type. The boundary-layer-independent approximation may remain defined.
+
+\subsection{Near-threshold loss of uniformity}
+When \(\Rzero\to1^+\), the first epidemic wave becomes weak and the peak, final-size anchor, threshold, and trough scales merge. The fixed-\(\Rzero\) outer/corner hierarchy is then nonuniform and requires a distinct near-threshold scaling.
+
+\subsection{Singular transmission endpoint}
+The present construction assumes fixed \(\psi<1\). As \(\psi\to1^-\),
+\[
+\xs=\Rzero^{-1/(1-\psi)}
+\]
+and the final-size anchor both approach the boundary on exponentially small scales. The corner displacement and matching height must remain small relative to both \(\xf\) and \(\xs-\xf\). At \(\psi=1\) the threshold and final-size geometry change qualitatively, so a separate asymptotic analysis is required.
+
+\subsection{Small-action Laplace breakdown}
+Even if \(\xin\) is accurate, Laplace's approximation may fail when \(\Lambda=O(1)\) or smaller. In that regime the correct response is to retain the exact Kendall integral rather than to increase the formal order of the entry expansion.
+
+\subsection{Joint small-\texorpdfstring{\(\xf\)}{xf} limit}
+If \(\xf\) becomes comparable with the recruitment-induced corner scale, replenishment modifies the final-size corner itself. Since
+\[
+\hth(x)\sim x^\theta,\qquad x\to0,
+\]
+the balance \(\rho x^\theta\sim x\) gives the characteristic scale
+\[
+x\sim\rho^{1/(1-\theta)},
+\qquad 0\leq\theta<1.
+\]
+The endpoint \(\theta=1\) has a different distinguished balance.
+
+\subsection{Finite-\texorpdfstring{\(K\)}{K} stochastic entry}
+The asymptotic matching treats \(\xin\) as deterministic. At finite \(K\), the actual entry point is random and its fluctuations may be exponentially amplified because
+\[
+\Lambda'(x)
+=-\frac{1-\Rzero x^\eta}{\rho\hth(x)}.
+\]
+This source of error is distinct from deterministic matching error and should be measured separately in stochastic simulations.
+
+\section{Theoretical chain and computational interface}
+The deterministic-entry problem forms the closed chain
+\[
+(\Rzero,\rho,\theta,\psi,K)
+\longrightarrow
+(\xf,\Cpsi,\Dpsi,\yin)
+\longrightarrow
+\xin^{(1)},\xin^{(2)}
+\longrightarrow
+\mathcal I,\Lambda
+\longrightarrow
+P_{\mathrm{burn}},P_{\mathrm{persist}}.
+\]
+A practical implementation separates naturally into a precomputation layer and a parameter layer.
+\begin{enumerate}
+\item For each \((\Rzero,\theta,\psi)\), compute \(\xf\), \(\Cpsi\), and \(\Dpsi\) using the regularized one-dimensional coefficient equations.
+\item For each \((\rho,K)\), compute \(y_*^{(0)}\) and \(\yin\), then obtain first- and second-order entry predictions from the scalar action equations.
+\item For the high-accuracy route, evaluate the exact Kendall integral.
+\item For a fully asymptotic closed form, use the action directly and apply the Laplace approximation.
+\item Record no-entry status, \(\Lambda\), the size of \(M_2-M_1\), and the separation of \(\xf\), \(\xs\), and the corner scales as validity diagnostics.
+\end{enumerate}
+
+
+\section{Detailed computational workflow and verification targets}
+The analytical construction is designed so that a production implementation never needs a two-dimensional deterministic ODE solve for every parameter set. The calculation naturally separates into parameter-independent precomputation for fixed \((R_0,\theta,\psi)\) and a cheap loop over \((\rho,K)\).
+
+\subsection{Precomputation for fixed \texorpdfstring{\((R_0,\theta,\psi)\)}{(R0,theta,psi)}}
+\begin{enumerate}
+\item Set \(\eta=1-\psi\), construct
+\[
+n_0(x)=\left(1+\frac\eta{R_0}\log x\right)^{1/\eta},
+\qquad F_\psi(x)=n_0(x)-x,
+\]
+and solve \(F_\psi(x_f)=0\) for the unique root in \( (e^{-R_0/\eta},x_*)\).
+\item Form
+\[
+x_*=R_0^{-1/\eta},\quad q=R_0x_f^\eta,\quad\delta=1-q,
+\]
+and then \(a,b,r,c,\kappa,e,f_1,f_2\) from the explicit local formulas above.
+\item Choose \(\bar x\in(x_f,x_*)\) bounded away from both endpoints, set \(\bar y=F_\psi(\bar x)\), integrate the smooth auxiliary equations for \(W_1,W_2\) from \(x=1\) to \(\bar x\), and convert once to \(X_1(\bar y),X_2(\bar y)\).
+\item Integrate the regularized inverse equation for \(Z_1=X_1+a\log y\) from \(\bar y\) to zero and set
+\[
+C_{\theta,\psi}=\exp\{Z_1(0^+)/a\}.
+\]
+As a regression test, compare this with \(f_1\exp(-K_1/\alpha_1)\) from the first phase-plane finite part.
+\item With this \(C_{\theta,\psi}\), integrate the regularized equation for
+\[
+Z_2=X_2-\kappa\log^2(C_{\theta,\psi}/y)
+\]
+to zero and set
+\[
+D_{\theta,\psi}=Z_2(0^+).
+\]
+Use double-exponential quadrature or a substitution such as \(y=\bar y t^2\); the regularized derivatives are only \(O(|\log y|)\) and \(O(\log^2y)\).
+\item Repeat steps 3--5 for two or three well-separated values of \(\bar x\).  The resulting \(C_{\theta,\psi}\) and \(D_{\theta,\psi}\) must be independent of \(\bar x\) to numerical accuracy.
+\item Compute the action difference
+\[
+\Delta A_f=\int_{x_f}^{x_*}\frac{1-R_0z^\eta}{h_\theta(z)}\dd z.
+\]
+\end{enumerate}
+
+\subsection{Loop over \texorpdfstring{\((\rho,K)\)}{(rho,K)}}
+For each \((\rho,K)\), form
+\[
+y_*^{(0)}=\rho h_\theta(x_*),
+\qquad
+y_{\rm BL}=\sqrt{y_*^{(0)}/K},
+\qquad
+L_{\rm BL}=\log(C_{\theta,\psi}/y_{\rm BL}).
+\]
+Evaluate \(M_1\) and \(M_2\). If\[
+0<M_j<\Delta A_f
+\]
+fails, record ``no admissible finite-boundary root'' for that order. Do not extrapolate the action equation outside \((x_f,x_*)\). Otherwise solve the monotone scalar equation
+\[
+\int_{x_f}^{x_{\rm in}^{(j)}}\frac{1-R_0z^\eta}{h_\theta(z)}\dd z=M_j.
+\]
+The exact-Kendall route uses \(x_{\rm in}^{(j)}\) as the lower integration limit. The fully asymptotic route instead computes
+\[
+\Lambda_j=(\Delta A_f-M_j)/\rho
+\]
+directly, so it does not need the root itself.
+
+\subsection{Diagnostics that distinguish different failure mechanisms}
+The numerical output should retain at least
+\[
+\frac{y_{\rm BL}}\rho,
+\qquad
+\frac{\rho|L_{\rm BL}|+y_{\rm BL}}{x_*-x_f},
+\qquad
+\frac{|M_2-M_1|}{|M_1|},
+\qquad
+\Lambda_1,\Lambda_2.
+\]
+When a deterministic ODE benchmark is available, also retain
+\[
+x_{\rm in}^{\rm ODE},\qquad y_{\min}^{\rm ODE},
+\]
+and the action errors
+\[
+\Delta\Lambda_j
+=\frac{A_{\theta,\psi}(x_{\rm in}^{\rm ODE})
+-A_{\theta,\psi}(x_{\rm in}^{(j)})}{\rho}.
+\]
+For the stochastic layer, compare the exact one-dimensional Kendall integral with its leading and next-order Laplace approximations separately. This prevents an accurate deterministic matching approximation from being blamed for a saddle-point error, or vice versa.
+
+\subsection{Algebraic and numerical checks before stochastic simulation}
+Several inexpensive checks can be performed before running any stochastic model.
+\begin{enumerate}
+\item Integrate the normalized deterministic ODE at very small \(\rho\) and verify that the first-wave trajectory approaches \(y=F_\psi(x)\).
+\item For a fixed \((R_0,\theta,\psi)\), compute trajectories at several decreasing \(\rho\) values and verify that the residual after subtracting \(F_\psi+\rho Y_1\) scales as \(O(\rho^2)\), and the residual after subtracting \(F_\psi+\rho Y_1+\rho^2Y_2\) scales as \(O(\rho^3)\) away from the corner.
+\item Near the final-size corner, compare the deterministic trajectory with the first- and second-order inverse formulas at a sequence of shrinking \(y\) values. The quantity
+\[
+X_2(y)-\kappa\log^2(C_{\theta,\psi}/y)
+\]
+should approach the computed constant \(D_{\theta,\psi}\).
+\item Verify numerically that the direct second-order entry and the action-resummed second-order entry differ only beyond the retained order when the matching conditions are well separated.
+\item Compare the exact Kendall integral with the saddle approximation while holding the deterministic entry fixed. This isolates the Laplace error from the matching error.
+\end{enumerate}
+These checks test each link of the analytical chain independently before the full persistence probability is compared with stochastic simulations.
+
+\appendix
+\section{Derivative formulas for the recruitment law}
+For
+\[
+\hth(x)=(1-x)x^\theta,
+\]
+we have
+\[
+\hth'(x)=x^{\theta-1}\{\theta-(\theta+1)x\},
+\]
+\[
+\hth''(x)
+=\theta x^{\theta-2}\{(\theta-1)-(\theta+1)x\}.
+\]
+These expressions enter the local corner coefficients and the next Laplace coefficient.
+
+\section{Numerical diagnostics to retain}
+A numerical implementation should retain at least the following diagnostics:
+\[
+\frac{y_{\min}}{\yin},
+\qquad
+\frac{\xin^{(1)}-\xin^{\mathrm{ODE}}}{\xin^{\mathrm{ODE}}},
+\qquad
+\frac{\xin^{(2)}-\xin^{\mathrm{ODE}}}{\xin^{\mathrm{ODE}}},
+\qquad
+\Delta\Lambda_1,\ \Delta\Lambda_2,
+\]
+plus exact-Kendall and Laplace burnout exponents. The regularized quadratures defining \(\Cpsi\) and \(\Dpsi\) should be tested for endpoint-treatment and numerical-precision sensitivity.
+
+\begin{thebibliography}{9}
+\bibitem{ParsonsEarn2024}
+T. L. Parsons and D. J. D. Earn,
+\emph{Uniform Asymptotic Approximations for the Phase Plane Trajectories of the SIR Model with Vital Dynamics},
+SIAM Journal on Applied Mathematics 84(4), 1580--1608 (2024).
+
+\bibitem{ParsonsEtAl2024}
+T. L. Parsons, B. M. Bolker, J. Dushoff, and D. J. D. Earn,
+\emph{The probability of epidemic burnout in the stochastic SIR model with vital dynamics},
+Proceedings of the National Academy of Sciences 121(5), e2313708120 (2024).
+\end{thebibliography}
+
+\end{document}

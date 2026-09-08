@@ -15,6 +15,16 @@ stopifnot(is.finite(bi$log_y_min),bi$P_conditional>=0,bi$P_conditional<=1,
           abs(bi$P_unconditional-(1-1/3)*bi$P_conditional)<1e-14)
 bi4<-bi_quantities(3,.01,.5,1e4,I0=4)
 stopifnot(abs(bi4$P_unconditional-(1-3^-4)*bi4$P_conditional)<1e-14)
+for(R0 in c(1.05,1.2,2,5))
+  stopifnot(abs(laplace_correction(R0,0)-1/(12*(R0-1)))<2e-13)
+bn<-bi_next_quantities(3,.01,.5,1e4)
+stopifnot(all(is.finite(bn$log_B)),all(bn$P_conditional>=0),
+          all(bn$P_conditional<=1),
+          abs((bn$log_B['D_only']-bn$log_B['leading'])-.01*bn$D/bn$a)<1e-14,
+          abs((bn$log_B['Laplace_only']-bn$log_B['leading'])+.01*bn$c_L)<1e-14,
+          abs(bn$log_B['combined']-bn$log_B['D_only']+.01*bn$c_L)<1e-14)
+bn0<-bi_next_quantities(3,1e-9,.5,1e4,D=bn$D)
+stopifnot(abs(bn0$log_B['combined']-bn0$log_B['leading'])<1e-8)
 ys<-.01*h_theta(1/3,.5); hs<-boundary_layer_height(ys,1e4,c('sqrt'))
 hc<-boundary_layer_height(ys,1e4,'compromise'); hy<-boundary_layer_height(ys,1e4,'ystar')
 hc34<-boundary_layer_height(ys,1e4,'compromise_3_4')

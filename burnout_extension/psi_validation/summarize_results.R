@@ -1,0 +1,16 @@
+source('psi_validation/R/theory_psi.R')
+library(data.table)
+s<-fread('psi_validation/data/psi05_stochastic_results.csv')
+v<-t(vapply(seq_len(nrow(s)),function(i){
+  a<-bi_quantities_psi(s$R0[i],s$rho[i],s$theta[i],.5,s$K[i])
+  b<-bi_quantities_psi(s$R0[i],s$rho[i],s$theta[i],.5,s$K[i],next_order=TRUE)
+  c(a['P_conditional'],a['P_unconditional'],b['P_conditional'])
+},numeric(3)))
+s[,`:=`(BI_conditional=v[,1],BI_unconditional=v[,2],BI_next_conditional=v[,3])]
+summary<-s[,.(points=.N,attempts=sum(attempts),expanded_points=sum(attempts==10000),
+  unresolved=sum(unresolved),MAE_conditional=mean(abs(P_conditional-BI_conditional),na.rm=TRUE),
+  MAE_unconditional=mean(abs(P_unconditional-BI_unconditional)),
+  conditional_CI_coverage=mean(BI_conditional>=cond_low&BI_conditional<=cond_high,na.rm=TRUE),
+  MAE_next_conditional=mean(abs(P_conditional-BI_next_conditional),na.rm=TRUE))]
+fwrite(summary,'psi_validation/data/psi05_summary.csv')
+print(summary)

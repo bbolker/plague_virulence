@@ -1,6 +1,15 @@
 # General-recruitment burnout asymptotics. Base R + deSolve only.
 h_theta <- function(x, theta) (1-x)*x^theta
 h_prime <- function(x, theta) x^(theta-1)*(theta-(theta+1)*x)
+h_second <- function(x, theta)
+  theta*x^(theta-2)*((theta-1)-(theta+1)*x)
+
+# O(rho) relative correction to the interior-saddle Laplace approximation of
+# the scaled Kendall integral.  Thus J = J_L * (1 + rho*c_L + O(rho^2)).
+laplace_correction <- function(R0,theta) {
+  xs <- 1/R0; hs <- h_theta(xs,theta)
+  hs/R0*((h_prime(xs,theta)/hs)^2/12-h_second(xs,theta)/hs/8)
+}
 
 # Boundary-layer matching heights.  The power-law compromises are
 # y_BL = K^(-1/3) * y_star^(2/3) and K^(-1/4) * y_star^(3/4), with no
@@ -62,6 +71,32 @@ bi_quantities <- function(R0,rho,theta,K,I0=1) {
        y_min=exp(log_y_min),log_B=log_B,B=B,
        P_conditional=P_conditional,
        P_unconditional=establishment*P_conditional,
+       establishment=establishment)
+}
+
+# Four boundary-independent approximations used in the next-order validation.
+# The D-only and combined versions require the strict overlap y_BL << rho^2;
+# after matching, none of these formulas contains y_BL.
+bi_next_quantities <- function(R0,rho,theta,K,I0=1,D=NULL) {
+  stopifnot(is.finite(R0),R0>1,is.finite(rho),rho>0,
+            is.finite(K),K>0,is.finite(I0),I0>0)
+  xf <- x_final(R0); xs <- 1/R0; delta <- 1-R0*xf
+  hf <- h_theta(xf,theta); a <- hf/delta
+  C <- C_explicit(R0,theta)
+  if(is.null(D)) D <- D_regularized(R0,theta)
+  cL <- laplace_correction(R0,theta)
+  Delta_A_f <- action_diff(xf,xs,R0,theta)
+  log_B0 <- log(K)+log(C)+.5*log(R0*rho*h_theta(xs,theta)/(2*pi))-
+    Delta_A_f/rho
+  shifts <- c(leading=0,D_only=rho*D/a,Laplace_only=-rho*cL,
+              combined=rho*(D/a-cL))
+  log_B <- log_B0+shifts
+  B <- exp(pmin(log_B,log(.Machine$double.xmax)))
+  B[log_B>log(.Machine$double.xmax)] <- Inf
+  P <- ifelse(is.infinite(B),1,-expm1(-B))
+  establishment <- -expm1(-I0*log(R0))
+  list(C=C,D=D,a=a,c_L=cL,Delta_A_f=Delta_A_f,log_B=log_B,B=B,
+       P_conditional=P,P_unconditional=establishment*P,
        establishment=establishment)
 }
 
