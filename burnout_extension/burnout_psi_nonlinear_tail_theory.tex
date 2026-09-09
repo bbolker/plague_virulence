@@ -1,0 +1,2390 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,mathtools,bm}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\hypersetup{colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\setlist{nosep,leftmargin=*}
+\newcommand{\Rzero}{R_0}
+\newcommand{\hth}{h_\theta}
+\newcommand{\Fpsi}{F_\psi}
+\newcommand{\Apsi}{A_{\theta,\psi}}
+\newcommand{\xf}{x_f}
+\newcommand{\xs}{x_*}
+\newcommand{\dd}{\,\mathrm{d}}
+\newcommand{\CalC}{\mathcal C_\rho}
+\newcommand{\gh}{g_0}
+\newcommand{\epsA}{\varepsilon_A}
+\title{Epidemic Burnout under Susceptible Recruitment and Population-Size-Dependent Transmission\\[0.4em]\large A Nonlinear Tail-Matching Theory from the First Epidemic Wave to Kendall Persistence Probability}
+\author{Theory note}
+\date{2026-09-08}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We develop a self-contained asymptotic and semi-analytical theory for pathogen burnout or persistence after the first epidemic wave in a susceptible--infectious--death model with susceptible recruitment $h_\theta(x)=(1-x)x^\theta$ and population-size-dependent transmission. The normalized deterministic system is
+\[
+\dot x=\rho h_\theta(x)-R_0xy(x+y)^{-\psi},
+\qquad
+\dot y=\{R_0x(x+y)^{-\psi}-1\}y,
+\]
+with $0\leq\theta\leq1$, $0\leq\psi<1$, $0<\rho\ll1$, and a large reference population $K$. The zero-recruitment first-wave geometry is explicit and supplies a regular outer approximation on any fixed interval away from the post-wave endpoint. The epidemic tail is then continued by the exact one-dimensional inverse-flow equation, written in logarithmic prevalence, without expanding the finite-prevalence transmission factor $(1+y/x)^{-\psi}$. This nonlinear tail continuation remains well defined when $y/x$ is not small and therefore does not require a Taylor expansion around a possibly very small final-size anchor. We derive explicit deterministic-to-stochastic overlap diagnostics, an action-based plateau quantity whose variation is rigorously controlled, the corresponding time-inhomogeneous Kendall branching formula, and its Laplace reduction. The construction recovers the usual logarithmic corner constants in the stronger local overlap, but those constants are asymptotic limits rather than required inputs. The special case $\psi=0$ is regular and particularly simple because the per-infective transmission rate is independent of prevalence. The endpoint $\psi\to1^-$ is regular at the level of the nonlinear deterministic tail but nonuniform for the full burnout theory because the low-prevalence threshold and the interior Laplace saddle collapse toward zero.
+\end{abstract}
+
+\tableofcontents
+\clearpage
+
+\section{Executive formula sheet}
+
+\subsection{Model and zero-recruitment geometry}
+The normalized deterministic equations are
+\[
+\dot x=\rho\hth(x)-g(x,y)y,
+\qquad
+\dot y=\{g(x,y)-1\}y,
+\]
+where
+\[
+g(x,y)=\Rzero x(x+y)^{-\psi},
+\qquad
+\hth(x)=(1-x)x^\theta,
+\qquad
+\eta=1-\psi>0.
+\]
+At $\rho=0$, with $n=x+y$,
+\[
+n_0(x)=\left(1+\frac{\eta}{\Rzero}\log x\right)^{1/\eta},
+\qquad
+\Fpsi(x)=n_0(x)-x.
+\]
+The post-wave endpoint $\xf$ is the nontrivial root
+\[
+\Fpsi(\xf)=0,
+\]
+and the low-prevalence growth threshold is
+\[
+\xs=\Rzero^{-1/\eta}.
+\]
+It is useful to define
+\[
+z_f=\xf^\eta.
+\]
+Then $z_f$ is the unique nontrivial root in $(0,1/\Rzero)$ of the $\psi$-independent equation
+\[
+\boxed{z_f=1+\frac1{\Rzero}\log z_f},
+\qquad
+\boxed{\xf=z_f^{1/\eta}}.
+\]
+Consequently
+\[
+0<\xf<\xs<1,
+\qquad
+q:=\Rzero\xf^\eta\in(0,1),
+\qquad
+\delta:=1-q>0.
+\]
+Thus increasing $\psi$ compresses $\xf$ toward zero even when the transformed final size $z_f$ is unchanged. The existence, uniqueness, and ordering are proved in Section~\ref{sec:zerorho}.
+
+\subsection{Regular outer initialization}
+Choose a fixed outer point
+\[
+\bar x\in(\xf,\xs)
+\]
+away from both endpoints, and set
+\[
+\bar y=\Fpsi(\bar x).
+\]
+On the regular outer interval, expand
+\[
+y=\Fpsi(x)+\rho Y_1(x)+\rho^2Y_2(x)+O(\rho^3).
+\]
+The coefficient equations are given explicitly in Section~\ref{sec:outer}. At fixed $y=\bar y$, inversion gives
+\[
+X(\bar y;\rho)=\bar x+\rho \bar X_1+\rho^2\bar X_2+O(\rho^3),
+\]
+where
+\[
+\bar X_1=-\frac{Y_1(\bar x)}{\Fpsi'(\bar x)},
+\]
+\[
+\bar X_2=-\frac{\frac12\Fpsi''(\bar x)\bar X_1^2+Y_1'(\bar x)\bar X_1+Y_2(\bar x)}{\Fpsi'(\bar x)}.
+\]
+
+\subsection{Nonlinear tail equation}
+On the descending branch $g<1$, define the logarithmic prevalence coordinate
+\[
+\ell=\log\frac{\bar y}{y},
+\qquad
+ y=\bar y e^{-\ell}.
+\]
+The exact phase-plane dynamics reduce to the scalar non-autonomous ODE
+\[
+\boxed{
+\frac{\dd X}{\dd\ell}
+=
+\frac{\rho\hth(X)-g(X,y)y}{1-g(X,y)},
+\qquad
+ y=\bar y e^{-\ell},
+}
+\]
+with initial condition
+\[
+X(0)=\bar x+\rho\bar X_1+\rho^2\bar X_2.
+\]
+No expansion of
+\[
+(1+y/X)^{-\psi}
+\]
+is made in this tail equation.
+
+\subsection{Overlap diagnostics and the action plateau}
+Define the low-prevalence rate
+\[
+\gh(x)=\Rzero x^\eta,
+\qquad
+ g(x,y)=\gh(x)\left(1+\frac yx\right)^{-\psi},
+\]
+and the two dimensionless overlap ratios
+\[
+s=\frac yx,
+\qquad
+ d=\frac{g(x,y)y}{\rho\hth(x)}.
+\]
+The first measures finite-prevalence correction to the per-infective birth rate; the second measures infection depletion relative to susceptible recruitment.
+
+Define the action through finite differences,
+\[
+\Apsi(v)-\Apsi(u)
+=\int_u^v\frac{1-\Rzero z^\eta}{\hth(z)}\dd z.
+\]
+Along the exact deterministic trajectory,
+\[
+\boxed{
+\frac{\dd}{\dd\sigma}
+\left(
+\log y+\frac{\Apsi(x)}{\rho}
+\right)
+=
+ g-\gh-(1-\gh)d.
+}
+\]
+Since $\dot\ell=1-g$ on the descending branch,
+\[
+\boxed{
+\frac{\dd}{\dd\ell}\log \CalC
+=
+\frac{g-\gh-(1-\gh)d}{1-g},
+}
+\]
+where
+\[
+\boxed{
+\CalC(y)
+=y\exp\left\{\frac{\Apsi(X(y))-\Apsi(\xf)}{\rho}\right\}.
+}
+\]
+For $0\leq\psi\leq1$,
+\[
+0\leq \gh-g
+=\gh\left[1-(1+s)^{-\psi}\right]
+\leq \psi\gh s,
+\]
+so
+\[
+\boxed{
+\left|\frac{\dd}{\dd\ell}\log\CalC\right|
+\leq
+\epsA
+:=
+\frac{\psi\gh s+|1-\gh|d}{1-g}.
+}
+\]
+An admissible deterministic-to-stochastic handoff point $(x_h,y_h)$ satisfies
+\[
+Ky_h\gg1,
+\qquad
+s_h\ll1,
+\qquad
+d_h\ll1,
+\qquad
+\varepsilon_{A,h}\ll1,
+\qquad
+g_h<1.
+\]
+A plateau of $\CalC(y)$ across several admissible handoff levels is the principal internal diagnostic.
+
+\subsection{Kendall prediction}
+At an admissible handoff, neglecting infectious feedback on $x$ and finite-$y/x$ correction to the per-infective birth rate gives
+\[
+\dot x=\rho\hth(x),
+\qquad
+b(\sigma)=\Rzero x(\sigma)^\eta,
+\qquad
+d(\sigma)=1.
+\]
+For one lineage starting at $x_h$ define
+\[
+\boxed{
+\mathcal I(x_h)
+=
+\int_{x_h}^{1}
+\frac{1}{\rho\hth(X)}
+\exp\left\{
+\frac{\Apsi(X)-\Apsi(x_h)}{\rho}
+\right\}\dd X.
+}
+\]
+Then
+\[
+q_1=\frac{\mathcal I}{1+\mathcal I}
+\]
+is the asymptotic extinction probability of one lineage. With $m=Ky_h$ lineages,
+\[
+\boxed{
+P_{\rm persist\mid est}
+\simeq
+1-\left(\frac{\mathcal I(x_h)}{1+\mathcal I(x_h)}\right)^{Ky_h}.
+}
+\]
+For one initial infective before the first wave,
+\[
+P_{\rm persist,uncond}
+\simeq
+\left(1-\frac1{\Rzero}\right)P_{\rm persist\mid est}.
+\]
+
+\subsection{Laplace and boundary-layer-independent form}
+The action has its unique interior maximum at
+\[
+\xs=\Rzero^{-1/\eta},
+\qquad
+\Apsi''(\xs)=-\frac{\eta}{\xs\hth(\xs)}.
+\]
+Hence
+\[
+\mathcal I(x_h)
+\sim
+\exp\left\{\frac{\Apsi(\xs)-\Apsi(x_h)}{\rho}\right\}
+\sqrt{\frac{2\pi\xs}{\eta\rho h_*}},
+\qquad
+h_*=\hth(\xs).
+\]
+When $\mathcal I\gg1$,
+\[
+B:=-\log P_{\rm burn\mid est}
+=Ky_h\log(1+1/\mathcal I)
+\sim\frac{Ky_h}{\mathcal I}.
+\]
+Therefore
+\[
+\boxed{
+B_{\rm NL}
+\sim
+K\mathcal C_{\rho,h}
+\sqrt{\frac{\eta\rho h_*}{2\pi\xs}}
+\exp\left\{-\frac{\Delta A_f}{\rho}\right\},
+}
+\]
+where
+\[
+\mathcal C_{\rho,h}=\CalC(y_h),
+\qquad
+\Delta A_f=\Apsi(\xs)-\Apsi(\xf).
+\]
+If $\CalC$ has reached a plateau, the leading Laplace prediction is asymptotically independent of the arbitrary handoff level.
+
+\subsection{Scope}
+The theory requires fixed
+\[
+0\leq\psi<1,
+\qquad
+\Rzero>1,
+\qquad
+\rho\ll1,
+\qquad
+K\gg1,
+\]
+together with a nonempty deterministic-to-stochastic overlap. The nonlinear tail itself remains meaningful when $y/x=O(1)$; only the later branching handoff requires $y/x\ll1$. At $\psi=0$ the finite-prevalence transmission correction vanishes identically. The endpoint $\psi=1$ is not covered by the full theory because $\xs\to0$ as $\psi\to1^-$, so the interior action saddle collapses to the boundary.
+
+\section{Count-level model and normalization}
+
+Let $S$ and $I$ be susceptible and infectious counts, $N=S+I$, $K$ a reference population size, $\gamma$ the infectious removal rate, $rK$ the susceptible-recruitment scale, and $\beta$ the transmission parameter. The infection event rate is
+\[
+\lambda_{SI}
+=\frac{\beta}{K}SI\left(\frac K N\right)^\psi.
+\]
+The deterministic count equations are
+\[
+\frac{\dd S}{\dd t}
+=rK\hth(S/K)-\frac{\beta}{K}SI\left(\frac K{S+I}\right)^\psi,
+\]
+\[
+\frac{\dd I}{\dd t}
+=\frac{\beta}{K}SI\left(\frac K{S+I}\right)^\psi-\gamma I.
+\]
+Set
+\[
+x=\frac SK,
+\qquad
+y=\frac IK,
+\qquad
+\sigma=\gamma t,
+\qquad
+\rho=\frac r\gamma,
+\qquad
+\Rzero=\frac\beta\gamma.
+\]
+Since $N/K=x+y$,
+\[
+\frac{\beta}{K}(Kx)(Ky)(x+y)^{-\psi}
+=\beta Kxy(x+y)^{-\psi},
+\]
+so division by $K\gamma$ gives
+\[
+\boxed{
+\dot x
+=\rho\hth(x)-\Rzero xy(x+y)^{-\psi},
+}
+\]
+\[
+\boxed{
+\dot y
+=\left\{\Rzero x(x+y)^{-\psi}-1\right\}y.
+}
+\]
+The deterministic fraction system is independent of $K$. Population size re-enters when a fraction $y$ is converted to the infectious count $Ky$ in the stochastic layer.
+
+Define
+\[
+g(x,y)=\Rzero x(x+y)^{-\psi}.
+\]
+Then
+\[
+\dot x=\rho\hth(x)-g(x,y)y,
+\qquad
+\dot y=\{g(x,y)-1\}y.
+\]
+For $x>0$ write
+\[
+s=\frac yx.
+\]
+The per-infective birth factor has the exact decomposition
+\[
+\boxed{
+g(x,y)=\Rzero x^{1-\psi}(1+s)^{-\psi}.}
+\]
+With $\eta=1-\psi$ define
+\[
+\gh(x)=\Rzero x^\eta.
+\]
+Then
+\[
+g=\gh(1+s)^{-\psi}.
+\]
+This identity separates two effects: $\gh(x)$ is the low-prevalence growth factor, while $(1+s)^{-\psi}$ is the finite-prevalence correction. When $\psi=0$ the second factor is exactly one at every prevalence.
+
+\section{Zero-recruitment first-wave geometry}
+\label{sec:zerorho}
+
+\subsection{Exact invariant and epidemic orbit}
+Set $\rho=0$ and $n=x+y$. Adding the equations gives
+\[
+\dot n=-y.
+\]
+Also
+\[
+\dot x=-\Rzero xy n^{-\psi}.
+\]
+Therefore, wherever $y>0$,
+\[
+\frac{\dd n}{\dd x}
+=\frac{n^\psi}{\Rzero x}.
+\]
+Let
+\[
+\eta=1-\psi>0.
+\]
+Then
+\[
+n^{-\psi}\dd n=\frac{\dd x}{\Rzero x},
+\]
+so, using the epidemic initial state $(x,n)=(1,1)$,
+\[
+\frac{n^\eta-1}{\eta}=\frac1{\Rzero}\log x.
+\]
+Hence
+\[
+\boxed{
+n_0(x)
+=\left(1+\frac\eta{\Rzero}\log x\right)^{1/\eta},
+}
+\]
+and the zero-recruitment epidemic branch is
+\[
+\boxed{
+\Fpsi(x)=n_0(x)-x.
+}
+\]
+Equivalently,
+\[
+H(x,y)=n^\eta-\frac\eta{\Rzero}\log x
+\]
+is constant when $\rho=0$.
+
+\subsection{Final-size anchor}
+At the end of the zero-recruitment epidemic, $y=0$, so $n=x=\xf$. Therefore
+\[
+\xf^\eta
+=1+\frac\eta{\Rzero}\log\xf.
+\]
+Define
+\[
+z_f=\xf^\eta.
+\]
+Because $\log\xf=(1/\eta)\log z_f$,
+\[
+\boxed{
+z_f=1+\frac1{\Rzero}\log z_f.}
+\]
+The transformed final-size equation is independent of $\psi$, while
+\[
+\boxed{\xf=z_f^{1/\eta}.}
+\]
+The location and uniqueness of the nontrivial root require a short argument because the resulting ordering will be used throughout the theory. Define
+\[
+\phi(z)=z-1-\frac1{\Rzero}\log z,
+\qquad z>0.
+\]
+Then
+\[
+\phi'(z)=1-\frac1{\Rzero z},
+\qquad
+\phi''(z)=\frac1{\Rzero z^2}>0.
+\]
+Hence $\phi$ is strictly convex and has its unique minimum at
+\[
+z_*=\frac1{\Rzero}.
+\]
+The point $z=1$ is one root, since $\phi(1)=0$. At the minimum,
+\[
+\phi(z_*)
+=\frac1{\Rzero}-1+\frac{\log\Rzero}{\Rzero}
+=-\frac{\Rzero-1-\log\Rzero}{\Rzero}<0,
+\]
+because $\Rzero-1-\log\Rzero>0$ for $\Rzero>1$. Moreover,
+\[
+\lim_{z\downarrow0}\phi(z)=+\infty.
+\]
+By continuity, $\phi$ therefore has a root in $(0,1/\Rzero)$. Strict convexity implies that there can be at most two positive roots; since $z=1$ is already the second one, the root in $(0,1/\Rzero)$ is unique. Denote it by $z_f$. Thus
+\[
+\boxed{
+0<z_f<\frac1{\Rzero}<1.
+}
+\]
+Since $\xf=z_f^{1/\eta}$ and $\xs=\Rzero^{-1/\eta}$, monotonicity of $z\mapsto z^{1/\eta}$ gives
+\[
+\boxed{
+0<\xf<\xs<1.
+}
+\]
+Furthermore,
+\[
+q=\Rzero\xf^\eta=\Rzero z_f,
+\]
+so
+\[
+\boxed{0<q<1,\qquad \delta=1-q>0.}
+\]
+These inequalities establish, rather than assume, the ordering of the final-size anchor and the later low-prevalence threshold. They also ensure that all local coefficients containing $\delta^{-1}$ are well defined. Finally, because $z_f$ depends only on $\Rzero$, increasing $\psi$ decreases $\eta$ and compresses $\xf=z_f^{1/\eta}$ rapidly toward zero.
+
+Differentiating $n_0$ gives
+\[
+\boxed{
+n_0'(x)=\frac{n_0(x)^\psi}{\Rzero x}.}
+\]
+Thus
+\[
+\Fpsi'(x)=\frac{n_0(x)^\psi}{\Rzero x}-1.
+\]
+At $x=\xf$, since $n_0(\xf)=\xf$,
+\[
+\Fpsi'(\xf)=\frac1{\Rzero\xf^\eta}-1.
+\]
+Writing
+\[
+q=\Rzero\xf^\eta,
+\qquad
+\delta=1-q,
+\]
+we have
+\[
+\boxed{\Fpsi'(\xf)=\frac\delta q>0.}
+\]
+The positivity follows from the root-ordering argument above, which proved $0<q<1$ and $\delta>0$.
+
+\subsection{Low-prevalence threshold and positive equilibrium}
+As $y/x\to0$,
+\[
+g(x,y)\to\gh(x)=\Rzero x^\eta.
+\]
+The low-prevalence growth threshold is therefore
+\[
+\boxed{\xs=\Rzero^{-1/\eta}.}
+\]
+At a positive deterministic equilibrium,
+\[
+g(x_e,y_e)=1,
+\qquad
+\rho\hth(x_e)=y_e,
+\]
+so
+\[
+y_e=\rho\hth(x_e)
+\]
+exactly and
+\[
+\Rzero x_e\{x_e+\rho\hth(x_e)\}^{-\psi}=1.
+\]
+Let
+\[
+x_e=\xs+\rho\xi+O(\rho^2),
+\qquad
+h_*=\hth(\xs).
+\]
+Because $y_e=\rho\hth(x_e)$,
+\[
+y_e=\rho h_*+O(\rho^2).
+\]
+Take logarithms of the equilibrium condition:
+\[
+0=\log\Rzero+\log x_e-\psi\log(x_e+y_e).
+\]
+The two logarithms have the first-order expansions
+\[
+\log x_e
+=\log\xs+\rho\frac{\xi}{\xs}+O(\rho^2),
+\]
+\[
+\log(x_e+y_e)
+=\log\xs+\rho\frac{\xi+h_*}{\xs}+O(\rho^2).
+\]
+Since $\Rzero\xs^\eta=1$,
+\[
+\log\Rzero+\eta\log\xs=0.
+\]
+Substitution therefore leaves, at order $O(\rho)$,
+\[
+0=\frac{\rho}{\xs}\{\xi-\psi(\xi+h_*)\}+O(\rho^2)
+=\frac{\rho}{\xs}(\eta\xi-\psi h_*)+O(\rho^2).
+\]
+Hence
+\[
+\boxed{\eta\xi-\psi h_*=0,}
+\]
+and therefore
+\[
+\boxed{
+x_e=\xs+\rho\frac{\psi h_*}{\eta}+O(\rho^2),}
+\]
+\[
+\boxed{
+y_e=\rho h_*+O(\rho^2).}
+\]
+The demographic infectious scale is thus $O(\rho)$.
+
+\section{Regular outer expansion on a fixed first-wave interval}
+\label{sec:outer}
+
+The nonlinear tail will be initialized from a point that remains a fixed positive distance from the zero-recruitment endpoint. On such an interval the perturbation expansion in $\rho$ is regular and no corner expansion is needed.
+
+Choose
+\[
+\bar x\in(\xf,\xs)
+\]
+with $\bar x-\xf=O(1)$ relative to the local perturbation scale, and define
+\[
+\bar y=\Fpsi(\bar x)>0.
+\]
+On $[\bar x,1]$ write
+\[
+y=\Fpsi(x)+\rho Y_1(x)+\rho^2Y_2(x)+O(\rho^3),
+\]
+\[
+n=n_0(x)+\rho Y_1(x)+\rho^2Y_2(x)+O(\rho^3).
+\]
+The exact phase-plane equation is
+\[
+\frac{\dd y}{\dd x}
+=
+\frac{\{\Rzero x(x+y)^{-\psi}-1\}y}
+{\rho\hth(x)-\Rzero xy(x+y)^{-\psi}}.
+\]
+
+Introduce
+\[
+W_1=n_0^{-\psi}Y_1,
+\qquad
+W_2=n_0^{-\psi}Y_2-\frac\psi2n_0^{-\psi-1}Y_1^2.
+\]
+Expansion of $n^{-\psi}$ and collection of equal powers of $\rho$ gives the sequential equations
+\[
+\boxed{
+W_1'
+=\frac{\hth(x)\Fpsi'(x)}{\Rzero x\Fpsi(x)}.
+}
+\]
+At the next order,
+\[
+\boxed{
+\begin{aligned}
+W_2'={}&
+\frac{\hth(x)}{\Rzero^2x^2\Fpsi(x)^2}
+\left[
+\psi n_0(x)^{\psi-1}\Fpsi(x)
+-\{n_0(x)^\psi-\Rzero x\}
+\right]Y_1(x)\\
+&+\frac{\hth(x)^2n_0(x)^\psi\{n_0(x)^\psi-\Rzero x\}}
+{\Rzero^3x^3\Fpsi(x)^2}.
+\end{aligned}
+}
+\]
+The original coefficients are recovered through
+\[
+\boxed{Y_1=n_0^\psi W_1,}
+\]
+\[
+\boxed{Y_2=n_0^\psi W_2+\frac\psi{2n_0}Y_1^2.}
+\]
+Because $h_\theta(1)=0$, the endpoint conditions
+\[
+Y_1(1)=0,
+\qquad
+Y_2(1)=0
+\]
+are understood by continuous extension from the interior. The equations are integrated only to $\bar x>\xf$, where every coefficient is regular.
+
+To initialize the inverse trajectory at the fixed prevalence $\bar y=\Fpsi(\bar x)$, write
+\[
+X(\bar y;\rho)
+=\bar x+\rho\bar X_1+\rho^2\bar X_2+O(\rho^3).
+\]
+Substituting this into
+\[
+\bar y
+=\Fpsi(X)+\rho Y_1(X)+\rho^2Y_2(X)+O(\rho^3)
+\]
+and equating powers of $\rho$ gives
+\[
+0=\Fpsi'(\bar x)\bar X_1+Y_1(\bar x),
+\]
+therefore
+\[
+\boxed{
+\bar X_1=-\frac{Y_1(\bar x)}{\Fpsi'(\bar x)}.
+}
+\]
+At $O(\rho^2)$,
+\[
+0=\Fpsi'(\bar x)\bar X_2
++\frac12\Fpsi''(\bar x)\bar X_1^2
++Y_1'(\bar x)\bar X_1
++Y_2(\bar x),
+\]
+so
+\[
+\boxed{
+\bar X_2
+=-\frac{
+\frac12\Fpsi''(\bar x)\bar X_1^2
++Y_1'(\bar x)\bar X_1
++Y_2(\bar x)
+}{\Fpsi'(\bar x)}.
+}
+\]
+This produces an $O(\rho^3)$ outer initialization error at fixed $\bar x$ if the displayed regular expansion is carried through second order.
+
+\section{Exact nonlinear continuation of the descending epidemic tail}
+\label{sec:tail}
+
+\subsection{Inverse-flow equation}
+On any branch on which $y$ is monotone and positive, divide the deterministic equations:
+\[
+\frac{\dd x}{\dd y}
+=
+\frac{\rho\hth(x)-g(x,y)y}{\{g(x,y)-1\}y}.
+\]
+After the first epidemic peak and before the first trough,
+\[
+g(x,y)<1,
+\qquad
+\dot y<0.
+\]
+Introduce
+\[
+\ell=\log\frac{\bar y}{y}.
+\]
+Because
+\[
+\dot\ell=-\frac{\dot y}{y}=1-g(x,y),
+\]
+we obtain directly
+\[
+\frac{\dd x}{\dd\ell}
+=\frac{\dot x}{\dot\ell}
+=\frac{\rho\hth(x)-g(x,y)y}{1-g(x,y)}.
+\]
+Thus the descending tail is governed by the scalar equation
+\[
+\boxed{
+\frac{\dd X}{\dd\ell}
+=
+\frac{\rho\hth(X)-\Rzero Xy(X+y)^{-\psi}}
+{1-\Rzero X(X+y)^{-\psi}},
+\qquad
+ y=\bar y e^{-\ell}.
+}
+\]
+The initial condition is supplied by the regular outer solution:
+\[
+\boxed{
+X(0)=\bar x+\rho\bar X_1+\rho^2\bar X_2.
+}
+\]
+
+The scalar equation is exactly equivalent to the two-dimensional deterministic trajectory on the monotone descending branch; the only approximation in this stage is the outer initial value. If the initial value were exact, the inverse-flow continuation would reproduce the exact deterministic phase-plane curve up to the point where $g=1$ and $y$ ceases to be monotone.
+
+\subsection{Existence on the descending branch}
+Fix a compact region
+\[
+\mathcal D
+=\{(x,y):x\geq x_{\min}>0,\ y\geq0,\ g(x,y)\leq1-\gamma_0\}
+\]
+with $\gamma_0>0$. On $\mathcal D$ the right-hand side of the scalar equation is smooth in $x$ and continuous in $\ell$, with denominator bounded away from zero. Standard ODE existence, uniqueness, and continuous-dependence results therefore apply. In particular, an $O(\rho^3)$ initialization error remains $O(\rho^3)$ on any fixed $\ell$ interval contained in such a region, with a constant determined by the corresponding Lipschitz bound.
+
+The condition $g\leq1-\gamma_0$ is not required for numerical integration all the way to a practical handoff point; it is used here only to state a simple uniform continuous-dependence result. The inverse coordinate necessarily becomes singular at the exact trough $g=1$, because $y$ itself has a turning point there. The stochastic handoff is made before that turning point.
+
+\subsection{Why the nonlinear continuation is uniform in finite prevalence}
+Write
+\[
+g(x,y)=\gh(x)(1+s)^{-\psi},
+\qquad
+\gh(x)=\Rzero x^\eta,
+\qquad
+s=\frac yx.
+\]
+The nonlinear tail equation keeps $(1+s)^{-\psi}$ exactly. Consequently the construction does not require
+\[
+s=\frac yx\ll1
+\]
+during the deterministic continuation from $\bar y$ down to the stochastic overlap.
+
+This distinction matters when $\xf$ is small. Since
+\[
+\xf=z_f^{1/\eta},
+\]
+a moderate reduction of $\eta=1-\psi$ can make $\xf$ orders of magnitude smaller while leaving the transformed final size $z_f$ unchanged. A prevalence that is absolutely small can then still satisfy $y/\xf=O(1)$ or larger. The nonlinear continuation is defined without expanding in that ratio.
+
+At $\psi=0$,
+\[
+g(x,y)=\Rzero x
+\]
+exactly, so finite prevalence never modifies the per-infective transmission factor. For $\psi>0$, the correction is monotone:
+\[
+0<(1+s)^{-\psi}\leq1.
+\]
+
+\subsection{Alternative total-population representation}
+For structural interpretation define
+\[
+n=x+y,
+\qquad
+p=\frac xn.
+\]
+Then
+\[
+x=pn,
+\qquad
+y=(1-p)n,
+\qquad
+g=\Rzero p n^\eta.
+\]
+Adding the original equations gives
+\[
+\boxed{
+\dot n=\rho\hth(pn)-(1-p)n.
+}
+\]
+Using $p=x/n$ gives
+\[
+\boxed{
+\dot p
+=(1-p)
+\left[
+\frac{\rho\hth(pn)}{n}
++p\{1-\Rzero n^\eta\}
+\right].
+}
+\]
+Thus the population-size-dependent transmission appears only through $n^\eta$. The pointwise deterministic vector field has a well-defined limit as $\psi\to1^-$ ($\eta\to0^+$), where $n^\eta\to1$ for fixed $n>0$. This observation concerns the deterministic tail only; the low-prevalence saddle structure of the burnout problem is not uniform at $\psi=1$, as discussed later.
+
+\section{Deterministic-to-stochastic overlap}
+\label{sec:overlap}
+
+The nonlinear tail may be continued through a regime in which $y/x$ is not small. The branching approximation is introduced only after the trajectory reaches a region in which two separate feedback mechanisms are small.
+
+\subsection{Finite-prevalence transmission error}
+The exact per-infective birth rate is
+\[
+g=\gh(1+s)^{-\psi}.
+\]
+The relative finite-prevalence correction is
+\[
+1-\frac g{\gh}
+=1-(1+s)^{-\psi}.
+\]
+For $s\geq0$ and $0\leq\psi<1$, the mean-value theorem gives
+\[
+0\leq1-(1+s)^{-\psi}\leq\psi s.
+\]
+Therefore
+\[
+\boxed{
+\frac{|g-\gh|}{\gh}\leq\psi\frac yx.
+}
+\]
+The first overlap condition is consequently
+\[
+\boxed{s_h=\frac{y_h}{x_h}\ll1.}
+\]
+At $\psi=0$ this error vanishes identically, regardless of $s_h$.
+
+\subsection{Susceptible-feedback error}
+The susceptible equation is
+\[
+\dot x=\rho\hth(x)-g(x,y)y.
+\]
+The approximation used in the branching layer is
+\[
+\dot x\simeq\rho\hth(x).
+\]
+Its natural relative error is
+\[
+\boxed{
+d(x,y)=\frac{g(x,y)y}{\rho\hth(x)}.}
+\]
+Thus the second overlap condition is
+\[
+\boxed{d_h\ll1.}
+\]
+This condition is more precise than comparing $y$ with $\rho$ alone because it includes the local transmission factor and the local recruitment law.
+
+\subsection{Population-size condition}
+At handoff, the deterministic infectious fraction corresponds to
+\[
+m=Ky_h
+\]
+infectious individuals. To initialize the stochastic branching layer from a concentrated deterministic state one requires
+\[
+\boxed{Ky_h\gg1.}
+\]
+The three primary overlap requirements are therefore
+\[
+\boxed{
+Ky_h\gg1,
+\qquad
+\frac{y_h}{x_h}\ll1,
+\qquad
+\frac{g_hy_h}{\rho\hth(x_h)}\ll1.
+}
+\]
+The existence of a $y_h$ satisfying all three conditions is a substantive assumption. If no such level exists, the deterministic and branching descriptions do not possess a clean common overlap at that finite $K$.
+
+\section{Action identity and the nonlinear tail amplitude}
+\label{sec:action}
+
+\subsection{Action primitive}
+Define the action only through finite differences:
+\[
+\boxed{
+\Apsi(v)-\Apsi(u)
+=\int_u^v\frac{1-\Rzero z^\eta}{\hth(z)}\dd z.
+}
+\]
+Thus
+\[
+\Apsi'(x)=\frac{1-\gh(x)}{\hth(x)}.
+\]
+The action is increasing for $x<\xs$, stationary at $\xs$, and decreasing for $x>\xs$.
+
+\subsection{Exact drift identity}
+Define
+\[
+J(x,y)
+=\log y+\frac{\Apsi(x)}{\rho}.
+\]
+Along the full deterministic model,
+\[
+\frac{\dd}{\dd\sigma}\log y=g-1.
+\]
+Also
+\[
+\frac1\rho\frac{\dd}{\dd\sigma}\Apsi(x)
+=\frac{1-\gh}{\rho\hth(x)}\{\rho\hth(x)-gy\}
+=(1-\gh)-(1-\gh)d.
+\]
+Adding the two identities yields
+\[
+\boxed{
+\dot J
+=g-\gh-(1-\gh)d.
+}
+\]
+This is exact. No low-prevalence expansion has been made.
+
+The first term measures the finite-prevalence change in the infectious birth rate. The second term measures infectious feedback on susceptible recovery. In the common overlap both terms are small, and $J$ becomes an approximate invariant.
+
+\subsection{Effective tail amplitude}
+Subtract the constant $\Apsi(\xf)/\rho$ and exponentiate. Define
+\[
+\boxed{
+\CalC(y)
+=y\exp\left\{\frac{\Apsi(X(y))-\Apsi(\xf)}{\rho}\right\}.
+}
+\]
+Then
+\[
+\log\CalC
+=J-\frac{\Apsi(\xf)}\rho.
+\]
+Since $\dot\ell=1-g$ on the descending branch,
+\[
+\boxed{
+\frac{\dd}{\dd\ell}\log\CalC
+=\frac{g-\gh-(1-\gh)d}{1-g}.
+}
+\]
+This identity quantifies handoff dependence directly.
+
+For $s\geq0$,
+\[
+\gh-g
+=\gh\{1-(1+s)^{-\psi}\}
+\leq\psi\gh s.
+\]
+Therefore
+\[
+\boxed{
+\left|
+\frac{\dd}{\dd\ell}\log\CalC
+\right|
+\leq
+\frac{\psi\gh s+|1-\gh|d}{1-g}
+=: \epsA.
+}
+\]
+If $y_1>y_2$ are two handoff levels on the descending branch, corresponding to $\ell_1<\ell_2$, integration gives the rigorous bound
+\[
+\boxed{
+\left|
+\log\frac{\CalC(y_2)}{\CalC(y_1)}
+\right|
+\leq
+\int_{\ell_1}^{\ell_2}\epsA(\ell)\dd\ell.
+}
+\]
+Thus a plateau in $\CalC$ is not merely a numerical convenience; it is the direct signature that the action invariant has entered its overlap regime.
+
+\subsection{Admissible handoff}
+A practical handoff point $(x_h,y_h)$ on the nonlinear tail should satisfy
+\[
+\boxed{
+Ky_h\gg1,
+\qquad
+s_h\ll1,
+\qquad
+d_h\ll1,
+\qquad
+\varepsilon_{A,h}\ll1,
+\qquad
+g_h<1.
+}
+\]
+The first three conditions validate the deterministic-to-branching approximation. The $\epsA$ condition additionally ensures that the action amplitude is locally insensitive to the arbitrary handoff level. In computation, it is preferable to identify an interval of admissible levels and verify a plateau rather than to rely on one prescribed boundary.
+
+A traditional geometric-mean candidate,
+\[
+y_{\rm geo}=\sqrt{\frac{\rho h_*}{K}},
+\]
+may be used as an initial guess, but it is accepted only if the displayed overlap diagnostics are satisfied there.
+
+\section{Kendall branching layer}
+\label{sec:kendall}
+
+\subsection{Reduced stochastic dynamics after handoff}
+Inside the overlap, infectious feedback on $x$ is negligible to leading order, so the susceptible background follows
+\[
+\boxed{\dot x=\rho\hth(x).}
+\]
+The finite-prevalence correction to infectious transmission is also negligible, so each infectious individual evolves as a time-inhomogeneous linear birth--death lineage with
+\[
+\boxed{
+b(\sigma)=\Rzero x(\sigma)^\eta,
+\qquad
+d(\sigma)=1.}
+\]
+This is a branching approximation because lineages no longer interact through the susceptible equation at leading order.
+
+\subsection{Probabilistic status of the handoff}
+The preceding reduction is an asymptotic branching approximation. A stochastic weak-convergence theorem is not proved in this note. The conditions
+\[
+Ky_h\gg1,
+\qquad
+s_h\ll1,
+\qquad
+d_h\ll1
+\]
+have distinct roles: $Ky_h\gg1$ places the deterministic handoff above the few-particle scale, $s_h\ll1$ makes the finite-prevalence correction to the per-capita birth rate small, and $d_h\ll1$ makes infectious depletion negligible in the susceptible equation. Together they identify a deterministic-to-branching overlap in which the reduced birth--death description is asymptotically consistent with the deterministic drift. They do not, by themselves, constitute a pathwise coupling, a functional central-limit theorem, or a Kurtz-type weak-convergence result for the full density-dependent jump process. Establishing such a theorem would require specifying the underlying finite-$K$ Markov chain and a joint limit for $K$, $\rho$, and the handoff scale. The persistence formulas below should therefore be read as semi-analytical branching approximations conditional on this overlap.
+
+\subsection{One-lineage extinction probability}
+For a time-inhomogeneous birth--death process with one initial individual, Kendall's formula may be written
+\[
+q_1=\frac{\mathcal I}{1+\mathcal I},
+\]
+where
+\[
+\mathcal I
+=\int_0^\infty
+\exp\left\{-\int_0^t[b(u)-d(u)]\dd u\right\}d(t)\dd t.
+\]
+Here $d(t)=1$. Along the susceptible recovery path,
+\[
+\dd\sigma=\frac{\dd X}{\rho\hth(X)}.
+\]
+Moreover,
+\[
+\int_{0}^{\sigma(X)}[b(u)-d(u)]\dd u
+=\int_{x_h}^{X}
+\frac{\Rzero z^\eta-1}{\rho\hth(z)}\dd z
+=-\frac{\Apsi(X)-\Apsi(x_h)}\rho.
+\]
+Therefore
+\[
+\boxed{
+\mathcal I(x_h)
+=\int_{x_h}^{1}
+\frac1{\rho\hth(X)}
+\exp\left\{
+\frac{\Apsi(X)-\Apsi(x_h)}\rho
+\right\}\dd X.
+}
+\]
+The upper endpoint is integrable. As $X\uparrow1$, $\hth(X)\sim1-X$ and
+\[
+\Apsi(X)=A_1+(\Rzero-1)\log(1-X)+o(1),
+\]
+more precisely the exponential factor contributes $(1-X)^{(\Rzero-1)/\rho}$, so the full integrand behaves as
+\[
+\rho^{-1}(1-X)^{(\Rzero-1)/\rho-1},
+\]
+which is integrable for $\Rzero>1$.
+
+\subsection{Many infectives at handoff}
+With
+\[
+m=Ky_h
+\]
+approximately independent lineages, the burnout probability is
+\[
+\boxed{
+P_{\rm burn\mid est}
+\simeq
+\left(\frac{\mathcal I(x_h)}{1+\mathcal I(x_h)}\right)^{Ky_h}.
+}
+\]
+Hence
+\[
+\boxed{
+P_{\rm persist\mid est}
+\simeq
+1-
+\left(\frac{\mathcal I(x_h)}{1+\mathcal I(x_h)}\right)^{Ky_h}.
+}
+\]
+For numerical stability define
+\[
+\boxed{
+B
+=-\log P_{\rm burn\mid est}
+=Ky_h\log\left(1+\frac1{\mathcal I(x_h)}\right),
+}
+\]
+so
+\[
+P_{\rm persist\mid est}=1-e^{-B}.
+\]
+
+If the epidemic starts from one infective in an otherwise susceptible population, the classical early establishment probability is approximately
+\[
+1-\frac1{\Rzero}.
+\]
+The unconditional persistence probability through the first trough is therefore
+\[
+\boxed{
+P_{\rm persist,uncond}
+\simeq
+\left(1-\frac1{\Rzero}\right)
+P_{\rm persist\mid est}.
+}
+\]
+
+\section{Laplace reduction and handoff-independent leading form}
+\label{sec:laplace}
+
+\subsection{Interior action saddle}
+The action derivative is
+\[
+\Apsi'(x)=\frac{1-\Rzero x^\eta}{\hth(x)}.
+\]
+Hence the unique interior stationary point is
+\[
+\boxed{\xs=\Rzero^{-1/\eta}.}
+\]
+At $x=\xs$ the numerator vanishes, and differentiation gives
+\[
+\boxed{
+\Apsi''(\xs)
+=-\frac{\eta}{\xs h_*},
+\qquad
+h_*=\hth(\xs).
+}
+\]
+Thus $\xs$ is a nondegenerate maximum for fixed $\eta>0$.
+
+Assume the lower endpoint is separated from the saddle by more than the Gaussian width,
+\[
+\xs-x_h\gg\sqrt\rho,
+\]
+and define
+\[
+\Lambda_h
+=\frac{\Apsi(\xs)-\Apsi(x_h)}\rho.
+\]
+For $\Lambda_h\gg1$, Laplace's method gives
+\[
+\boxed{
+\mathcal I(x_h)
+\sim
+\exp(\Lambda_h)
+\sqrt{\frac{2\pi\xs}{\eta\rho h_*}}.
+}
+\]
+
+\subsection{Leading burnout exponent}
+When $\mathcal I\gg1$,
+\[
+\log(1+1/\mathcal I)
+=\frac1{\mathcal I}+O(\mathcal I^{-2}).
+\]
+Therefore
+\[
+B
+\sim
+Ky_h
+\exp\left\{-\frac{\Apsi(\xs)-\Apsi(x_h)}\rho\right\}
+\sqrt{\frac{\eta\rho h_*}{2\pi\xs}}.
+\]
+Insert
+\[
+y_h
+\exp\left\{\frac{\Apsi(x_h)-\Apsi(\xf)}\rho\right\}
+=\mathcal C_{\rho,h}.
+\]
+With
+\[
+\Delta A_f=\Apsi(\xs)-\Apsi(\xf),
+\]
+we obtain
+\[
+\boxed{
+B_{\rm NL}
+\sim
+K\mathcal C_{\rho,h}
+\sqrt{\frac{\eta\rho h_*}{2\pi\xs}}
+\exp\left(-\frac{\Delta A_f}{\rho}\right).
+}
+\]
+If $\mathcal C_{\rho,h}$ lies on an action plateau, the leading expression is independent of the arbitrary handoff level up to the integral plateau error derived in Section~\ref{sec:action}.
+
+\subsection{Next saddle coefficient}
+Write the Laplace expansion as
+\[
+\mathcal I(x_h)
+\sim
+\exp(\Lambda_h)
+\sqrt{\frac{2\pi\xs}{\eta\rho h_*}}
+\left(1+\rho c_L+O(\rho^2)\right).
+\]
+For $h=h_\theta$, the coefficient is
+\[
+\boxed{
+ c_L=
+\frac{
+(2\eta^2-\eta-1)h_*^2
++(\eta-1)\xs h_*h_*'
++2\xs^2(h_*')^2
+-3\xs^2h_*h_*''
+}
+{24\eta h_*\xs}.
+}
+\]
+The derivatives and term-by-term algebra reducing the general Laplace coefficient to this closed form are displayed in Section~\ref{sec:laplacedetail}.
+Consequently,
+\[
+\boxed{
+B_{\rm NL,next}
+\sim
+B_{\rm NL}\left(1-\rho c_L+O(\rho^2)+O(\mathcal I^{-1})\right).
+}
+\]
+An exponentialized form,
+\[
+B_{\rm NL,next}
+\approx B_{\rm NL}e^{-\rho c_L},
+\]
+is equivalent through relative order $O(\rho)$.
+
+\section{Asymptotic reduction of the nonlinear tail}
+\label{sec:reduction}
+
+The nonlinear tail equation is the primary deterministic bridge. In the stronger regime where the trajectory also becomes local relative to $\xf$, it reduces to the familiar logarithmic corner structure. This section derives that reduction and identifies the asymptotic meaning of the action amplitude.
+
+\subsection{Local variables}
+Let
+\[
+x=\xf+\xi,
+\qquad
+y\to0,
+\qquad
+\frac{|\xi|+y}{\xf}\ll1.
+\]
+At the anchor,
+\[
+q=\Rzero\xf^\eta,
+\qquad
+\delta=1-q>0.
+\]
+Also define
+\[
+h_f=\hth(\xf),
+\qquad
+\boxed{a=\frac{h_f}{\delta}},
+\qquad
+\boxed{b=\frac q\delta}.
+\]
+The zero-recruitment inverse branch satisfies
+\[
+X_0(y)=\xf+by+O(y^2),
+\]
+because
+\[
+X_0'(0)=\frac1{\Fpsi'(\xf)}=\frac q\delta=b.
+\]
+
+For sufficiently small relative displacement,
+\[
+g(x,y)=q+O\left(\frac{|\xi|+y}{\xf}\right).
+\]
+The logarithmic-tail equation therefore has leading balance
+\[
+\frac{\dd X}{\dd\ell}
+=\frac{\rho h_f-qy}{\delta}+\text{higher-order terms}.
+\]
+The $qy$ contribution reproduces the zero-recruitment displacement $by$, while the recruitment term integrates to a logarithm. Hence
+\[
+\boxed{
+X(y;\rho)
+=\xf+by+\rho a\log\frac C y+\text{higher-order terms},
+}
+\]
+where $C>0$ is fixed by matching to the regular outer trajectory.
+
+\subsection{Action reduction}
+At the anchor,
+\[
+\Apsi'(\xf)
+=\frac{1-q}{h_f}
+=\frac1a.
+\]
+Therefore, to first order,
+\[
+\Apsi(X)-\Apsi(\xf)
+=\frac{X-\xf}{a}+\cdots
+=\rho\log\frac C y+\frac ba y+\cdots.
+\]
+Thus
+\[
+\CalC(y)
+=y\exp\left\{\frac{\Apsi(X)-\Apsi(\xf)}\rho\right\}
+=C\exp\left\{\frac{b}{a}\frac y\rho+\cdots\right\}.
+\]
+In the strict overlap
+\[
+y\ll\rho,
+\]
+we obtain
+\[
+\boxed{\CalC(y)\to C.}
+\]
+Thus the logarithmic matching amplitude $C$ is the leading small-$\rho$ limit of the nonlinear action plateau.
+
+\subsection{Second-order interpretation}
+The local inverse expansion may be written
+\[
+X(y;\rho)
+=X_0(y)+\rho X_1(y)+\rho^2X_2(y)+\cdots,
+\]
+with
+\[
+X_1(y)=a\log\frac C y+O(y\log y).
+\]
+Define
+\[
+r=\frac{\eta q}{\xf},
+\qquad
+c=\delta h_f'+rh_f,
+\qquad
+\kappa=\frac{h_fc}{2\delta^3}.
+\]
+The second inverse coefficient has the local form
+\[
+X_2(y)=\kappa\log^2\frac C y+D+O(y\log^2y),
+\]
+where $D$ is a global finite part fixed by the regular trajectory.
+
+The action derivatives at $\xf$ are
+\[
+\Apsi'(\xf)=\frac1a,
+\qquad
+\Apsi''(\xf)=-\frac{c}{h_f^2}.
+\]
+The quadratic logarithms cancel because
+\[
+\frac\kappa a
+=\frac{c}{2\delta^2},
+\qquad
+\frac12\Apsi''(\xf)a^2
+=-\frac{c}{2\delta^2}.
+\]
+Consequently, in the stricter overlap in which explicit $y$-dependent quadratic terms are negligible,
+\[
+\boxed{
+\Apsi(X)-\Apsi(\xf)
+=\rho\log\frac C y
++\rho^2\frac Da
++o(\rho^2).
+}
+\]
+It follows that
+\[
+\boxed{
+\CalC
+=C\exp\left(\rho\frac Da+o(\rho)\right).
+}
+\]
+Thus the nonlinear plateau contains the first and second logarithmic matching constants as the first two terms in its small-$\rho$ expansion, while retaining the finite-prevalence tail nonlinearly when that local expansion is not well ordered.
+
+\section{Special parameter limits}
+\label{sec:limits}
+
+\subsection{The case \texorpdfstring{$\psi=0$}{psi=0}}
+When $\psi=0$, $\eta=1$ and
+\[
+g(x,y)=\Rzero x
+\]
+is independent of $y$. The zero-recruitment geometry reduces to
+\[
+n_0(x)=1+\frac1{\Rzero}\log x,
+\qquad
+\xs=\frac1{\Rzero}.
+\]
+The nonlinear tail equation becomes
+\[
+\boxed{
+\frac{\dd X}{\dd\ell}
+=\frac{\rho\hth(X)-\Rzero Xy}{1-\Rzero X}.
+}
+\]
+The action-drift identity simplifies to
+\[
+\boxed{
+\dot J=-(1-\Rzero x)d.
+}
+\]
+The entire finite-prevalence transmission term $g-\gh$ vanishes exactly. Correspondingly,
+\[
+\epsA
+=\frac{|1-\Rzero x|d}{1-\Rzero x}=d
+\]
+on the descending branch. This is the structural reason that the $\psi=0$ case possesses a particularly broad action overlap: only susceptible feedback must become small.
+
+In the local limit, the nonlinear tail reduces to the standard $\psi=0$ logarithmic corner and the plateau amplitude reduces to the corresponding matching constant $C_\theta$.
+
+\subsection{Fixed \texorpdfstring{$0<\psi<1$}{0<psi<1}}
+For positive $\psi$ the finite-prevalence correction is present:
+\[
+g=\gh(1+s)^{-\psi}.
+\]
+No assumption on $s$ is required during the nonlinear deterministic tail. The small-$s$ assumption enters only at the stochastic handoff. Consequently a trajectory may pass through a substantial interval with $y/x=O(1)$ and still be propagated deterministically without a transmission Taylor expansion.
+
+\subsection{The endpoint \texorpdfstring{$\psi\to1^-$}{psi to 1-}}
+For fixed positive $(x,y)$, the exact deterministic transmission factor has the finite limit
+\[
+g(x,y)
+=\Rzero x(x+y)^{-\psi}
+\longrightarrow
+\Rzero\frac{x}{x+y}.
+\]
+Likewise, in $(n,p)$ coordinates,
+\[
+g=\Rzero pn^\eta\to\Rzero p.
+\]
+Thus the nonlinear deterministic tail equation itself has a regular pointwise limit.
+
+The full burnout asymptotics are nevertheless nonuniform because
+\[
+\xs=\Rzero^{-1/\eta}\to0
+\qquad(\eta\to0^+),
+\]
+and
+\[
+\xf=z_f^{1/\eta}\to0.
+\]
+At exactly $\psi=1$, the low-prevalence rate for fixed $x>0$ is
+\[
+\gh(x)=\Rzero,
+\]
+so there is no positive interior solution of $\gh(x)=1$ when $\Rzero>1$. The interior Laplace saddle therefore disappears into the boundary. A theory uniform all the way to $\psi=1$ would require a separate joint scaling in $\eta$ and the small host fraction. The present theory is consequently stated for fixed $0\leq\psi<1$.
+
+\section{Validity conditions and identifiable failure modes}
+
+\subsection{Regular outer validity}
+The outer expansion is used only at a fixed point $\bar x$ away from the zero-recruitment endpoint and the low-prevalence saddle. It requires
+\[
+\rho\ll1
+\]
+and bounded outer coefficient corrections, for example
+\[
+|\rho Y_1(\bar x)|\ll\bar y,
+\qquad
+|\rho^2Y_2(\bar x)|\ll|\rho Y_1(\bar x)|
+\]
+when a strict second-order hierarchy is desired.
+
+\subsection{Descending inverse-flow validity}
+The scalar nonlinear continuation requires
+\[
+y>0,
+\qquad
+g<1,
+\]
+so that $y$ is monotone decreasing. It is stopped before the first trough $g=1$. No condition $y/x\ll1$ is imposed during this stage.
+
+\subsection{Deterministic-to-stochastic overlap}
+A clean handoff requires a nonempty interval on which
+\[
+Ky\gg1,
+\qquad
+s=\frac yx\ll1,
+\qquad
+d=\frac{gy}{\rho\hth(x)}\ll1.
+\]
+For action-plateau independence one also requires the accumulated drift to be small:
+\[
+\int\epsA\dd\ell\ll1
+\]
+over the range of candidate handoff levels.
+
+Failure to find such an interval is not a failure of the nonlinear deterministic tail. It indicates that, at the specified finite $K$, stochasticity becomes important before the deterministic trajectory enters a clean low-prevalence, recruitment-dominated overlap.
+
+\subsection{Near-threshold loss of saddle separation}
+Laplace's method requires
+\[
+\Lambda_h
+=\frac{\Apsi(\xs)-\Apsi(x_h)}\rho\gg1,
+\]
+and, equivalently in the fixed-parameter regime,
+\[
+\xs-x_h\gg\sqrt\rho.
+\]
+If the handoff lies too close to the saddle, the exact Kendall integral should be retained.
+
+\subsection{Large \texorpdfstring{$R_0$}{R0} and positive \texorpdfstring{$\psi$}{psi}}
+At fixed $\Rzero$, $z_f$ is independent of $\psi$, while
+\[
+\xf=z_f^{1/(1-\psi)}.
+\]
+Thus positive $\psi$ can make the post-wave susceptible fraction extremely small. The nonlinear tail remains applicable because it retains $(1+y/x)^{-\psi}$ exactly. However, the branching handoff still requires eventual entry into $y/x\ll1$. At finite $K$ this may force the handoff to very low prevalence, potentially conflicting with $Ky\gg1$. The relevant diagnostic is therefore the existence of the overlap itself, not the smallness of $\xf$ alone.
+
+\subsection{The singular endpoint \texorpdfstring{$\psi=1$}{psi=1}}
+The deterministic inverse-flow representation has a limit at $\psi=1$, but the interior threshold $\xs$ is lost. The Kendall/Laplace theory derived here therefore does not extend uniformly to $\psi=1$.
+
+\section{Computational workflow}
+\label{sec:workflow}
+
+\subsection{Precomputation for fixed \texorpdfstring{$(R_0,\theta,\psi)$}{(R0,theta,psi)}}
+\begin{enumerate}
+\item Set
+\[
+\eta=1-\psi,
+\qquad
+\hth(x)=(1-x)x^\theta.
+\]
+\item Solve
+\[
+z_f=1+\frac1{\Rzero}\log z_f
+\]
+for the nontrivial root $z_f\in(0,1)$ and set
+\[
+\xf=z_f^{1/\eta}.
+\]
+\item Compute
+\[
+\xs=\Rzero^{-1/\eta},
+\qquad
+h_*=\hth(\xs),
+\qquad
+\Delta A_f=\int_{\xf}^{\xs}
+\frac{1-\Rzero z^\eta}{\hth(z)}\dd z.
+\]
+\item Choose several test values of $\bar x\in(\xf,\xs)$ away from the endpoints and compute
+\[
+\bar y=\Fpsi(\bar x).
+\]
+\item Integrate the regular outer equations for $Y_1,Y_2$ from $x=1$ to $\bar x$ and convert to $\bar X_1,\bar X_2$.
+\end{enumerate}
+
+\subsection{Loop over \texorpdfstring{$\rho$}{rho}}
+For each $\rho$:
+\begin{enumerate}
+\item Initialize
+\[
+X(0)=\bar x+\rho\bar X_1+\rho^2\bar X_2.
+\]
+\item Integrate
+\[
+\frac{\dd X}{\dd\ell}
+=\frac{\rho\hth(X)-g(X,y)y}{1-g(X,y)},
+\qquad
+y=\bar y e^{-\ell},
+\]
+down the descending tail.
+\item Along the trajectory record
+\[
+s=\frac yX,
+\qquad
+d=\frac{gy}{\rho\hth(X)},
+\qquad
+\epsA=\frac{\psi\gh s+|1-\gh|d}{1-g},
+\]
+\[
+\CalC(y)=y\exp\left\{\frac{\Apsi(X)-\Apsi(\xf)}\rho\right\}.
+\]
+\item Verify that results are insensitive to the chosen outer initialization point $\bar x$.
+\end{enumerate}
+
+\subsection{Loop over \texorpdfstring{$K$}{K}}
+For each population size $K$:
+\begin{enumerate}
+\item Find candidate handoff points satisfying
+\[
+Ky\gg1,
+\qquad
+s\ll1,
+\qquad
+d\ll1,
+\qquad
+\epsA\ll1.
+\]
+\item Require $\CalC(y)$ to be approximately flat across a range of such points. Use the plateau range to quantify deterministic handoff sensitivity.
+\item For a representative handoff $(x_h,y_h)$ compute the exact Kendall integral
+\[
+\mathcal I(x_h)
+=\int_{x_h}^{1}
+\frac1{\rho\hth(X)}
+\exp\left\{\frac{\Apsi(X)-\Apsi(x_h)}\rho\right\}\dd X.
+\]
+\item Compute
+\[
+B=Ky_h\log(1+1/\mathcal I),
+\qquad
+P_{\rm persist\mid est}=1-e^{-B}.
+\]
+\item If $\Lambda_h\gg1$, also compute
+\[
+B_{\rm NL}
+=K\mathcal C_{\rho,h}
+\sqrt{\frac{\eta\rho h_*}{2\pi\xs}}
+\exp\left(-\frac{\Delta A_f}{\rho}\right)
+\]
+as the fully asymptotic predictor.
+\end{enumerate}
+
+\section{Verification targets}
+
+A production implementation should retain the following checks.
+
+\subsection{Zero-recruitment checks}
+Verify numerically that
+\[
+\Fpsi(\xf)=0,
+\qquad
+\xf^\eta=z_f,
+\qquad
+z_f=1+\frac1{\Rzero}\log z_f,
+\qquad
+\xs=\Rzero^{-1/\eta}.
+\]
+
+\subsection{Outer-initialization independence}
+Repeat the calculation for several $\bar x$ values. The nonlinear tail and final persistence prediction should agree to the order of the regular outer truncation.
+
+\subsection{Exact deterministic regression}
+Because the nonlinear inverse flow is mathematically equivalent to the two-dimensional deterministic ODE on the descending branch, compare $X(y)$ against a direct deterministic trajectory. Any discrepancy larger than the expected outer initialization error indicates an implementation error.
+
+\subsection{Action plateau}
+Plot
+\[
+\log\CalC(y)
+=\log y+\frac{\Apsi(X(y))-\Apsi(\xf)}\rho
+\]
+against $\ell=\log(\bar y/y)$ together with $s$, $d$, and $\epsA$. The plateau should emerge where the overlap diagnostics become small.
+
+\subsection{Handoff invariance}
+Evaluate the exact Kendall prediction at several handoff points inside the admissible plateau. The variation is a direct finite-parameter measure of handoff error.
+
+\subsection{\texorpdfstring{$\psi=0$}{psi=0} regression}
+At $\psi=0$, verify
+\[
+g=\Rzero x
+\]
+for all $y$ and confirm that the finite-prevalence term in the action drift is identically zero. The nonlinear theory should reduce to the corresponding $\psi=0$ prediction as $\rho\to0$.
+
+\subsection{Positive-\texorpdfstring{$\psi$}{psi} stress test}
+For large $\Rzero$ and positive $\psi$, record
+\[
+\frac yx
+\]
+along the tail. The nonlinear continuation should remain stable through regions where this ratio is $O(1)$, while the stochastic handoff should be delayed until a genuine low-prevalence overlap is reached.
+
+\section{Recruitment-law derivatives}
+For
+\[
+\hth(x)=(1-x)x^\theta,
+\]
+we have
+\[
+\boxed{
+\hth'(x)=x^{\theta-1}\{\theta-(\theta+1)x\}.
+}
+\]
+For $x>0$,
+\[
+\boxed{
+\hth''(x)
+=\theta x^{\theta-2}\{(\theta-1)-(\theta+1)x\}.
+}
+\]
+These formulas enter the next Laplace coefficient and local asymptotic reductions.
+
+\section{Detailed derivation of the regular outer coefficient equations}
+\label{sec:outerdetail}
+
+The compact formulas in Section~\ref{sec:outer} follow most transparently from the perturbed zero-recruitment invariant. This derivation is included so that the regular initialization is completely reproducible.
+
+\subsection{Exact drift of the zero-recruitment invariant}
+Recall
+\[
+H(x,y)=n^\eta-\frac\eta{\Rzero}\log x,
+\qquad n=x+y.
+\]
+For the full system,
+\[
+\dot n=\rho\hth(x)-y.
+\]
+Hence
+\[
+\dot H
+=\eta n^{-\psi}(\rho\hth-y)
+-\frac\eta{\Rzero x}(\rho\hth-gy).
+\]
+Using
+\[
+\frac{g}{\Rzero x}=n^{-\psi},
+\]
+the two terms proportional to $y$ cancel exactly, leaving
+\[
+\boxed{
+\dot H
+=\eta\rho\hth(x)
+\left[n^{-\psi}-\frac1{\Rzero x}\right].
+}
+\]
+Dividing by
+\[
+\dot x=\rho\hth(x)-\Rzero xy n^{-\psi}
+\]
+gives the exact phase derivative
+\[
+\boxed{
+\frac{\dd H}{\dd x}
+=
+\eta\rho\hth(x)
+\frac{n^{-\psi}-1/(\Rzero x)}
+{\rho\hth(x)-\Rzero xy n^{-\psi}}.
+}
+\]
+
+\subsection{Expansion of the invariant itself}
+On the regular outer interval set
+\[
+y=\Fpsi+\rho Y_1+\rho^2Y_2+O(\rho^3),
+\qquad
+n=n_0+\rho Y_1+\rho^2Y_2+O(\rho^3).
+\]
+Taylor expansion of $n^\eta$ gives
+\[
+\begin{aligned}
+n^\eta
+={}&n_0^\eta
++\eta n_0^{-\psi}(\rho Y_1+\rho^2Y_2)
++\frac{\eta(\eta-1)}2n_0^{\eta-2}\rho^2Y_1^2
++O(\rho^3)\\
+={}&n_0^\eta
++\eta\rho n_0^{-\psi}Y_1
++\eta\rho^2
+\left[n_0^{-\psi}Y_2-\frac\psi2n_0^{-\psi-1}Y_1^2\right]
++O(\rho^3),
+\end{aligned}
+\]
+because $\eta-1=-\psi$. Since
+\[
+n_0^\eta-\frac\eta{\Rzero}\log x=1
+\]
+on the zero-recruitment orbit, define
+\[
+W_1=n_0^{-\psi}Y_1,
+\qquad
+W_2=n_0^{-\psi}Y_2-\frac\psi2n_0^{-\psi-1}Y_1^2.
+\]
+Then
+\[
+\boxed{
+H=1+\eta\rho W_1+\eta\rho^2W_2+O(\rho^3),
+}
+\]
+and therefore
+\[
+\frac{\dd H}{\dd x}
+=\eta\rho W_1'+\eta\rho^2W_2'+O(\rho^3).
+\]
+
+\subsection{First outer coefficient}
+Write
+\[
+N_0=n_0^{-\psi},
+\qquad
+B_0=N_0-\frac1{\Rzero x},
+\qquad
+A_0=\Rzero x\Fpsi N_0.
+\]
+At leading order in the exact formula for $H_x$,
+\[
+\frac1{\eta\rho}\frac{\dd H}{\dd x}
+=\hth(x)\frac{B_0}{-A_0}+O(\rho).
+\]
+Now
+\[
+B_0
+=\frac{\Rzero x-n_0^\psi}{\Rzero x n_0^\psi},
+\qquad
+A_0=\frac{\Rzero x\Fpsi}{n_0^\psi}.
+\]
+Thus
+\[
+\hth\frac{B_0}{-A_0}
+=
+\frac{\hth(n_0^\psi-\Rzero x)}{\Rzero^2x^2\Fpsi}.
+\]
+Using
+\[
+\Fpsi'(x)=\frac{n_0^\psi}{\Rzero x}-1
+=\frac{n_0^\psi-\Rzero x}{\Rzero x},
+\]
+we obtain
+\[
+\boxed{
+W_1'
+=\frac{\hth(x)\Fpsi'(x)}{\Rzero x\Fpsi(x)}.
+}
+\]
+
+\subsection{Second outer coefficient}
+To one further order,
+\[
+n^{-\psi}=N_0+\rho N_1+O(\rho^2),
+\qquad
+N_1=-\psi n_0^{-\psi-1}Y_1.
+\]
+Also
+\[
+\Rzero xy n^{-\psi}
+=A_0+\rho A_1+O(\rho^2),
+\]
+with
+\[
+A_1
+=\Rzero x\{Y_1N_0+\Fpsi N_1\}
+=\Rzero xN_0Y_1
+\left(1-\psi\frac{\Fpsi}{n_0}\right).
+\]
+The numerator factor is
+\[
+n^{-\psi}-\frac1{\Rzero x}
+=B_0+\rho N_1+O(\rho^2),
+\]
+while the denominator is
+\[
+\rho\hth-\Rzero xy n^{-\psi}
+=-A_0+\rho(\hth-A_1)+O(\rho^2).
+\]
+Therefore
+\[
+\frac1{-A_0+\rho(\hth-A_1)}
+=-\frac1{A_0}
+\left[1+\rho\frac{\hth-A_1}{A_0}\right]
++O(\rho^2).
+\]
+Multiplication gives
+\[
+W_2'
+=-\frac{\hth}{A_0}
+\left[
+N_1+B_0\frac{\hth-A_1}{A_0}
+\right].
+\]
+Substituting $A_0,A_1,B_0,N_1$ and simplifying yields
+\[
+\boxed{
+\begin{aligned}
+W_2'={}&
+\frac{\hth(x)}{\Rzero^2x^2\Fpsi(x)^2}
+\left[
+\psi n_0(x)^{\psi-1}\Fpsi(x)
+-\{n_0(x)^\psi-\Rzero x\}
+\right]Y_1(x)\\
+&+\frac{\hth(x)^2n_0(x)^\psi\{n_0(x)^\psi-\Rzero x\}}
+{\Rzero^3x^3\Fpsi(x)^2}.
+\end{aligned}
+}
+\]
+Finally,
+\[
+Y_1=n_0^\psi W_1,
+\qquad
+Y_2=n_0^\psi W_2+\frac\psi{2n_0}Y_1^2,
+\]
+which completes the regular outer derivation.
+
+\section{Detailed local inverse hierarchy and finite-part constants}
+\label{sec:localdetail}
+
+The nonlinear tail does not require a local expansion about $\xf$. Nevertheless, the local hierarchy is useful because it proves the reduction stated in Section~\ref{sec:reduction} and identifies the asymptotic coefficients contained in the plateau amplitude.
+
+\subsection{Exact inverse-flow hierarchy}
+Write
+\[
+\frac{\dd x}{\dd y}
+=\Phi(x,y)+\rho\Theta(x,y),
+\]
+where
+\[
+\Phi(x,y)=-\frac{g(x,y)}{g(x,y)-1},
+\qquad
+\Theta(x,y)=\frac{\hth(x)}{\{g(x,y)-1\}y}.
+\]
+At fixed $y$, expand
+\[
+X(y;\rho)=X_0(y)+\rho X_1(y)+\rho^2X_2(y)+O(\rho^3).
+\]
+Taylor expansion of the right-hand side about $X_0$ gives
+\[
+\begin{aligned}
+\Phi(X,y)+\rho\Theta(X,y)
+={}&\Phi(X_0,y)\\
+&+\rho\{\Phi_x(X_0,y)X_1+\Theta(X_0,y)\}\\
+&+\rho^2\left\{
+\Phi_x(X_0,y)X_2
++\frac12\Phi_{xx}(X_0,y)X_1^2
++\Theta_x(X_0,y)X_1
+\right\}
++O(\rho^3).
+\end{aligned}
+\]
+Equating coefficients gives
+\[
+\boxed{X_0'=\Phi(X_0,y),}
+\]
+\[
+\boxed{X_1'=\Phi_x(X_0,y)X_1+\Theta(X_0,y),}
+\]
+\[
+\boxed{
+X_2'=\Phi_x(X_0,y)X_2
++\frac12\Phi_{xx}(X_0,y)X_1^2
++\Theta_x(X_0,y)X_1.
+}
+\]
+The leading solution is the inverse zero-recruitment orbit,
+\[
+\Fpsi(X_0(y))=y.
+\]
+
+\subsection{Analytic normal form at the anchor}
+Define
+\[
+\Psi(x,y)=\frac{\hth(x)}{g(x,y)-1}.
+\]
+Then
+\[
+\Theta=\frac\Psi y,
+\qquad
+\Theta_x=\frac{\Psi_x}{y}.
+\]
+At $(\xf,0)$,
+\[
+g(\xf,0)=q<1,
+\]
+so $g-1$ is nonzero and $\Phi,\Psi$ are analytic in a neighborhood of the anchor. Because
+\[
+\Fpsi'(\xf)=\frac\delta q>0,
+\]
+the inverse-function theorem gives an analytic $X_0(y)$ near $y=0$.
+
+Define
+\[
+\varphi(y)=\Phi_x(X_0(y),y),
+\qquad
+\chi(y)=\frac12\Phi_{xx}(X_0(y),y),
+\]
+\[
+\widetilde\Psi(y)=\Psi(X_0(y),y),
+\qquad
+\omega(y)=\Psi_x(X_0(y),y).
+\]
+Then
+\[
+\boxed{
+X_1'=\varphi X_1+\frac{\widetilde\Psi}{y},
+}
+\]
+\[
+\boxed{
+X_2'=\varphi X_2+\chi X_1^2+\frac\omega yX_1.
+}
+\]
+All four coefficient functions are analytic at $y=0$.
+
+The required local values follow directly from
+\[
+g_x=g\left(\frac1x-\frac\psi{x+y}\right).
+\]
+At the anchor,
+\[
+g_x(\xf,0)=\frac{\eta q}{\xf}=:r.
+\]
+Since
+\[
+\Phi_x=\frac{g_x}{(g-1)^2},
+\]
+we have
+\[
+\boxed{\varphi(0)=\frac r{\delta^2}.}
+\]
+Also
+\[
+\boxed{\widetilde\Psi(0)=-\frac{h_f}{\delta}=-a.}
+\]
+Differentiating $\Psi$ gives
+\[
+\Psi_x
+=\frac{h'(g-1)-hg_x}{(g-1)^2}.
+\]
+Therefore
+\[
+\boxed{
+\omega(0)
+=-\frac{\delta h_f'+rh_f}{\delta^2}
+=-\frac c{\delta^2}.
+}
+\]
+
+\subsection{First coefficient and the logarithmic amplitude}
+Let
+\[
+E(y)=\exp\left\{\int_0^y\varphi(t)\dd t\right\}.
+\]
+Then $E(0)=1$ and
+\[
+\left(\frac{X_1}{E}\right)'
+=\frac{\widetilde\Psi(y)}{E(y)y}.
+\]
+Set
+\[
+\mu(y)=\frac{\widetilde\Psi(y)}{E(y)}.
+\]
+Because $\mu$ is analytic and $\mu(0)=-a$,
+\[
+\frac{\mu(y)}y
+=-\frac ay+\frac{\mu(y)+a}{y},
+\]
+and the second term is regular at zero. Integration therefore gives
+\[
+\frac{X_1(y)}{E(y)}
+=-a\log y+C_1+O(y).
+\]
+Since $E(y)=1+O(y)$,
+\[
+X_1(y)=-a\log y+C_1+O(y\log y).
+\]
+Writing
+\[
+C_1=a\log C
+\]
+defines the positive global matching amplitude $C$ and gives
+\[
+\boxed{
+X_1(y)=a\log\frac C y+O(y\log y).
+}
+\]
+Equivalently,
+\[
+\boxed{
+a\log C
+=\lim_{y\downarrow0}\{X_1(y)+a\log y\}.}
+\]
+
+\subsection{Second coefficient and the finite constant}
+The second equation is a linear ODE in $X_2$:
+\[
+X_2'-\varphi X_2
+=\chi X_1^2+\frac\omega yX_1.
+\]
+Using the same integrating factor,
+\[
+\boxed{
+\left(\frac{X_2}{E}\right)'
+=\frac{\chi X_1^2}{E}
++\frac{\omega X_1}{Ey}.
+}
+\]
+Since
+\[
+X_1=aL+O(yL),
+\qquad
+L=\log\frac C y,
+\]
+the first forcing term is $O(L^2)$ and is integrable at zero. The only nonintegrable contribution comes from the second term:
+\[
+\frac{\omega X_1}{Ey}
+=-\frac{ac}{\delta^2}\frac L y+O(L).
+\]
+Define
+\[
+\boxed{
+\kappa=\frac{ac}{2\delta^2}
+=\frac{h_fc}{2\delta^3}.
+}
+\]
+Because
+\[
+\frac{\dd}{\dd y}(\kappa L^2)
+=-\frac{2\kappa L}{y}
+=-\frac{ac}{\delta^2}\frac L y,
+\]
+the complete nonintegrable singularity is the derivative of $\kappa L^2$. Hence
+\[
+\boxed{
+X_2(y)=\kappa L^2+D+O(yL^2),
+}
+\]
+where
+\[
+\boxed{
+D=\lim_{y\downarrow0}\left\{X_2(y)-\kappa\log^2\frac C y\right\}.
+}
+\]
+No independent single-log constant occurs at this order: the coefficient of the possible single logarithm is tied to the first-order finite part through the same singular forcing.
+
+For numerical evaluation define
+\[
+Z_1=X_1+a\log y,
+\qquad
+Z_2=X_2-\kappa\log^2\frac C y.
+\]
+Their derivatives are integrable at zero, so for any regular $\bar y>0$,
+\[
+\boxed{
+Z_j(0^+)=Z_j(\bar y)-\int_0^{\bar y}Z_j'(y)\dd y,
+\qquad j=1,2.
+}
+\]
+Thus $C$ and $D$ are global finite parts determined by convergent one-dimensional quadratures.
+
+\subsection{Action cancellation at second order}
+At the anchor,
+\[
+\Apsi'(\xf)=\frac1a.
+\]
+Differentiating once more and using $\gh'(\xf)=r$ gives
+\[
+\boxed{
+\Apsi''(\xf)=-\frac c{h_f^2}.
+}
+\]
+In the strict local overlap, the logarithmic part of the displacement is
+\[
+X-\xf=\rho aL+\rho^2(\kappa L^2+D)+\cdots.
+\]
+Taylor expansion of the action gives
+\[
+\begin{aligned}
+\Apsi(X)-\Apsi(\xf)
+={}&\frac1a\{\rho aL+\rho^2(\kappa L^2+D)\}
++\frac12\Apsi''(\xf)\rho^2a^2L^2+\cdots\\
+={}&\rho L
++\rho^2\frac Da
++\rho^2L^2
+\left\{
+\frac\kappa a+\frac12\Apsi''(\xf)a^2
+\right\}
++\cdots.
+\end{aligned}
+\]
+Now
+\[
+\frac\kappa a=\frac c{2\delta^2},
+\qquad
+\frac12\Apsi''(\xf)a^2=-\frac c{2\delta^2},
+\]
+so the squared logarithm cancels exactly. Therefore
+\[
+\boxed{
+\Apsi(X)-\Apsi(\xf)
+=\rho\log\frac C y+\rho^2\frac Da+\cdots,
+}
+\]
+which proves the second-order plateau expansion used in Section~\ref{sec:reduction}.
+
+\section{Derivation of the Laplace correction}
+\label{sec:laplacedetail}
+
+Write the Kendall integral as
+\[
+\mathcal I(x_h)
+=\frac1\rho e^{-\Apsi(x_h)/\rho}
+\int_{x_h}^{1}f(X)e^{\Apsi(X)/\rho}\dd X,
+\qquad
+f(X)=\frac1{\hth(X)}.
+\]
+Let
+\[
+A_0=\Apsi(\xs),
+\qquad
+\lambda=-\Apsi''(\xs)>0,
+\qquad
+A_3=\Apsi'''(\xs),
+\qquad
+A_4=\Apsi''''(\xs).
+\]
+Set $z=X-\xs$. Near the saddle,
+\[
+\Apsi(X)
+=A_0-\frac\lambda2z^2+\frac{A_3}{6}z^3+\frac{A_4}{24}z^4+O(z^5),
+\]
+\[
+f(X)=f_0+f_1z+\frac{f_2}{2}z^2+O(z^3).
+\]
+Scale
+\[
+z=\sqrt{\frac\rho\lambda}\,t.
+\]
+Expanding the exponential and retaining terms whose Gaussian averages are $O(\rho)$ gives
+\[
+\begin{aligned}
+\int f(X)e^{\Apsi(X)/\rho}\dd X
+\sim{}&e^{A_0/\rho}\sqrt{\frac{2\pi\rho}{\lambda}}f_0\\
+&\times\left[
+1+\rho\left(
+\frac{f_2}{2f_0\lambda}
++\frac{f_1A_3}{2f_0\lambda^2}
++\frac{A_4}{8\lambda^2}
++\frac{5A_3^2}{24\lambda^3}
+\right)
++O(\rho^2)
+\right].
+\end{aligned}
+\]
+Here the numerical coefficients follow from the Gaussian moments
+\[
+\langle t^2\rangle=1,
+\qquad
+\langle t^4\rangle=3,
+\qquad
+\langle t^6\rangle=15.
+\]
+Therefore
+\[
+\boxed{
+ c_L
+=
+\frac{f_2}{2f_0\lambda}
++\frac{f_1A_3}{2f_0\lambda^2}
++\frac{A_4}{8\lambda^2}
++\frac{5A_3^2}{24\lambda^3}.
+}
+\]
+For $f=1/h_\theta$, write $h=h_\theta$ temporarily and define
+\[
+r(x)=1-\Rzero x^\eta,
+\qquad
+\Apsi'(x)=\frac{r(x)}{h(x)}.
+\]
+At $x=\xs$ we have $r(\xs)=0$ and $\Rzero\xs^\eta=1$. The derivatives of $r$ at the saddle are
+\[
+r_*'=-\frac{\eta}{\xs},
+\qquad
+r_*''=-\frac{\eta(\eta-1)}{\xs^2},
+\qquad
+r_*'''=-\frac{\eta(\eta-1)(\eta-2)}{\xs^3}.
+\]
+Consequently
+\[
+\lambda=-\Apsi''(\xs)=\frac{\eta}{\xs h_*},
+\]
+\[
+A_3
+=-\frac{\eta(\eta-1)}{\xs^2h_*}
++\frac{2\eta h_*'}{\xs h_*^2},
+\]
+and, using
+\[
+\left(\frac1h\right)'=-\frac{h'}{h^2},
+\qquad
+\left(\frac1h\right)''=\frac{2(h')^2}{h^3}-\frac{h''}{h^2},
+\]
+\[
+A_4
+=-\frac{\eta(\eta-1)(\eta-2)}{\xs^3h_*}
++\frac{3\eta(\eta-1)h_*'}{\xs^2h_*^2}
+-\frac{6\eta(h_*')^2}{\xs h_*^3}
++\frac{3\eta h_*''}{\xs h_*^2}.
+\]
+For the prefactor,
+\[
+f_0=\frac1{h_*},
+\qquad
+f_1=-\frac{h_*'}{h_*^2},
+\qquad
+f_2=\frac{2(h_*')^2}{h_*^3}-\frac{h_*''}{h_*^2}.
+\]
+Substituting these expressions into
+\[
+ c_L
+=
+\frac{f_2}{2f_0\lambda}
++\frac{f_1A_3}{2f_0\lambda^2}
++\frac{A_4}{8\lambda^2}
++\frac{5A_3^2}{24\lambda^3}
+\]
+gives the four contributions
+\[
+\frac{f_2}{2f_0\lambda}
+=\frac{\xs}{\eta}
+\left\{
+\frac{(h_*')^2}{h_*}-\frac12h_*''
+\right\},
+\]
+\[
+\frac{f_1A_3}{2f_0\lambda^2}
+=\frac{\eta-1}{2\eta}h_*'
+-\frac{\xs(h_*')^2}{\eta h_*},
+\]
+\[
+\frac{A_4}{8\lambda^2}
+=-\frac{(\eta-1)(\eta-2)h_*}{8\eta\xs}
++\frac{3(\eta-1)h_*'}{8\eta}
+-\frac{3\xs(h_*')^2}{4\eta h_*}
++\frac{3\xs h_*''}{8\eta},
+\]
+\[
+\frac{5A_3^2}{24\lambda^3}
+=\frac{5(\eta-1)^2h_*}{24\eta\xs}
+-\frac{5(\eta-1)h_*'}{6\eta}
++\frac{5\xs(h_*')^2}{6\eta h_*}.
+\]
+Collecting the coefficients of $h_*/\xs$, $h_*'$, $\xs(h_*')^2/h_*$, and $\xs h_*''$ yields
+\[
+ c_L
+=\frac{(2\eta^2-\eta-1)h_*}{24\eta\xs}
++\frac{(\eta-1)h_*'}{24\eta}
++\frac{\xs(h_*')^2}{12\eta h_*}
+-\frac{\xs h_*''}{8\eta}.
+\]
+Putting these terms over the common denominator $24\eta h_*\xs$ gives
+\[
+\boxed{
+ c_L=
+\frac{
+(2\eta^2-\eta-1)h_*^2
++(\eta-1)\xs h_*h_*'
++2\xs^2(h_*')^2
+-3\xs^2h_*h_*''
+}{24\eta h_*\xs}.
+}
+\]
+Thus every algebraic step from the general Gaussian correction to the closed coefficient used in Section~\ref{sec:laplace} is explicit.
+
+\section{Summary of the theoretical chain}
+
+The theory can be summarized as
+\[
+\boxed{
+\begin{array}{c}
+\text{zero-recruitment first-wave geometry}\\[0.2em]
+\Downarrow\\[0.2em]
+\text{regular outer expansion at a fixed }\bar x>\xf\\[0.2em]
+\Downarrow\\[0.2em]
+\text{exact scalar nonlinear tail in }\ell=\log(\bar y/y)\\[0.2em]
+\Downarrow\\[0.2em]
+\text{overlap diagnostics }(Ky,s,d,\epsA)\\[0.2em]
+\Downarrow\\[0.2em]
+\text{action plateau }\CalC\\[0.2em]
+\Downarrow\\[0.2em]
+\text{exact Kendall integral}\\[0.2em]
+\Downarrow\\[0.2em]
+\text{Laplace reduction and persistence probability.}
+\end{array}
+}
+\]
+
+The key structural separation is that the deterministic tail is allowed to pass through finite relative prevalence $y/x=O(1)$ without expanding the transmission factor. The condition $y/x\ll1$ is imposed only where it is actually needed: at the deterministic-to-stochastic handoff. The action identity then supplies both a quantitative overlap diagnostic and the handoff-independent amplitude that enters the leading Laplace burnout exponent.
+
+\end{document}
