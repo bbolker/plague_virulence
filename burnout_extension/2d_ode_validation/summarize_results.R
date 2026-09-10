@@ -1,0 +1,23 @@
+library(data.table)
+sim<-fread('psi_validation/data/psi05_stochastic_results.csv')
+curves<-fread('2d_ode_validation/data/psi05_2d_ode_curves.csv')
+sim[,R0:=round(R0,12)];curves[,R0:=round(R0,12)]
+curves<-unique(curves,by=c('rho','theta','K','R0','psi'))
+z<-merge(sim,curves,by=c('rho','theta','K','R0','psi'),all.x=TRUE)
+ok<-z[status=='OK']
+test48<-ok[K==1000&R0%in%c(1.5,2,3,6)]
+summary<-data.table(
+  points=nrow(z),defined=nrow(ok),
+  MAE_trough_conditional=ok[,mean(abs(P_conditional-P_trough))],
+  MAE_kendall_conditional=ok[,mean(abs(P_conditional-P_kendall))],
+  MAE_trough_unconditional=ok[,mean(abs(P_unconditional-P_trough_unconditional))],
+  MAE_kendall_unconditional=ok[,mean(abs(P_unconditional-P_kendall_unconditional))],
+  MAE_trough_conditional_R0_ge_1_3=ok[R0>=1.3,mean(abs(P_conditional-P_trough))],
+  MAE_kendall_conditional_R0_ge_1_3=ok[R0>=1.3,mean(abs(P_conditional-P_kendall))],
+  MAE_trough_vs_kendall_test48=test48[,mean(abs(P_trough-P_kendall))],
+  median_trough_vs_kendall_test48=test48[,median(abs(P_trough-P_kendall))],
+  p90_trough_vs_kendall_test48=test48[,quantile(abs(P_trough-P_kendall),.9)],
+  max_trough_vs_kendall_test48=test48[,max(abs(P_trough-P_kendall))])
+dir.create('2d_ode_validation/data',FALSE,TRUE)
+fwrite(summary,'2d_ode_validation/data/psi05_2d_ode_summary.csv')
+print(summary)

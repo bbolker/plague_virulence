@@ -1,0 +1,651 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,mathtools,bm}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\hypersetup{colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\setlist{nosep,leftmargin=*}
+
+\newcommand{\Rzero}{\mathcal R_0}
+\newcommand{\hth}{h_\theta}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\e}{\mathrm e}
+\newcommand{\gam}{\gamma}
+\newcommand{\PhiB}{\Phi}
+\newcommand{\Ptr}{P_{\mathrm{tr}}}
+\newcommand{\PK}{P_{\mathrm K}}
+
+\title{Epidemic Burnout under Susceptible Recruitment and Population-Size-Dependent Transmission\\[0.35em]
+\large A Finite-Prevalence Bottleneck Theory Based on Numerical Deterministic Trajectories and Kendall Branching}
+\author{Theory note}
+\date{2026-09-09}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We develop a self-contained semi-analytical theory for epidemic burnout after a major first wave in a susceptible--infectious model with susceptible recruitment and population-size-dependent transmission. The deterministic background is defined by the full two-dimensional ordinary differential equation and is evaluated numerically through the inter-wave valley. The stochastic bottleneck is described by a time-inhomogeneous linear birth--death process evolving in that deterministic environment. Kendall's finite-horizon survival formula is derived directly from the backward equation. When the inter-wave valley is controlled by a single interior infective trough, the Kendall integral has a Gaussian saddle at the physical trough. The resulting persistence exponent is
+\[
+B_{\mathrm{tr}}
+=K y_t\sqrt{\frac{\alpha_t}{2\pi}},
+\qquad
+\alpha_t=\left.\frac{\dd}{\dd t}\bigl(g(x(t),y(t))-1\bigr)\right|_{t=t_t},
+\]
+with an explicit expression for \(\alpha_t\). Thus the leading prediction depends only on the numerically computed trough and contains no arbitrary burnout boundary-layer threshold. We prove how the factor-of-two error produced by naively restarting the branching process at the trough is avoided, give the correct multi-trough extension, derive the low-prevalence Todd limit, state validity diagnostics, and compare the trough formula with direct numerical evaluation of the corresponding Kendall integral on a 48-point test grid. For that test grid the mean absolute probability difference is about \(6.25\times10^{-3}\), with maximum about \(3.55\times10^{-2}\).
+\end{abstract}
+
+\tableofcontents
+\clearpage
+
+\section{Model and objective}
+
+Let \(K\) be the reference population size, and let
+\[
+x=\frac{S}{K},\qquad y=\frac{I}{K},\qquad n=x+y.
+\]
+The normalized deterministic model is
+\begin{align}
+\dot x&=\rho \hth(x)-\Rzero x y (x+y)^{-\psi},\label{eq:xdot}\\
+\dot y&=\left[\Rzero x(x+y)^{-\psi}-1\right]y,\label{eq:ydot}
+\end{align}
+where
+\[
+\hth(x)=(1-x)x^\theta,
+\]
+\(\rho>0\) is the susceptible recruitment scale, \(\Rzero>1\), and \(\psi\ge0\) controls population-size dependence in transmission. The derivations below require only positivity of the deterministic state and smoothness of the vector field near the bottleneck. In particular, the finite-prevalence construction itself is regular at \(\psi=1\); the restriction \(\psi<1\) is needed only when taking the classical low-prevalence interior-saddle limit.
+
+Define the instantaneous per-infective birth rate
+\begin{equation}
+ g(x,y)=\Rzero x(x+y)^{-\psi}.\label{eq:gdef}
+\end{equation}
+Then
+\begin{equation}
+ \dot y=\gam(t)y,
+ \qquad
+ \gam(t):=g(x(t),y(t))-1.\label{eq:gammadef}
+\end{equation}
+The first epidemic wave produces a local maximum of \(y\), followed by a declining phase. Susceptible recruitment may later make \(\gam\) positive again, producing an infective trough and subsequent recovery. Burnout is the stochastic loss of all infectives while the deterministic trajectory passes through this inter-wave bottleneck.
+
+The objective is to approximate the probability that an established epidemic survives this bottleneck. The initial fizzle probability from \(I_0=1\) is a separate early-time branching problem and is treated in Section~\ref{sec:uncond}.
+
+\section{Deterministic geometry of the bottleneck}
+
+\subsection{Physical peak, trough and recovery peak}
+
+Along any positive deterministic trajectory, critical points of \(y\) satisfy
+\[
+\dot y=0
+\quad\Longleftrightarrow\quad
+\gam(t)=0
+\quad\Longleftrightarrow\quad
+ g(x(t),y(t))=1.
+\]
+We denote by \(t_-\) the first post-establishment local maximum of \(y\), by \(t_t\) the following local minimum, and, when it exists, by \(t_+\) the following local maximum. Thus
+\begin{align*}
+\gam(t_-)&=0, & \dot\gam(t_-) &<0,\\
+\gam(t_t)&=0, & \dot\gam(t_t) &>0,\\
+\gam(t_+)&=0, & \dot\gam(t_+) &<0.
+\end{align*}
+Write
+\[
+(x_t,y_t)=(x(t_t),y(t_t)).
+\]
+The trough is not an imposed boundary layer. It is an intrinsic turning point of the deterministic trajectory.
+
+\subsection{Exact crossing rate at the trough}
+
+The local sharpness of the bottleneck is measured by
+\begin{equation}
+\alpha_t:=\dot\gam(t_t)=\left.\frac{\dd}{\dd t}(g-1)\right|_{t=t_t}.\label{eq:alphadef}
+\end{equation}
+We now derive \(\alpha_t\) exactly.
+
+From \eqref{eq:gdef},
+\[
+\log g=\log\Rzero+\log x-\psi\log(x+y),
+\]
+so
+\begin{equation}
+\frac{\dot g}{g}
+=\frac{\dot x}{x}-\psi\frac{\dot x+\dot y}{x+y}.
+\end{equation}
+At the trough, \(g=1\) and \(\dot y=0\). Equation~\eqref{eq:xdot} therefore gives
+\[
+\dot x_t=\rho\hth(x_t)-y_t.
+\]
+Hence
+\begin{equation}
+\boxed{
+\alpha_t
+=
+\bigl[\rho\hth(x_t)-y_t\bigr]
+\left[
+\frac1{x_t}-\frac{\psi}{x_t+y_t}
+\right].}
+\label{eq:alphaexplicit}
+\end{equation}
+For a genuine local minimum of \(y\), \(\alpha_t>0\). Equation~\eqref{eq:alphaexplicit} is therefore both a formula and a numerical consistency check.
+
+Near the trough,
+\begin{equation}
+\gam(t)=\alpha_t(t-t_t)+O\bigl((t-t_t)^2\bigr),\label{eq:gammalocal}
+\end{equation}
+which implies a locally Gaussian deterministic valley:
+\begin{equation}
+\frac{y(t)}{y_t}
+=
+\exp\left[
+\frac{\alpha_t}{2}(t-t_t)^2+O\bigl((t-t_t)^3\bigr)
+\right].\label{eq:ylocal}
+\end{equation}
+
+\section{Branching process in the deterministic environment}
+
+\subsection{Approximation being made}
+
+We approximate infective descendants during the bottleneck by a time-inhomogeneous linear birth--death process \(Z(t)\) evolving in the deterministic environment \((x(t),y(t))\). Its per-capita rates are
+\begin{equation}
+\beta(t)=g(x(t),y(t)),
+\qquad
+\mu(t)=1.\label{eq:bdrates}
+\end{equation}
+Thus the branching growth rate is exactly the deterministic per-capita infective growth rate:
+\[
+\beta(t)-\mu(t)=\gam(t).
+\]
+No low-prevalence expansion of \(g\) is made. In particular, the factor \((x+y)^{-\psi}\) is retained exactly.
+
+This is a stochastic approximation, not a pathwise identity for the finite-\(K\) epidemic. It treats the deterministic trajectory as an externally prescribed background and neglects finite-population feedback fluctuations around that background. The theory below is therefore asymptotic/semi-analytical rather than a claimed exact weak-limit theorem for the full epidemic over the entire bottleneck.
+
+\subsection{Finite-horizon Kendall survival probability}
+
+Fix \(t_a<t_b\). Let
+\[
+u(t;t_b)=\Pr\{Z(t_b)>0\mid Z(t)=1\}
+\]
+be the probability that one infective lineage present at time \(t\) still has at least one descendant at \(t_b\). A first-step argument over \([t,t+\Delta t]\) gives the backward equation
+\begin{equation}
+\partial_t u
+=-\gam(t)u+\beta(t)u^2,
+\qquad
+u(t_b;t_b)=1.\label{eq:riccati}
+\end{equation}
+For completeness, if \(q=1-u\) is the extinction-by-\(t_b\) probability, then
+\[
+q(t)=\bigl[1-(\beta+\mu)\Delta t\bigr]q(t+\Delta t)
++\mu\Delta t
++\beta\Delta t\,q(t+\Delta t)^2+o(\Delta t),
+\]
+which yields \eqref{eq:riccati} after expansion.
+
+Set \(v=1/u\). Then
+\begin{equation}
+\partial_t v=\gam(t)v-\beta(t),
+\qquad v(t_b)=1.\label{eq:linearv}
+\end{equation}
+Define
+\begin{equation}
+\PhiB(t_a,s):=\int_{t_a}^{s}\gam(r)\dd r.\label{eq:Phidef}
+\end{equation}
+Solving \eqref{eq:linearv} gives
+\begin{equation}
+\boxed{
+ u(t_a;t_b)
+ =
+ \left[
+ \e^{-\PhiB(t_a,t_b)}
+ +\int_{t_a}^{t_b}\beta(s)\e^{-\PhiB(t_a,s)}\dd s
+ \right]^{-1}.}
+\label{eq:kendallbeta}
+\end{equation}
+Because \(\beta=\gam+1\), integration of
+\[
+\frac{\dd}{\dd s}\e^{-\PhiB(t_a,s)}=-\gam(s)\e^{-\PhiB(t_a,s)}
+\]
+shows that \eqref{eq:kendallbeta} is equivalent to the simpler form
+\begin{equation}
+\boxed{
+ u(t_a;t_b)
+ =
+ \left[
+ 1+\int_{t_a}^{t_b}\e^{-\PhiB(t_a,s)}\dd s
+ \right]^{-1}.}
+\label{eq:kendallmu}
+\end{equation}
+Equation~\eqref{eq:kendallmu} is the finite-horizon Kendall formula specialized to unit death rate.
+
+If there are \(m\) independent lineages at \(t_a\), the branching approximation gives
+\begin{equation}
+P_{\mathrm K}(t_a,t_b;m)
+=1-[1-u(t_a;t_b)]^m.\label{eq:PKexact}
+\end{equation}
+For the deterministic epidemic state we take \(m\approx Ky(t_a)\).
+
+\section{Why the trough is the saddle}
+
+The deterministic equation \eqref{eq:gammadef} integrates exactly to
+\begin{equation}
+ y(s)=y(t_a)\e^{\PhiB(t_a,s)}.\label{eq:yPhi}
+\end{equation}
+Consequently, minima of \(\PhiB(t_a,s)\) are exactly minima of the deterministic infective trajectory \(y(s)\). The physical trough is therefore the Laplace saddle of the Kendall integral, not an artificially chosen matching location.
+
+Suppose the first inter-wave interval contains a unique relevant trough \(t_t\in(t_a,t_b)\), and suppose \(\alpha_t>0\). Then, from \eqref{eq:gammalocal},
+\begin{equation}
+\PhiB(t_a,s)
+=
+\PhiB_t+\frac{\alpha_t}{2}(s-t_t)^2
++O\bigl((s-t_t)^3\bigr),
+\qquad
+\PhiB_t:=\PhiB(t_a,t_t).\label{eq:Philocal}
+\end{equation}
+If the Gaussian width \(\alpha_t^{-1/2}\) is small relative to the distances to the integration endpoints and the trough is the dominant minimum, Laplace's method gives
+\begin{equation}
+\int_{t_a}^{t_b}\e^{-\PhiB(t_a,s)}\dd s
+\sim
+\e^{-\PhiB_t}\sqrt{\frac{2\pi}{\alpha_t}}.\label{eq:laplaceint}
+\end{equation}
+If this integral is also large compared with the additive 1 in \eqref{eq:kendallmu}, then
+\begin{equation}
+ u(t_a;t_b)
+ \sim
+ \e^{\PhiB_t}\sqrt{\frac{\alpha_t}{2\pi}}.\label{eq:usingle}
+\end{equation}
+Using \eqref{eq:yPhi},
+\[
+ y_t=y(t_a)\e^{\PhiB_t},
+\]
+so
+\begin{equation}
+ Ky(t_a)u(t_a;t_b)
+ \sim
+ K y_t\sqrt{\frac{\alpha_t}{2\pi}}.\label{eq:Bcancel}
+\end{equation}
+The starting state \(y(t_a)\) has cancelled. This is the boundary-selection-independent quantity.
+
+\section{Finite-prevalence trough formula}
+
+Define
+\begin{equation}
+\boxed{
+B_{\mathrm{tr}}
+:=K y_t\sqrt{\frac{\alpha_t}{2\pi}},}
+\label{eq:Btr}
+\end{equation}
+with \(\alpha_t\) given by \eqref{eq:alphaexplicit}. If the single-lineage survival probability is small, then
+\[
+[1-u]^{Ky(t_a)}
+=\exp\bigl[-Ky(t_a)u+O(Ky(t_a)u^2)\bigr],
+\]
+so the persistence probability through the bottleneck is
+\begin{equation}
+\boxed{
+\Ptr
+\approx
+1-\exp(-B_{\mathrm{tr}}).}
+\label{eq:Ptr}
+\end{equation}
+This is the recommended leading finite-prevalence prediction.
+
+Substituting \eqref{eq:alphaexplicit},
+\begin{equation}
+\boxed{
+B_{\mathrm{tr}}
+=K y_t
+\sqrt{
+\frac{
+[\rho\hth(x_t)-y_t]
+\left[x_t^{-1}-\psi(x_t+y_t)^{-1}\right]
+}{2\pi}
+}.}
+\label{eq:Bexpanded}
+\end{equation}
+All inputs in \eqref{eq:Bexpanded} come from one numerical integration of the original two-dimensional deterministic system and evaluation at its physical trough.
+
+\subsection{No burnout-boundary threshold is selected}
+
+The usual boundary-layer formulation introduces a prevalence threshold \(y_{\mathrm{BL}}\) and switches approximation at the first time the trajectory reaches that level. Equation~\eqref{eq:Btr} does not do this. The only distinguished point is \(t_t\), selected intrinsically by
+\[
+ g(x_t,y_t)=1,
+\qquad
+\alpha_t>0.
+\]
+The calculation is nevertheless not equivalent to restarting a branching process at \(t_t\); Section~\ref{sec:factor2} explains this distinction.
+
+\section{The factor-of-two trap}\label{sec:factor2}
+
+A tempting but incorrect construction is to declare that there are exactly \(K y_t\) independent infectives at the trough and start the branching process there. In the local approximation
+\[
+\gam(t)\approx\alpha_t(t-t_t),
+\]
+this uses only the right half of the Gaussian bottleneck:
+\begin{equation}
+\int_{t_t}^{\infty}
+\exp\left[-\frac{\alpha_t}{2}(s-t_t)^2\right]\dd s
+=\sqrt{\frac{\pi}{2\alpha_t}}.
+\end{equation}
+The corresponding exponent would be
+\[
+B_{\mathrm{restart}}
+=K y_t\sqrt{\frac{2\alpha_t}{\pi}}
+=2B_{\mathrm{tr}}.
+\]
+Thus a naive restart at the trough overestimates the leading persistence exponent by a factor of two.
+
+The correct derivation starts before the trough, propagates the branching process through the entire bottleneck, and only then uses the deterministic relation \(y_t=y(t_a)e^{\PhiB_t}\) to eliminate the pre-trough starting state. The final formula depends only on trough data, but it already contains stochastic thinning from both sides of the saddle.
+
+\section{Multiple troughs}
+
+If several well-separated local minima \(t_j\) of \(\PhiB\) have comparable exponential depth, their contributions add in the Kendall \emph{integral}:
+\begin{equation}
+\int\e^{-\PhiB(s)}\dd s
+\sim
+\sum_j
+\e^{-\PhiB_j}\sqrt{\frac{2\pi}{\alpha_j}},
+\qquad
+\alpha_j=\dot\gam(t_j)>0.\label{eq:multisaddleint}
+\end{equation}
+The Gaussian neighborhoods must be asymptotically separated, for example
+\[
+|t_i-t_j|\gg \alpha_i^{-1/2}+\alpha_j^{-1/2}
+\quad(i\ne j),
+\]
+and endpoint truncation must be negligible.
+
+Using \(y_j=y(t_a)e^{\PhiB_j}\), the leading branching exponent becomes
+\begin{equation}
+\boxed{
+B_{\mathrm{multi}}
+\sim
+K\left[
+\sum_j
+\frac1{y_j}
+\sqrt{\frac{2\pi}{\alpha_j}}
+\right]^{-1}.}
+\label{eq:Bmulti}
+\end{equation}
+This reciprocal-sum structure is important: one does \emph{not} add the single-trough exponents. If one trough is much deeper than the others in the Laplace sense, \eqref{eq:Bmulti} reduces to \eqref{eq:Btr}.
+
+\section{Validity conditions and numerical diagnostics}
+
+The trough formula is a controlled reduction of the Kendall integral under the following conditions.
+
+\subsection{Deterministic bottleneck conditions}
+
+There must be a post-wave local minimum with
+\[
+ y_t>0,\qquad g(x_t,y_t)=1,\qquad \alpha_t>0.
+\]
+The deterministic integration should locate the zero of \(g-1\) directly rather than infer the trough from a coarse time grid.
+
+\subsection{Interior Gaussian saddle}
+
+The local width is
+\[
+\tau_G=\alpha_t^{-1/2}.
+\]
+For an inter-wave interval \([t_-,t_+]\), define
+\begin{equation}
+L_-:=\sqrt{\alpha_t}(t_t-t_-),
+\qquad
+L_+:=\sqrt{\alpha_t}(t_+-t_t).\label{eq:Lpm}
+\end{equation}
+Values \(L_-,L_+\gg1\) give a clean full Gaussian. Moderate values need not invalidate the formula, but they remove the formal asymptotic guarantee. The direct numerical Kendall integral \eqref{eq:kendallmu} over the physical inter-wave interval then provides a cheap diagnostic.
+
+\subsection{Saddle dominance}
+
+Define
+\[
+\Delta_-:=\PhiB(t_a,t_-)-\PhiB_t,
+\qquad
+\Delta_+:=\PhiB(t_a,t_+)-\PhiB_t.
+\]
+Large positive \(\Delta_\pm\) mean that the trough dominates the integral exponentially. If another trough has comparable \(\PhiB_j\), use \eqref{eq:Bmulti} or evaluate \eqref{eq:kendallmu} numerically.
+
+\subsection{Small single-lineage survival}
+
+The replacement
+\[
+1-(1-u)^m\approx1-\e^{-mu}
+\]
+requires \(u\ll1\). If this condition is not met, retain the exact branching combination
+\begin{equation}
+P=1-(1-u)^m\label{eq:exactcombine}
+\end{equation}
+instead of exponentiating. The trough saddle can still be used to approximate \(u\), but \eqref{eq:Ptr} should then be replaced by \eqref{eq:exactcombine}.
+
+\subsection{What failure means}
+
+Failure of a Gaussian diagnostic does not create a singularity in the deterministic model. It only means that the one-number trough reduction is not controlled. The original two-dimensional ODE remains regular, and the finite-horizon Kendall integral can be evaluated numerically along the computed trajectory at negligible cost compared with CTMC simulation.
+
+\section{Low-prevalence limit and relation to Todd-style BI}
+
+Assume now \(0\le\psi<1\) and set
+\[
+\eta=1-\psi.
+\]
+If the trough prevalence is asymptotically small relative to the susceptible fraction,
+\[
+\frac{y_t}{x_t}\to0,
+\]
+then the trough equation \(g(x_t,y_t)=1\) gives
+\[
+\Rzero x_t^{\eta}\to1,
+\]
+so
+\begin{equation}
+ x_t\to x_*:=\Rzero^{-1/\eta}.\label{eq:xstar}
+\end{equation}
+Moreover,
+\[
+\frac1{x_t}-\frac{\psi}{x_t+y_t}
+\to
+\frac{1-\psi}{x_*}
+=\frac{\eta}{x_*},
+\]
+and if \(y_t=o(\rho\hth(x_*))\), then
+\begin{equation}
+\alpha_t
+\to
+\frac{\eta\rho\hth(x_*)}{x_*}.\label{eq:alphalow}
+\end{equation}
+Therefore
+\begin{equation}
+\boxed{
+B_{\mathrm{tr}}
+\to
+K y_t
+\sqrt{
+\frac{\eta\rho\hth(x_*)}{2\pi x_*}
+}.}
+\label{eq:Toddlimit}
+\end{equation}
+This is the familiar low-prevalence Gaussian Kendall prefactor. Thus the finite-prevalence trough formula is a direct extension of the Todd-style bottleneck result: the latter is recovered when the physical trough itself approaches the low-prevalence threshold \(x_*\).
+
+The limit \eqref{eq:Toddlimit} is determined by the local geometry of the physical trough and the low-prevalence branching rates. In the semi-analytical construction, \((x_t,y_t)\) is obtained directly from the nonlinear numerical trajectory.
+
+\subsection{Large \(\Rzero\) and the endpoint \(\psi=1\)}
+
+The finite-prevalence transmission rate entering both the deterministic trajectory and the trough calculation is
+\[
+ g(x,y)=\Rzero x(x+y)^{-\psi}.
+\]
+For every positive state \(x+y>0\), this quantity is smooth for finite \(\psi\). In particular, at \(\psi=1\),
+\[
+ g(x,y)=\Rzero\frac{x}{x+y},
+\]
+so the deterministic vector field and the explicit crossing rate \eqref{eq:alphaexplicit} remain regular at finite prevalence. Large \(\Rzero\) can move the trough toward small host fractions and thereby change \(y_t\), \(x_t\), and \(\alpha_t\), but these quantities continue to be defined by the physical numerical trajectory.
+
+The low-prevalence reduction is more restrictive. For \(0\le\psi<1\), its interior threshold is \(x_*=\Rzero^{-1/(1-\psi)}\), which approaches zero as \(\psi\to1^-\). Hence the assumptions underlying the interior low-prevalence saddle need not remain uniform near that endpoint. The finite-prevalence trough construction itself does not rely on that interior-saddle limit.
+
+\section{Initial establishment and unconditional persistence}\label{sec:uncond}
+
+If the epidemic starts from one infective in an otherwise susceptible population, the early phase is approximately a constant-rate birth--death process with birth rate \(\Rzero\) and death rate 1. Hence the leading establishment probability is
+\begin{equation}
+P_{\mathrm{est}}
+\approx
+1-\frac1{\Rzero}.
+\label{eq:Pest}
+\end{equation}
+Conditional on establishment, the autonomous deterministic system rapidly approaches the major-wave trajectory up to a random time shift. The conditional burnout-persistence probability is approximated by \eqref{eq:Ptr}, or by the numerical Kendall probability when the trough saddle is not sufficiently sharp. The leading unconditional prediction is therefore
+\begin{equation}
+P_{\mathrm{persist}}
+\approx
+P_{\mathrm{est}}\,P_{\mathrm{persist}\mid\mathrm{est}}.
+\label{eq:Puncond}
+\end{equation}
+Equation~\eqref{eq:Puncond} separates the early fizzle mechanism from post-wave burnout.
+
+\section{Numerical validation of the trough reduction}
+
+The approximation has two distinct ingredients: the branching-on-deterministic-background approximation and the Gaussian reduction of the Kendall integral to trough data. The present numerical check isolates the second ingredient by comparing \eqref{eq:Ptr} directly with numerical evaluation of the finite-horizon Kendall formula \eqref{eq:kendallmu} along the same deterministic trajectory.
+
+For each test point, the two-dimensional ODE was integrated from \((x(0),y(0))=(1-K^{-1},K^{-1})\). The physical interval was taken from the first deterministic infective peak \(t_-\) to the next infective peak \(t_+\), with the intervening trough located by an event solve of \(g-1=0\). The numerical Kendall probability was
+\[
+\PK
+=1-[1-u(t_-;t_+)]^{Ky(t_-)},
+\]
+with \(u\) evaluated by quadrature from \eqref{eq:kendallmu}. The trough approximation was \eqref{eq:Ptr}.
+
+The test grid used
+\[
+\psi=0.5,\qquad K=1000,
+\]
+with
+\[
+\theta\in\{0,0.5,1\},\quad
+\rho\in\{0.01,0.02,0.05,0.1\},\quad
+\Rzero\in\{1.5,2,3,6\},
+\]
+for 48 combinations. Across these points,
+\begin{align*}
+\text{mean absolute difference} &= 0.00625,\\
+\text{median absolute difference} &= 1.82\times10^{-4},\\
+\text{90th percentile absolute difference} &= 0.0246,\\
+\text{maximum absolute difference} &= 0.0355.
+\end{align*}
+Thus the single-trough Gaussian reduction is very close to direct numerical Kendall evaluation on this test grid, while costing essentially only the detection of the deterministic trough.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.66\textwidth]{trough_vs_kendall.pdf}
+\caption{Finite-prevalence trough approximation versus direct numerical evaluation of the Kendall probability on the 48-point test grid described in the text. The diagonal is equality. This comparison validates the Gaussian trough reduction conditional on the deterministic-background branching approximation; it is not a replacement for full CTMC validation of that stochastic approximation.}
+\label{fig:validation}
+\end{figure}
+
+Representative points are shown in Table~\ref{tab:representative}.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{ccccccc}
+\toprule
+$\theta$ & $\rho$ & $\Rzero$ & $y_t$ & $\alpha_t$ & $\PK$ & $\Ptr$\\
+\midrule
+0   & 0.05 & 1.5 & $1.417\times10^{-2}$ & 0.01452 & 0.4639 & 0.4941\\
+0   & 0.05 & 2.0 & $1.861\times10^{-2}$ & 0.03589 & 0.7251 & 0.7550\\
+0   & 0.05 & 3.0 & $2.773\times10^{-2}$ & 0.06798 & 0.9350 & 0.9441\\
+0.5 & 0.10 & 1.5 & $1.931\times10^{-2}$ & 0.01935 & 0.6221 & 0.6576\\
+0.5 & 0.02 & 3.0 & $4.707\times10^{-7}$ & 0.02666 & $3.064\times10^{-5}$ & $3.066\times10^{-5}$\\
+1   & 0.10 & 1.5 & $4.988\times10^{-3}$ & 0.02222 & 0.2415 & 0.2567\\
+\bottomrule
+\end{tabular}
+\caption{Representative validation points for \(\psi=0.5\) and \(K=1000\). \(\PK\) is direct finite-horizon Kendall quadrature along the nonlinear deterministic trajectory; \(\Ptr\) is the trough formula.}
+\label{tab:representative}
+\end{table}
+
+\section{Recommended computational workflow}
+
+For each parameter combination:
+
+\begin{enumerate}
+\item Integrate the two-dimensional ODE \eqref{eq:xdot}--\eqref{eq:ydot} through the first inter-wave valley with event detection for zero crossings of \(g-1\).
+
+\item Detect the first epidemic peak from a \(+\to-\) zero crossing of \(g-1\), then detect the subsequent trough from a \(-\to+\) zero crossing.
+
+\item Evaluate \((x_t,y_t)\) and \(\alpha_t\) from \eqref{eq:alphaexplicit}. Reject a putative trough if \(\alpha_t\le0\).
+
+\item Compute
+\[
+B_{\mathrm{tr}}=K y_t\sqrt{\frac{\alpha_t}{2\pi}}
+\]
+and
+\[
+P_{\mathrm{persist}\mid\mathrm{est}}\approx1-\e^{-B_{\mathrm{tr}}}.
+\]
+
+\item As a diagnostic, compute the physical neighboring peaks and the dimensionless widths \(L_\pm\) in \eqref{eq:Lpm}. If the trough is shallow, endpoints are too close on the Gaussian scale, or several comparable troughs occur, evaluate the finite-horizon Kendall integral \eqref{eq:kendallmu} numerically along the same deterministic trajectory.
+
+\item If an unconditional probability from \(I_0=1\) is required, multiply by the establishment approximation \eqref{eq:Pest}, or use the same establishment convention as the CTMC benchmark being compared.
+\end{enumerate}
+
+The computational cost of Steps 2--5 is negligible compared with CTMC simulation. All quantities entering the closed trough formula are determined by the physical deterministic trajectory and its local crossing geometry.
+
+\section{Scope and limitations}
+
+The theory deliberately makes only the approximations needed for the final prediction.
+
+\begin{itemize}
+\item The deterministic path is numerical and fully nonlinear, and the transmission rate is evaluated at the finite-prevalence state along that path.
+\item The stochastic step is a branching process in a deterministic environment. This is the principal stochastic approximation and should ultimately be assessed against the existing CTMC cache.
+\item The closed trough formula is a Laplace approximation to the Kendall integral. Its accuracy can be checked cheaply by evaluating the Kendall integral numerically on the same trajectory.
+\item A naive branching restart at the trough is incorrect at leading order because it keeps only half of the Gaussian bottleneck.
+\item Multiple comparable troughs require the reciprocal-sum formula \eqref{eq:Bmulti} or direct numerical Kendall integration.
+\item The method concerns survival through the post-wave burnout bottleneck, not indefinite non-extinction in a finite endemic population.
+\end{itemize}
+
+\section{Conclusion}
+
+The minimal self-contained theory is
+\[
+\boxed{
+\begin{gathered}
+\text{nonlinear 2D deterministic trajectory}
+\;\longrightarrow\;
+\text{physical infective trough}\\
+\longrightarrow\;
+\text{finite-prevalence Kendall bottleneck probability}
+\end{gathered}}
+\]
+The leading result is
+\[
+\boxed{
+P_{\mathrm{persist}\mid\mathrm{est}}
+\approx
+1-\exp\left\{
+-Ky_t
+\sqrt{
+\frac{
+[\rho\hth(x_t)-y_t]
+\left[x_t^{-1}-\psi(x_t+y_t)^{-1}\right]
+}{2\pi}}
+\right\}.}
+\]
+It uses one numerical deterministic trajectory, has no arbitrary burnout boundary-layer height, remains well defined when the trough has finite prevalence, and reduces to the classical low-prevalence Todd bottleneck prefactor when \(y_t/x_t\to0\). Direct numerical Kendall quadrature provides an inexpensive fallback whenever the single-trough Gaussian reduction is not controlled.
+
+\begin{thebibliography}{9}
+\bibitem{Parsons2024}
+T.~L. Parsons, B.~M. Bolker, and J.~Dushoff.
+\newblock The probability of epidemic burnout in the stochastic SIR model with vital dynamics.
+\newblock \emph{Proceedings of the National Academy of Sciences}, 121(5):e2313708120, 2024.
+\newblock doi:10.1073/pnas.2313708120.
+
+\bibitem{Gandon2025}
+S.~Gandon, A.~Lambert, M.~Voinson, T.~Day, and T.~L. Parsons.
+\newblock The speed of vaccination rollout and the risk of pathogen adaptation.
+\newblock \emph{Journal of the Royal Society Interface}, 22(228):20250060, 2025.
+\newblock doi:10.1098/rsif.2025.0060.
+
+\bibitem{Kendall1948}
+D.~G. Kendall.
+\newblock On the generalized ``birth-and-death'' process.
+\newblock \emph{The Annals of Mathematical Statistics}, 19:1--15, 1948.
+\end{thebibliography}
+
+\end{document}

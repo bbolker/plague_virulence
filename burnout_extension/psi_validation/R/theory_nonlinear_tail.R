@@ -33,6 +33,54 @@ outer_initial_psi <- local({
   }
 })
 
+# Locate the first recovery trough on the continuous deterministic background.
+# This is the finite-prevalence Kendall saddle from Section "Finite-prevalence
+# Kendall crossing" of burnout_psi_nonlinear_tail_theory.tex.  Integrating in
+# time avoids the inverse-flow singularity at g = 1.
+finite_prevalence_trough_psi <- function(R0,rho,theta,psi,
+                                        xbar_fraction=.45,
+                                        time_max=1e6){
+  oi<-outer_initial_psi(R0,theta,psi,xbar_fraction)
+  x0<-unname(oi['xbar']+rho*oi['X1']+rho^2*oi['X2'])
+  y0<-unname(oi['ybar'])
+  empty<-c(t_t=NA_real_,x_t=NA_real_,y_t=NA_real_,log_y_t=NA_real_,
+    s_t=NA_real_,alpha_t=NA_real_,gaussian_width=NA_real_)
+  if(!is.finite(x0)||!is.finite(y0)||x0<=0||y0<=0)return(empty)
+  growth<-function(x,y)R0*x*(x+y)^(-psi)
+  if(growth(x0,y0)>=1)return(empty)
+  rhs<-function(time,z,parms){
+    x<-z[1];y<-exp(z[2]);g<-growth(x,y)
+    list(c(rho*h_theta(x,theta)-g*y,g-1))
+  }
+  rootfun<-function(time,z,parms)growth(z[1],exp(z[2]))-1
+  identity_event<-function(time,z,parms)z
+  z<-deSolve::ode(c(x=x0,log_y=log(y0)),c(0,time_max),rhs,NULL,method='lsodar',
+    rootfunc=rootfun,
+    events=list(func=identity_event,root=TRUE,terminalroot=1),
+    rtol=2e-10,atol=c(2e-12,2e-11),maxsteps=1e6)
+  roots<-attr(z,'troot')
+  if(!length(roots)||!is.finite(roots[1]))return(empty)
+  last<-z[nrow(z),];xt<-unname(last['x']);logyt<-unname(last['log_y']);yt<-exp(logyt)
+  alpha<-(rho*h_theta(xt,theta)-yt)*(1/xt-psi/(xt+yt))
+  if(!is.finite(logyt)||!is.finite(alpha)||alpha<=0)return(empty)
+  c(t_t=unname(roots[1]),x_t=xt,y_t=yt,log_y_t=logyt,s_t=yt/xt,
+    alpha_t=alpha,gaussian_width=1/sqrt(alpha))
+}
+
+finite_prevalence_kendall_psi <- function(R0,rho,theta,psi,K_values,
+                                          xbar_fraction=.45){
+  tr<-finite_prevalence_trough_psi(R0,rho,theta,psi,xbar_fraction)
+  logB<-log(K_values)+unname(tr['log_y_t'])+
+    .5*log(unname(tr['alpha_t'])/(2*pi))
+  B<-exp(pmin(logB,log(.Machine$double.xmax)))
+  B[logB>log(.Machine$double.xmax)]<-Inf
+  probability<-ifelse(is.infinite(B),1,-expm1(-B))
+  data.frame(K=K_values,trough=probability,log_B_trough=logB,
+    t_t=unname(tr['t_t']),x_t=unname(tr['x_t']),y_t=unname(tr['y_t']),
+    log_y_t=unname(tr['log_y_t']),s_t=unname(tr['s_t']),alpha_t=unname(tr['alpha_t']),
+    gaussian_width=unname(tr['gaussian_width']))
+}
+
 # Evaluate all requested K values with a single nonlinear-tail integration.
 nonlinear_tail_quantities <- function(R0,rho,theta,psi,K_values,
                                       xbar_fraction=.45){
@@ -43,7 +91,9 @@ nonlinear_tail_quantities <- function(R0,rho,theta,psi,K_values,
   empty_result<-function()data.frame(K=K_values,x_h=NA_real_,y_h=NA_real_,
     C_eff=NA_real_,s=NA_real_,d=NA_real_,epsilon_A=NA_real_,g=NA_real_,
     overlap_score=NA_real_,leading=NA_real_,next_order=NA_real_,
-    c_L=laplace_correction_psi(R0,theta,psi))
+    c_L=laplace_correction_psi(R0,theta,psi),trough=NA_real_,
+    log_B_trough=NA_real_,t_t=NA_real_,x_t=NA_real_,y_t=NA_real_,
+    log_y_t=NA_real_,s_t=NA_real_,alpha_t=NA_real_,gaussian_width=NA_real_)
   if(!is.finite(x)||x<=xf||x>=xs)return(empty_result())
   ell_max<-max(5,log(oi['ybar']/min(ygeo))+2);nmax<-ceiling(ell_max/dl)
   path<-matrix(NA_real_,nmax+1L,2L,dimnames=list(NULL,c('ell','x')));path[1,]<-c(0,x);n<-1L
@@ -78,7 +128,9 @@ nonlinear_tail_quantities <- function(R0,rho,theta,psi,K_values,
   B<-exp(pmin(logB,log(.Machine$double.xmax)));B[logB>log(.Machine$double.xmax)]<-Inf
   lead<-ifelse(is.infinite(B),1,-expm1(-B))
   Bnext<-B*exp(-rho*cL);nextp<-ifelse(is.infinite(Bnext),1,-expm1(-Bnext))
-  data.frame(K=K_values,x_h=xh,y_h=yh,C_eff=Ceff,s=s,d=d,epsilon_A=epsA,g=g,
+  ans<-data.frame(K=K_values,x_h=xh,y_h=yh,C_eff=Ceff,s=s,d=d,epsilon_A=epsA,g=g,
     overlap_score=score,
     leading=lead,next_order=nextp,c_L=cL)
+  tr<-finite_prevalence_kendall_psi(R0,rho,theta,psi,K_values,xbar_fraction)
+  merge(ans,tr,by='K',sort=FALSE)
 }

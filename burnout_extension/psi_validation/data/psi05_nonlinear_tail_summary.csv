@@ -1,2 +1,2 @@
-points,defined_leading,MAE_conditional,MAE_next_conditional,fraction_nominal_overlap,median_overlap_score,max_epsilon_A
-624,528,0.0258612411974723,0.0250963050932265,0.0576190476190476,5.15642368073214,7927.77956035053
+points,defined_leading,defined_trough,MAE_conditional,MAE_next_conditional,MAE_trough_conditional,fraction_nominal_overlap,median_overlap_score,max_epsilon_A,median_trough_relative_prevalence,fraction_finite_prevalence_trough
+624,528,528,0.0258612411974723,0.0250963050932265,0.0179386793895363,0.0576190476190476,5.15642368073214,7927.77956035053,0.00133595043854816,0.0914285714285714

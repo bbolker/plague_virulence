@@ -12,7 +12,7 @@
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0.55em}
 \setlist{nosep,leftmargin=*}
-\newcommand{\Rzero}{R_0}
+\newcommand{\Rzero}{\mathcal R_0}
 \newcommand{\hth}{h_\theta}
 \newcommand{\Fpsi}{F_\psi}
 \newcommand{\Apsi}{A_{\theta,\psi}}
@@ -22,7 +22,7 @@
 \newcommand{\CalC}{\mathcal C_\rho}
 \newcommand{\gh}{g_0}
 \newcommand{\epsA}{\varepsilon_A}
-\title{Epidemic Burnout under Susceptible Recruitment and Population-Size-Dependent Transmission\\[0.4em]\large A Nonlinear Tail-Matching Theory from the First Epidemic Wave to Kendall Persistence Probability}
+\title{Epidemic Burnout under Susceptible Recruitment and Population-Size-Dependent Transmission\\[0.4em]\large A Nonlinear Tail-Matching Theory with Low- and Finite-Prevalence Kendall Reductions}
 \author{Theory note}
 \date{2026-09-08}
 
@@ -32,11 +32,11 @@
 \begin{abstract}
 We develop a self-contained asymptotic and semi-analytical theory for pathogen burnout or persistence after the first epidemic wave in a susceptible--infectious--death model with susceptible recruitment $h_\theta(x)=(1-x)x^\theta$ and population-size-dependent transmission. The normalized deterministic system is
 \[
-\dot x=\rho h_\theta(x)-R_0xy(x+y)^{-\psi},
+\dot x=\rho h_\theta(x)-\Rzero xy(x+y)^{-\psi},
 \qquad
-\dot y=\{R_0x(x+y)^{-\psi}-1\}y,
+\dot y=\{\Rzero x(x+y)^{-\psi}-1\}y,
 \]
-with $0\leq\theta\leq1$, $0\leq\psi<1$, $0<\rho\ll1$, and a large reference population $K$. The zero-recruitment first-wave geometry is explicit and supplies a regular outer approximation on any fixed interval away from the post-wave endpoint. The epidemic tail is then continued by the exact one-dimensional inverse-flow equation, written in logarithmic prevalence, without expanding the finite-prevalence transmission factor $(1+y/x)^{-\psi}$. This nonlinear tail continuation remains well defined when $y/x$ is not small and therefore does not require a Taylor expansion around a possibly very small final-size anchor. We derive explicit deterministic-to-stochastic overlap diagnostics, an action-based plateau quantity whose variation is rigorously controlled, the corresponding time-inhomogeneous Kendall branching formula, and its Laplace reduction. The construction recovers the usual logarithmic corner constants in the stronger local overlap, but those constants are asymptotic limits rather than required inputs. The special case $\psi=0$ is regular and particularly simple because the per-infective transmission rate is independent of prevalence. The endpoint $\psi\to1^-$ is regular at the level of the nonlinear deterministic tail but nonuniform for the full burnout theory because the low-prevalence threshold and the interior Laplace saddle collapse toward zero.
+with $0\leq\theta\leq1$, $0\leq\psi<1$, $0<\rho\ll1$, and a large reference population $K$. The zero-recruitment first-wave geometry is explicit and supplies a regular outer approximation on any fixed interval away from the post-wave endpoint. The epidemic tail is then continued by the exact one-dimensional inverse-flow equation, written in logarithmic prevalence, without expanding the finite-prevalence transmission factor $(1+y/x)^{-\psi}$. This nonlinear tail continuation remains well defined when $y/x$ is not small and therefore does not require a Taylor expansion around a possibly very small final-size anchor. We derive explicit deterministic-to-stochastic overlap diagnostics, an action-based plateau quantity whose variation is rigorously controlled, the corresponding time-inhomogeneous Kendall branching formula, and its Laplace reduction. When the infective bottleneck is reached at finite relative prevalence, we also derive a boundary-independent interior-saddle Kendall reduction in terms of the deterministic infective trough $(x_t,y_t)$ and the local crossing speed $\alpha_t$; its low-prevalence limit recovers the action/Laplace prefactor exactly. The construction recovers the usual logarithmic corner constants in the stronger local overlap, but those constants are asymptotic limits rather than required inputs. The special case $\psi=0$ is regular and particularly simple because the per-infective transmission rate is independent of prevalence. The endpoint $\psi\to1^-$ is regular at the level of the nonlinear deterministic tail but nonuniform for the full burnout theory because the low-prevalence threshold and the interior Laplace saddle collapse toward zero.
 \end{abstract}
 
 \tableofcontents
@@ -156,7 +156,7 @@ and the two dimensionless overlap ratios
 \[
 s=\frac yx,
 \qquad
- d=\frac{g(x,y)y}{\rho\hth(x)}.
+ d_{\rm dep}=\frac{g(x,y)y}{\rho\hth(x)}.
 \]
 The first measures finite-prevalence correction to the per-infective birth rate; the second measures infection depletion relative to susceptible recruitment.
 
@@ -173,7 +173,7 @@ Along the exact deterministic trajectory,
 \log y+\frac{\Apsi(x)}{\rho}
 \right)
 =
- g-\gh-(1-\gh)d.
+ g-\gh-(1-\gh)d_{\rm dep}.
 }
 \]
 Since $\dot\ell=1-g$ on the descending branch,
@@ -181,7 +181,7 @@ Since $\dot\ell=1-g$ on the descending branch,
 \boxed{
 \frac{\dd}{\dd\ell}\log \CalC
 =
-\frac{g-\gh-(1-\gh)d}{1-g},
+\frac{g-\gh-(1-\gh)d_{\rm dep}}{1-g},
 }
 \]
 where
@@ -191,7 +191,7 @@ where
 =y\exp\left\{\frac{\Apsi(X(y))-\Apsi(\xf)}{\rho}\right\}.
 }
 \]
-For $0\leq\psi\leq1$,
+For $0\leq\psi<1$,
 \[
 0\leq \gh-g
 =\gh\left[1-(1+s)^{-\psi}\right]
@@ -204,7 +204,7 @@ so
 \leq
 \epsA
 :=
-\frac{\psi\gh s+|1-\gh|d}{1-g}.
+\frac{\psi\gh s+|1-\gh|d_{\rm dep}}{1-g}.
 }
 \]
 An admissible deterministic-to-stochastic handoff point $(x_h,y_h)$ satisfies
@@ -213,7 +213,7 @@ Ky_h\gg1,
 \qquad
 s_h\ll1,
 \qquad
-d_h\ll1,
+d_{{\rm dep},h}\ll1,
 \qquad
 \varepsilon_{A,h}\ll1,
 \qquad
@@ -226,9 +226,9 @@ At an admissible handoff, neglecting infectious feedback on $x$ and finite-$y/x$
 \[
 \dot x=\rho\hth(x),
 \qquad
-b(\sigma)=\Rzero x(\sigma)^\eta,
+\beta_{\rm br}(\sigma)=\Rzero x(\sigma)^\eta,
 \qquad
-d(\sigma)=1.
+\mu_{\rm br}(\sigma)=1.
 \]
 For one lineage starting at $x_h$ define
 \[
@@ -260,6 +260,37 @@ P_{\rm persist,uncond}
 \simeq
 \left(1-\frac1{\Rzero}\right)P_{\rm persist\mid est}.
 \]
+
+\subsection{Finite-prevalence Kendall refinement}
+The low-prevalence handoff above is the primary form used when $y/x\ll1$ before the stochastic bottleneck.  If the deterministic background instead reaches an infective trough while the relative prevalence is not asymptotically negligible, let $(x_t,y_t)$ denote the first post-peak minimum of $y$, so
+\[
+g(x_t,y_t)=1.
+\]
+Along the deterministic background define the instantaneous per-infective growth rate
+\[
+\gamma(\sigma)=g(x(\sigma),y(\sigma))-1
+\]
+and the upward crossing speed
+\[
+\boxed{
+\alpha_t=\dot\gamma(\sigma_t)
+=[\rho\hth(x_t)-y_t]
+\left(\frac1{x_t}-\frac{\psi}{x_t+y_t}\right)>0.
+}
+\]
+A single Kendall calculation initiated before the trough and evaluated by an interior Gaussian saddle gives the handoff-independent bottleneck exponent
+\[
+\boxed{
+B_{\rm tr}\sim K y_t\sqrt{\frac{\alpha_t}{2\pi}},
+\qquad
+P_{\rm persist\mid est}\simeq1-e^{-B_{\rm tr}}.
+}
+\]
+This formula must not be obtained by restarting an independent branching process exactly at the trough; doing so retains only a half-Gaussian and produces an erroneous factor of two.  In the stronger limit $y_t/x_t\to0$ and $x_t\to\xs$,
+\[
+\alpha_t\to\frac{\eta\rho h_*}{\xs},
+\]
+so the finite-prevalence formula reduces to the usual Todd-style action/Laplace prefactor.
 
 \subsection{Laplace and boundary-layer-independent form}
 The action has its unique interior maximum at
@@ -530,6 +561,31 @@ we have
 \]
 The positivity follows from the root-ordering argument above, which proved $0<q<1$ and $\delta>0$.
 
+In fact the derivative is strictly positive throughout the entire outer-inversion interval $(\xf,\xs)$. On the zero-recruitment epidemic branch one has
+\[
+\Fpsi(x)>0,
+\qquad
+n_0(x)=x+\Fpsi(x)>x
+\]
+for every $x\in(\xf,1)$. Hence, for $0\leq\psi<1$,
+\[
+n_0(x)^\psi\geq x^\psi.
+\]
+If in addition $x<\xs$, then $\Rzero x^\eta<1$, and therefore
+\[
+\Fpsi'(x)
+=\frac{n_0(x)^\psi}{\Rzero x}-1
+\geq
+\frac{x^\psi}{\Rzero x}-1
+=\frac1{\Rzero x^\eta}-1
+>0.
+\]
+Thus
+\[
+\boxed{\Fpsi'(x)>0\quad\text{for all }x\in(\xf,\xs).}
+\]
+Consequently the divisions by $\Fpsi'(\bar x)$ in the inverse outer coefficients are legitimate for every admissible choice $\bar x\in(\xf,\xs)$; no additional nondegeneracy assumption is being made.
+
 \subsection{Low-prevalence threshold and positive equilibrium}
 As $y/x\to0$,
 \[
@@ -663,13 +719,21 @@ The original coefficients are recovered through
 \[
 \boxed{Y_2=n_0^\psi W_2+\frac\psi{2n_0}Y_1^2.}
 \]
-Because $h_\theta(1)=0$, the endpoint conditions
+The initial epidemic state is fixed as $(x,y)=(1,0)$ independently of $\rho$.  Therefore the expansion
 \[
-Y_1(1)=0,
-\qquad
-Y_2(1)=0
+y(x;\rho)=\Fpsi(x)+\rho Y_1(x)+\rho^2Y_2(x)+O(\rho^3)
 \]
-are understood by continuous extension from the interior. The equations are integrated only to $\bar x>\xf$, where every coefficient is regular.
+must satisfy, at the common initial point,
+\[
+\boxed{Y_1(1)=0,\qquad Y_2(1)=0.}
+\]
+These are boundary data inherited from the $\rho$-independent initial condition; they are not inferred from the coefficient equations themselves.  The apparent endpoint singularities in those equations are removable.  Indeed, with $u=1-x\downarrow0$,
+\[
+\hth(x)=u+O(u^2),
+\qquad
+\Fpsi(x)=\frac{\Rzero-1}{\Rzero}u+O(u^2),
+\]
+so the ratio defining $W_1'$ has a finite limit, and the same expansion shows that the combinations entering $W_2'$ admit finite continuous extensions.  In practice the quadratures are evaluated from the endpoint by this continuous extension and only down to $\bar x>\xf$, where all coefficients are manifestly regular.
 
 To initialize the inverse trajectory at the fixed prevalence $\bar y=\Fpsi(\bar x)$, write
 \[
@@ -878,11 +942,11 @@ The approximation used in the branching layer is
 Its natural relative error is
 \[
 \boxed{
-d(x,y)=\frac{g(x,y)y}{\rho\hth(x)}.}
+d_{\rm dep}(x,y)=\frac{g(x,y)y}{\rho\hth(x)}.}
 \]
 Thus the second overlap condition is
 \[
-\boxed{d_h\ll1.}
+\boxed{d_{{\rm dep},h}\ll1.}
 \]
 This condition is more precise than comparing $y$ with $\rho$ alone because it includes the local transmission factor and the local recruitment law.
 
@@ -938,13 +1002,13 @@ Also
 \[
 \frac1\rho\frac{\dd}{\dd\sigma}\Apsi(x)
 =\frac{1-\gh}{\rho\hth(x)}\{\rho\hth(x)-gy\}
-=(1-\gh)-(1-\gh)d.
+=(1-\gh)-(1-\gh)d_{\rm dep}.
 \]
 Adding the two identities yields
 \[
 \boxed{
 \dot J
-=g-\gh-(1-\gh)d.
+=g-\gh-(1-\gh)d_{\rm dep}.
 }
 \]
 This is exact. No low-prevalence expansion has been made.
@@ -968,7 +1032,7 @@ Since $\dot\ell=1-g$ on the descending branch,
 \[
 \boxed{
 \frac{\dd}{\dd\ell}\log\CalC
-=\frac{g-\gh-(1-\gh)d}{1-g}.
+=\frac{g-\gh-(1-\gh)d_{\rm dep}}{1-g}.
 }
 \]
 This identity quantifies handoff dependence directly.
@@ -986,7 +1050,7 @@ Therefore
 \frac{\dd}{\dd\ell}\log\CalC
 \right|
 \leq
-\frac{\psi\gh s+|1-\gh|d}{1-g}
+\frac{\psi\gh s+|1-\gh|d_{\rm dep}}{1-g}
 =: \epsA.
 }
 \]
@@ -1010,7 +1074,7 @@ Ky_h\gg1,
 \qquad
 s_h\ll1,
 \qquad
-d_h\ll1,
+d_{{\rm dep},h}\ll1,
 \qquad
 \varepsilon_{A,h}\ll1,
 \qquad
@@ -1036,9 +1100,9 @@ Inside the overlap, infectious feedback on $x$ is negligible to leading order, s
 The finite-prevalence correction to infectious transmission is also negligible, so each infectious individual evolves as a time-inhomogeneous linear birth--death lineage with
 \[
 \boxed{
-b(\sigma)=\Rzero x(\sigma)^\eta,
+\beta_{\rm br}(\sigma)=\Rzero x(\sigma)^\eta,
 \qquad
-d(\sigma)=1.}
+\mu_{\rm br}(\sigma)=1.}
 \]
 This is a branching approximation because lineages no longer interact through the susceptible equation at leading order.
 
@@ -1049,9 +1113,9 @@ Ky_h\gg1,
 \qquad
 s_h\ll1,
 \qquad
-d_h\ll1
+d_{{\rm dep},h}\ll1
 \]
-have distinct roles: $Ky_h\gg1$ places the deterministic handoff above the few-particle scale, $s_h\ll1$ makes the finite-prevalence correction to the per-capita birth rate small, and $d_h\ll1$ makes infectious depletion negligible in the susceptible equation. Together they identify a deterministic-to-branching overlap in which the reduced birth--death description is asymptotically consistent with the deterministic drift. They do not, by themselves, constitute a pathwise coupling, a functional central-limit theorem, or a Kurtz-type weak-convergence result for the full density-dependent jump process. Establishing such a theorem would require specifying the underlying finite-$K$ Markov chain and a joint limit for $K$, $\rho$, and the handoff scale. The persistence formulas below should therefore be read as semi-analytical branching approximations conditional on this overlap.
+have distinct roles: $Ky_h\gg1$ places the deterministic handoff above the few-particle scale, $s_h\ll1$ makes the finite-prevalence correction to the per-capita birth rate small, and $d_{{\rm dep},h}\ll1$ makes infectious depletion negligible in the susceptible equation. Together they identify a deterministic-to-branching overlap in which the reduced birth--death description is asymptotically consistent with the deterministic drift. They do not, by themselves, constitute a pathwise coupling, a functional central-limit theorem, or a Kurtz-type weak-convergence result for the full density-dependent jump process. Establishing such a theorem would require specifying the underlying finite-$K$ Markov chain and a joint limit for $K$, $\rho$, and the handoff scale. The persistence formulas below should therefore be read as semi-analytical branching approximations conditional on this overlap.
 
 \subsection{One-lineage extinction probability}
 For a time-inhomogeneous birth--death process with one initial individual, Kendall's formula may be written
@@ -1062,15 +1126,15 @@ where
 \[
 \mathcal I
 =\int_0^\infty
-\exp\left\{-\int_0^t[b(u)-d(u)]\dd u\right\}d(t)\dd t.
+\exp\left\{-\int_0^t[\beta_{\rm br}(u)-\mu_{\rm br}(u)]\dd u\right\}\mu_{\rm br}(t)\dd t.
 \]
-Here $d(t)=1$. Along the susceptible recovery path,
+Here $\mu_{\rm br}(t)=1$. Along the susceptible recovery path,
 \[
 \dd\sigma=\frac{\dd X}{\rho\hth(X)}.
 \]
 Moreover,
 \[
-\int_{0}^{\sigma(X)}[b(u)-d(u)]\dd u
+\int_{0}^{\sigma(X)}[\beta_{\rm br}(u)-\mu_{\rm br}(u)]\dd u
 =\int_{x_h}^{X}
 \frac{\Rzero z^\eta-1}{\rho\hth(z)}\dd z
 =-\frac{\Apsi(X)-\Apsi(x_h)}\rho.
@@ -1144,6 +1208,284 @@ P_{\rm persist,uncond}
 P_{\rm persist\mid est}.
 }
 \]
+
+\section{Finite-prevalence Kendall crossing}
+\label{sec:finitekendall}
+
+The action/Laplace reduction of the next section assumes that the stochastic handoff can be made after the finite-prevalence transmission correction has become small.  A second, complementary reduction is available when the deterministic trajectory reaches its infective bottleneck at non-negligible relative prevalence.  The derivation below keeps the deterministic background through the trough and performs the Kendall saddle in time rather than replacing the background by the low-prevalence susceptible equation.
+
+The reduction in this section is conditional on the deterministic trajectory possessing a post-peak recovery crossing and on the corresponding bottleneck being dominant for the Kendall integral.  These are dynamical conditions, not identities.  More precisely, there must exist a first post-peak time $\sigma_t$ at which the infectious growth rate changes sign from negative to positive, and either this trough is the unique relevant minimum of the cumulative growth exponent defined below or all later minima give exponentially smaller contributions.  If several troughs have comparable depth, the single-saddle formula is replaced by the multi-saddle expression derived in Section~\ref{sec:multisaddle}.  If no recovery crossing exists on the deterministic background, this finite-prevalence reduction is not invoked; one must retain the exact Kendall integral on the appropriate background or use the low-prevalence action route when its overlap conditions hold.
+
+\subsection{Deterministic trough and crossing speed}
+Along the deterministic trajectory define
+\[
+\gamma(\sigma)=g(x(\sigma),y(\sigma))-1,
+\qquad
+ g(x,y)=\Rzero x(x+y)^{-\psi}.
+\]
+Let $\sigma_t$ be the first post-peak time for which
+\[
+\gamma(\sigma_t)=0,
+\qquad
+\dot\gamma(\sigma_t)>0,
+\]
+and write
+\[
+x_t=x(\sigma_t),
+\qquad
+y_t=y(\sigma_t),
+\qquad
+\alpha_t=\dot\gamma(\sigma_t).
+\]
+Because $\gamma(\sigma_t)=0$, one has $g(x_t,y_t)=1$ and therefore $\dot y(\sigma_t)=0$.  Differentiating
+\[
+\gamma=\Rzero x(x+y)^{-\psi}-1
+\]
+gives
+\[
+\gamma_x=g\left(\frac1x-\frac{\psi}{x+y}\right),
+\qquad
+\gamma_y=-\frac{\psi g}{x+y}.
+\]
+At the trough $g=1$ and $\dot y=0$, while the susceptible equation gives
+\[
+\dot x=\rho\hth(x_t)-y_t.
+\]
+Hence
+\[
+\boxed{
+\alpha_t
+=[\rho\hth(x_t)-y_t]
+\left(\frac1{x_t}-\frac{\psi}{x_t+y_t}\right).
+}
+\]
+Since $0\leq\psi<1$,
+\[
+\frac1{x_t}-\frac{\psi}{x_t+y_t}
+=\frac{(1-\psi)x_t+y_t}{x_t(x_t+y_t)}>0.
+\]
+Thus a genuine recovery trough satisfies
+\[
+\rho\hth(x_t)>y_t
+\quad\Longleftrightarrow\quad
+\alpha_t>0.
+\]
+
+\subsection{Branching approximation on the prescribed deterministic background}
+Choose a handoff time $\sigma_h<\sigma_t$ while the infectious count is still large, $m_h=K y_h\gg1$, and while fluctuations of the remaining infectives make only a lower-order perturbation to the deterministic environment.  Conditional on that prescribed background, approximate descendant families by a time-inhomogeneous linear birth--death process with per-capita birth rate
+\[
+\beta_{\rm br}(\sigma)=1+\gamma(\sigma)=g(x(\sigma),y(\sigma))
+\]
+and unit per-capita death rate.  This is an asymptotic branching approximation, not a pathwise coupling theorem.
+
+Let $p_{\rm ext}(\sigma)$ be the eventual extinction probability of the descendants of one infective present at time $\sigma$.  A backward decomposition over $\dd\sigma$ gives
+\[
+p_{\rm ext}(\sigma)=
+\{1-[\beta_{\rm br}(\sigma)+1]\dd\sigma\}p_{\rm ext}(\sigma+\dd\sigma)
++\beta_{\rm br}(\sigma)\dd\sigma\,p_{\rm ext}(\sigma+\dd\sigma)^2
++\dd\sigma+o(\dd\sigma).
+\]
+Expanding $p_{\rm ext}(\sigma+\dd\sigma)$ and cancelling the zeroth-order term yields
+\[
+-p_{\rm ext}'=(1-p_{\rm ext})(1-\beta_{\rm br}p_{\rm ext}).
+\]
+Set
+\[
+u=\frac{p_{\rm ext}}{1-p_{\rm ext}}.
+\]
+Since $p_{\rm ext}'=u'/(1+u)^2$ and $\beta_{\rm br}=1+\gamma$, direct substitution gives the linear equation
+\[
+\boxed{u'=\gamma(\sigma)u-1.}
+\]
+To make the selection of the physical solution explicit, assume first that the prescribed recovery background is eventually uniformly supercritical: there exist $\sigma_+>\sigma$ and $\gamma_+>0$ such that
+\[
+\gamma(s)\geq\gamma_+\qquad(s\geq\sigma_+).
+\]
+Then
+\[
+\int_\sigma^\infty
+\exp\left[-\int_\sigma^s\gamma(v)\dd v\right]\dd s<\infty,
+\]
+because the tail is bounded by a constant multiple of $\int_{\sigma_+}^\infty e^{-\gamma_+(s-\sigma_+)}\dd s$. Variation of constants therefore gives the nonnegative solution
+\[
+\boxed{
+u(\sigma)=\int_\sigma^\infty
+\exp\left[-\int_\sigma^s \gamma(v)\dd v\right]\dd s.}
+\]
+Any two solutions of $u'=\gamma u-1$ differ by a solution of $w'=\gamma w$. Under the same eventual-supercritical condition, every nonzero such difference grows in forward time like
+\[
+\exp\left\{\int^s\gamma(v)\dd v\right\},
+\]
+and is therefore unbounded. Hence the displayed $u$ is the unique solution that remains bounded in the future supercritical region. Since $u\geq0$,
+\[
+\boxed{0\leq p_{\rm ext}(\sigma)=\frac{u(\sigma)}{1+u(\sigma)}<1,}
+\]
+so the selected solution has the required probabilistic range.
+
+The finite-prevalence bottleneck calculation needs this selection only on the interval over which the branching description is used. If the full deterministic background is not eventually uniformly supercritical, one introduces a post-trough exit time $\sigma_R$ on the recovery side and solves the same backward equation with a terminal extinction probability in $[0,1)$. Provided
+\[
+\sigma_R-\sigma_t\gg\alpha_t^{-1/2}
+\]
+and the cumulative post-trough growth is large, the terminal contribution is exponentially smaller than the interior-saddle contribution derived below. Thus the local bottleneck exponent is unchanged, while no unjustified infinite-time convergence claim is required.
+
+For $m_h=K y_h$ conditionally independent descendant families,
+\[
+P_{\rm burn\mid est}=p_{\rm ext}(\sigma_h)^{m_h}.
+\]
+When the bottleneck is strong, $u_h=u(\sigma_h)\gg1$, and
+\[
+p_{{\rm ext},h}^{m_h}
+=\exp\left[-\frac{m_h}{u_h}+O\left(\frac{m_h}{u_h^2}\right)\right].
+\]
+Thus the leading persistence exponent is
+\[
+\boxed{B=\frac{m_h}{u_h}.}
+\]
+
+\subsection{Interior-saddle evaluation and cancellation of the handoff}
+Define
+\[
+\Phi(\sigma)=\int_{\sigma_h}^{\sigma}\gamma(v)\dd v,
+\qquad
+\Phi(\sigma_h)=0.
+\]
+Then
+\[
+u_h=\int_{\sigma_h}^{\infty}e^{-\Phi(s)}\dd s.
+\]
+Before the infective trough $\gamma<0$ and immediately after it $\gamma>0$.  Hence $\Phi$ has a strict interior minimum at $\sigma_t$.  With
+\[
+\Phi_t=\Phi(\sigma_t)<0,
+\]
+Taylor expansion about the minimum gives
+\[
+\Phi(\sigma)
+=\Phi_t+\frac{\alpha_t}{2}(\sigma-\sigma_t)^2
++O((\sigma-\sigma_t)^3).
+\]
+If the Gaussian bottleneck scale $\alpha_t^{-1/2}$ lies well inside both the pre-trough and post-trough intervals on which the prescribed-background branching approximation is valid, Laplace's method gives
+\[
+\boxed{
+u_h\sim e^{-\Phi_t}\sqrt{\frac{2\pi}{\alpha_t}}.}
+\]
+The deterministic infective equation is exactly
+\[
+\frac{\dd}{\dd\sigma}\log y=\gamma(\sigma).
+\]
+Therefore
+\[
+\log\frac{y_t}{y_h}
+=\int_{\sigma_h}^{\sigma_t}\gamma(v)\dd v
+=\Phi_t,
+\]
+so
+\[
+\boxed{y_t=y_h e^{\Phi_t}.}
+\]
+Substitution into $B=m_h/u_h$ eliminates the arbitrary handoff:
+\[
+\begin{aligned}
+B
+&\sim K y_h e^{\Phi_t}\sqrt{\frac{\alpha_t}{2\pi}}\\
+&=K y_t\sqrt{\frac{\alpha_t}{2\pi}}.
+\end{aligned}
+\]
+Hence
+\[
+\boxed{
+B_{\rm tr}\sim K y_t\sqrt{\frac{\alpha_t}{2\pi}},
+\qquad
+P_{\rm persist\mid est}\simeq1-e^{-B_{\rm tr}}.
+}
+\]
+For one initial infective, the unconditional approximation is
+\[
+\boxed{
+P_{\rm persist,uncond}
+\simeq
+\left(1-\frac1{\Rzero}\right)
+\left(1-e^{-B_{\rm tr}}\right).
+}
+\]
+The boundary-independent character is literal: $\sigma_h$ and $y_h$ cancel from the leading exponent, while $(x_t,y_t)$ is a dynamically selected trough rather than a freely chosen matching boundary.
+
+\subsection{Global dominance and multiple troughs}
+\label{sec:multisaddle}
+The local conditions $\gamma(\sigma_t)=0$ and $\dot\gamma(\sigma_t)>0$ prove only that $\Phi$ has a local minimum at $\sigma_t$.  Laplace dominance requires a global statement on the interval contributing to Kendall's integral.  Suppose the prescribed deterministic background contains finitely many nondegenerate recovery troughs $\sigma_j$ satisfying
+\[
+\gamma(\sigma_j)=0,
+\qquad
+\alpha_j=\dot\gamma(\sigma_j)>0,
+\qquad
+\Phi_j=\Phi(\sigma_j).
+\]
+If one minimum is separated from every other minimum by an $O(1)$ amount in $\Phi$, then its contribution is exponentially dominant and the single-trough formula above follows. If several minima are comparable on the Laplace scale, their Gaussian neighborhoods must additionally be asymptotically separated. A sufficient condition is
+\[
+|\sigma_i-\sigma_j|
+\gg
+\max\{\alpha_i^{-1/2},\alpha_j^{-1/2}\}
+\qquad(i\neq j),
+\]
+so that the leading Gaussian cores do not overlap. Under this separation condition the correct leading approximation is the sum of their Gaussian contributions,
+\[
+u_h
+\sim
+\sum_j e^{-\Phi_j}\sqrt{\frac{2\pi}{\alpha_j}}.
+\]
+If two comparable minima approach within a Gaussian width, the separate-saddle sum is not uniform; their joint neighborhood must instead be treated by a uniform multi-critical-point approximation or by retaining the Kendall integral over that combined region.
+Since the deterministic identity $y_j=y_h e^{\Phi_j}$ holds at every trough, the arbitrary handoff again cancels:
+\[
+\boxed{
+B_{\rm multi}
+\sim
+\frac{K}{\displaystyle\sum_j y_j^{-1}\sqrt{2\pi/\alpha_j}}.
+}
+\]
+For a single dominant trough this reduces exactly to $B_{\rm tr}=K y_t\sqrt{\alpha_t/(2\pi)}$.  Thus the globality requirement is explicit and testable rather than hidden inside the local saddle calculation.
+
+\subsection{The factor-of-two issue}
+Restarting a fresh branching process exactly at $\sigma_t$ is not equivalent to the boundary-independent construction.  A lineage started at the trough produces the one-sided Gaussian integral
+\[
+\int_{\sigma_t}^{\infty}
+\exp\left[-\int_{\sigma_t}^{s}\gamma(v)\dd v\right]\dd s
+\sim\sqrt{\frac{\pi}{2\alpha_t}},
+\]
+which would give a coefficient larger by a factor of two.  That calculation discards the stochastic thinning accumulated on the subcritical side of the bottleneck.  Starting before the trough retains the full interior saddle, and the pre-trough attenuation is simultaneously converted through $y_t=y_h e^{\Phi_t}$.  The coefficient $\sqrt{\alpha_t/(2\pi)}$ therefore follows from one Kendall calculation without an ad hoc doubling convention.
+
+\subsection{Low-prevalence reduction}
+Suppose now that
+\[
+\frac{y_t}{x_t}\to0,
+\qquad
+x_t\to\xs,
+\qquad
+\frac{\Apsi(x_t)-\Apsi(\xs)}{\rho}\to0.
+\]
+The last condition is needed because persistence is exponentially sensitive to the action on the $1/\rho$ scale; pointwise convergence $x_t\to\xs$ alone is insufficient.  Since $\Apsi'(\xs)=0$ and $\Apsi''(\xs)\neq0$, a convenient sufficient condition is
+\[
+\boxed{|x_t-\xs|\ll\sqrt{\rho}.}
+\]
+Then $g(x_t,y_t)=1$ implies the usual low-prevalence threshold $\Rzero\xs^\eta=1$.  Moreover
+\[
+\rho\hth(x_t)-y_t\to\rho h_*,
+\]
+and
+\[
+\frac1{x_t}-\frac{\psi}{x_t+y_t}
+\to\frac{1-\psi}{\xs}=\frac{\eta}{\xs}.
+\]
+Consequently
+\[
+\boxed{
+\alpha_t\to\frac{\eta\rho h_*}{\xs}.
+}
+\]
+The finite-prevalence exponent therefore becomes
+\[
+B_{\rm tr}
+\sim K y_t\sqrt{\frac{\eta\rho h_*}{2\pi\xs}},
+\]
+which is exactly the Gaussian/Laplace prefactor of the low-prevalence action theory.  Thus the finite-prevalence result is an extension of the same Todd-style boundary-independent Kendall mechanism, not a separate definition of BI.
 
 \section{Laplace reduction and handoff-independent leading form}
 \label{sec:laplace}
@@ -1425,13 +1767,13 @@ The nonlinear tail equation becomes
 The action-drift identity simplifies to
 \[
 \boxed{
-\dot J=-(1-\Rzero x)d.
+\dot J=-(1-\Rzero x)d_{\rm dep}.
 }
 \]
 The entire finite-prevalence transmission term $g-\gh$ vanishes exactly. Correspondingly,
 \[
 \epsA
-=\frac{|1-\Rzero x|d}{1-\Rzero x}=d
+=\frac{|1-\Rzero x|d_{\rm dep}}{1-\Rzero x}=d_{\rm dep}
 \]
 on the descending branch. This is the structural reason that the $\psi=0$ case possesses a particularly broad action overlap: only susceptible feedback must become small.
 
@@ -1504,7 +1846,7 @@ Ky\gg1,
 \qquad
 s=\frac yx\ll1,
 \qquad
-d=\frac{gy}{\rho\hth(x)}\ll1.
+d_{\rm dep}=\frac{gy}{\rho\hth(x)}\ll1.
 \]
 For action-plateau independence one also requires the accumulated drift to be small:
 \[
@@ -1526,7 +1868,7 @@ and, equivalently in the fixed-parameter regime,
 \]
 If the handoff lies too close to the saddle, the exact Kendall integral should be retained.
 
-\subsection{Large \texorpdfstring{$R_0$}{R0} and positive \texorpdfstring{$\psi$}{psi}}
+\subsection{Large \texorpdfstring{$\Rzero$}{R0} and positive \texorpdfstring{$\psi$}{psi}}
 At fixed $\Rzero$, $z_f$ is independent of $\psi$, while
 \[
 \xf=z_f^{1/(1-\psi)}.
@@ -1590,15 +1932,24 @@ down the descending tail.
 \[
 s=\frac yX,
 \qquad
-d=\frac{gy}{\rho\hth(X)},
+d_{\rm dep}=\frac{gy}{\rho\hth(X)},
 \qquad
-\epsA=\frac{\psi\gh s+|1-\gh|d}{1-g},
+\epsA=\frac{\psi\gh s+|1-\gh|d_{\rm dep}}{1-g},
 \]
 \[
 \CalC(y)=y\exp\left\{\frac{\Apsi(X)-\Apsi(\xf)}\rho\right\}.
 \]
 \item Verify that results are insensitive to the chosen outer initialization point $\bar x$.
 \end{enumerate}
+
+\subsection{Optional finite-prevalence trough refinement}
+If the action-overlap diagnostics do not become small before the deterministic infective bottleneck, continue the deterministic background and locate all post-peak recovery troughs that can contribute on the Kendall scale.  A candidate trough $\sigma_j$ is characterized dynamically by
+\[
+g(x_j,y_j)=1,
+\qquad
+\alpha_j>0.
+\]
+If one trough is globally dominant, evaluate $B_{\rm tr}$ from Section~\ref{sec:finitekendall}; if several have comparable cumulative-growth depth, use the multi-saddle expression in Section~\ref{sec:multisaddle}.  This refinement changes only the deterministic-to-stochastic reduction; the CTMC data used for validation need not be regenerated.  In numerical work the trough should be located by event detection on a continuous deterministic trajectory or by an equivalent branch-continuation procedure, not by an independent parameter-point search that can jump between crossings.
 
 \subsection{Loop over \texorpdfstring{$K$}{K}}
 For each population size $K$:
@@ -1609,7 +1960,7 @@ Ky\gg1,
 \qquad
 s\ll1,
 \qquad
-d\ll1,
+d_{\rm dep}\ll1,
 \qquad
 \epsA\ll1.
 \]
@@ -1683,6 +2034,13 @@ For large $\Rzero$ and positive $\psi$, record
 \frac yx
 \]
 along the tail. The nonlinear continuation should remain stable through regions where this ratio is $O(1)$, while the stochastic handoff should be delayed until a genuine low-prevalence overlap is reached.
+
+\subsection{Finite-prevalence Kendall regression}
+For parameter points where the deterministic trough has non-negligible $y_t/x_t$, compare the original low-prevalence nonlinear-tail prediction with
+\[
+B_{\rm tr}=K y_t\sqrt{\alpha_t/(2\pi)}.
+\]
+The two predictions must agree as $y_t/x_t\to0$.  At finite relative prevalence, the trough formula should be assessed against the same stochastic cache; no new CTMC trajectories are required solely because the analytical reduction has changed.
 
 \section{Recruitment-law derivatives}
 For
@@ -2242,7 +2600,25 @@ Expanding the exponential and retaining terms whose Gaussian averages are $O(\rh
 \right].
 \end{aligned}
 \]
-Here the numerical coefficients follow from the Gaussian moments
+To make the $t^6$ contribution explicit, after the scaling one has
+\[
+\exp\left[
+\sqrt\rho\,\frac{A_3}{6\lambda^{3/2}}t^3
++\rho\,\frac{A_4}{24\lambda^2}t^4
++O(\rho^{3/2})
+\right]
+\]
+\[
+=1
++\sqrt\rho\,\frac{A_3}{6\lambda^{3/2}}t^3
++\rho\left
+\{
+\frac{A_4}{24\lambda^2}t^4
++\frac12\left(\frac{A_3}{6\lambda^{3/2}}\right)^2t^6
+\right\}
++O(\rho^{3/2}).
+\]
+The second term inside braces is the square of the cubic exponential correction; after Gaussian averaging it is precisely the source of the $5A_3^2/(24\lambda^3)$ term.  The required moments are
 \[
 \langle t^2\rangle=1,
 \qquad
@@ -2263,17 +2639,17 @@ Therefore
 \]
 For $f=1/h_\theta$, write $h=h_\theta$ temporarily and define
 \[
-r(x)=1-\Rzero x^\eta,
+\zeta(x)=1-\Rzero x^\eta,
 \qquad
-\Apsi'(x)=\frac{r(x)}{h(x)}.
+\Apsi'(x)=\frac{\zeta(x)}{h(x)}.
 \]
-At $x=\xs$ we have $r(\xs)=0$ and $\Rzero\xs^\eta=1$. The derivatives of $r$ at the saddle are
+At $x=\xs$ we have $\zeta(\xs)=0$ and $\Rzero\xs^\eta=1$. The derivatives of this auxiliary saddle function are
 \[
-r_*'=-\frac{\eta}{\xs},
+\zeta_*'=-\frac{\eta}{\xs},
 \qquad
-r_*''=-\frac{\eta(\eta-1)}{\xs^2},
+\zeta_*''=-\frac{\eta(\eta-1)}{\xs^2},
 \qquad
-r_*'''=-\frac{\eta(\eta-1)(\eta-2)}{\xs^3}.
+\zeta_*'''=-\frac{\eta(\eta-1)(\eta-2)}{\xs^3}.
 \]
 Consequently
 \[
@@ -2386,5 +2762,9 @@ The theory can be summarized as
 \]
 
 The key structural separation is that the deterministic tail is allowed to pass through finite relative prevalence $y/x=O(1)$ without expanding the transmission factor. The condition $y/x\ll1$ is imposed only where it is actually needed: at the deterministic-to-stochastic handoff. The action identity then supplies both a quantitative overlap diagnostic and the handoff-independent amplitude that enters the leading Laplace burnout exponent.
+
+
+\paragraph{Finite-prevalence extension.}
+When the low-prevalence action overlap is attained, the primary nonlinear-tail BI formula remains the expression based on the plateau amplitude $\CalC$.  When the deterministic bottleneck is instead reached at finite relative prevalence, the same Kendall architecture admits the trough reduction of Section~\ref{sec:finitekendall}.  These are two asymptotic reductions of the same prescribed deterministic background; the second is not a replacement for the first in parameter regions where the stronger low-prevalence overlap already holds.
 
 \end{document}

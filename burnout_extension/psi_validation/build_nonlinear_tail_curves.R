@@ -14,6 +14,8 @@ for(i in seq_len(nrow(grid))){
   ans[[i]]<-z
 }
 curves<-rbindlist(ans)
-setcolorder(curves,c('rho','theta','K','R0','psi','leading','next_order','x_h','y_h','C_eff','s','d','epsilon_A','g','overlap_score','c_L'))
+setcolorder(curves,c('rho','theta','K','R0','psi','leading','next_order','trough',
+  'x_h','y_h','C_eff','s','d','epsilon_A','g','overlap_score','c_L',
+  'log_B_trough','t_t','x_t','y_t','log_y_t','s_t','alpha_t','gaussian_width'))
 fwrite(curves,'psi_validation/data/psi05_nonlinear_tail_curves.csv')
 cat('nonlinear-tail curves complete\n')

@@ -33,6 +33,16 @@ handoff when it is reached before the safe pre-trough cutoff. Otherwise it uses
 the deepest available point with `g < 0.98`. Curves are left undefined when the
 second-order regular-outer initialization is not on the descending branch.
 
+The rebuilt curve cache also contains the finite-prevalence Kendall prediction
+from the updated theory.  The deterministic system is continued in time to the
+first recovery trough, located by a continuous `g = 1` event, and records
+`x_t`, `y_t`, `log_y_t`, `s_t = y_t/x_t`, and the analytic crossing speed
+`alpha_t`. The log prevalence is retained so exponentially deep troughs remain
+numerically meaningful even when `y_t` itself underflows. The
+new `trough` column is computed from
+`B_tr = K*y_t*sqrt(alpha_t/(2*pi))`.  Figures compare this refinement against
+the same CTMC cache; stochastic trajectories do not need to be regenerated.
+
 For a compact conditional overview similar to the original `fig13_comb.pdf`:
 
 ```r

@@ -1,0 +1,14 @@
+library(data.table)
+sim<-fread('2d_ode_validation/data/psi1_stochastic_results.csv')
+curves<-fread('2d_ode_validation/data/psi1_2d_ode_curves.csv')
+setkey(sim,rho,theta,K,R0);setkey(curves,rho,theta,K,R0)
+z<-curves[sim,nomatch=0]
+z[,`:=`(ae_cond=abs(P_conditional-P_kendall),
+  ae_uncond=abs(P_unconditional-P_kendall_unconditional),
+  covered_cond=P_conditional>=cond_low&P_conditional<=cond_high)]
+out<-z[,.(points=.N,attempts=sum(attempts),mean_abs_cond=mean(ae_cond,na.rm=TRUE),
+  mean_abs_uncond=mean(ae_uncond,na.rm=TRUE),
+  zero_persistence=sum(persistent==0),no_trough=sum(status%in%c('NO_TROUGH','NO_RECOVERY_PEAK'))),
+  by=.(theta,K)]
+fwrite(out,'2d_ode_validation/data/psi1_2d_ode_summary.csv')
+print(out)
