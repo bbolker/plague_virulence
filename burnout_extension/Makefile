@@ -2,6 +2,14 @@ R=R CMD BATCH --vanilla
 DATADIR=validation/data
 SIMFILES=$(DATADIR)/stochastic_scan_results.csv $(DATADIR)/stochastic_scan_analytic.csv $(DATADIR)/fig11_scan_analytic.csv
 
+.PHONY: paper-figures paper
+
+paper-figures: $(SIMFILES) $(DATADIR)/fig11_scan_results.csv
+	Rscript validation/make_section7_figures.R
+
+paper: paper-figures
+	latexmk -pdf -interaction=nonstopmode -halt-on-error burnout_theta_paper.tex
+
 validation/figures/fig13_comb.pdf: validation/plot_fig13_comb.R $(SIMFILES)
 	$(R) $<
 validation/figures/fig13_BI_conditional_stochastic_validation.pdf: validation/plot_BI_validation.R $(SIMFILES)

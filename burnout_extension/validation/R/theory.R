@@ -41,8 +41,11 @@ Fp <- function(x, R0) 1/(R0*x)-1
 Fpp <- function(x, R0) -1/(R0*x^2)
 
 x_final <- function(R0) {
-  uniroot(function(x) F0(x,R0), c(1e-15, 1/R0-1e-12),
-          tol=1e-13)$root
+  # Solve for log(x_f) so the nontrivial final-size root remains accessible
+  # when R0 is large and x_f is exponentially small.
+  zhi <- log(1/R0) - 1e-12
+  zlo <- -max(2*R0,50)
+  exp(uniroot(function(z) 1-exp(z)+z/R0,c(zlo,zhi),tol=1e-13)$root)
 }
 
 action_derivative <- function(x,R0,theta) (1-R0*x)/h_theta(x,theta)

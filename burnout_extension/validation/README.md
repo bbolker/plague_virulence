@@ -106,6 +106,20 @@ Key files are `R/theory.R`, `R/ode_reference.R`, `R/kendall.R`, `R/scan.R`,
 and `R/stochastic.R`. Generated CSVs are under `data/` and figures under
 `figures/`.
 
+## Paper-facing figures
+
+The compact figures used by `../burnout_theta_paper.tex` are regenerated from
+the cached stochastic and ODE scans (no stochastic rerun is required) with:
+
+```r
+Rscript validation/make_paper_figures.R
+```
+
+This writes the direct conditional-persistence comparison, the
+theta-dependent 50% persistence threshold, and the supplementary error
+isolation figure to `figures/paper/`.  The numerical summaries quoted in the
+Results section are written to `data/paper_numerical_summary.csv`.
+
 ## First-trough boundary-entry diagnostic
 
 `R/trough_diagnostics.R` measures the first post-epidemic deterministic trough

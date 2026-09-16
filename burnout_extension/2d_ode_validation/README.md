@@ -36,3 +36,19 @@ direct Kendall quadrature, and no closed-trough overlay.
 The corresponding `psi = 1` workflow is provided by the scripts whose names
 end in `_psi1.R`. Its CTMC results are newly simulated and checkpointed in
 `data/psi1_scan_checkpoint.rds`; they are not reused from the earlier scan.
+
+The `psi = 1`, large-population workflow uses `K = 1e6, 1e7, 1e8, 1e9`.
+Scripts ending in `_psi1_largeK.R` use adaptive tau-leaping with
+`epsilon = 0.01`, while retaining the same parameter grid, adaptive Wilson
+precision rule and 2D ODE calculation. Its validation figures show only the
+numerical finite-horizon Kendall prediction; the closed trough-saddle overlay
+and its comparison figure are intentionally omitted.
+
+The transition-focused `psi = 1`, `theta = 0.5` diagnostic uses
+`pilot_psi1_largeK_transition.R`, `build_curves_psi1_largeK_transition.R`, and
+`plot_psi1_largeK_transition.R`.  Instead of a fixed `R0` grid it follows
+`q = rho*sqrt(K)/R0` over `q = 2.5, 3, 3.5, 4, 4.5`, which tracks the moving,
+sharpening persistence transition as `K` increases.  The pilot deliberately
+uses 50--200 paths per point; its purpose is to locate the informative region
+and expose theory/solver discrepancies before committing to a high-precision
+scan.
