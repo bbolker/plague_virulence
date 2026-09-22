@@ -109,7 +109,9 @@ Throughout the main derivation we consider
 \rhoeps\to0,\qquad \Rzero>1\ \text{fixed},\qquad K\ \text{large}.
 \label{eq:regime}
 \end{equation}
+[[JD: 100\% agree with BB here: always avoid saying things are small without a scale-appropriate comparator.]]
 The near-threshold regime \(\Rzero\downarrow1\) requires separate treatment because the scale separation underlying the post-wave asymptotics becomes nonuniform.
+[[JD: Might even be good to briefly describe the scale separation before talking about the breakdown.]]
 
 \section{Phase-plane asymptotics under generalized susceptible recruitment}
 \label{sec:phaseplane}
@@ -123,7 +125,7 @@ Starting from a naive invasion near \((x,y)=(1,0)\), the leading first-wave orbi
 F(x)=1-x+\frac{1}{\Rzero}\log x,\qquad y=F(x).
 \label{eq:F}
 \end{equation}
-The epidemic peak occurs at \(x=\xs\). The nontrivial post-wave zero \(\xf\in(0,\xs)\) is defined by
+The epidemic peak occurs at \(x=\xs\). The [[nontrivial ??]] post-wave zero \(\xf\in(0,\xs)\) is defined by
 \begin{equation}
 F(\xf)=0,
 \qquad
@@ -614,14 +616,14 @@ The representative small-\(\rhoeps\) extrema are not an artifact of the Laplace 
 \begin{figure}[p]
 \centering
 \includegraphics[width=\textwidth]{validation/figures/paper/unconditional_persistence_structure.pdf}
-\caption{Analytically verified structure of unconditional persistence. (a) Landscapes at \(K=10^6\) for five recruitment shapes; white dashed and solid curves are local maxima and minima obtained from \(G=0\). Gray cells fail the first-order finite-entry condition, as in \cref{fig:conditional-landscape}. (b) Continuous extremum branches obtained by one-sided continuation of \(G=0\) in \(\theta\), initialized at \(\theta=0\) or at a verified saddle-node; branches end at the plotting boundary \(\Rzero=8\) when necessary. An empty part of (b) means no extremum within the displayed \(\Rzero\) window, not global monotonicity. (c) Genuine saddle-node pair-creation boundary obtained from \(G=G_{\Rzero}=0\). No point is plotted where a pair already exists at \(\theta=0\).}
+\caption{Analytically verified [[JD: consider log(-1) scaling here as well.]] structure of unconditional persistence. (a) Landscapes at \(K=10^6\) for five recruitment shapes; white dashed and solid curves are local maxima and minima obtained from \(G=0\). Gray cells fail the first-order finite-entry condition, as in \cref{fig:conditional-landscape}. (b) Continuous extremum branches obtained by one-sided continuation of \(G=0\) in \(\theta\), initialized at \(\theta=0\) or at a verified saddle-node; branches end at the plotting boundary \(\Rzero=8\) when necessary. An empty part of (b) means no extremum within the displayed \(\Rzero\) window, not global monotonicity. (c) Genuine saddle-node pair-creation boundary obtained from \(G=G_{\Rzero}=0\). No point is plotted where a pair already exists at \(\theta=0\).}
 \label{fig:unconditional-structure}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=.88\textwidth]{validation/figures/paper/unconditional_shape_map.pdf}
-\caption{Global shape classification of the leading BI unconditional-persistence curve over \(\Rzero>1\), across \((\rhoeps,\theta)\) at \(K=10^6\). The observed structures are one maximum (blue, possibly far outside Figure~\ref{fig:unconditional-structure}) and two maxima separated by one minimum (green). The black dashed line is the genuine pair-creation locus \(G=G_{\Rzero}=0\), not a generic nonmonotonicity threshold. Roots are bracketed from the analytical \(G=0\) condition through \(\Rzero=300\); the far-right maximum for \(\theta<1\) is continued using the derived large-\(\Rzero\) asymptotics. This classifies the BI expression and does not validate its quantitative accuracy at extreme \(\Rzero\).}
+\caption{[[JD: Possible to do something like bifurcation diagrams for a few values of $\theta$? Show maxima, with $\Rzero$ on the vertical axis and $\rho$ on the horizontal?]] Global shape classification of the leading BI unconditional-persistence curve over \(\Rzero>1\), across \((\rhoeps,\theta)\) at \(K=10^6\). The observed structures are one maximum (blue, possibly far outside Figure~\ref{fig:unconditional-structure}) and two maxima separated by one minimum (green). The black dashed line is the genuine pair-creation locus \(G=G_{\Rzero}=0\), not a generic nonmonotonicity threshold. Roots are bracketed from the analytical \(G=0\) condition through \(\Rzero=300\); the far-right maximum for \(\theta<1\) is continued using the derived large-\(\Rzero\) asymptotics. This classifies the BI expression and does not validate its quantitative accuracy at extreme \(\Rzero\).}
 \label{fig:unconditional-shape-map}
 \end{figure}
 

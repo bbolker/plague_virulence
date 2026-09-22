@@ -1,6 +1,7 @@
 ## This is a PERSONAL MAKEFILE for plague_virulence
 ## It is version-controlled as jd.MK and linked and used as extras.mk
 ## `make jd.extras` to use
+## If this file opens for you automatically, Jonathan, it means you've already done that
 
 current: target
 -include target.mk
@@ -24,11 +25,11 @@ Ignore += *_files/
 
 Sources += $(wildcard burnout_extension/*.tex burnout_extension/*.md)
 
-burnout_extension/burnout_theta_theory_unified_en.pdf: burnout_extension/burnout_theta_theory_unified_en.tex
-	$(texThere)
-
 ## git rm --cached burnout_extension/burnout_theta_paper.pdf ##
 burnout_extension/burnout_theta_paper.pdf: burnout_extension/burnout_theta_paper.tex
+	$(texThere)
+
+burnout_extension/burnout_theta_theory_unified_en.pdf: burnout_extension/burnout_theta_theory_unified_en.tex
 	$(texThere)
 
 ## Bolker current comparison figure
