@@ -27,7 +27,8 @@ Sources += $(wildcard burnout_extension/*.tex burnout_extension/*.md)
 burnout_extension/burnout_theta_theory_unified_en.pdf: burnout_extension/burnout_theta_theory_unified_en.tex
 	$(texThere)
 
-## burnout_extension/burnout_theta_paper.pdf: burnout_extension/burnout_theta_paper.tex
+burnout_extension/burnout_theta_paper.pdf: burnout_extension/burnout_theta_paper.tex
+	$(texThere)
 
 ## Bolker current comparison figure
 ## burnout_extension/validation/figures/fig13_comb.pdf
