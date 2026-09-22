@@ -8,7 +8,7 @@ current: target
 vim_session:
 	bash -ic "vi extras.mk target.mk Makefile"
 
-Sources += $(wildcard *.MK) Makefile
+Sources += $(wildcard *.MK) Makefile .gitignore
 Ignore += extras.mk 
 
 ######################################################################
@@ -27,11 +27,13 @@ Sources += $(wildcard burnout_extension/*.tex burnout_extension/*.md)
 burnout_extension/burnout_theta_theory_unified_en.pdf: burnout_extension/burnout_theta_theory_unified_en.tex
 	$(texThere)
 
+## git rm --cached burnout_extension/burnout_theta_paper.pdf ##
 burnout_extension/burnout_theta_paper.pdf: burnout_extension/burnout_theta_paper.tex
 	$(texThere)
 
 ## Bolker current comparison figure
 ## burnout_extension/validation/figures/fig13_comb.pdf
+
 
 ######################################################################
 
