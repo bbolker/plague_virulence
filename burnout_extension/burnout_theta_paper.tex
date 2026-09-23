@@ -43,7 +43,6 @@
 
 \begin{abstract}
 [[JD: Would be good to get a bit more motivation in the abstract]]
-[[JD: If we are going to use authordate style (
 Parsons et al. approximated epidemic burnout after a major epidemic wave by matching a deterministic epidemic trajectory to a stochastic branching process at low prevalence. Existing asymptotic burnout theory for the susceptible--infectious--recovered model with vital dynamics assumes linear susceptible replenishment. Motivated by the possibility of density-dependent recruitment, particularly in ecological host populations, we replace the linear term by the one-parameter family
 \(
 \hth(x)=(1-x)x^\theta,\qquad 0\leq \theta\leq 1,
@@ -445,10 +444,12 @@ I(\xin)=
 \end{equation}
 If the finite matching line contains \(m=K\yin\) infectives and their descendants are approximated as independent, then
 \begin{align}
+[[JD: Probably prefer $\approx$ to $\simeq$ everywhere.]]
 P_{\rm burn\mid est}&\simeq\left(\frac{I}{1+I}\right)^{K\yin},\label{eq:Pburn}\\
 P_{\rm persist\mid est}&\simeq1-P_{\rm burn\mid est}.
 \label{eq:Ppersistcond}
 \end{align}
+[[JD: It seems OK to use equality above: Pburn can mean the true Pburn, and the approximation in the first equation above is marked as an approximation.]]
 For numerical stability define the burnout exponent
 \begin{equation}
 B=-\log P_{\rm burn\mid est}
