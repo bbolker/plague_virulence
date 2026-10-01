@@ -31,15 +31,14 @@ and hence have lower $\rzero$.
 
 We were inspired by @Pars+2024, which suggests that lowering within-population $\rzero$ (from $\approx 2$) could decrease the probability of burnout in the trough after the initial introduction of plague into
 
-* **demographic models matter**: @Pars+2024 considered only the case where hosts are replenished at a constant rate (i.e., absolute birth rate), which is reasonable for a disease with low impact on population size. For rat populations affected by plague, however, a logistic growth model (birth rate/susceptible replenishment rate proportional to population size) is more reasonable.
-
-add metapopulation findings ('ratchet' effect in the absence of seasonality because of persistence post-first-trough)
-
-starting on seasonality
+* **demographic models matter**: @Pars+2024 considered only the case where hosts are replenished at a constant rate (i.e., absolute birth rate), which is reasonable for a disease with low impact on population size. For rat populations affected by plague, however, a logistic growth model (birth rate/susceptible replenishment rate proportional to population size) is more reasonable. (Also mention different $\epsilon$ value
+* **simple metapopulation models may not work**: in stochastic simulation models of plague in rat metapopulations, we find a 'ratchet' effect: because persistence is extremely likely once an epidemic survives through the first trough, and since (enhancement via population suppression)
+* starting on seasonality
 
 ## open questions/questioning assumptions
 
-* importance of colonization?
+* is the enhanced possibility of colonization (through increased survival)
+* should we be considering possibilities other than the classic rat-flea transmission cycle? (evolution in humans, e.g. importance of human ectoparasite/pneumonic transmission modes?)
 * are there any other ways that historical or ancient-DNA evidence can shed light on the ancient ecology of plague? e.g.
    * evidence of host (rat) coevolution with plague
    * finding out more about the sylvatic cycle
