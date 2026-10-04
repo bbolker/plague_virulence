@@ -4,9 +4,14 @@ author: Ben Bolker, Jonathan Dushoff, and David Earn
 bibliography: virulence.bib
 ---
 
-\newcommand{rzero}{{\mathcal R}_0}
+::: {.hidden}
+$$
+\newcommand{\rzero}{{\mathcal R}_0}
+$$
+:::
+
 The recent paper by @sidhuAttenuationVirulenceYersinia2025 documented the repeated emergence of a relatively avirulent
-strain of $Y. pestis* ("PLA-depleted", a copy number reduction in a plasmid-carried plasminogen) across all three plague
+strain of *Y. pestis* ("PLA-depleted", a copy number reduction in a plasmid-carried plasminogen) across all three plague
 pandemics. We have been working to 
 
 **check**: are these paragraphs what actually made it into the paper?
