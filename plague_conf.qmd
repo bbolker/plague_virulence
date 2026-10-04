@@ -2,6 +2,7 @@
 title: "understanding the repeated evolution of plague avirulence"
 author: Ben Bolker, Jonathan Dushoff, and David Earn
 bibliography: virulence.bib
+link-citations: true
 from: markdown+latex_macros
 ---
 
@@ -9,7 +10,7 @@ from: markdown+latex_macros
 
 The recent paper by @sidhuAttenuationVirulenceYersinia2025 documented the repeated emergence of a relatively avirulent
 strain of *Y. pestis* ("PLA-depleted", a copy number reduction in a plasmid-carried plasminogen) across all three plague
-pandemics. We have been working to 
+pandemics. We have been working to **[DE: added the remainder of this sentence]** develop and test a mathematical model that formalizes the verbal arguments that we gave in @sidhuAttenuationVirulenceYersinia2025.
 
 **check**: are these paragraphs what actually made it into the paper?
 
@@ -30,6 +31,60 @@ fatality proportions, they will actually cause fewer secondary infections
 and hence have lower $\rzero$.
 
 > We suggest two other mechanisms that may instead be responsible for inducing selection for PLA depletion after the wild type is established.  First, while less virulent and less transmissible strains are handicapped in competing with the wild type strain in the early phase of the epidemic, as the rat population is reduced in size, these "weaker" strains will be less likely to go extinct during epidemic troughs.  Second, rats infected with strains that kill more slowly will be more likely to disperse while infected, enhancing pathogen persistence through colonization of uninfected areas. These mechanisms are discussed further in SOM.
+
+**[DE] no:** Here are the complete published paragraphs (extracted by ChatGPT).  They are the third and fourth paragraphs of the Discussion, on article page 8 of 15 (PDF page 9).  The reference numbers are as they appear in the published pdf.
+
+> Our *in vivo* results showed that *pla*-reduced, attenuated strains that carry a
+> single copy of the *pla* gene remain fully capable of causing lethal bubonic
+> infections, inducing full blown pneumonia (as well as septicemia), contrary to
+> engineered strains that lack *pla* or have no Pla activity (19–21, 45, 46). However,
+> selection for *pla* depletion likely occurred in the context of bubonic plague, as it
+> was the only form of the disease for which we observed an effect on virulence. Knowing
+> that *pla*-reduced strains take longer than *pla*-WT strains to kill their host in our
+> *in vivo* experiments, it may initially appear that the selection for *pla* depletion
+> reflects a classical transmission-virulence trade-off (16, 47–49). However, bubonic
+> plague is primarily transmitted from one host to another during a very short
+> late-stage high bacteremia, which leads to the death of the initial host and movement
+> of their infected fleas to another host (50–52). Because fatal bacteremia enhances
+> transmission, the reduced virulence and higher host survival time due to *pla*
+> depletion would seemingly decrease overall transmission and hence be selectively
+> disadvantageous.
+
+> Instead, we suggest that these data support models of epidemic burnout (53) in which
+> pathogen attenuation enables disease persistence in small and fragmented populations
+> through frequent, reinitiated epidemics after population recovery. Indeed, modeling
+> has suggested that both metapopulation structure and partial population immunity could
+> account for plague persistence in the modern plague Malagasy foci (54). Sylvatic
+> rodent reservoirs are responsible for the long-term persistence of *Y. pestis* in
+> nature (55), whereas multiple peridomestic rodent species, including black rats, play
+> the role of amplification hosts (56). We focused on black rats (and their associated
+> fleas) because they represent recognized drivers of plague epidemics in urban locales
+> (56–62). The highly virulent *pla*-WT strain that generates frequent septicemia with a
+> greater reproduction number than the *pla*-reduced strain would be selectively
+> advantageous in the large, fecund naïve (61, 63), highly susceptible (58–60, 64–66),
+> and well-connected metapopulations of rats that likely characterized the early phases
+> of pandemics and where susceptible hosts were easily replenished. However, after
+> reductions in the size and density of peridomestic rat populations during repeated
+> epidemic waves, we hypothesize that there was selection at the metapopulation level
+> for *pla*-reduced strains. The high rat mortality that likely accompanied documented
+> massive human mortality during the Black Death and the subsequent decennial epidemics
+> likely led to low rodent densities for long periods of time. Indeed, prairie dog
+> colonies can take years to recover after epizootics with high mortality rates of >95%
+> (67). Human population sizes in Europe were also reduced by ~30 to 50% during the
+> Black Death and remained low until the mid-16th century (68, 69), likely affecting
+> human-rat plague cycles. This decline in the density of susceptible hosts and their
+> increasing population fragmentation about a century into the second pandemic (~1420
+> CE) may thus have created an environment that favored *pla*-reduced, attenuated
+> strains of *Y. pestis* over their more virulent *pla*-WT relatives. Specifically, a
+> decreased mortality rate and longer time to host death would allow for continued
+> movement of rats between existing populations, now more distantly spaced than early in
+> the pandemic, allowing for the continued persistence, and hence increased
+> transmission, of *Y. pestis* and the subsequent slow burn of the epidemic. Although
+> metapopulation or landscape-level mechanisms for plague persistence have been
+> suggested (50, 70, 71), we are not aware of previous hypotheses concerning the
+> metapopulation-level selection of *Y. pestis*, though the concept of
+> metapopulation-level selection for pathogen virulence or predator efficiency is well
+> established in theoretical ecology (72–74).
 
 We were inspired by @Pars+2024, which suggests that lowering within-population $\rzero$ (from $\approx 2$) could decrease the probability of burnout in the trough after the initial introduction of plague into
 
