@@ -23,6 +23,11 @@ Ignore += *_files/
 
 ######################################################################
 
+autoknitR = defined
+## plague_conf.html: plague_conf.qmd
+
+######################################################################
+
 Sources += $(wildcard burnout_extension/*.tex burnout_extension/*.md)
 
 ## git rm --cached burnout_extension/burnout_theta_paper.pdf ##
