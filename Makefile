@@ -1,3 +1,5 @@
+ALL: plague_conf.pdf
+
 R=R CMD BATCH --vanilla
 
 README.md: README.qmd
