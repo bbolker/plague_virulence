@@ -73,6 +73,19 @@ only. If global extinction occurs, the fit stops in the year containing global
 extinction so that subsequent zero occupancy is not treated as an ordinary
 trend.
 
+## Seasonal vs constant comparison
+
+```bash
+Rscript fadeout/seasonal/occupancy_seasonal_vs_constant_100y.R
+```
+
+Two 100-year realizations differing only in `seasonal_amp` (0.40 vs 0). The
+cosine forcing averages to zero over a year, so both runs share the same mean
+transmission and the comparison isolates seasonality rather than a change in
+mean. Output is thinned to every 10th day, which makes the one-step
+extinction/recolonization counts meaningless; those are not computed here.
+Figures and summaries go to `fadeout/output/seasonal_vs_constant_100y/`.
+
 ## Validation
 
 Run focused synthetic checks:
