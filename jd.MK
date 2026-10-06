@@ -23,7 +23,7 @@ Ignore += *_files/
 
 ######################################################################
 
-## plague_conf.html: plague_conf.qmd
+## html not necessarily supported
 ## plague_conf.pdf: plague_conf.qmd
 
 ######################################################################
