@@ -2,6 +2,7 @@
 title: "understanding the repeated evolution of reduced plague virulence"
 author: Ben Bolker, Jonathan Dushoff, and David Earn
 bibliography: virulence.bib
+csl: harvard-cite-them-right.csl
 link-citations: true
 from: markdown+latex_macros
 format:
