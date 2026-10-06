@@ -96,7 +96,7 @@ knitr::include_graphics(
    * evidence of host (rat) coevolution with plague
    * finding out more about the sylvatic cycle
    * proxies for historical rat populations
-   * ancient polymorphisms/substitutions that are connected to *Y. pestis* loci that have known phenotypic effects in its hosts or vectors (based on current-day empirical studies) [e.g. @@Hinn+2017]
+   * ancient polymorphisms/substitutions that are connected to *Y. pestis* loci that have known phenotypic effects in its hosts or vectors (based on current-day empirical studies) [e.g. @Hinn+2017]
    
 The general point is that ancient DNA can tell us an astonishing amount about organism-level biology, but ecology --- starting with mechanisms of transmission and working up to population-level effects --- is harder (although not impossible; for example, coalescent methods tell us about population history).
 
