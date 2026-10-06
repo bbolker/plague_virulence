@@ -692,6 +692,7 @@ extras.mk
 *.docx
 *.html
 *_files/
+fadeout/output/occupancy_factorial_100y/data/
 plagueMetapop.pkg
 makestuff
 *.checkfile
@@ -804,6 +805,7 @@ extras.mk
 *.docx
 *.html
 *_files/
+fadeout/output/occupancy_factorial_100y/data/
 plagueMetapop.pkg
 makestuff
 *.checkfile
@@ -916,6 +918,7 @@ extras.mk
 *.docx
 *.html
 *_files/
+fadeout/output/occupancy_factorial_100y/data/
 plagueMetapop.pkg
 makestuff
 *.checkfile

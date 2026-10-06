@@ -27,6 +27,7 @@ Sources += $(wildcard *.qmd)
 
 ## html not necessarily supported
 ## plague_conf.pdf: plague_conf.qmd
+Ignore += fadeout/output/occupancy_factorial_100y/data/
 
 ######################################################################
 
