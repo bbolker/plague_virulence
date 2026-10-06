@@ -23,6 +23,8 @@ Ignore += *_files/
 
 ######################################################################
 
+Sources += $(wildcard *.qmd)
+
 ## html not necessarily supported
 ## plague_conf.pdf: plague_conf.qmd
 
