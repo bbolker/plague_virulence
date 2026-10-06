@@ -18,7 +18,7 @@ FACTORIAL_FIGS = fadeout/output/occupancy_factorial_100y/figures
 LATE_SUMMARY = $(FACTORIAL_FIGS)/occupancy_factorial_late_summary
 
 ## one run of the script writes all the factorial figures (PDF and PNG)
-$(LATE_SUMMARY).pdf $(LATE_SUMMARY).png &: fadeout/seasonal/occupancy_factorial_100y.R fadeout/seasonal/seasonal_model_metapop.R
+$(LATE_SUMMARY).pdf $(LATE_SUMMARY).png &: fadeout/seasonal/occupancy_factorial_100y_plotx.R fadeout/seasonal/seasonal_model_metapop.R
 	Rscript $<
 
 plague_conf.pdf: $(LATE_SUMMARY).pdf

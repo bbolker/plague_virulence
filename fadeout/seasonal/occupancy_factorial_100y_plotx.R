@@ -53,7 +53,7 @@ p_late <- ggplot(
     scale_shape_manual(values = c(16, 17, 15),
                        name = "colonization rate") +
   labs(
-    x = "Carrying capacity",
+    x = "Carrying capacity per patch",
     y = "Proportion of patches occupied",
     title = sprintf(
       "Occupancy over the last %d years: median and 95%% range",
