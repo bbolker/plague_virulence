@@ -69,8 +69,9 @@ amps <- c(seasonal = 0.40, constant = 0.00)
 ## infectious period, 1e-4 is the original 100-year run
 alpha_vals <- c(2e-5, 5e-5, 1e-4)
 
-## Jobs are spread over at most this many forked workers
-n_workers <- 27
+## Jobs are spread over at most this many forked workers, leaving at least
+## one core free (detectCores() can return NA)
+n_workers <- min(27, max(1, parallel::detectCores() - 1, na.rm = TRUE))
 
 param_grid <- expand_grid(
   R0 = c(2, 2.5, 3),
@@ -397,30 +398,45 @@ late_summary <- meta_summary |>
 write.csv(late_summary, file.path(outdir, "data", "late_summary.csv"),
           row.names = FALSE)
 
+## Proportions rather than counts; the largest K is omitted because every
+## run there saturates
+late_plot_data <- late_summary |>
+  filter(K < max(K)) |>
+  mutate(
+    across(c(lwr, median, upr), ~ . / n_patch),
+    alpha = factor(alpha, labels = c("slow", "medium", "fast")),
+    scenario = factor(scenario, levels = c("constant", "seasonal"))
+  )
+
 p_late <- ggplot(
-  late_summary,
+  late_plot_data,
   aes(
-    x = factor(R0),
+    x = factor(K),
     y = median,
     ymin = lwr,
     ymax = upr,
-    colour = scenario,
-    shape = factor(alpha),
-    group = interaction(scenario, alpha)
+    colour = factor(R0),
+    shape = alpha
   )
 ) +
   geom_pointrange(position = position_dodge(width = 0.7), size = 0.3) +
-  facet_grid(. ~ K, labeller = facet_labels) +
-  scale_colour_manual(values = okabe_ito, labels = scenario_labels, name = NULL) +
-  scale_shape_manual(values = c(16, 17, 15), name = "alpha (/day)") +
+  facet_grid(. ~ scenario, labeller = labeller(scenario = scenario_labels)) +
+  scale_colour_manual(values = okabe_ito,
+                      name = expression("transmission " * (R[0]))) +
+  scale_shape_manual(values = c(16, 17, 15), name = "colonization rate") +
+  guides(
+    colour = guide_legend(override.aes = list(size = 0.6)),
+    shape = guide_legend(override.aes = list(size = 0.6))
+  ) +
   labs(
-    x = "R0",
-    y = occupancy_ylab,
+    x = "Carrying capacity per patch",
+    y = "Proportion of patches occupied",
     title = sprintf(
       "Occupancy over the last %d years: median and 95%% range",
       summary_years
     )
   ) +
+  theme_bw(base_size = 14) +
   zmargin +
   theme(legend.position = "top")
 

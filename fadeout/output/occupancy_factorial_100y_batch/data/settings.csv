@@ -1,0 +1,7 @@
+"name","value"
+"n_patch",200
+"n_years",100
+"summary_years",50
+"threshold_multiplier",1.5
+"major_frac",0.01
+"n_reps",5
