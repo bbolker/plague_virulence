@@ -12,8 +12,10 @@ format:
 
 \newcommand{\rzero}{{\mathcal R}_0}
 
-The recent paper by @sidhuAttenuationVirulenceYersinia2025 documented the repeated emergence of reduced-virulence strains of *Y. pestis*[^pla-reduced] across all three plague pandemics.
-We have been working to develop and test a mathematical model that formalizes the verbal arguments that we gave in @sidhuAttenuationVirulenceYersinia2025, as follows:
+Our expertise is in mathematical modelling and statistical analysis.  We have previously studied mortality from plague during the second pandemic in London, and found that plague spread much more quickly during later outbreaks (17th century) than in the earliest outbreaks (14th century) (@Earn+20).
+
+More recently, we contributed to the recent paper by @sidhuAttenuationVirulenceYersinia2025, which documented the repeated emergence of reduced-virulence strains of *Y. pestis*[^pla-reduced] across all three plague pandemics.
+Since then, we have been working to develop and test a mathematical model that formalizes the verbal arguments that we gave in @sidhuAttenuationVirulenceYersinia2025. For convenience, we quote here two paragraphs from @sidhuAttenuationVirulenceYersinia2025 that summarize our argument as it stood at the time:
 
 [^pla-reduced]: these strains are called "*pla*-reduced" or "*pla*-depleted", for a reduction in copy number of the pPCP1 plasmid carrying *pla*, which encodes the plasminogen activator Pla. 
 
@@ -69,7 +71,7 @@ We have been working to develop and test a mathematical model that formalizes th
 > metapopulation-level selection for pathogen virulence or predator efficiency is well
 > established in theoretical ecology [@claessenEvolution1995; @bootsSmall1999; @Pels+2002].
 
-We were inspired by our work on epidemic burnout (@Pars+2024), which suggests that lowering within-population $\rzero$ (from $\approx 2$) could decrease the probability of burnout in the trough after the initial introduction of plague into a population. However, the story is more complicated.
+We were inspired by our mathematical work on epidemic burnout (@Pars+2024), which suggests that lowering within-population $\rzero$ (from $\approx 2$) could decrease the probability of burnout in the trough after the initial introduction of plague into a population. However, the story is more complicated.
 
 * **demographic models matter**: @Pars+2024 considered only the case where hosts are replenished at a constant rate (i.e., a constant absolute birth rate), which is reasonable for a disease with low impact on population size. For rat populations affected by plague, however, a logistic growth model (*per capita* birth rate/susceptible replenishment rate decreasing with population size; absolute birth rate highest for intermediate population size) is more reasonable. We also considered a different range of parameter values: the ratio of disease generation interval to replenishment time scale is vastly different for *Y. pestis* in rats ($\approx 0.1$--$0.2$) as compared to acute infectious disease (e.g. flu, measles) in humans ($< 0.001$).
 * **simple metapopulation models may not work**: in stochastic simulation models of plague in rat metapopulations, we find a 'ratchet' effect over a large range of parameters. Because (1) persistence is extremely likely once an epidemic survives through the first trough and (2) a higher-$\rzero$, 'wild type' strain will outcompete a lower-$\rzero$, *pla*-reduced strain within a patch, the proportion of patches occupied by the wild type typically grows slowly (but irreversibly) over time. One might concoct a scenario where the accumulation is slow enough to see metapopulation-level persistence of both strains over a long time frame, but it is hard to explain takeover by a *pla*-reduced strain. Because burnout is driven by epidemic overshoot, which in turn depends on a large initial susceptible population, previous colonization of a patch by a *pla*-reduced strain actually makes it *easier* (by reducing the susceptible population size) for a wild-type strain to invade and persist in the patch.
