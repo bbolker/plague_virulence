@@ -80,7 +80,7 @@ We were inspired by our mathematical work on epidemic burnout (@Pars+2024), whic
 ```{r}
 #| echo: false
 #| label: fig-late-summary
-#| fig-cap: "Long-term patch occupancy in a single-strain stochastic metapopulation model. If the effective population size of patches in the rat reservoir is not too high (3000 in this example), there is a range of parameters for which the disease can persist on the landscape while leaving space for an attenuated invader (patch occupancy not near 100%). The presence of seasonality and higher reproductive number favor this outcome. Increasing the colonization rate can make the disease more likely to persist, but can also make it less likely to leave space for invaders."
+#| fig-cap: "Long-term patch occupancy in a single-strain stochastic metapopulation model. If the effective population size of patches in the rat reservoir is not too high (3000 in this example), there is a range of parameters for which the disease can persist on the landscape while leaving space for an attenuated invader (patch occupancy not near 100%). The presence of seasonality favors this outcome. Increasing transmission or the colonization rate can make the disease more likely to persist, but can also make it less likely to leave space for invaders."
 #| out-width: "100%"
 knitr::include_graphics(
   "fadeout/output/occupancy_factorial_100y/figures/occupancy_factorial_late_summary.pdf"
