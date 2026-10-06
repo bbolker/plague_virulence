@@ -1,0 +1,31 @@
+## postscript: why doesn't the constant-$\rzero$ model ratchet?
+
+The premise of the 'ratchet' argument above — that persistence is extremely likely once an epidemic survives through the first trough — is regime-dependent, and the parameter that controls it turns out to be the patch carrying capacity $K$ rather than $\rzero$ or the demographic ratio $r/\gamma$.
+
+The earlier metapopulation explorations that produced the ratchet used $\rzero=3$, $K=10^4$, and $r/\gamma=0.125$ (`fadeout/single_strain_metapop.R`). A more recent 100-year single-strain run comparing seasonal with constant forcing (`fadeout/seasonal/occupancy_seasonal_vs_constant_100y.R`) instead used $\rzero=2.5$, $K=3\times 10^3$, and $r/\gamma=0.1$. Its constant-$\rzero$ arm does *not* ratchet: after a transient it settles to a stable intermediate occupancy of about 95 of 200 patches and stays there for the remaining 85 years.
+
+Our multi-trough extension of the burnout calculation to logistic host demography accounts for the difference. Write the conditional persistence probability through trough $j$, given survival to that trough, as
+$$
+P_j = 1 - q_j^m,
+$$
+where $q_j$ is the extinction probability of a single infected lineage entering trough $j$ and $m=\max[1,\mathrm{round}(K y_{\mathrm{BL}})]$ is the number of infected lineages present at boundary-layer entry. Because the rescaled trajectory $x=S/K$ obeys an equation that does not involve $K$, the per-lineage probability $q_j$ is independent of $K$; only $m$ depends on it. Reducing $K$ from $10^4$ to $3\times 10^3$ therefore cuts $m$ from 229 to 69, and since $Q_j = q_j^m$, a 3.3-fold reduction in the number of boundary-layer lineages is enough to destroy the near-certainty of persistence.
+
+Evaluating $P_2$ — persistence through the second trough, conditional on having survived the first — at both parameter sets and both carrying capacities separates the two candidate explanations:
+
+| | $K=10^4$ (earlier runs) | $K=3\times 10^3$ (recent run) |
+|:--|:--:|:--:|
+| $\rzero=3.0$, $r/\gamma=0.125$ | 0.974 | 0.666 |
+| $\rzero=2.5$, $r/\gamma=0.100$ | 0.986 | 0.721 |
+
+Both parameter combinations give $P_2\approx 0.98$ at the larger carrying capacity and $P_2\approx 0.7$ at the smaller one: the change in $\rzero$ and $r/\gamma$ is immaterial, and $K$ accounts for essentially the whole effect. The full trough sequences at the two corners that correspond to actual simulation runs are
+
+| trough $j$ | $P_j$, earlier runs ($K=10^4$) | $P_j$, recent run ($K=3\times 10^3$) |
+|:--:|:--:|:--:|
+| 1 | 0.060 | 0.034 |
+| 2 | 0.974 | 0.721 |
+| 3 | 1.000 | 0.983 |
+| 4 | 1.000 | 0.999 |
+
+At $K=10^4$ a patch that survives its first trough has essentially stopped dying, which is exactly the ratchet. At $K=3\times 10^3$ it still carries a ~28% chance of burning out at its *next* trough and ~2% at the one after; with an intrinsic period of $T_0\approx 129$ days there are roughly 280 troughs in a century, so the per-patch extinction rate remains high enough to balance recolonization and occupancy equilibrates well below saturation.
+
+This has a direct bearing on the seasonality bullet above. The seasonal-versus-constant comparison as currently run cannot establish that seasonality is what converts ratcheting into stable intermediate occupancy, because the constant-$\rzero$ arm already fails to ratchet at $K=3\times 10^3$: carrying capacity is confounded with the presence of forcing. The clean test is a constant-$\rzero$ run at $K=10^4$, where the burnout calculation predicts that occupancy *should* ratchet toward saturation. If it does, the claim stands as written; if it also plateaus, the claim needs to be reformulated — plausibly in terms of the wild-type *proportion* ratcheting rather than overall occupancy, which in any case requires the two-strain model rather than the single-strain runs discussed here.
