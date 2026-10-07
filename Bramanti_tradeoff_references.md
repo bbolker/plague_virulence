@@ -1,6 +1,6 @@
 # Do Bramanti et al.'s refs 26–28 support the virulence–transmission trade-off?
 
-*Notes compiled 2026-10-06 (Claude Code session).*
+*Notes compiled 2026-10-06, from the full texts of all three cited papers.*
 
 ## The question posed
 
@@ -36,23 +36,74 @@ transmission rate?
 ## Headline conclusion
 
 None of the three papers tests, or even addresses, the trade-off hypothesis in
-that sense. None of them measures or models an infectious period, a transmission
-rate, or a reproductive number. The claim that "this trade-off hypothesis was
-previously demonstrated for *Y. pestis* (26, 27)" is not supported by the cited
-work.
+that sense. None measures a transmission rate or a reproductive number, and none
+relates transmission to virulence within a host species. The claim that "this
+trade-off hypothesis was previously demonstrated for *Y. pestis* (26, 27)" is not
+supported by the cited work.
 
-### Access status at time of writing
+One clause of the passage does hold up. Ref 28 measures host survival time and
+shows that losing Pla prolongs it, so "reduce virulence and enhance the time of
+survival of the host" is supported for *pla* in a mouse pneumonic model. What
+fails is the step that follows — "and, consequently, of the pathogen" — for
+which the same paper supplies evidence to the contrary.
 
-| Ref | Access | Basis for notes below |
-|---|---|---|
-| 27 Cui et al. 2020 | open ([PMC6962365](https://pmc.ncbi.nlm.nih.gov/articles/PMC6962365/)) | full text read |
-| 26 Hinnebusch et al. 2017 | paywalled (Annual Reviews, no PMC deposit) | abstract + related lab literature only |
-| 28 Lathem et al. 2007 | paywalled (*Science*) | abstract + secondary coverage only |
+## Ref 26 — Hinnebusch et al. 2017
 
-Refs 26 and 28 still want a full-text check — in particular whether Hinnebusch
-discusses chronic/subclinical infection in resistant rodents, which is the one
-place in that review where a duration-of-infectiousness argument could
-plausibly live.
+A review of *Y. pestis* biofilm biology in the flea gut. Mammalian virulence
+enters only as a bacteremia threshold that transmission is gated on, and on that
+point the review argues roughly the **opposite** of the use Bramanti et al. make
+of it.
+
+The decisive passage states that the transmission window is bounded by host
+*death*, not extended by host survival:
+
+> "Transmission by this mode is rare unless the infectious blood meal contains
+> at least 10⁸ *Y. pestis*/mL, and reported early-phase transmission efficiency
+> values are based on blood bacteremia levels of ∼10⁹ *Y. pestis*/mL or higher.
+> With the notable exception of mice, terminal bacteremias may not routinely
+> reach 10⁹/mL in most mammals, or may occur only shortly before death. **Thus,
+> if it occurs at all, there is a very brief interval between the early-phase
+> threshold bacteremia level and death.**"
+
+That is a near-threshold β(α) relationship: lowering virulence moves a host
+*down* through the threshold and toward β = 0.
+
+Sublethal infections are transmission dead ends:
+
+> "Intermittent challenges from just a few fleas at a time would frequently in
+> effect vaccinate animals and remove them from the susceptible population,
+> rather than cause the septicemic plague necessary to complete the transmission
+> cycle and drive epizootic spread."
+
+The authors conclude that late-stage, blockage-dependent transmission — the mode
+depending on terminal bacteremia — "provides the foundation for ecologically
+stable plague transmission cycles."
+
+The review contains no discussion of chronic or subclinical infection in
+resistant rodents. Its only use of "chronic" refers to chronic proventricular
+biofilm infection *in fleas*, and every "persistent" refers to colonization of
+the flea gut. There is no mammalian duration-of-infectiousness argument anywhere
+in it.
+
+### The one real trade-off here is in the vector, not the host
+
+The paper does contain a duration-versus-intensity trade-off, but it concerns
+*flea* survival:
+
+> "Bacot stressed the importance of transmission by partially blocked fleas and
+> considered them to be more efficient transmitters than completely blocked
+> fleas. They also have a shorter EIP and live longer."
+
+Complete blockage starves the flea, which then "will spend the last few days of
+its life trying to obtain a blood meal, making repeated probing attempts, each
+one potentially resulting in transmission." Higher biofilm "virulence" toward
+the vector thus buys intense but brief infectiousness, while partial blockage
+buys a longer infectious period.
+
+This is a genuine virulence–transmission trade-off, structurally the one
+Bramanti et al. want — but its host is the *flea*, and the trait under selection
+is biofilm production, not *pla*. It cannot be transferred to mammalian virulence
+or to *pla* decay without an argument the authors do not make.
 
 ## Ref 27 — Cui et al. 2020
 
@@ -74,37 +125,40 @@ time, attenuation, or R₀** anywhere in the paper. Citing it as a demonstration
 of the virulence–transmission trade-off conflates "a trade-off exists among
 *Y. pestis* phenotypes" with "the virulence–transmission trade-off hypothesis".
 
-## Ref 26 — Hinnebusch et al. 2017
-
-From the abstract and the surrounding Hinnebusch-lab literature, this review
-argues roughly the **opposite** of the use Bramanti et al. make of it. Flea
-transmission requires host bacteremia of ~10⁸–10⁹ CFU/ml, essentially a terminal
-condition, and transmission probability is *positively* correlated with that
-lethal bacteremia level.
-
-The companion experimental paper (Bland et al. 2020, *PLoS Pathog*,
-[ppat.1009092](https://journals.plos.org/plospathogens/article?id=10.1371%2Fjournal.ppat.1009092))
-makes the point sharply: early-phase transmission more often yields sublethal,
-immunizing, **non-productive** infections — hosts that survive do not reach
-transmissible bacteremia — whereas blocked-flea transmission yields terminal
-disease and onward transmission.
-
-Under that biology, reduced virulence costs transmission rather than buying extra
-infectious days. This is a case where virulence and transmissibility are
-positively coupled, which is the classic circumstance under which the trade-off
-argument *fails*.
-
 ## Ref 28 — Lathem et al. 2007
 
-Purely mechanistic and route-specific: Pla is required for *Y. pestis* to
-establish fulminant primary pneumonic plague; without Pla expression,
-inflammation aborts and lung repair is activated. Pla is less important for
-dissemination in pneumonic than in bubonic plague.
+This is the only one of the three that measures anything resembling a component
+of the trade-off, and it measures the duration side alone.
 
-No transmission experiment, no co-infection, no host-survival-vs-transmission
-comparison. It supports "*pla* loss would impair pneumonic disease" — which, for
-Bramanti et al.'s own argument, implies *reduced* onward pneumonic transmission,
-not a compensating gain.
+**Losing Pla prolongs host survival.** Wild-type CO92 killed mice synchronously,
+whereas "only 50% of the mice infected with the ∆pla strain developed terminal
+plague after 7 days"; the authors state that "the lack of Pla substantially
+delayed the time to death." With a tetracycline-inducible construct, mean time
+to death was 3.1 days in the *pla*-induced state versus 5.1 days when repressed.
+The abstract frames this therapeutically: "inhibition of Pla expression prolonged
+the survival of animals with the disease."
+
+So the narrow clause Bramanti et al. attribute to this paper — reduced virulence
+lengthening host survival — is supported, for *pla*, in a mouse intranasal model.
+That is the mutation at issue, so the citation is apt as far as it goes.
+
+**But the survival is bought by a collapse in pulmonary bacterial load:**
+
+- 100- to 1000-fold fewer bacteria recovered from ∆pla lungs at 24 h; over the
+  next two days ∆pla numbers "did not substantially change, whereas wild-type
+  bacteria increased by almost 6 logs."
+- ∆pla lungs "showed no change in weight, even after 7 days," so the mice died
+  of systemic infection rather than pneumonia.
+- Inflammation aborted and lung repair was activated (PCNA-positive cells).
+
+For a respiratory pathogen, infectious output is bacterial load in the airway.
+The ∆pla host lives longer while being, as far as the lung is concerned, close to
+non-infectious. Longer duration times near-zero transmission rate is not a
+compensating gain — it is the branch of the trade-off where R₀ falls.
+
+Absent from the paper: any transmission experiment, co-infection, or measurement
+of onward infection, and anything about flea-borne transmission, which is the
+route relevant to the Black Death reservoir argument.
 
 ## Why the citation chain doesn't do the work
 
@@ -114,11 +168,15 @@ not a compensating gain.
 2. **The mechanism is backwards for flea-borne transmission.** Transmission is
    gated on a bacteremia threshold reached only near death, so β is a steeply
    increasing (near-threshold) function of α. With a hard threshold, lowering
-   virulence can drive β toward 0 — reducing virulence cannot increase R₀.
-3. **"Prolonging the infectious period" has no demonstrated correlate in these
-   papers.** The one duration-like quantity in Cui et al. is persistence of the
-   bacterium in the *flea foregut*, not the mammalian infectious period — a
-   different compartment entirely.
+   virulence can drive β toward 0 — reducing virulence cannot increase R₀. Ref 26
+   states this outright: "there is a very brief interval between the early-phase
+   threshold bacteremia level and death."
+3. **Longer survival is demonstrated; longer *infectiousness* is not.** Ref 28
+   shows prolonged host survival under *pla* loss, but with 100–1000× fewer
+   bacteria in the lung — duration up, infectious output down. No paper here
+   shows the product increasing. The only other duration-like quantity, in Cui
+   et al., is persistence of the bacterium in the *flea foregut*, a different
+   compartment entirely.
 4. **Refs 26 and 27 concern the enzootic rodent–flea cycle**, whereas the
    Bramanti claim is about human epidemic waves, where (if pneumonic or
    louse-borne transmission matters) the relevant β–α relation is different
@@ -135,12 +193,13 @@ host-survival benefit.
 
 ## Sources consulted
 
-- Cui et al. 2020, *Nat. Commun.* 11:281 — <https://pmc.ncbi.nlm.nih.gov/articles/PMC6962365/>
-- Bland et al. 2020, *PLoS Pathog.* — transmission efficiency and plague progression
-  by the two flea mechanisms —
-  <https://journals.plos.org/plospathogens/article?id=10.1371%2Fjournal.ppat.1009092>
-- Hinnebusch et al. 2017 (record) —
-  <https://www.researchgate.net/publication/319613290_Fleaing_the_Plague_Adaptations_of_Yersinia_pestis_to_Its_Insect_Vector_That_Lead_to_Transmission>
-- Lathem et al. 2007, summary coverage —
-  <https://source.washu.edu/2007/01/disabling-key-protein-may-give-physicians-time-to-treat-pneumonic-plague/>
+- Hinnebusch, Jarrett & Bland 2017, *Annu. Rev. Microbiol.* 71:215–232 —
+  full text, doi:10.1146/annurev-micro-090816-093521
+- Cui et al. 2020, *Nat. Commun.* 11:281 — full text,
+  doi:10.1038/s41467-019-14099-w
+  ([PMC6962365](https://pmc.ncbi.nlm.nih.gov/articles/PMC6962365/))
+- Lathem, Price, Miller & Goldman 2007, *Science* 315:509–513 — full text,
+  doi:10.1126/science.1137195
+- Bland et al. 2020, *PLoS Pathog.* 16:e1009092 — transmission efficiency and
+  plague progression by the two flea mechanisms, doi:10.1371/journal.ppat.1009092
 - Plasminogen activator Pla — <https://en.wikipedia.org/wiki/Plasminogen_activator_Pla>
