@@ -1,0 +1,252 @@
+---
+title: "Why does post-establishment fade-out increase with $R_0$?"
+date: 2026-10-06
+format:
+  html:
+    embed-resources: true
+execute:
+  echo: false
+  message: false
+  warning: false
+---
+
+```{r setup}
+library(dplyr)
+library(tidyr)
+library(knitr)
+library(here)
+
+batch_dir <- here::here("fadeout", "output", "occupancy_factorial_100y_batch",
+                        "data")
+combo <- read.csv(file.path(batch_dir, "combo_summary.csv"))
+runs <- read.csv(file.path(batch_dir, "run_summary.csv"))
+
+source(here::here("fadeout", "logistic_burnout",
+                  "logistic_burnout_functions.R"))
+
+gamma <- 0.2          ## per day (one generation = 5 days)
+r <- 0.125 * gamma    ## logistic growth rate per day
+threshold <- 1.5      ## establishment threshold, in units of T0
+```
+
+## The observation
+
+In the batch runs (`occupancy_factorial_100y_batch.R`), a patch counts as
+*established* once its episode has lasted $1.5\,T_0$, where $T_0$ is the
+intrinsic period of the damped endemic oscillation. Under constant
+transmission, the hazard of fade-out after establishment rises steeply with
+$R_0$ at every $K$:
+
+```{r hazard-table}
+combo |>
+  filter(scenario == "constant", alpha == 1e-4, K %in% c(1000, 3000, 5000, 10000)) |>
+  select(R0, K, fadeout_hazard) |>
+  pivot_wider(names_from = K, values_from = fadeout_hazard,
+              names_prefix = "K = ") |>
+  kable(digits = 5,
+        caption = "Fade-outs per established patch-year (constant transmission, alpha = 1e-4/day, 5 replicates pooled)")
+```
+
+## Candidate explanations
+
+1. **Transient ringing after establishment.** An established patch is still
+   recovering from the initial overshoot. At higher $R_0$ the overshoot is
+   larger and is damped more slowly, so the 2nd and 3rd troughs are deeper.
+   This is the $P_2, P_3, \ldots$ effect: the probability of surviving the
+   *second and later* troughs, not just the first. It predicts fade-outs
+   concentrated at young ages (a few $T_0$).
+2. **Stochastic amplification near equilibrium.** Long after the transient has
+   gone, demographic noise keeps exciting the weakly damped oscillatory mode
+   (quasi-cycles; Alonso, McKane & Pascual 2007). Weaker damping means larger
+   sustained fluctuations and occasional troughs deep enough to lose the
+   infection. This predicts a roughly constant hazard at all ages.
+3. **Smaller endemic prevalence.** A lower $I^*$ at higher $R_0$ would raise
+   the hazard. This is ruled out: $I^*/K = (r/\gamma)(1 - 1/R_0)/R_0$ is
+   nearly flat across the range of $R_0$ (table below).
+
+A minor additional factor is that $T_0$ is shorter at high $R_0$, so there are
+more troughs per year. That accounts for at most a factor of about 1.5, not
+orders of magnitude.
+
+## Linear analysis
+
+Linearizing the logistic SI model about its endemic equilibrium gives a
+damped oscillation with damping rate $r/(2R_0)$ and natural frequency
+$\omega_0^2 = \gamma r (R_0 - 1)/R_0 - r^2/(4R_0^2)$. Damping *per cycle*
+weakens as $R_0$ increases, because the decay rate falls while the frequency
+rises:
+
+```{r linear-table}
+linear <- tibble(R0 = c(1.5, 2, 2.5, 3, 3.5)) |>
+  mutate(
+    damping = r / (2 * R0),
+    omega0 = sqrt(gamma * r * (R0 - 1) / R0 - r^2 / (4 * R0^2)),
+    T0 = 2 * pi / omega0,
+    retained = exp(-damping * T0),
+    I_star_K = (r / gamma) * (1 - 1 / R0) / R0
+  )
+linear |>
+  kable(digits = c(1, 4, 4, 0, 2, 4),
+        col.names = c("R0", "damping rate (/day)", "omega0 (/day)",
+                      "T0 (days)", "amplitude retained per cycle", "I*/K"))
+```
+
+Both explanation 1 and explanation 2 follow from this weakening damping. A
+slowly damped transient rings for longer, and the variance of noise-driven
+quasi-cycles scales inversely with the damping rate.
+
+## Young versus older fade-outs
+
+To separate the two mechanisms, split the time after establishment into a
+young window ($1.5$–$3\,T_0$, around the second trough) and everything later.
+Then compute the hazard in each window (constant transmission; $K$ = 5000 and
+10000; all $\alpha$ pooled). Time at risk in the young window comes from the
+episode-duration histograms ($0.1\,T_0$ bins, using bin midpoints).
+
+```{r young-old}
+young_end <- 3
+
+hist <- readRDS(file.path(batch_dir, "duration_hist.rds"))
+
+sel <- runs |>
+  filter(scenario == "constant", K %in% c(5000, 10000)) |>
+  select(run_id, R0, T0, n_fadeout, established_years)
+
+young <- hist |>
+  inner_join(sel, by = "run_id") |>
+  mutate(age = (bin + 0.5) * 0.1) |>   ## bin midpoint, in units of T0
+  filter(age > threshold) |>
+  group_by(run_id) |>
+  summarise(
+    young_fadeouts = sum(n[class == "fadeout" & age < young_end]),
+    young_years = sum(n * (pmin(age, young_end) - threshold) * T0) / 365
+  )
+
+age_hazard <- sel |>
+  left_join(young, by = "run_id") |>
+  mutate(across(c(young_fadeouts, young_years), \(x) coalesce(x, 0))) |>
+  group_by(R0) |>
+  summarise(
+    young_hazard = sum(young_fadeouts) / sum(young_years),
+    old_hazard = sum(n_fadeout - young_fadeouts) /
+      sum(established_years - young_years),
+    frac_old = sum(n_fadeout - young_fadeouts) / sum(n_fadeout),
+    n_fadeout = sum(n_fadeout)
+  ) |>
+  mutate(ratio = if_else(young_hazard > 0, young_hazard / old_hazard, NA))
+
+age_hazard |>
+  select(R0, young_hazard, old_hazard, ratio, frac_old, n_fadeout) |>
+  kable(digits = c(1, 5, 6, 0, 2, 0),
+        col.names = c("R0", "hazard, 1.5-3 T0 (/yr)", "hazard, > 3 T0 (/yr)",
+                      "ratio", "fraction of fade-outs > 3 T0",
+                      "total fade-outs"))
+```
+
+* Per unit time, the risk in the young window is 20–80 times the later risk,
+  so transient ringing (explanation 1) is real.
+* The later hazard also rises by more than two orders of magnitude between
+  $R_0 = 2$ and $3.5$. Patches spend much more time at older ages, so most
+  fade-outs happen there. Stochastic amplification (explanation 2) therefore
+  contributes most of the total.
+* The $R_0 = 1.5$ row rests on very few fade-outs and is mostly noise.
+
+## Deterministic-trough calculation of $P_2$, $P_3$
+
+The `burnout` package (Earn & Bolker) computes $\mathcal{P}_m$ (`Pm_prob()`)
+only for the SIR model with births and deaths. Our within-patch model is an
+SI model with disease-induced death and logistic host growth, so we use the
+same method as implemented for that model in
+`fadeout/logistic_burnout/logistic_burnout_functions.R`
+(`logistic_multitrough_probabilities()`). The method has three steps:
+
+1. Follow the deterministic trajectory from a single infective in a patch at
+   $S = K$.
+2. At the entry to each trough's boundary layer, compute the Kendall
+   extinction probability $q$ of one lineage while susceptibles recover
+   logistically.
+3. Raise $q$ to the number of infectives at entry.
+
+$Q_j$ is the probability of burnout in trough $j$, given survival through
+trough $j-1$. The table also shows when each trough is entered, in units of
+$T_0$ since introduction.
+
+```{r multitrough}
+mt_grid <- expand_grid(R0 = c(2, 2.5, 3, 3.5), K = c(3000, 5000, 10000))
+
+T0_days <- setNames(linear$T0, linear$R0)
+
+multitrough <- mt_grid |>
+  rowwise() |>
+  reframe({
+    tt <- logistic_multitrough_probabilities(R0, 0.125, K,
+                                             max_troughs = 3)$trough_table
+    tibble(R0 = R0, K = K, trough = tt$trough_index,
+           ## t_in is in generations; one generation is 1/gamma days
+           t_in_T0 = tt$t_in / gamma / T0_days[as.character(R0)],
+           Q = tt$Q_burnout)
+  })
+```
+
+To compare with the simulations, take colonization episodes that are still
+infected at $1.5\,T_0$ (constant transmission, all $\alpha$ pooled). The
+comparable simulated quantity is the proportion of these episodes that go
+extinct before $3\,T_0$, a window that contains the second trough.
+
+```{r multitrough-compare}
+empirical <- hist |>
+  filter(!initial) |>
+  inner_join(runs |> filter(scenario == "constant") |> select(run_id, R0, K),
+             by = "run_id") |>
+  mutate(age = (bin + 0.5) * 0.1) |>
+  filter(age > threshold) |>
+  group_by(R0, K) |>
+  summarise(
+    sim_p = sum(n[class == "fadeout" & age < young_end]) / sum(n),
+    at_risk = sum(n),
+    .groups = "drop"
+  )
+
+multitrough |>
+  pivot_wider(id_cols = c(R0, K), names_from = trough,
+              values_from = c(t_in_T0, Q), names_sep = "") |>
+  select(R0, K, t_in_T02, t_in_T03, Q1, Q2, Q3) |>
+  left_join(empirical, by = c("R0", "K")) |>
+  arrange(K, R0) |>
+  mutate(across(Q1:Q3, \(x) formatC(x, format = "g", digits = 2))) |>
+  kable(digits = 3,
+        col.names = c("R0", "K", "trough 2 entry (T0)", "trough 3 entry (T0)",
+                      "Q1", "Q2", "Q3",
+                      "simulated P(extinct 1.5-3 T0)", "episodes at risk"))
+```
+
+* The deterministic-trough theory reproduces the qualitative pattern: $Q_2$
+  rises by many orders of magnitude with $R_0$. At $K = 5000$, for example,
+  it goes from about $10^{-6}$ at $R_0 = 2$ to 0.5 at $R_0 = 3.5$.
+  Trough 2 starts at about $1.7$–$2.2\,T_0$, just after the establishment
+  threshold, so explanation 1 explains the steep young-age hazard.
+* Quantitatively the fit is poor in both directions:
+  * At low $R_0$ the theory is far too small. It has no noise, so it misses
+    fade-outs from explanation 2 and from lineages lingering after the first
+    trough.
+  * At high $R_0$ it is too large, probably because colonizations in the
+    metapopulation often reach patches whose hosts have not yet recovered to
+    $K$ after an earlier epidemic. The overshoot is then smaller than from
+    $S = K$.
+* The "Q" values describe a single deterministic pass and ignore the
+  subsequent stationary hazard entirely. They therefore cannot account for the
+  70–80% of fade-outs that happen after $3\,T_0$.
+
+## Summary
+
+The fade-out hazard after establishment rises with $R_0$ because damping per
+cycle of the within-patch oscillation weakens as $R_0$ rises: the amplitude
+retained per cycle goes from 0.27 at $R_0 = 1.5$ to 0.69 at $R_0 = 3.5$.
+Weaker damping does two things:
+
+* the post-invasion transient keeps ringing, giving deep second and third
+  troughs (high $Q_2$, $Q_3$);
+* demographic noise sustains larger quasi-cycles around equilibrium.
+
+The first effect dominates the hazard per unit time early on. The second
+dominates the total number of fade-outs.
