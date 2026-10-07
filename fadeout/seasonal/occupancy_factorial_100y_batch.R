@@ -1,7 +1,8 @@
 ## Burnout and persistence over a dense R0 x K x alpha grid, 100-year runs.
 ##
-## Extends occupancy_factorial_100y.R to 8 K x 5 R0 x 7 alpha values, for
-## seasonal (amplitude 0.40) and constant transmission, with replicate runs.
+## Extends occupancy_factorial_100y.R to 8 K x 7 R0 x 7 alpha values, for
+## seasonal amplitudes 0 (constant transmission), 0.1, 0.2, 0.3 and 0.4, with
+## replicate runs.
 ## Demography and initial conditions are as in that script: r = 0.125 per
 ## infectious period, gamma = 0.2/day, dt = 1 day, and each patch starts at a
 ## random point between a fresh outbreak and the endemic equilibrium.
@@ -85,16 +86,19 @@ summary_years <- 50
 hist_width <- 0.1
 hist_max <- 10
 
-amps <- c(seasonal = 0.40, constant = 0.00)
+amps <- c(0, 0.1, 0.2, 0.3, 0.4)
 
 n_reps <- 5
 
-## Jobs are spread over at most this many forked workers, leaving at least
-## one core free (detectCores() can return NA)
-n_workers <- min(27, max(1, parallel::detectCores() - 1, na.rm = TRUE))
+## Jobs are spread over N_WORKERS forked workers (environment variable),
+## by default all cores but one (detectCores() can return NA)
+n_workers <- as.integer(Sys.getenv(
+  "N_WORKERS",
+  max(1, parallel::detectCores() - 1, na.rm = TRUE)
+))
 
 K_vals <- c(1000, 2000, 3000, 5000, 7500, 10000, 15000, 30000)
-R0_vals <- seq(1.5, 3.5, by = 0.5)
+R0_vals <- c(1.2, seq(1.5, 3.5, by = 0.5), 5)
 alpha_vals <- c(1e-5, 2e-5, 3e-5, 5e-5, 8e-5, 1e-4, 2e-4)  ## per day
 
 if (pilot) {
@@ -108,11 +112,11 @@ param_grid <- expand_grid(
   R0 = R0_vals,
   K = K_vals,
   alpha = alpha_vals,
-  scenario = names(amps),
+  seasonal_amp = amps,
   replicate = seq_len(n_reps)
 ) |>
   mutate(
-    seasonal_amp = amps[scenario],
+    scenario = if_else(seasonal_amp == 0, "constant", "seasonal"),
     run_id = row_number(),
     T0 = map_dbl(R0, \(x) calculate_intrinsic_period(x, gamma, r)$T0)
   )

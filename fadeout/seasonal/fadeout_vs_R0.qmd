@@ -77,7 +77,7 @@ weakens as $R_0$ increases, because the decay rate falls while the frequency
 rises:
 
 ```{r linear-table}
-linear <- tibble(R0 = c(1.5, 2, 2.5, 3, 3.5)) |>
+linear <- tibble(R0 = sort(unique(combo$R0))) |>
   mutate(
     damping = r / (2 * R0),
     omega0 = sqrt(gamma * r * (R0 - 1) / R0 - r^2 / (4 * R0^2)),

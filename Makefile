@@ -26,16 +26,16 @@ plague_conf.pdf: $(LATE_SUMMARY).pdf
 
 BATCH_DATA = fadeout/output/occupancy_factorial_100y_batch/data
 BATCH_FIGS = fadeout/output/occupancy_factorial_100y_batch/figures
-BATCH_HEATMAPS = $(foreach h,occupancy persistence burnout fadeout_hazard,\
+BATCH_HEATMAPS = $(foreach h,occupancy persistence burnout fadeout_hazard amp_burnout amp_fadeout_hazard,\
 	$(foreach ext,pdf png,$(BATCH_FIGS)/heatmap_$(h).$(ext)))
 
-## the batch simulations (2800 runs, ~10 min on 27 cores) write all the
-## summary data
-$(BATCH_DATA)/combo_summary.csv $(BATCH_DATA)/settings.csv &: fadeout/seasonal/occupancy_factorial_100y_batch.R fadeout/seasonal/seasonal_model_metapop.R fadeout/seasonal/seasonal_fadeout_functions.R
+## the batch simulations (9800 runs, ~2 h on 15 workers / 8 physical cores;
+## set N_WORKERS to override) write all the summary data
+$(BATCH_DATA)/combo_summary.csv $(BATCH_DATA)/run_summary.csv $(BATCH_DATA)/settings.csv &: fadeout/seasonal/occupancy_factorial_100y_batch.R fadeout/seasonal/seasonal_model_metapop.R fadeout/seasonal/seasonal_fadeout_functions.R
 	Rscript $<
 
 ## the heatmaps are drawn from the summary data in a few seconds
-$(BATCH_HEATMAPS) &: fadeout/seasonal/occupancy_factorial_100y_batch_plots.R $(BATCH_DATA)/combo_summary.csv $(BATCH_DATA)/settings.csv
+$(BATCH_HEATMAPS) &: fadeout/seasonal/occupancy_factorial_100y_batch_plots.R $(BATCH_DATA)/combo_summary.csv $(BATCH_DATA)/run_summary.csv $(BATCH_DATA)/settings.csv
 	Rscript $<
 
 batch_heatmaps: $(BATCH_HEATMAPS)
