@@ -52,6 +52,10 @@ batch_heatmaps: $(BATCH_HEATMAPS)
 %.docx: %.qmd virulence.bib
 	quarto render $< --to docx
 
+## GitHub-flavored markdown, for documents meant to be read on GitHub
+%.md: %.qmd virulence.bib
+	quarto render $< --to gfm
+
 .PRECIOUS: %.pdf
 %.open: %.pdf
 	open "$<"
