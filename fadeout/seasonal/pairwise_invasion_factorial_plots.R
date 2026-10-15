@@ -49,13 +49,16 @@ if (length(res$missing_tasks)) {
   cat("note:", length(res$missing_tasks), "tasks missing from the combined output\n")
 }
 
-## Save each figure as both PDF and 300-dpi PNG (for HTML output)
-save_figure <- function(plot, name, width, height) {
+## Save each figure as both PDF and PNG (for HTML output)
+save_figure <- function(plot, name, width, height, dpi = 300) {
   for (ext in c("pdf", "png")) {
     ggsave(file.path(outdir, "figures", paste0(name, ".", ext)),
-           plot, width = width, height = height, dpi = 300)
+           plot, width = width, height = height, dpi = dpi)
   }
 }
+
+## Resolution of the large occupancy-series figure (rasterized lines and PNG)
+series_dpi <- 200
 
 facet_labels <- labeller(
   K = \(x) paste0("K = ", x),
@@ -145,7 +148,8 @@ if (!is.null(opt$series)) {
     geom_vline(xintercept = settings$resident_years, colour = "grey50",
                linetype = 2) +
     ## Thousands of overlapping lines: rasterize them to keep the PDF small
-    ggrastr::rasterise(geom_line(linewidth = 0.25, alpha = 0.5), dpi = 300) +
+    ggrastr::rasterise(geom_line(linewidth = 0.25, alpha = 0.5),
+                       dpi = series_dpi) +
     scale_colour_manual(values = strain_cols, name = NULL) +
     guides(colour = guide_legend(override.aes = list(linewidth = 1,
                                                      alpha = 1))) +
@@ -162,7 +166,8 @@ if (!is.null(opt$series)) {
   n_R0 <- n_distinct(tasks$R0_res)
   save_figure(gg, sprintf("occupancy_series_K%g_alpha%g_amp%g",
                           env[1], env[2], env[3]),
-              width = 2 + 2.3 * n_R0, height = 1.5 + 1.6 * n_R0)
+              width = 2 + 2.3 * n_R0, height = 1.5 + 1.6 * n_R0,
+              dpi = series_dpi)
 }
 
 cat("Figures: ", file.path(outdir, "figures"), "\n", sep = "")
