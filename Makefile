@@ -40,6 +40,21 @@ $(BATCH_HEATMAPS) &: fadeout/seasonal/occupancy_factorial_100y_batch_plots.R $(B
 
 batch_heatmaps: $(BATCH_HEATMAPS)
 
+PIP_DATA = fadeout/output/pairwise_invasion_100y/data
+PIP_FIGS = fadeout/output/pairwise_invasion_100y/figures
+PIP_PLOTS = $(foreach h,pip_outcomes invader_survival occupancy_series,\
+	$(foreach ext,pdf png,$(PIP_FIGS)/$(h).$(ext)))
+
+## pairwise invasion runs at K = 5000, amplitude 0.2, alpha = 5e-5
+## (3600 runs, ~55 min on 15 workers; set N_WORKERS to override)
+$(PIP_DATA)/combo_summary.csv $(PIP_DATA)/run_summary.csv $(PIP_DATA)/occupancy_thinned.rds $(PIP_DATA)/settings.csv &: fadeout/seasonal/pairwise_invasion_100y.R fadeout/seasonal/seasonal_model_metapop.R
+	Rscript $<
+
+$(PIP_PLOTS) &: fadeout/seasonal/pairwise_invasion_100y_plots.R $(PIP_DATA)/combo_summary.csv $(PIP_DATA)/run_summary.csv $(PIP_DATA)/occupancy_thinned.rds $(PIP_DATA)/settings.csv
+	Rscript $<
+
+pip_plots: $(PIP_PLOTS)
+
 ## main.html: main.qmd virulence.bib
 ## main.pdf: main.qmd virulence.bib
 
