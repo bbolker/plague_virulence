@@ -1069,15 +1069,15 @@ Evaluating \(L\), defined in \cref{eq:corner-L}, at \(y=\yin\), we denote its va
 L_{\rm BL}:=\left.L\right|_{y=\yin}=\log\frac{\Cth}{\yin}.
 \label{eq:LBLQ}
 \end{equation}
-The direct first-order corner estimate is
+The first-order corner estimate is
 \begin{equation}
-x_{\rm in}^{(1),\mathrm{dir}}=\xf+\rhoeps aL_{\rm BL}+b\yin.
+x_{\rm in}^{(1)}=\xf+\rhoeps aL_{\rm BL}+b\yin.
 \label{eq:xindir1}
 \end{equation}
-The direct second-order estimate is
+The second-order estimate is
 \begin{equation}
 \begin{split}
-x_{\rm in}^{(2),\mathrm{dir}}=&\;\xf+\rhoeps aL_{\rm BL}+b\yin
+x_{\rm in}^{(2)}=&\;\xf+\rhoeps aL_{\rm BL}+b\yin
 +\rhoeps^2\left(\kappa L_{\rm BL}^2+\Dth\right)\\
 &+\frac{\rhoeps\yin}{\delta_f^2}
 \left[\Rzero a(L_{\rm BL}+1)-bc\right]
@@ -1085,37 +1085,6 @@ x_{\rm in}^{(2),\mathrm{dir}}=&\;\xf+\rhoeps aL_{\rm BL}+b\yin
 \end{split}
 \label{eq:xindir2}
 \end{equation}
-These formulas display the asymptotic corrections transparently. For production calculations, however, it is preferable to retain the nonlinear action rather than Taylor-expand it once more.
-
-We define
-\begin{equation}
-Q=\frac{\Rzero a-bc}{a\delta_f^2}.
-\label{eq:Q}
-\end{equation}
-Define
-\begin{align}
-M_1&=\rhoeps L_{\rm BL}+\frac{b}{a}\yin,\label{eq:M1}\\
-M_2&=M_1+\rhoeps^2\frac{\Dth}{a}
-+\rhoeps\yin Q(L_{\rm BL}+1)
-+\frac{bQ}{2a}\yin^2.
-\label{eq:M2}
-\end{align}
-The action-resummed first- and second-order entry states are the admissible roots
-\begin{equation}
-\Ath(x_{\rm in}^{(j)})-\Ath(\xf)=M_j,
-\qquad \xf<x_{\rm in}^{(j)}<\xs,
-\qquad j=1,2.
-\label{eq:actionentry}
-\end{equation}
-They exist precisely when
-\begin{equation}
-0<M_j<\dAf,
-\qquad
-\dAf=\Ath(\xs)-\Ath(\xf).
-\label{eq:admissibility}
-\end{equation}
-A failure of \cref{eq:admissibility} is a validity diagnostic for the chosen boundary-layer threshold, not a reason to extrapolate the scalar equation beyond its interval \(\xf<x<\xs\).
-
 \subsection{Laplace reduction}
 The burnout probability obtained above still requires numerical evaluation of the Kendall integral \cref{eq:Kendall}. We next use Laplace's method to approximate this integral further.
 Laplace's method \cite[Section~6.4]{BenderOrszag1978} gives
@@ -1217,7 +1186,7 @@ If \cref{eq:Laplace-endpoint-conditions} is not satisfied, the Kendall integral 
 \subsection{Boundary-layer-independent trough and burnout exponent}
 The first-order estimate \cref{eq:xindir1} is
 \begin{equation}
-x_{\rm in}^{(1),\mathrm{dir}}
+x_{\rm in}^{(1)}
 =\xf+\rhoeps a\log\frac{\Cth}{\yin}+b\yin.
 \label{eq:BI-entry-repeat}
 \end{equation}
@@ -1228,16 +1197,28 @@ For our choice \(\yin=\sqrt{y_*/K}\),
 \qquad\text{when }Ky_*\gg1.
 \label{eq:BI-height-scale}
 \end{equation}
-The corresponding entry equation \cref{eq:actionentry}, with \(M_1\) from \cref{eq:M1}, gives
+Taylor expansion about \(\xf\), using \(\Ath'(\xf)=1/a\), gives
 \begin{equation}
 \begin{aligned}
 \frac{\Ath(x_{\rm in}^{(1)})-\Ath(\xf)}{\rhoeps}
-&=\log\frac{\Cth}{\yin}+\frac ba\frac{\yin}{\rhoeps}\\
-&=\log\frac{\Cth}{\yin}+o(1).
+&=\frac{x_{\rm in}^{(1)}-\xf}{a\rhoeps}
++O\!\left(\frac{(x_{\rm in}^{(1)}-\xf)^2}{\rhoeps}\right)\\
+&=\log\frac{\Cth}{\yin}+\frac ba\frac{\yin}{\rhoeps}
++O\!\left(\rhoeps L_{\rm BL}^2+\frac{\yin^2}{\rhoeps}\right).
 \end{aligned}
+\label{eq:BI-entry-Taylor}
+\end{equation}
+Since \(\yin/\rhoeps\ll1\), we can neglect the second term in the last line of \cref{eq:BI-entry-Taylor}. To neglect the Taylor remainder as well, we require
+\begin{equation}
+\rhoeps L_{\rm BL}^2\ll1.
+\label{eq:BI-log-condition}
+\end{equation}
+Under these conditions,
+\begin{equation}
+\frac{\Ath(x_{\rm in}^{(1)})-\Ath(\xf)}{\rhoeps}
+=\log\frac{\Cth}{\yin}+o(1).
 \label{eq:BIaction}
 \end{equation}
-Since \(\yin/\rhoeps\ll1\), we can neglect the second term in the first line of \cref{eq:BIaction}.
 
 In particular, combining this approximation with the leading-order Laplace result \cref{eq:LaplaceB} gives a burnout estimate that is independent of the particular choice of \(\yin\) at leading order. To show this, we write
 \begin{equation}
@@ -1248,7 +1229,12 @@ In particular, combining this approximation with the leading-order Laplace resul
 \end{aligned}
 \label{eq:BI-action-split}
 \end{equation}
-where \(\dAf=\Ath(\xs)-\Ath(\xf)\), as defined in \cref{eq:admissibility}. Using \cref{eq:BIaction}, we obtain
+where we define
+\begin{equation}
+\dAf:=\Ath(\xs)-\Ath(\xf).
+\label{eq:action-barrier}
+\end{equation}
+Using \cref{eq:BIaction}, we obtain
 \begin{equation}
 \begin{aligned}
 \exp\!\left[-\frac{\Ath(\xs)-\Ath(x_{\rm in}^{(1)})}{\rhoeps}\right]
