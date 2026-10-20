@@ -201,6 +201,57 @@ Combined: `euler_twostrain[_mini|_mini2|_singlepatchintro].rds`
 
 ---
 
+### pairwise_invasion_factorial
+
+Seasonal two-strain pairwise invasion (the cluster version of
+`fadeout/seasonal/pairwise_invasion_100y.R`) over R0_res × R0_inv × K × alpha × seasonal amplitude.
+Each run: resident alone for 100 y from the ratchet initial conditions, then 10 invader infecteds
+in one randomly chosen occupied patch, then 50 y of two-strain dynamics (daily steps, 200 patches).
+Simulation code is shared with the local script via `fadeout/seasonal/pairwise_invasion_functions.R`
+and the model is `fadeout/seasonal/seasonal_model_metapop.R` (compiled by odin in each task, ~1 min),
+so the scripts use `here` and must be run inside the repository. They don't use `plagueMetapop`.
+
+| file | purpose |
+|------|---------|
+| `submit_pairwise_invasion_factorial.sh` | full run (1323 tasks, 1 h, 4G, 1 CPU); submit through `submit_chunked.sh` |
+| `submit_pairwise_invasion_factorial_mini.sh` | mini test (32 tasks, 30 min, 4G, 1 CPU) |
+| `pairwise_invasion_factorial_run_array.R` | shared array script (`--mini` flag); one grid row per task; skips tasks whose output exists |
+| `pairwise_invasion_factorial_combine.R` | combine outputs (`--mini`); reports missing task ids |
+
+Grid (full): `R0_res = R0_inv ∈ {1.2, 1.5, 2, 2.5, 3, 3.5, 5}` × `K ∈ {5000, 7500, 10000}` ×
+`alpha ∈ {1e-5, 5e-5, 2e-4}` × `seasonal_amp ∈ {0.1, 0.2, 0.4}` — 1323 tasks, 100 reps each  
+Grid (mini): `R0 ∈ {1.5, 3}` × `K ∈ {5000, 10000}` × `alpha ∈ {1e-5, 2e-4}` × `amp ∈ {0.1, 0.4}` — 32 tasks, 5 reps each  
+The thinned occupancy series (every 10 days from year 80) is saved for replicates 1–20 only.
+
+**Wall-time derivation:** ~11.5 s/run on one idle local core (Oct 2026), so 100 reps ≈ 19 min + ~1 min
+compile per task; 1 h gives ~3× buffer. Peak memory is ~0.3 GB per run. Check against the mini run's
+`sacct` before the full submit.
+
+**Mini:**
+```bash
+sbatch submit_pairwise_invasion_factorial_mini.sh
+sacct -j <jobid> --format=JobID,Elapsed,MaxRSS,State
+Rscript pairwise_invasion_factorial_combine.R --mini
+```
+
+**Full (≤ 50 tasks queued + running at once):** 1323 tasks exceed the 1000-job submit cap, and
+`submit_chunked.sh` counts pending + running tasks, so 10-task chunks with a queue cap of 50 also
+hold the run to ~50 cores:
+```bash
+bash submit_chunked.sh submit_pairwise_invasion_factorial.sh 1 1323 10 50 120
+Rscript pairwise_invasion_factorial_combine.R
+```
+Expected total ≈ 1323 × ~20 min / ~45 concurrent ≈ 10 h. Run `submit_chunked.sh` under
+`tmux`/`screen` or `nohup`. If tasks fail or time out, re-run the same command: tasks whose
+output file exists exit immediately.
+
+Outputs: `outputs/pairwise_factorial[_mini]_task_NNNNNN.rds`  
+Combined: `pairwise_factorial[_mini].rds` (list: `run_summary`, `combo_summary`, `thinned`,
+`settings`, `missing_tasks`). Copy it back to `odin/sharcnet/` locally, then
+`Rscript fadeout/seasonal/pairwise_invasion_factorial_plots.R [--mini] [--series K,alpha,amp]`.
+
+---
+
 ## Utilities
 
 ```bash

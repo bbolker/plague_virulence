@@ -86,6 +86,46 @@ mean. Output is thinned to every 10th day, which makes the one-step
 extinction/recolonization counts meaningless; those are not computed here.
 Figures and summaries go to `fadeout/output/seasonal_vs_constant_100y/`.
 
+## Pairwise invasion
+
+```bash
+Rscript fadeout/seasonal/pairwise_invasion_100y.R [--pilot]
+Rscript fadeout/seasonal/pairwise_invasion_100y_plots.R [--pilot]
+```
+
+(or `make pip_plots` from the repository root). At K = 5000, seasonal
+amplitude 0.2 and alpha = 5e-5/day, where the batch runs show intermediate
+occupancy, each resident R0 in {1.2, 1.5, 2, 2.5, 3, 3.5} runs alone for 100
+years. Then 10 infecteds of each invader R0 go into one randomly chosen patch
+the resident occupies, and both strains are followed for 50 more years (100
+replicates per pair, 15 workers by default via `N_WORKERS`). Outputs go to
+`fadeout/output/pairwise_invasion_100y/`: per-run and per-pair outcome
+summaries, a thinned occupancy series, PIP heatmaps, invader survival curves
+and occupancy time series.
+
+`pairwise_invasion_100y.R --add-missing` runs only the grid cells missing from
+the existing output (e.g. after adding R0 values) and merges them;
+`--susc-eq` starts each patch's S at Uniform(0.7, 1.3) x (S* + I*), capped at
+K, and writes to a separate `_susc_eq` directory.
+
+The K × alpha × amplitude factorial version runs on Nibi as a job array
+(`odin/sharcnet/pairwise_invasion_factorial_run_array.R`; see "pairwise_invasion_factorial"
+in `odin/sharcnet/README.md`). Both versions share
+`pairwise_invasion_functions.R`; `pairwise_invasion_factorial_plots.R` draws the
+factorial figures from the combined cluster output.
+
+## Initial susceptible density and persistence
+
+```bash
+Rscript fadeout/seasonal/s0_persistence_check.R
+Rscript fadeout/seasonal/s0_persistence_check_plots.R
+```
+
+Single-strain runs in the same regime, with every patch starting at
+S = f (S* + I*) (capped at K) and I = I*, for f = 0.5, ..., 1.5 and the eight
+pairwise-invasion R0 values (20 runs each, 100 years, stopped at global
+extinction). Outputs go to `fadeout/output/s0_persistence_check/`.
+
 ## Validation
 
 Run focused synthetic checks:
