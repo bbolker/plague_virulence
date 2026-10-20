@@ -66,10 +66,11 @@ A key simplification is that the leading-order trajectory of the first epidemic 
 
 Building on the phase-plane and epidemic-burnout approximations developed in earlier work \cite{ParsonsEarn2024,ParsonsEtAl2024}, we derive the corresponding first- and second-order post-wave corrections for the generalized recruitment law, extend the existing matching and trough approximations to this setting, and use the resulting low-prevalence entry states in Kendall's time-inhomogeneous birth--death calculation to evaluate burnout and persistence probabilities.
 
-The paper is organized as follows. Section~\ref{sec:model} introduces the generalized SIR model and formulates the post-wave burnout problem. Section~\ref{sec:phaseplane} develops the leading epidemic orbit and its first- and second-order corrections under generalized susceptible recruitment. Section~\ref{sec:matching} analyzes the post-wave low-prevalence regime and derives the matching quantities required to connect the epidemic trajectory to the stochastic calculation. Section~\ref{sec:action} reformulates this matching problem in terms of an action variable and derives finite-threshold estimates for the low-prevalence entry state. Section~\ref{sec:burnout} combines these results with Kendall's time-inhomogeneous birth--death formulation and derives the corresponding burnout and persistence approximations. Section~\ref{sec:numerics} compares the approximations with stochastic simulations and examines the effect of the recruitment-shape parameter \(\theta\). Section~\ref{sec:discussion} discusses interpretation, limitations, and possible extensions of the framework.
+The paper is organized as follows. Section~\ref{sec:model} introduces the generalized SIR model, defines the post-wave burnout problem, and outlines the matching of deterministic and stochastic descriptions. Section~\ref{sec:phaseplane} develops the leading epidemic trajectory and its first- and second-order recruitment corrections. Section~\ref{sec:matching} constructs the local approximation near the end of the epidemic wave and determines its constants by matching to the epidemic trajectory. Section~\ref{sec:action} applies Kendall's time-inhomogeneous birth--death formula to the generalized susceptible recovery path and obtains burnout and persistence probabilities in terms of the boundary-layer entry state. Section~\ref{sec:burnout} estimates that state from the epidemic trajectory, then derives closed-form probability approximations and relates them to the infection trough. Section~\ref{sec:numerics} compares the approximations with stochastic simulations and examines the effect of recruitment shape. Section~\ref{sec:discussion} discusses interpretation, limitations, and possible extensions.
 
 \section{Generalized SIR model and epidemic burnout}
 \label{sec:model}
+\subsection{Model and parameter regime}
 We consider an SIR-type model with susceptible population \(S(t)\) and infectious population \(I(t)\):
 \begin{align}
 \frac{\dd S}{\dd t} &= g_\theta(S)-\beta\frac{SI}{K},\label{eq:dimensional-models}\\
@@ -109,8 +110,6 @@ y_*=\rhoeps\hth(\xs)=\rhoeps(\Rzero-1)\Rzero^{-(1+\theta)}.
 \label{eq:ystar}
 \end{equation}
 
-Conditional on a successful initial invasion, the first epidemic wave can be described deterministically while \(Ky\gg1\). As prevalence declines after the wave, however, the expected number of infectives may become sufficiently small that stochastic extinction is no longer negligible. The analysis below focuses on how the recruitment law modifies the post-wave trajectory and, through it, the probability that infection disappears during the first epidemic trough.
-
 Throughout the main derivation we consider
 \begin{equation}
 0<\rhoeps\ll1,\qquad \Rzero>1\ \text{fixed},\qquad K\gg1.
@@ -119,6 +118,40 @@ Throughout the main derivation we consider
 [[Yuyang: This discussion of near-threshold scale separation has been moved to the subsection on validity and regions of reduced accuracy.]]
 [[JD: Might even be good to briefly describe the scale separation before talking about the breakdown.]]
 
+\subsection{Burnout and deterministic--stochastic matching}
+\label{sec:framework}
+Following Parsons et al.\ \cite{ParsonsEtAl2024}, we use a deterministic approximation for the epidemic wave and a birth--death approximation in the low-prevalence region, which we call the boundary layer. We combine these descriptions to estimate the probability of burnout conditional on successful epidemic establishment.
+
+Above the low-prevalence region, we approximate the epidemic trajectory deterministically. This requires the infection count to remain large compared with one individual,
+\begin{equation}
+Ky\gg1,\qquad\text{or equivalently}\qquad y\gg K^{-1}.
+\label{eq:deterministic-count-condition}
+\end{equation}
+
+Within the boundary layer, we describe infection by a time-inhomogeneous birth--death process while retaining a deterministic susceptible recovery path. We neglect susceptible loss through infection when
+\begin{equation}
+\Rzero xy\ll\rhoeps\hth(x).
+\label{eq:low-prevalence-loss-condition}
+\end{equation}
+For this low-prevalence approximation, we use \(y\ll y_*\).
+
+We choose a boundary-layer threshold \(\yin\) where both descriptions apply. It must therefore satisfy
+\begin{equation}
+K^{-1}\ll\yin\ll y_*,
+\label{eq:matching-overlap}
+\end{equation}
+where the subscript BL denotes boundary layer.
+
+If the post-peak decline reaches \(y=\yin\), let \(\tau_{\rm BL}\) denote the time of the first downward crossing. We define the corresponding susceptible fraction by
+\begin{equation}
+\xin:=x(\tau_{\rm BL}).
+\label{eq:matching-state}
+\end{equation}
+The state \((\xin,\yin)\) supplies the susceptible fraction \(\xin\) and the infection count \(K\yin\) for the stochastic extinction calculation.
+
+The calculation proceeds in three steps. First, we determine the epidemic trajectory and its recruitment corrections, then construct a local approximation that remains useful as infection declines toward the boundary-layer threshold. Next, we use this trajectory to estimate \(\xin\) and describe susceptible recovery in the low-prevalence phase. Finally, we calculate the burnout probability using a time-inhomogeneous birth--death process starting from the state \((\xin,\yin)\).
+[[Yuyang: An illustrative phase-plane figure showing the outer, corner, and low-prevalence approximations is planned but has not yet been added.]]
+
 \section{Phase-plane asymptotics under generalized susceptible recruitment}
 \label{sec:phaseplane}
 We describe the deterministic epidemic trajectory in the phase plane by \(y=y(x;\rhoeps)\), with \(\Rzero\) and \(\theta\) held fixed. For small \(\rhoeps\), we seek an expansion
@@ -126,7 +159,7 @@ We describe the deterministic epidemic trajectory in the phase plane by \(y=y(x;
 y(x;\rhoeps)=F(x)+\rhoeps Y_1(x)+\rhoeps^2Y_2(x)+O(\rhoeps^3).
 \label{eq:outerexp}
 \end{equation}
-Our goal in this section is to determine the leading-order trajectory \(F(x)\), the first-order correction \(Y_1(x)\), and the second-order correction \(Y_2(x)\). Their behavior near the end of the epidemic wave provides the information needed to match this trajectory to the subsequent low-prevalence approximation.
+Our goal in this section is to determine the leading-order trajectory \(F(x)\), the first-order correction \(Y_1(x)\), and the second-order correction \(Y_2(x)\).
 
 \subsection{Universal leading epidemic geometry}
 We first determine the leading-order trajectory \(F(x)\) by neglecting susceptible recruitment. Setting \(\rhoeps=0\) in \cref{eq:modelx,eq:modely} gives
@@ -155,7 +188,6 @@ To determine \(Y_1(x)\) and \(Y_2(x)\), we substitute the trajectory expansion i
 \label{eq:phaseplane}
 \end{equation}
 We first construct the trajectory expansion in the original variables \(x\) and \(y\). This is called the outer expansion: it describes the epidemic trajectory away from regions where the expansion ceases to be valid and a rescaling of the variables is needed. We will identify and treat these regions below.
-[[Yuyang: An illustrative phase-plane figure showing the outer, corner, and low-prevalence approximations is planned but has not yet been added.]]
 To derive the correction equations, we first rewrite \cref{eq:phaseplane} as
 \[
 \bigl[\rhoeps\hth(x)-\Rzero xy\bigr]y'=(\Rzero x-1)y,
@@ -488,89 +520,495 @@ so the matched first-order corner approximation can be written as
 u_1(v)=aL+bv.
 \label{eq:u1}
 \end{equation}
+The first-order trajectory is therefore
+\begin{equation}
+x\approx\xf+\rhoeps aL+by.
+\label{eq:first-order-corner-trajectory}
+\end{equation}
 
 \subsection{Second-order matching and \(\Dth\)}
-At second order, the inverse coefficient is
+We first determine the second-order outer coefficient \(X_2(y)\) and its behavior as \(y\to0^+\). We then derive the second-order corner correction \(u_2(v)\) and determine its integration constant by matching the two expansions.
+
+Substituting the inverse expansion in \cref{eq:inverseexp} into \cref{eq:outerexp} and expanding about \(X_0(y)\) gives
+\[
+\begin{aligned}
+y={}&F(X_0)\\
+&+\rhoeps\left[F'(X_0)X_1+Y_1(X_0)\right]\\
+&+\rhoeps^2\left[F'(X_0)X_2+\frac12F''(X_0)X_1^2
++Y_1'(X_0)X_1+Y_2(X_0)\right]+O(\rhoeps^3).
+\end{aligned}
+\]
+Since \(F(X_0)=y\), the coefficients of each positive power of \(\rhoeps\) must vanish. The first-order coefficient gives \cref{eq:X1}, while the second-order coefficient gives
+\[
+F'(X_0)X_2+\frac12F''(X_0)X_1^2+Y_1'(X_0)X_1+Y_2(X_0)=0.
+\]
+Solving for \(X_2(y)\), we obtain
 \begin{equation}
 X_2(y)=
 -\frac{\frac12F''(X_0)X_1^2+Y_1'(X_0)X_1+Y_2(X_0)}{F'(X_0)}.
 \label{eq:X2general}
 \end{equation}
-For the second-order local calculation, we use the abbreviations
+To shorten the expressions below, we define
 \begin{equation}
-\delta=1-\Rzero\xf,\qquad h_f=\hth(\xf),\qquad h_f'=\hth'(\xf).
+\delta_f=1-\Rzero\xf,\qquad h_f=\hth(\xf),\qquad h_f'=\hth'(\xf).
 \label{eq:localdefs1}
 \end{equation}
-Thus \(a=h_f/\delta\) and \(b=\Rzero\xf/\delta\). We also define
+The coefficients already defined in \cref{eq:a,eq:b} then satisfy
+\[
+a=\frac{h_f}{\delta_f},\qquad b=\frac{\Rzero\xf}{\delta_f}.
+\]
+We also define
 \begin{equation}
-c=\delta h_f'+\Rzero h_f,\qquad \kappa=\frac{h_fc}{2\delta^3}.
+c=\delta_f h_f'+\Rzero h_f.
 \label{eq:localdefs2}
 \end{equation}
-The second corner coefficient satisfies
+To calculate \(X_2(y)\) near \(y=0\), we need the corresponding expansions of \(Y_1(x)\) and \(Y_2(x)\) near \(\xf\). We first obtain the expansion of \(Y_1(x)\). Define
 \begin{equation}
-u_2'(v)=\frac{u_1(v)}{\delta^2}
-\left(\Rzero-\frac{c}{v}\right).
-\label{eq:u2prime}
+s=x-\xf,\qquad f_1=F'(\xf)=\frac{\delta_f}{\Rzero\xf},\qquad
+f_2=F''(\xf)=-\frac{1}{\Rzero\xf^2}.
+\label{eq:xf-local-derivatives}
 \end{equation}
-Using \cref{eq:u1} and \(\dd L/\dd v=-1/v\), integration gives
+Then
 \begin{equation}
-\begin{split}
-u_2(v)=&\;\kappa L^2+B_2(\rhoeps)
-+\frac{\Rzero a}{\delta^2}(L+1)v
--\frac{bc}{\delta^2}v
-+\frac{b\Rzero}{2\delta^2}v^2.
-\end{split}
-\label{eq:u2pre}
+F(\xf+s)=f_1s+\frac12f_2s^2+O(s^3),\qquad
+\hth(\xf+s)=h_f+h_f's+O(s^2).
+\label{eq:xf-local-taylor}
 \end{equation}
-The local equation determines all displayed \(v\)-dependent terms but leaves the constant \(B_2\) undetermined. That constant is fixed by the finite part of the second outer coefficient.
+Substituting \cref{eq:xf-local-taylor} into \cref{eq:Y1prime} and expanding the remaining factors gives
+\begin{equation}
+Y_1'(\xf+s)=\frac{h_f}{\Rzero\xf}\frac1s
++\frac{2\delta_f\xf h_f'-(1+2\delta_f)h_f}{2\Rzero\delta_f\xf^2}+O(s).
+\label{eq:Y1prime-local}
+\end{equation}
+We denote these two coefficients by
+\begin{equation}
+\alpha=\frac{h_f}{\Rzero\xf},\qquad
+p_0=\frac{2\delta_f\xf h_f'-(1+2\delta_f)h_f}{2\Rzero\delta_f\xf^2}.
+\label{eq:p0}
+\end{equation}
+Integration therefore gives
+\begin{equation}
+Y_1(\xf+s)=\alpha\log s+\zeta+p_0s+O(s^2).
+\label{eq:Y1localapp}
+\end{equation}
+The constant \(\zeta\) is determined by the first-order matching result. Using \cref{eq:Gtheta-finite-part,eq:Ctheta}, together with \(G_\theta=\Rzero Y_1\), gives
+\begin{equation}
+\zeta=\alpha\log\frac{f_1}{\Cth}.
+\label{eq:zeta}
+\end{equation}
 
-The second-order outer integral is singular near \(\xf\). Instead of extrapolating numerically from small \(y\), we subtract its analytically known singular part, integrate a finite remainder, and add back the primitive. The detailed regularization is given in Appendix~\ref{app:Dtheta}. The result is the intrinsic matching constant \(\Dth\) defined by
+We next identify the terms in \(Y_2'(x)\) whose integrals diverge as \(x\to\xf^+\). Let \(q_2(x)\) denote the right-hand side of \cref{eq:Y2prime}. Using \cref{eq:xf-local-taylor}, the second term in the square brackets of \cref{eq:Y2prime} expands as
+\begin{equation}
+\begin{aligned}
+\frac{\hth(\xf+s)}{\Rzero(\xf+s)}
+&=\frac{h_f+h_f's+O(s^2)}{\Rzero\xf}
+\left(1-\frac{s}{\xf}+O(s^2)\right)\\
+&=\alpha+\left[\frac{h_f'}{\Rzero\xf}
+-\frac{h_f}{\Rzero\xf^2}\right]s+O(s^2).
+\end{aligned}
+\label{eq:recruitment-ratio-local}
+\end{equation}
+Subtracting \cref{eq:recruitment-ratio-local} from \cref{eq:Y1localapp} gives
+\begin{equation}
+\begin{aligned}
+Y_1(\xf+s)-\frac{\hth(\xf+s)}{\Rzero(\xf+s)}
+={}&\alpha\log s+\zeta-\alpha\\
+&+\left[p_0-\frac{h_f'}{\Rzero\xf}+\frac{h_f}{\Rzero\xf^2}\right]s+O(s^2).
+\end{aligned}
+\label{eq:Y2-bracket-local}
+\end{equation}
+The prefactor in \cref{eq:Y2prime} expands as
+\begin{equation}
+\frac{\hth(x)(\Rzero x-1)}{\Rzero^2x^2F(x)^2}
+=-\frac{a}{s^2}+\frac{h_f/\xf-c}{\delta_f^2}\frac1s+O(1).
+\label{eq:Y2-prefactor-local}
+\end{equation}
+We define
+\begin{equation}
+\begin{aligned}
+A_{-1}&=\frac{h_f/\xf-c}{\delta_f^2},\qquad r_0=\zeta-\alpha,\\
+r_1&=p_0-\frac{h_f'}{\Rzero\xf}+\frac{h_f}{\Rzero\xf^2}
+=-\frac{h_f}{2\Rzero\delta_f\xf^2}.
+\end{aligned}
+\label{eq:ABdefs}
+\end{equation}
+With these definitions, \cref{eq:Y2-prefactor-local,eq:Y2-bracket-local} become
+\begin{equation}
+\begin{aligned}
+\frac{\hth(x)(\Rzero x-1)}{\Rzero^2x^2F(x)^2}
+&=-\frac{a}{s^2}+\frac{A_{-1}}s+O(1),\\
+Y_1(\xf+s)-\frac{\hth(\xf+s)}{\Rzero(\xf+s)}
+&=\alpha\log s+r_0+r_1s+O(s^2).
+\end{aligned}
+\label{eq:Y2-factors-abbreviated}
+\end{equation}
+Multiplying the two expansions in \cref{eq:Y2-factors-abbreviated} gives
+\begin{equation}
+q_2(\xf+s)=-\frac{a\alpha\log s+ar_0}{s^2}
++\frac{A_{-1}\alpha\log s+A_{-1}r_0-ar_1}{s}+O(|\log s|).
+\label{eq:q2-local}
+\end{equation}
+We denote the displayed \(s^{-2}\) and \(s^{-1}\) terms by
+\begin{equation}
+q_{2,\rm sing}(s)=-\frac{a\alpha\log s+ar_0}{s^2}
++\frac{A_{-1}\alpha\log s+A_{-1}r_0-ar_1}{s}.
+\label{eq:q2sing}
+\end{equation}
+
+We subtract the singular terms identified in \cref{eq:q2sing} and define
+\begin{equation}
+q_{2,\rm reg}(x)=q_2(x)-q_{2,\rm sing}(x-\xf).
+\label{eq:q2reg}
+\end{equation}
+Thus
+\begin{equation}
+Y_2'(x)=q_{2,\rm sing}(x-\xf)+q_{2,\rm reg}(x).
+\label{eq:Y2prime-split}
+\end{equation}
+By \cref{eq:q2-local}, \(q_{2,\rm reg}(\xf+s)=O(|\log s|)\). Since \(\int_0^\varepsilon|\log s|\dd s\) is finite, this remainder is integrable at \(\xf\). Integrating the singular terms gives the primitive
+\begin{equation}
+\begin{aligned}
+P_2(s)={}&\frac{a\alpha\log s+a\zeta}{s}
++\frac{A_{-1}\alpha}{2}\log^2s\\
+&+(A_{-1}r_0-ar_1)\log s,
+\end{aligned}
+\label{eq:P2}
+\end{equation}
+which satisfies \(P_2'(s)=q_{2,\rm sing}(s)\).
+
+Integrating \cref{eq:Y2prime-split} with \(Y_2(1)=0\) from \cref{eq:Y2prime}, we obtain
+\begin{equation}
+\begin{aligned}
+Y_2(x)&=-\int_x^1q_2(u)\dd u\\
+&=-\int_x^1\left[q_{2,\rm sing}(u-\xf)+q_{2,\rm reg}(u)\right]\dd u\\
+&=P_2(x-\xf)-P_2(1-\xf)-\int_x^1q_{2,\rm reg}(u)\dd u.
+\end{aligned}
+\label{eq:Y2-regularized-integral}
+\end{equation}
+We therefore define
+\begin{equation}
+K_2=-P_2(1-\xf)-\int_{\xf}^{1}q_{2,\rm reg}(u)\dd u.
+\label{eq:K2}
+\end{equation}
+Then \cref{eq:Y2-regularized-integral} becomes
+\[
+Y_2(x)=P_2(x-\xf)+K_2+\int_{\xf}^{x}q_{2,\rm reg}(u)\dd u.
+\]
+The remaining integral vanishes as \(x\to\xf^+\), giving
+\begin{equation}
+Y_2(x)=P_2(x-\xf)+K_2+o(1).
+\label{eq:Y2-local}
+\end{equation}
+
+\paragraph{Local expansions of the inverse trajectory.}
+We now obtain the small-\(y\) expansions of \(X_0(y)\), \(X_1(y)\), and \(X_2(y)\) needed for second-order matching. With \(x=X_0(y)=\xf+s\), we first expand \(X_0(y)\).
+Inverting \(y=f_1s+\tfrac12f_2s^2+O(s^3)\) from \cref{eq:xf-local-taylor} gives
+\begin{equation}
+X_0(y)-\xf=\frac{y}{f_1}-\frac{f_2}{2f_1^3}y^2+O(y^3)
+=by+\frac{b\Rzero}{2\delta_f^2}y^2+O(y^3).
+\label{eq:X0-second-order-local}
+\end{equation}
+Define
+\[
+W(s)=\alpha\log s+\zeta.
+\]
+Using \cref{eq:X1,eq:Y1localapp,eq:xf-local-taylor} gives
+\begin{equation}
+X_1(y)=-\frac{W(s)}{f_1}
++s\left[\frac{f_2W(s)}{f_1^2}-\frac{p_0}{f_1}\right]
++O(s^2|\log s|).
+\label{eq:X1-local-second-order}
+\end{equation}
+Substituting \(s=by-f_2y^2/(2f_1^3)+O(y^3)\) from \cref{eq:X0-second-order-local} into \cref{eq:X1-local-second-order}, and using \cref{eq:zeta,eq:corner-L}, gives
+\begin{equation}
+X_1(y)=aL+y\left[\frac{\Rzero a}{\delta_f^2}(L+1)-\frac{bc}{\delta_f^2}\right]
++O(y^2|\log y|).
+\label{eq:X1-second-order-local}
+\end{equation}
+
+We next determine \(X_2(y)\). Denote the numerator of \cref{eq:X2general} by
+\begin{equation}
+N_2(s)=\frac12F''(\xf+s)X_1(y)^2
++Y_1'(\xf+s)X_1(y)+Y_2(\xf+s).
+\label{eq:N2-definition}
+\end{equation}
+Substituting \cref{eq:X1-local-second-order,eq:Y1prime-local,eq:Y2-local,eq:P2} into \cref{eq:N2-definition} and using \(a=\alpha/f_1\), we obtain
+\begin{equation}
+\begin{aligned}
+N_2(s)={}&\frac{f_2W(s)^2}{2f_1^2}
+-\frac{\alpha W(s)}{f_1s}
++\frac{\alpha f_2W(s)}{f_1^2}
+-\frac{p_0[\alpha+W(s)]}{f_1}\\
+&+\frac{aW(s)}s+\frac{A_{-1}\alpha}{2}\log^2s
++(A_{-1}r_0-ar_1)\log s+K_2+o(1)\\
+={}&\frac{f_2W(s)^2}{2f_1^2}
++\frac{\alpha f_2W(s)}{f_1^2}
+-\frac{p_0[\alpha+W(s)]}{f_1}\\
+&+\frac{A_{-1}\alpha}{2}\log^2s
++(A_{-1}r_0-ar_1)\log s+K_2+o(1).
+\end{aligned}
+\label{eq:N2-term-expansions}
+\end{equation}
+Collecting the logarithmic and constant terms in \cref{eq:N2-term-expansions} gives
+\begin{equation}
+N_2(s)=-\frac{f_1h_fc}{2\delta_f^3}\left[\log^2s+2\frac{\zeta}{\alpha}\log s\right]+N_{20}+o(1),
+\label{eq:N2-local}
+\end{equation}
+where we define
+\begin{align}
+N_{20}&=K_2+\frac{\alpha\zeta f_2}{f_1^2}
+-\frac{(\alpha+\zeta)p_0}{f_1}
++\frac{f_2\zeta^2}{2f_1^2},
+\label{eq:N20}\\
+\kappa&=\frac{ac}{2\delta_f^2}=\frac{h_fc}{2\delta_f^3}.
+\label{eq:kappa}
+\end{align}
+Using \(F'(\xf+s)=f_1+O(s)\) and \cref{eq:N2-local} in \cref{eq:X2general}, we obtain
+\[
+X_2(y)=\kappa\left(\log s+\frac{\zeta}{\alpha}\right)^2
+-\frac{N_{20}}{f_1}-\kappa\frac{\zeta^2}{\alpha^2}+o(1).
+\]
+We define the constant term as
+\begin{equation}
+\Dth=-\frac{N_{20}}{f_1}-\kappa\frac{\zeta^2}{\alpha^2}.
+\label{eq:DthetaApp}
+\end{equation}
+Then
+\begin{equation}
+X_2(y)=\kappa\left(\log s+\frac{\zeta}{\alpha}\right)^2+\Dth+o(1).
+\label{eq:X2-local-Dtheta}
+\end{equation}
+By \cref{eq:xf-local-taylor},
+\begin{equation}
+y=f_1s+O(s^2)=f_1s\left[1+O(s)\right].
+\label{eq:y-s-local}
+\end{equation}
+Since \(f_1>0\), \cref{eq:y-s-local} gives \(s=O(y)\). Using \cref{eq:zeta,eq:y-s-local}, we obtain
+\begin{equation}
+\begin{aligned}
+\log s+\frac{\zeta}{\alpha}
+&=\log\frac{f_1s}{\Cth}\\
+&=\log\frac{y}{\Cth}-\log\left[1+O(s)\right]\\
+&=\log\frac{y}{\Cth}+O(s)
+=\log\frac{y}{\Cth}+O(y).
+\end{aligned}
+\label{eq:log-s-to-y}
+\end{equation}
+Squaring \cref{eq:log-s-to-y} gives
+\begin{equation}
+\begin{aligned}
+\left(\log s+\frac{\zeta}{\alpha}\right)^2
+&=\left[\log\frac{y}{\Cth}+O(y)\right]^2\\
+&=\log^2\frac{y}{\Cth}
++O\left(y\left|\log\frac{y}{\Cth}\right|\right)+O(y^2)\\
+&=\left(\log\frac{\Cth}{y}\right)^2+o(1),
+\qquad y\to0^+,
+\end{aligned}
+\label{eq:log-square-s-to-y}
+\end{equation}
+Substituting \cref{eq:log-square-s-to-y} into \cref{eq:X2-local-Dtheta} therefore gives
 \begin{equation}
 X_2(y)=\kappa\left(\log\frac{\Cth}{y}\right)^2+\Dth+o(1),
 \qquad y\to0^+.
 \label{eq:X2asymp}
 \end{equation}
-Matching \cref{eq:X2asymp} to the corner solution sets \(B_2(\rhoeps)=\Dth\), so
+
+\paragraph{The second-order corner correction.}
+We now determine \(u_2(v)\) by retaining the next order in the inverse phase-plane equation, \cref{eq:inverse-phaseplane}. The recruitment term is expanded about \(\xf\) as
+\begin{equation}
+\hth(x)=\hth(\xf)+\hth'(\xf)(x-\xf)+O\bigl((x-\xf)^2\bigr).
+\label{eq:u2-recruitment-taylor}
+\end{equation}
+Substituting the corner expansion in \cref{eq:corner}, with \(y=\rhoeps v\), and using \cref{eq:corner-derivative,eq:u2-recruitment-taylor}, the terms needed to determine \(u_2'\) give
+\begin{equation}
+u_1'(v)+\rhoeps u_2'(v)
+\approx
+\frac{\rhoeps\left[\hth(\xf)-\Rzero\xf v\right]
++\rhoeps^2u_1(v)\left[\hth'(\xf)-\Rzero v\right]}
+{\rhoeps(\Rzero\xf-1)v+\rhoeps^2\Rzero u_1(v)v}.
+\label{eq:u2-substituted-quotient}
+\end{equation}
+Cancelling the common factor \(\rhoeps\) and multiplying by the denominator in \cref{eq:u2-substituted-quotient} yields
+\begin{equation}
+\begin{aligned}
+&\left[u_1'(v)+\rhoeps u_2'(v)\right]
+\left[(\Rzero\xf-1)v+\rhoeps\Rzero u_1(v)v\right]\\
+&\qquad\approx\hth(\xf)-\Rzero\xf v
++\rhoeps u_1(v)\left[\hth'(\xf)-\Rzero v\right].
+\end{aligned}
+\label{eq:u2-product}
+\end{equation}
+Comparing the coefficients of \(\rhoeps\) in \cref{eq:u2-product} gives
+\begin{equation}
+(\Rzero\xf-1)v\,u_2'(v)+\Rzero u_1(v)v\,u_1'(v)
+=u_1(v)\left[\hth'(\xf)-\Rzero v\right].
+\label{eq:u2-coefficient}
+\end{equation}
+Substituting \cref{eq:u1prime-full} into \cref{eq:u2-coefficient} and solving for \(u_2'(v)\) gives
+\begin{equation}
+\begin{aligned}
+u_2'(v)={}&-\frac{u_1(v)\left[\hth'(\xf)-\Rzero v\right]}{(1-\Rzero\xf)v}\\
+&-\frac{\Rzero u_1(v)\left[\hth(\xf)-\Rzero\xf v\right]}{(1-\Rzero\xf)^2v}\\
+={}&\frac{u_1(v)}{(1-\Rzero\xf)^2}
+\left[\Rzero-\frac{(1-\Rzero\xf)\hth'(\xf)+\Rzero\hth(\xf)}{v}\right].
+\end{aligned}
+\label{eq:u2prime-full}
+\end{equation}
+Then \cref{eq:u2prime-full} becomes
+\begin{equation}
+u_2'(v)=\frac{u_1(v)}{\delta_f^2}\left(\Rzero-\frac{c}{v}\right).
+\label{eq:u2prime}
+\end{equation}
+Substituting \cref{eq:u1} into \cref{eq:u2prime} gives
+\[
+u_2'(v)=-\frac{ac}{\delta_f^2}\frac{L}{v}
++\frac{\Rzero a}{\delta_f^2}L-\frac{bc}{\delta_f^2}
++\frac{b\Rzero}{\delta_f^2}v.
+\]
+Integrating with respect to \(v\) gives
 \begin{equation}
 \begin{split}
-u_2(v)=&\;\kappa L^2+\Dth
-+\frac{\Rzero a}{\delta^2}(L+1)v
--\frac{bc}{\delta^2}v
-+\frac{b\Rzero}{2\delta^2}v^2.
+u_2(v)={}&\frac{ac}{2\delta_f^2}L^2+B_2
++\frac{\Rzero a}{\delta_f^2}(L+1)v\\
+&-\frac{bc}{\delta_f^2}v+\frac{b\Rzero}{2\delta_f^2}v^2.
+\end{split}
+\label{eq:u2pre}
+\end{equation}
+Here \(B_2\) is an undetermined constant arising from integration.
+
+\paragraph{Matching the outer and corner expansions.}
+We now determine \(B_2\) by matching the outer and corner expansions using \(y=\rhoeps v\). Using \cref{eq:X0-second-order-local,eq:X1-second-order-local,eq:X2asymp} in \cref{eq:inverseexp}, the terms needed for matching are
+\begin{equation}
+\begin{aligned}
+x-\xf={}&by+\rhoeps aL+\frac{b\Rzero}{2\delta_f^2}y^2\\
+&+\rhoeps y\left[\frac{\Rzero a}{\delta_f^2}(L+1)-\frac{bc}{\delta_f^2}\right]
++\rhoeps^2(\kappa L^2+\Dth)+\cdots.
+\end{aligned}
+\label{eq:second-order-outer-matching}
+\end{equation}
+Matching is performed where \(y\to0^+\) and \(\rhoeps|\log y|\ll y\), so the outer correction remains smaller than the leading displacement. Substituting \(y=\rhoeps v\) into \cref{eq:second-order-outer-matching} gives
+\begin{equation}
+\begin{aligned}
+x-\xf={}&\rhoeps(aL+bv)\\
+&+\rhoeps^2\left[\kappa L^2+\Dth
++\frac{\Rzero a}{\delta_f^2}(L+1)v
+-\frac{bc}{\delta_f^2}v
++\frac{b\Rzero}{2\delta_f^2}v^2\right]+\cdots.
+\end{aligned}
+\label{eq:second-order-outer-local}
+\end{equation}
+The corner expansion in \cref{eq:corner}, with \(u_1\) and \(u_2\) from \cref{eq:u1,eq:u2pre}, has the same displayed terms except that \(\Dth\) is replaced by \(B_2\). Matching the remaining constant terms therefore determines
+\begin{equation}
+B_2=\Dth.
+\label{eq:B2-matched}
+\end{equation}
+The matched second-order corner correction is
+\begin{equation}
+\begin{split}
+u_2(v)={}&\kappa L^2+\Dth
++\frac{\Rzero a}{\delta_f^2}(L+1)v\\
+&-\frac{bc}{\delta_f^2}v
++\frac{b\Rzero}{2\delta_f^2}v^2.
 \end{split}
 \label{eq:u2final}
 \end{equation}
-Thus \(\Cth\) and \(\Dth\) are the two finite matching data selected by the global outer trajectory and inherited by the local post-wave corner.
+The constants \(\Cth\) and \(\Dth\) are determined by the first- and second-order outer solutions, respectively. Matching incorporates these constants into the local corner approximation near \(\xf\).
 
-\section{Action formulation and the post-wave bottleneck}
+\section{Burnout probability from the boundary-layer entry state}
 \label{sec:action}
-\subsection{The action variable}
-In the low-prevalence basin, infection-induced depletion of susceptibles is higher order and
-\[
-\frac{\dd x}{\dd\tau}\approx\rhoeps\hth(x),
-\qquad
-\frac{\dd\log y}{\dd\tau}=\Rzero x-1.
-\]
-Define the action by
+We now estimate the burnout probability starting from the state \((\xin,\yin)\) at entry into the boundary layer.
+
+\subsection{The birth--death process and Kendall's formula}
+We take \(\tau=0\) at entry into the boundary layer, with susceptible fraction \(\xin\) and \(m=K\yin\) infectious individuals. In the boundary layer, we neglect susceptible loss through infection, \(\Rzero xy\), relative to recruitment, \(\rhoeps\hth(x)\), as specified in \cref{eq:low-prevalence-loss-condition}. We therefore approximate susceptible recovery by the solution of
+\begin{equation}
+\frac{\dd x}{\dd\tau}=\rhoeps\hth(x),\qquad x(0)=\xin.
+\label{eq:branching-background}
+\end{equation}
+Under this approximation, when there are \(n\) infectious individuals, new infections occur at total rate \(n\Rzero x(\tau)\), and removals occur at total rate \(n\). Both rates are proportional to \(n\), and the infection rate varies with time through the deterministic susceptible fraction \(x(\tau)\). The infectious population therefore follows a time-inhomogeneous linear birth--death process.
+For a time-inhomogeneous linear birth--death process with per-capita birth and removal rates \(b(\tau)\) and \(d(\tau)\), Kendall's formula \cite{Kendall1948} gives the eventual extinction probability starting from one individual as
+\begin{equation}
+q_1=\frac{\mathcal{I}}{1+\mathcal{I}},
+\label{eq:q1}
+\end{equation}
+where
+\begin{equation}
+\mathcal{I}(\xin)=\int_0^\infty d(\tau)
+\exp\!\left[-\int_0^\tau\bigl(b(s)-d(s)\bigr)\dd s\right]\dd\tau.
+\label{eq:Kendall-time}
+\end{equation}
+For our epidemic approximation, these rates are
+\begin{equation}
+b(\tau)=\Rzero x(\tau),\qquad d(\tau)=1,
+\label{eq:branching-rates}
+\end{equation}
+where \(x(\tau)\) is given by \cref{eq:branching-background}.
+
+\subsection{Evaluating the Kendall integral}
+We now evaluate \cref{eq:Kendall-time} by changing the integration variable from time to the susceptible fraction, using \cref{eq:branching-background}.
+
+Using the susceptible recovery equation \cref{eq:branching-background} and the infectious-fraction equation \cref{eq:modely}, we obtain
+\begin{equation}
+\frac{\dd\log y}{\dd x}
+=\frac{\dd\log y/\dd\tau}{\dd x/\dd\tau}
+\approx\frac{\Rzero x-1}{\rhoeps\hth(x)}.
+\label{eq:logy-versus-x}
+\end{equation}
+We define the action function \(\Ath(x)\) by
 \begin{equation}
 \Ath'(x)=\frac{1-\Rzero x}{\hth(x)}
 =\frac{1-\Rzero x}{(1-x)x^\theta}.
 \label{eq:actionprime}
 \end{equation}
-Then
+The relation above then becomes
 \begin{equation}
-\frac{\dd\log y}{\dd x}=-\frac{1}{\rhoeps}\Ath'(x).
+\frac{\dd\log y}{\dd x}\approx-\frac{1}{\rhoeps}\Ath'(x).
 \label{eq:logyaction}
 \end{equation}
-Only action differences are required. We therefore define
+Integrating \cref{eq:logyaction} between two susceptible fractions \(z\) and \(x\) along the low-prevalence trajectory gives
 \begin{equation}
-\Ath(x)-\Ath(z)=
-\int_z^x\frac{1-\Rzero u}{(1-u)u^\theta}\dd u.
+\begin{aligned}
+\log\frac{y(x)}{y(z)}
+&\approx-\frac1{\rhoeps}\int_z^x\Ath'(u)\dd u\\
+&=-\frac{\Ath(x)-\Ath(z)}{\rhoeps}.
+\end{aligned}
+\label{eq:logy-action-difference}
+\end{equation}
+Equivalently,
+\begin{equation}
+y(x)\approx y(z)\exp\!\left[-\frac{\Ath(x)-\Ath(z)}{\rhoeps}\right].
+\label{eq:y-action-propagation}
+\end{equation}
+Thus, the action difference determines the exponential change in infectious prevalence. From \cref{eq:actionprime}, this difference is
+\begin{equation}
+\Ath(x)-\Ath(z)=\int_z^x\frac{1-\Rzero u}{(1-u)u^\theta}\dd u.
 \label{eq:actiondifference}
 \end{equation}
-The action is the natural object connecting deterministic phase-plane matching to the later branching-process exponent.
 
-For reference, useful special cases include
+For the susceptible background in \cref{eq:branching-background}, changing variables to \(X=x(\tau)\) gives
+\begin{equation}
+\dd\tau=\frac{\dd X}{\rhoeps\hth(X)},\qquad
+x(0)=\xin,\qquad \lim_{\tau\to\infty}x(\tau)=1.
+\label{eq:Kendall-time-change}
+\end{equation}
+Using \cref{eq:branching-rates,eq:Kendall-time-change,eq:actionprime}, the accumulated growth rate becomes
+\begin{equation}
+\begin{aligned}
+\int_0^\tau\bigl(b(s)-d(s)\bigr)\dd s
+&=\int_{\xin}^{x(\tau)}\frac{\Rzero X-1}{\rhoeps\hth(X)}\dd X\\
+&=-\frac{\Ath(x(\tau))-\Ath(\xin)}{\rhoeps}.
+\end{aligned}
+\label{eq:Kendall-growth-integral}
+\end{equation}
+Substituting \cref{eq:Kendall-time-change,eq:Kendall-growth-integral} and \(d(\tau)=1\) from \cref{eq:branching-rates} into \cref{eq:Kendall-time} gives
+\begin{equation}
+\mathcal{I}(\xin)=
+\int_{\xin}^{1}
+\frac{1}{\rhoeps\hth(X)}
+\exp\left[\frac{\Ath(X)-\Ath(\xin)}{\rhoeps}\right]\dd X.
+\label{eq:Kendall}
+\end{equation}
+
+For \(\theta=0,\tfrac12,1\), integrating \cref{eq:actionprime} gives
 \begin{align}
 A_0(x)&=\Rzero x+(\Rzero-1)\log(1-x),\\
 A_{1/2}(x)&=2\Rzero\sqrt{x}-2(\Rzero-1)\operatorname{artanh}\sqrt{x},\\
@@ -578,23 +1016,57 @@ A_1(x)&=\log x+(\Rzero-1)\log(1-x),
 \end{align}
 up to additive constants.
 
+\subsection{Burnout and persistence probabilities}
+In the birth--death approximation, the susceptible fraction \(x(\tau)\) is prescribed deterministically, and infectious individuals produce new infections and are removed independently at the per-capita rates in \cref{eq:branching-rates}. The \(m=K\yin\) infectious individuals present at boundary-layer entry therefore generate independent lineages. Burnout occurs if all these lineages become extinct, giving
+\begin{equation}
+P_{\rm burn\mid est}\approx q_1^{\,m}
+=\left[\frac{\mathcal{I}(\xin)}{1+\mathcal{I}(\xin)}\right]^{K\yin}.
+\label{eq:Pburn}
+\end{equation}
+The conditional persistence probability is therefore
+\begin{equation}
+P_{\rm persist\mid est}=1-P_{\rm burn\mid est}.
+\label{eq:Ppersistcond}
+\end{equation}
+We define
+\begin{equation}
+B:=K\yin\log\!\left(1+\frac{1}{\mathcal{I}(\xin)}\right).
+\label{eq:B}
+\end{equation}
+Then
+\[
+-\log P_{\rm burn\mid est}\approx B,
+\qquad
+P_{\rm persist\mid est}\approx1-e^{-B}.
+\]
+
+The post-wave calculation is conditional on initial epidemic establishment. When \(\Rzero>1\), the early branching approximation gives the establishment probability for a single infectious host introduced into an otherwise susceptible population as \cite{Whittle1955}
+\begin{equation}
+p_{\rm est}\approx1-\frac{1}{\Rzero},
+\label{eq:pest}
+\end{equation}
+The unconditional persistence probability is therefore
+\begin{equation}
+P_{\rm persist,uncond}
+=p_{\rm est}P_{\rm persist\mid est}
+\approx\left(1-\frac{1}{\Rzero}\right)P_{\rm persist\mid est}.
+\label{eq:uncond}
+\end{equation}
+
+
+\section{Entry-state estimates and asymptotic burnout probabilities}
+\label{sec:burnout}
 \subsection{Finite-height entry equations}
-To connect the deterministic post-wave trajectory to the stochastic low-prevalence approximation, we introduce a finite matching threshold \(\yin\). Following the original construction \cite{ParsonsEtAl2024}, we take
+We now estimate \(\xin\) at the boundary-layer threshold \(y=\yin\) defined in Section~\ref{sec:framework}. We choose
 \begin{equation}
 \yin=\sqrt{\frac{y_*}{K}}.
 \label{eq:ybl}
 \end{equation}
-When \(Ky_*\gg1\), this choice lies in the overlap region
-\[
-K^{-1}\ll\yin\ll y_*,
-\]
-so that the corresponding infection count is still large compared with one individual while the prevalence remains small relative to the endemic scale. Let \(\xin\) denote the susceptible fraction at the first downward crossing of \(y=\yin\) after the epidemic peak. The matching threshold is an auxiliary quantity rather than a physical observable; its leading-order dependence will cancel in the boundary-layer-independent limit derived below.
+When \(Ky_*\gg1\), this choice satisfies \cref{eq:matching-overlap}.
 
-Let
+Evaluating \(L\), defined in \cref{eq:corner-L}, at \(y=\yin\), we denote its value by
 \begin{equation}
-L_{\rm BL}=\log\frac{\Cth}{\yin},
-\qquad
-Q=\frac{\Rzero a-bc}{a\delta^2}.
+L_{\rm BL}:=\left.L\right|_{y=\yin}=\log\frac{\Cth}{\yin}.
 \label{eq:LBLQ}
 \end{equation}
 The direct first-order corner estimate is
@@ -607,14 +1079,19 @@ The direct second-order estimate is
 \begin{split}
 x_{\rm in}^{(2),\mathrm{dir}}=&\;\xf+\rhoeps aL_{\rm BL}+b\yin
 +\rhoeps^2\left(\kappa L_{\rm BL}^2+\Dth\right)\\
-&+\frac{\rhoeps\yin}{\delta^2}
+&+\frac{\rhoeps\yin}{\delta_f^2}
 \left[\Rzero a(L_{\rm BL}+1)-bc\right]
-+\frac{b\Rzero}{2\delta^2}\yin^2.
++\frac{b\Rzero}{2\delta_f^2}\yin^2.
 \end{split}
 \label{eq:xindir2}
 \end{equation}
 These formulas display the asymptotic corrections transparently. For production calculations, however, it is preferable to retain the nonlinear action rather than Taylor-expand it once more.
 
+We define
+\begin{equation}
+Q=\frac{\Rzero a-bc}{a\delta_f^2}.
+\label{eq:Q}
+\end{equation}
 Define
 \begin{align}
 M_1&=\rhoeps L_{\rm BL}+\frac{b}{a}\yin,\label{eq:M1}\\
@@ -637,151 +1114,179 @@ They exist precisely when
 \dAf=\Ath(\xs)-\Ath(\xf).
 \label{eq:admissibility}
 \end{equation}
-A failure of \cref{eq:admissibility} is a validity diagnostic for the chosen finite matching height, not a reason to extrapolate the scalar equation beyond its matching interval.
-
-\section{Burnout probability and the boundary-layer-independent limit}
-\label{sec:burnout}
-\subsection{Kendall's time-inhomogeneous branching calculation}
-Once prevalence is sufficiently small, treat the susceptible path as deterministic and neglect feedback from the rare infective population. Each infectious lineage then has per-capita birth rate \(\Rzero x(\tau)\) and removal rate one. Kendall's formula gives the eventual extinction probability of a single lineage as
-\begin{equation}
-q_1=\frac{I}{1+I},
-\label{eq:q1}
-\end{equation}
-where
-\begin{equation}
-I(\xin)=
-\int_{\xin}^{1}
-\frac{1}{\rhoeps\hth(X)}
-\exp\left[\frac{\Ath(X)-\Ath(\xin)}{\rhoeps}\right]\dd X.
-\label{eq:Kendall}
-\end{equation}
-If the finite matching line contains \(m=K\yin\) infectives and their descendants are approximated as independent, then
-\begin{align}
-P_{\rm burn\mid est}&\approx\left(\frac{I}{1+I}\right)^{K\yin},\label{eq:Pburn}\\
-P_{\rm persist\mid est}&\approx1-P_{\rm burn\mid est}.
-\label{eq:Ppersistcond}
-\end{align}
-[[JD: It seems OK to use equality above: Pburn can mean the true Pburn, and the approximation in the first equation above is marked as an approximation.]]
-For numerical stability define the burnout exponent
-\begin{equation}
-B=-\log P_{\rm burn\mid est}
-=K\yin\log\left(1+\frac{1}{I}\right),
-\label{eq:B}
-\end{equation}
-so \(P_{\rm persist\mid est}=1-e^{-B}\).
-
-The post-wave calculation is conditional on initial epidemic establishment. For one initially infectious host, the classical early branching approximation gives
-\begin{equation}
-p_{\rm est}\approx1-\frac{1}{\Rzero},
-\label{eq:pest}
-\end{equation}
-and hence
-\begin{equation}
-P_{\rm persist,uncond}\approx
-\left(1-\frac{1}{\Rzero}\right)P_{\rm persist\mid est}.
-\label{eq:uncond}
-\end{equation}
-The early-fizzle event and the post-wave burnout event are therefore kept conceptually separate.
+A failure of \cref{eq:admissibility} is a validity diagnostic for the chosen boundary-layer threshold, not a reason to extrapolate the scalar equation beyond its interval \(\xf<x<\xs\).
 
 \subsection{Laplace reduction}
-The exponent in \cref{eq:Kendall} has a unique interior stationary point at \(\xs=1/\Rzero\), because \(\Ath'(\xs)=0\). Define
+The burnout probability obtained above still requires numerical evaluation of the Kendall integral \cref{eq:Kendall}. We next use Laplace's method to approximate this integral further.
+Laplace's method \cite[Section~6.4]{BenderOrszag1978} gives
 \begin{equation}
-\Lambda(\xin)=\frac{\Ath(\xs)-\Ath(\xin)}{\rhoeps}.
+\begin{aligned}
+\int_a^b f(X)e^{\phi(X)/\rhoeps}\dd X
+={}&f(x_m)e^{\phi(x_m)/\rhoeps}
+\sqrt{\frac{2\pi\rhoeps}{\lambda_m}}\\
+&\times\left[1+\rhoeps c_{\mathrm{Lap}}+O(\rhoeps^2)\right],
+\qquad \rhoeps\to0^+,
+\end{aligned}
+\label{eq:Laplace-standard}
+\end{equation}
+where \(x_m\) is the unique interior maximum of \(\phi\), \(\lambda_m=-\phi''(x_m)>0\), and
+\begin{equation}
+c_{\mathrm{Lap}}=
+\frac{f''}{2f\lambda_m}
++\frac{f'\phi'''}{2f\lambda_m^2}
++\frac{\phi''''}{8\lambda_m^2}
++\frac{5(\phi''')^2}{24\lambda_m^3}.
+\label{eq:Laplace-standard-correction}
+\end{equation}
+All functions and derivatives in \cref{eq:Laplace-standard-correction} are evaluated at \(x_m\). The expansion requires sufficient smoothness and \(f(x_m)\ne0\). The distances from the maximum to both integration endpoints must be much larger than the width of the peak:
+\begin{equation}
+x_m-a\gg\sqrt{\frac{\rhoeps}{\lambda_m}},\qquad
+b-x_m\gg\sqrt{\frac{\rhoeps}{\lambda_m}}.
+\label{eq:Laplace-endpoint-general}
+\end{equation}
+For the Kendall integral \cref{eq:Kendall}, we take
+\begin{equation}
+f(X)=\frac1{\hth(X)},\qquad
+\phi(X)=\Ath(X)-\Ath(\xin).
+\label{eq:Laplace-substitution}
+\end{equation}
+From \cref{eq:actionprime},
+\begin{equation}
+\phi'(X)=\frac{1-\Rzero X}{\hth(X)}.
+\label{eq:Laplace-phase-derivative}
+\end{equation}
+Since \(\hth(X)>0\) for \(0<X<1\), \(\phi\) increases for \(X<\xs\) and decreases for \(X>\xs\). Thus, for \(\xin<\xs=1/\Rzero\), its unique maximum lies inside the integration interval at \(x_m=\xs\), with
+\begin{equation}
+\lambda_m=-\phi''(\xs)=\frac{\Rzero}{\hth(\xs)}.
+\label{eq:Laplace-phase-curvature}
+\end{equation}
+We define
+\begin{equation}
+\Lambda(\xin):=\frac{\Ath(\xs)-\Ath(\xin)}{\rhoeps},\qquad h_*:=\hth(\xs).
 \label{eq:Lambda}
 \end{equation}
-Laplace's method gives
+For our integral, \cref{eq:Laplace-endpoint-general} becomes
 \begin{equation}
-I(\xin)\sim
-\sqrt{\frac{2\pi}{\Rzero y_*}}\,e^{\Lambda(\xin)},
+\xs-\xin\gg\sqrt{\frac{\rhoeps h_*}{\Rzero}},\qquad
+1-\xs\gg\sqrt{\frac{\rhoeps h_*}{\Rzero}}.
+\label{eq:Laplace-endpoint-conditions}
+\end{equation}
+Substituting \cref{eq:Laplace-substitution,eq:Laplace-phase-curvature} into the leading term of \cref{eq:Laplace-standard} gives
+\begin{equation}
+\begin{aligned}
+\mathcal{I}(\xin)&\sim
+\frac{e^{\Lambda(\xin)}}{\rhoeps h_*}
+\sqrt{\frac{2\pi\rhoeps h_*}{\Rzero}}\\
+&=\sqrt{\frac{2\pi}{\Rzero y_*}}\,e^{\Lambda(\xin)},
+\end{aligned}
 \label{eq:LaplaceI}
 \end{equation}
-where \(y_*=\rhoeps\hth(\xs)\). If in addition \(I\gg1\),
-\begin{equation}
-B\sim K\yin\sqrt{\frac{\Rzero y_*}{2\pi}}\,e^{-\Lambda(\xin)}.
-\label{eq:LaplaceB}
-\end{equation}
-The next relative saddle correction is
-\begin{equation}
-I=e^{\Lambda}
-\sqrt{\frac{2\pi}{\Rzero\rhoeps h_*}}
-\left[1+\rhoeps c_L+O(\rhoeps^2)\right],
-\qquad h_*=\hth(\xs),
-\label{eq:LaplaceNext}
-\end{equation}
-with
+where \(y_*=\rhoeps h_*\).
+Substituting the derivatives of \(f\) and \(\phi\) into \cref{eq:Laplace-standard-correction} gives
 \begin{equation}
 c_L=\frac{h_*}{\Rzero}
 \left[
 \frac{1}{12}\left(\frac{h_*'}{h_*}\right)^2
 -\frac18\frac{h_*''}{h_*}
-\right].
+\right],\qquad
+h_*'=\hth'(\xs),\quad h_*''=\hth''(\xs).
 \label{eq:cL}
 \end{equation}
-The exact Kendall integral and the Laplace closed form are deliberately retained as distinct approximation levels. Improving \(\xin\) reduces deterministic matching error; it does not repair a poor saddle approximation when \(\Lambda=O(1)\).
+The corrected approximation is therefore
+\begin{equation}
+\mathcal{I}(\xin)=
+\sqrt{\frac{2\pi}{\Rzero y_*}}\,e^{\Lambda(\xin)}
+\left[1+\rhoeps c_L+O(\rhoeps^2)\right].
+\label{eq:LaplaceNext}
+\end{equation}
+For fixed \(\xin<\xs\), the action difference \(\Ath(\xs)-\Ath(\xin)\) is positive. Hence, \cref{eq:LaplaceI} shows that \(\mathcal{I}(\xin)\) grows exponentially as \(\rhoeps\to0^+\). Therefore, for sufficiently small \(\rhoeps\), \(\mathcal{I}(\xin)\gg1\), and
+\begin{equation}
+\log\!\left(1+\frac1{\mathcal{I}(\xin)}\right)\sim\frac1{\mathcal{I}(\xin)}.
+\label{eq:large-I-log}
+\end{equation}
+Substituting \cref{eq:LaplaceI} into \cref{eq:B}, using \cref{eq:large-I-log}, therefore gives
+\begin{equation}
+\begin{aligned}
+B&\sim\frac{K\yin}{\mathcal{I}(\xin)}\\
+&\sim K\yin\sqrt{\frac{\Rzero y_*}{2\pi}}\,e^{-\Lambda(\xin)}.
+\end{aligned}
+\label{eq:LaplaceB}
+\end{equation}
+If \cref{eq:Laplace-endpoint-conditions} is not satisfied, the Kendall integral \cref{eq:Kendall} can instead be evaluated numerically.
 
 \subsection{Boundary-layer-independent trough and burnout exponent}
-The finite matching line is not a physical parameter. In the strict first-order overlap, finite-height terms vanish and
+The first-order estimate \cref{eq:xindir1} is
 \begin{equation}
-\Ath(\xin)-\Ath(\xf)
-\sim\rhoeps\log\frac{\Cth}{\yin}.
+x_{\rm in}^{(1),\mathrm{dir}}
+=\xf+\rhoeps a\log\frac{\Cth}{\yin}+b\yin.
+\label{eq:BI-entry-repeat}
+\end{equation}
+For our choice \(\yin=\sqrt{y_*/K}\),
+\begin{equation}
+\frac{\yin}{\rhoeps}
+=\frac{\hth(\xs)}{\sqrt{Ky_*}}\ll1
+\qquad\text{when }Ky_*\gg1.
+\label{eq:BI-height-scale}
+\end{equation}
+The corresponding entry equation \cref{eq:actionentry}, with \(M_1\) from \cref{eq:M1}, gives
+\begin{equation}
+\begin{aligned}
+\frac{\Ath(x_{\rm in}^{(1)})-\Ath(\xf)}{\rhoeps}
+&=\log\frac{\Cth}{\yin}+\frac ba\frac{\yin}{\rhoeps}\\
+&=\log\frac{\Cth}{\yin}+o(1).
+\end{aligned}
 \label{eq:BIaction}
 \end{equation}
-Propagation from \(\xin\) to the action saddle gives the deterministic trough scale
-\begin{equation}
-y_{\min}=\yin
-\exp\left[-\frac{\Ath(\xs)-\Ath(\xin)}{\rhoeps}\right].
-\label{eq:yminentry}
-\end{equation}
-Combining \cref{eq:BIaction,eq:yminentry} cancels the artificial matching height:
-\begin{equation}
-y_{\min}^{\BI}
-\sim\Cth\exp\left(-\frac{\dAf}{\rhoeps}\right).
-\label{eq:yminBI}
-\end{equation}
-Thus the leading post-wave bottleneck is determined by the matching amplitude \(\Cth\) and the action barrier \(\dAf\), with no arbitrary finite cutoff.
+Since \(\yin/\rhoeps\ll1\), we can neglect the second term in the first line of \cref{eq:BIaction}.
 
-Combining \cref{eq:yminBI} with the local saddle factor gives the leading boundary-layer-independent burnout exponent
+In particular, combining this approximation with the leading-order Laplace result \cref{eq:LaplaceB} gives a burnout estimate that is independent of the particular choice of \(\yin\) at leading order. To show this, we write
 \begin{equation}
-B_{\BI}
-\sim
-K\Cth
-\sqrt{\frac{\Rzero y_*}{2\pi}}
-\exp\left(-\frac{\dAf}{\rhoeps}\right),
+\begin{aligned}
+\Ath(\xs)-\Ath(x_{\rm in}^{(1)})
+={}&\dAf\\
+&-\left[\Ath(x_{\rm in}^{(1)})-\Ath(\xf)\right],
+\end{aligned}
+\label{eq:BI-action-split}
+\end{equation}
+where \(\dAf=\Ath(\xs)-\Ath(\xf)\), as defined in \cref{eq:admissibility}. Using \cref{eq:BIaction}, we obtain
+\begin{equation}
+\begin{aligned}
+\exp\!\left[-\frac{\Ath(\xs)-\Ath(x_{\rm in}^{(1)})}{\rhoeps}\right]
+&=e^{-\dAf/\rhoeps}\frac{\Cth}{\yin}\,e^{o(1)}\\
+&\sim\frac{\Cth}{\yin}e^{-\dAf/\rhoeps}.
+\end{aligned}
+\label{eq:BI-exponential-cancellation}
+\end{equation}
+Substituting \cref{eq:BI-exponential-cancellation} into \cref{eq:LaplaceB} cancels \(\yin\), giving
+\begin{equation}
+\begin{aligned}
+B&\sim K\yin\sqrt{\frac{\Rzero y_*}{2\pi}}\,
+\frac{\Cth}{\yin}e^{-\dAf/\rhoeps}\\
+&=K\Cth\sqrt{\frac{\Rzero y_*}{2\pi}}\,e^{-\dAf/\rhoeps}.
+\end{aligned}
+\label{eq:BI-B-cancellation}
+\end{equation}
+We denote this threshold-independent approximation by
+\begin{equation}
+B_{\BI}:=K\Cth\sqrt{\frac{\Rzero y_*}{2\pi}}\,e^{-\dAf/\rhoeps},
 \label{eq:BBI}
 \end{equation}
-and
 \begin{equation}
-P_{\rm persist\mid est}^{\BI}
-\approx1-e^{-B_{\BI}}.
+P_{\rm persist\mid est}^{\BI}:=1-e^{-B_{\BI}}.
 \label{eq:PBI}
 \end{equation}
-Unlike the finite-boundary construction, \cref{eq:BBI} remains defined when a chosen line \(y=\yin\) is not reached by the deterministic first trough.
 
-A next-order boundary-independent approximation follows under the stronger overlap \(K^{-1}\ll\yin\ll\rhoeps^2\). Then
+The same approximation also gives an estimate of the minimum infectious fraction along the deterministic trajectory. Setting \(x=\xs\) and \(z=\xin\) in \cref{eq:y-action-propagation} gives
 \begin{equation}
-\Ath(\xin)-\Ath(\xf)
-=\rhoeps\log\frac{\Cth}{\yin}
-+\rhoeps^2\frac{\Dth}{a}+o(\rhoeps^2),
-\label{eq:BIaction2}
+y_{\min}\approx\yin
+\exp\!\left[-\frac{\Ath(\xs)-\Ath(\xin)}{\rhoeps}\right].
+\label{eq:yminentry}
 \end{equation}
-so
+Using \cref{eq:BI-exponential-cancellation}, this simplifies to
 \begin{equation}
-y_{\min}^{\BI,2}
-\sim
-\Cth\exp\left[-\frac{\dAf}{\rhoeps}
-+\rhoeps\frac{\Dth}{a}\right].
-\label{eq:yminBI2}
+y_{\min}\approx\Cth e^{-\dAf/\rhoeps}.
+\label{eq:yminBI}
 \end{equation}
-Including the next Laplace factor gives
-\begin{equation}
-B_{\BI}^{\rm next}
-=
-K\Cth\sqrt{\frac{\Rzero y_*}{2\pi}}
-\exp\left[-\frac{\dAf}{\rhoeps}
-+\rhoeps\left(\frac{\Dth}{a}-c_L\right)\right].
-\label{eq:Bnext}
-\end{equation}
-This is a next-order boundary-independent approximation, not a uniform second-order theory. In particular, the fixed-\(\Rzero\) asymptotic hierarchy remains nonuniform as \(\Rzero\to1^+\).
 
 \section{Numerical validation and the effect of recruitment shape}
 \label{sec:numerics}
@@ -802,12 +1307,12 @@ The recruitment-shape effect is systematic in the numerical sweep. For \(0<x<1\)
 Conditional persistence itself is nonmonotone in \(\Rzero\): its boundary-independent extrema satisfy \(L=\dd\log B_{\BI}/\dd\Rzero=0\), independently of \(K\). At \(\rhoeps=0.01\), each plotted \(\theta<1\) has a near-threshold maximum followed by a minimum and, much farther out, another maximum before its eventual decline; the minima occur at \(\Rzero\approx2.377,3.495,5.987,13.974\) for \(\theta=0,0.25,0.5,0.75\). The last minimum and the remote maxima lie beyond the range emphasized in \cref{fig:main-persistence}. For \(\theta=1\), the analytical search finds only a near-threshold maximum at \(\Rzero\approx1.0714\); the distinct large-\(\Rzero\) behavior and the distinction from unconditional extrema are detailed in Appendix~\ref{app:numerical-diagnostics}.
 
 \subsection{Global conditional-persistence landscape}
-The same ordering persists away from the one-dimensional validation slices. Figure~\ref{fig:conditional-landscape} maps \cref{eq:PBI} over \((\Rzero,\rhoeps)\), with columns varying recruitment shape and rows separating population sizes by three orders of magnitude. Increasing \(K\) expands the high-persistence region, whereas increasing \(\theta\) contracts it and shifts its transition toward slower recruitment or larger populations. Sensitivity is strongest near the \(\theta\)-dependent transition boundary, which can move substantially: a point with near-certain persistence for one recruitment shape need not remain saturated for another. Gray cells identify where the first-order finite matching entry fails the directly derived admissibility test \(0<M_1<\Delta A_f\) in \cref{eq:admissibility}, using \(y_{\rm BL}=\sqrt{y_*/K}\). The boundary-independent formula remains mathematically defined there, but its finite-entry derivation lacks an overlap check. This diagnostic is not a theorem that every unmasked cell is quantitatively accurate; the near-critical and larger-\(\rhoeps\) limitations remain visible in \cref{fig:accuracy-map}.
+The same ordering persists away from the one-dimensional validation slices. Figure~\ref{fig:conditional-landscape} maps \cref{eq:PBI} over \((\Rzero,\rhoeps)\), with columns varying recruitment shape and rows separating population sizes by three orders of magnitude. Increasing \(K\) expands the high-persistence region, whereas increasing \(\theta\) contracts it and shifts its transition toward slower recruitment or larger populations. Sensitivity is strongest near the \(\theta\)-dependent transition boundary, which can move substantially: a point with near-certain persistence for one recruitment shape need not remain saturated for another. Gray cells identify where the first-order entry estimate fails the directly derived admissibility test \(0<M_1<\Delta A_f\) in \cref{eq:admissibility}, using \(y_{\rm BL}=\sqrt{y_*/K}\). The boundary-independent formula remains mathematically defined there, but its finite-entry derivation lacks an overlap check. This diagnostic is not a theorem that every unmasked cell is quantitatively accurate; the near-critical and larger-\(\rhoeps\) limitations remain visible in \cref{fig:accuracy-map}.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{validation/figures/paper/conditional_persistence_landscape.pdf}
-\caption{Boundary-layer-independent conditional persistence over transmission strength and recruitment rate. Columns show \(\theta=0,0.5,1\), and rows show \(K=10^6\) and \(10^9\). Gray cells fail the first-order finite-entry condition \(0<M_1<\Delta A_f\) at the specified matching height. This is a concrete overlap diagnostic, not a sharp accuracy boundary. Increasing recruitment nonlinearity suppresses persistence most strongly along the probability transition.}
+\caption{Boundary-layer-independent conditional persistence over transmission strength and recruitment rate. Columns show \(\theta=0,0.5,1\), and rows show \(K=10^6\) and \(10^9\). Gray cells fail the first-order finite-entry condition \(0<M_1<\Delta A_f\) at the specified boundary-layer threshold. This is a concrete overlap diagnostic, not a sharp accuracy boundary. Increasing recruitment nonlinearity suppresses persistence most strongly along the probability transition.}
 \label{fig:conditional-landscape}
 \end{figure}
 
@@ -849,14 +1354,14 @@ Figure~\ref{fig:accuracy-map} localizes the discrepancy between theory and stoch
 \begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{validation/figures/paper/stochastic_error_validity_map.pdf}
-\caption{Absolute error of the boundary-layer-independent conditional-persistence prediction against stochastic simulation at \(K=3\times10^4\). Square color gives absolute probability error on a logarithmic scale. Small neutral crosses mark points where the first-order finite matching entry is inadmissible, \(M_1\notin(0,\dAf)\). This is an overlap diagnostic rather than a sharp error guarantee.}
+\caption{Absolute error of the boundary-layer-independent conditional-persistence prediction against stochastic simulation at \(K=3\times10^4\). Square color gives absolute probability error on a logarithmic scale. Small neutral crosses mark points where the first-order entry estimate is inadmissible, \(M_1\notin(0,\dAf)\). This is an overlap diagnostic rather than a sharp error guarantee.}
 \label{fig:accuracy-map}
 \end{figure}
 
 The conspicuous near-critical exception in \cref{fig:main-persistence} has the same interpretation. At \(K=10^6\) and \(\Rzero=1.03\), the theory predicts conditional persistence probabilities of 0.46--0.48, whereas the simulations give 0.05--0.08. The discrepancy occurs for all three simulated values of \(\theta\), despite the large population size, and therefore does not have the signature of a recruitment-shape or ordinary finite-\(K\) effect. Rather, \(\Rzero-1\) is then comparable to the recruitment scale, so the epidemic excursion, post-wave relaxation, and stochastic bottleneck are no longer separated. The prediction has recovered by \(\Rzero=1.075\)--1.10 in the same panel.
 
 \enlargethispage{2\baselineskip}
-The ODE and Kendall diagnostics localize the remaining error (Appendix~\ref{app:numerical-diagnostics}). On points for which a finite matching entry exists, replacing the numerical ODE entry by the second-order asymptotic entry changes conditional persistence by only 0.0009--0.0015 on average over \(\rhoeps=0.02\)--0.10. The errors from reducing the ODE-plus-exact-Kendall reference to the boundary-independent closed form, and from applying Laplace's method, are an order of magnitude larger. Thus second-order matching is working as intended where an overlap exists; the conspicuous failures arise mainly when that overlap disappears or the saddle approximation is no longer sharply separated. For high-accuracy calculations near this edge, the finite-entry prediction with the exact one-dimensional Kendall integral should be retained.
+The ODE and Kendall diagnostics localize the remaining error (Appendix~\ref{app:numerical-diagnostics}). On points for which a entry estimate exists, replacing the numerical ODE entry by the second-order asymptotic entry changes conditional persistence by only 0.0009--0.0015 on average over \(\rhoeps=0.02\)--0.10. The errors from reducing the ODE-plus-exact-Kendall reference to the boundary-independent closed form, and from applying Laplace's method, are an order of magnitude larger. Thus second-order matching is working as intended where an overlap exists; the conspicuous failures arise mainly when that overlap disappears or the saddle approximation is no longer sharply separated. For high-accuracy calculations near this edge, the finite-entry prediction with the exact one-dimensional Kendall integral should be retained.
 
 \clearpage
 \section{Discussion}
@@ -876,99 +1381,6 @@ These limitations suggest several directions for future work. A natural first ex
 Overall, generalized susceptible recruitment changes the post-wave trajectory without changing the leading first-wave orbit. Extending the existing burnout approximation to this setting connects host-demographic assumptions to both the magnitude and the nonmonotone structure of post-wave persistence. When a valid finite entry and deterministic-to-stochastic overlap remain, the exact one-dimensional Kendall integral can replace an inaccurate Laplace or boundary-independent reduction; when that overlap or scale separation fails, full stochastic simulation or a different asymptotic treatment is needed.
 
 \appendix
-\section{Regularized second-order matching constant \(\Dth\)}
-\label{app:Dtheta}
-This appendix records the production-level regularization underlying \cref{eq:X2asymp}. Let
-\[
-s=x-\xf,\qquad
-f_1=F'(\xf)=\frac{\delta}{\Rzero\xf},
-\qquad
-f_2=F''(\xf)=-\frac{1}{\Rzero\xf^2}.
-\]
-Writing \(G_\theta=\Rzero Y_1\), define
-\[
-\alpha=\frac{h_f}{\Rzero\xf},
-\qquad
-\beta=\alpha\log\frac{f_1}{\Cth}.
-\]
-The first-order local expansion takes the form
-\begin{equation}
-Y_1(\xf+s)=\alpha\log s+\beta+p_0s+O(s^2),
-\label{eq:Y1localapp}
-\end{equation}
-where
-\begin{equation}
-p_0=\frac{2\delta\xf h_f'-(1+2\delta)h_f}
-{2\Rzero\delta\xf^2}.
-\label{eq:p0}
-\end{equation}
-Define
-\begin{equation}
-A_{-1}=\frac{h_f/\xf-c}{\delta^2},
-\qquad
-B_0=\beta-\alpha,
-\qquad
-B_1=-\frac{h_f}{2\Rzero\delta\xf^2}.
-\label{eq:ABdefs}
-\end{equation}
-The singular part of \(Y_2'\) is
-\begin{equation}
-q_{2,\rm sing}(s)=
--\frac{a\alpha\log s+aB_0}{s^2}
-+\frac{A_{-1}\alpha\log s+A_{-1}B_0-aB_1}{s}.
-\label{eq:q2sing}
-\end{equation}
-A corresponding primitive is
-\begin{equation}
-P_2(s)=
-\frac{a\alpha\log s+a\beta}{s}
-+\frac{A_{-1}\alpha}{2}\log^2s
-+(A_{-1}B_0-aB_1)\log s.
-\label{eq:P2}
-\end{equation}
-Let \(q_2(x)\) denote the right-hand side of \cref{eq:Y2prime} and define
-\[
-q_{2,\rm reg}(x)=q_2(x)-q_{2,\rm sing}(x-\xf).
-\]
-Then \(q_{2,\rm reg}(x)=O(\log(x-\xf))\) is integrable at \(\xf\), and
-\begin{equation}
-K_2=-P_2(1-\xf)-\int_{\xf}^{1}q_{2,\rm reg}(u)\dd u.
-\label{eq:K2}
-\end{equation}
-The constant term in the numerator of \cref{eq:X2general} is
-\begin{equation}
-N_{20}=K_2+
-\frac{\alpha\beta f_2}{f_1^2}
--\frac{(\alpha+\beta)p_0}{f_1}
-+\frac{f_2\beta^2}{2f_1^2}.
-\label{eq:N20}
-\end{equation}
-The regularized second-order matching constant is therefore
-\begin{equation}
-\Dth=-\frac{N_{20}}{f_1}-\kappa\frac{\beta^2}{\alpha^2}.
-\label{eq:DthetaApp}
-\end{equation}
-This formula requires only finite regularized quadrature and local algebra. No small-\(y\) extrapolation is required.
-
-\section{Laplace correction}
-\label{app:laplace}
-Let \(z=X-\xs\), \(h_*=\hth(\xs)\), and \(\lambda=\Rzero/h_*>0\). Since
-\[
-\Ath'(\xs+z)=-\frac{\Rzero z}{\hth(\xs+z)},
-\]
-the required derivatives at the saddle are
-\begin{align}
-\Ath'''(\xs)&=\frac{2\Rzero h_*'}{h_*^2},\\
-\Ath''''(\xs)&=-\frac{6\Rzero(h_*')^2}{h_*^3}
-+\frac{3\Rzero h_*''}{h_*^2}.
-\end{align}
-Applying Gaussian averaging to the amplitude \(1/\hth\) after \(z=\sqrt{\rhoeps}\,t\) gives the relative correction \(1+\rhoeps c_L+O(\rhoeps^2)\), with \(c_L\) given by \cref{eq:cL}. For the recruitment family \cref{eq:hth},
-\begin{align}
-\hth'(x)&=x^{\theta-1}\{\theta-(\theta+1)x\},\\
-\hth''(x)&=\theta x^{\theta-2}\{(\theta-1)-(\theta+1)x\}.
-\end{align}
-In particular, at \(\theta=0\), \(c_L=1/[12(\Rzero-1)]\).
-
 \section{Implementation and diagnostic quantities}
 \label{app:numerical-diagnostics}
 \subsection{Conditional extrema and the large-\(\Rzero\) limit}
@@ -1107,9 +1519,9 @@ and separate exact-Kendall and Laplace burnout exponents. The regularized quadra
 For repeated parameter studies, a natural computational decomposition is:
 \begin{enumerate}[leftmargin=2em]
 \item for each \((\Rzero,\theta)\), compute \(\xf\), \(\Cth\), and \(\Dth\);
-\item for each \((\rhoeps,K)\), compute \(y_*\) and the chosen finite matching height if the finite-boundary route is used;
+\item for each \((\rhoeps,K)\), compute \(y_*\) and the chosen boundary-layer threshold if the finite-boundary route is used;
 \item solve \cref{eq:actionentry} for first- or second-order entry and evaluate the exact one-dimensional Kendall integral for the high-accuracy finite-boundary prediction;
-\item evaluate \cref{eq:BBI} or \cref{eq:Bnext} for a boundary-layer-independent closed form;
+\item evaluate \cref{eq:BBI} for a boundary-layer-independent closed form;
 \item record no-entry status, action size, and the difference between first- and second-order predictions as validity diagnostics.
 \end{enumerate}
 
@@ -1123,6 +1535,18 @@ T. L. Parsons and D. J. D. Earn,
 T. L. Parsons, B. M. Bolker, J. Dushoff, and D. J. D. Earn,
 \newblock The probability of epidemic burnout in the stochastic SIR model with vital dynamics,
 \newblock \emph{Proceedings of the National Academy of Sciences} 121(5), e2313708120 (2024).
+\bibitem{Kendall1948}
+D. G. Kendall,
+\newblock On the generalized ``Birth-and-Death'' process,
+\newblock \emph{The Annals of Mathematical Statistics} 19(1), 1--15 (1948).
+\bibitem{Whittle1955}
+P. Whittle,
+\newblock The outcome of a stochastic epidemic---a note on Bailey's paper,
+\newblock \emph{Biometrika} 42(1--2), 116--122 (1955).
+\bibitem{BenderOrszag1978}
+C. M. Bender and S. A. Orszag,
+\newblock \emph{Advanced Mathematical Methods for Scientists and Engineers},
+\newblock McGraw-Hill, New York (1978).
 \end{thebibliography}
 
 \end{document}
