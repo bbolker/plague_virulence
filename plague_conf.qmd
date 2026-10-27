@@ -4,6 +4,7 @@ author: Ben Bolker, Jonathan Dushoff, and David Earn
 bibliography: virulence.bib
 link-citations: true
 from: markdown+latex_macros
+date: today
 format:
     html:
       embed-resources: true
