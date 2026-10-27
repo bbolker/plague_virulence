@@ -13,6 +13,7 @@ pkgs <- c(
 ## , "ggnewscale" ## useful extension but no longer needed
 , "ggrastr"
 , "gsl"
+, "here"
 , "odin"
 , "optparse"
 , "patchwork"

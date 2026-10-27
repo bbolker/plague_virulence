@@ -1,0 +1,11 @@
+"name","value"
+"n_patch",200
+"K",5000
+"alpha",5e-05
+"seasonal_amp",0.2
+"resident_years",100
+"invasion_years",50
+"summary_years",10
+"I_invader",10
+"n_reps",100
+"THIN",10
