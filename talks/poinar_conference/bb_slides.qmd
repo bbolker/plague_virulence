@@ -1,0 +1,25 @@
+---
+format:
+  revealjs:
+    embed-resources: true
+    slide-number: true
+revealjs-plugins:
+    - editable
+filters:
+   - editable
+---
+
+## 
+
+![](alltern.png)
+
+## tradeoff theory
+
+![](../pix/lenski_date.png){.absolute width=373px height=63px left=335px top=97px}
+![](../pix/lenski_hdr.png){.absolute width=407px height=105px left=-73px top=80px}
+![](../pix/lenski_text.png){.absolute width=575px height=549px left=-1px top=196px}
+
+## patch occupancy under seasonal forcing
+
+![](occupancy_raster.png)
+
