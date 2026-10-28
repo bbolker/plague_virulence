@@ -9,17 +9,21 @@ filters:
    - editable
 ---
 
+## prior distribution
+
+![](prior_dist.png){.absolute width=912.7px height=600.4px left=0px top=89px}
+
 ## 
 
-![](alltern.png)
+![](alltern.png){.absolute width=1111.6px height=687px left=119.2px top=1.9px}
 
 ## tradeoff theory
 
-![](../pix/lenski_date.png){.absolute width=373px height=63px left=335px top=97px}
-![](../pix/lenski_hdr.png){.absolute width=407px height=105px left=-73px top=80px}
-![](../pix/lenski_text.png){.absolute width=575px height=549px left=-1px top=196px}
+![](../pix/lenski_date.png){.absolute width=373px height=63px left=488.8px top=110.4px}
+![](../pix/lenski_hdr.png){.absolute width=526.6px height=133.9px left=457.1px top=-21.6px}
+![](../pix/lenski_text.png){.absolute width=454px height=476px left=577.8px top=190px}
 
-## patch occupancy under seasonal forcing
+## metapopulation patch occupancy
 
-![](occupancy_raster.png)
+![](occupancy_raster.png){.absolute width=958.8px height=668.3px left=0px top=56.7px}
 
