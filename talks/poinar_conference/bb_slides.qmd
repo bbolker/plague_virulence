@@ -3,11 +3,11 @@ format:
   revealjs:
     embed-resources: true
     slide-number: true
-revealjs-plugins:
-    - editable
-filters:
-   - editable
 ---
+<!-- revealjs-plugins: -->
+<!--     - editable -->
+<!-- filters: -->
+<!--    - editable -->
 
 ## prior distribution
 
