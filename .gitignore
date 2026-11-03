@@ -366,6 +366,7 @@ space.time
 hot/VPD-Immunity-Estimation/
 dirs
 makestuff
+makestuff*.stamp
 *.checkfile
 dropstuff
 index.lsd
@@ -419,6 +420,7 @@ space.time
 hot/VPD-Immunity-Estimation/
 dirs
 makestuff
+makestuff*.stamp
 *.checkfile
 dropstuff
 index.lsd
