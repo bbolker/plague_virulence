@@ -1,4 +1,17 @@
-## To do
+# To do
+
+## newer (3 November 2026)
+
+* getting invasion of high-R0 resident by low-R0 invader is hard, in the ranges where the resident can persist at intermediate metapopulation occupancy
+* consider a 'transition' run, where we adapt $K$ and $\alpha$ logistically from high values (early-pandemic) to low values (late-pandemic), with a constant mutational input/immigration of lower-R0 strains; can we get a high- to low-R0 strain emergence/transition in this way?
+* revisit questions of metapopulation persistence; e.g. Keeling and Gilligan 2000 have a model that purportedly enables metapopulation persistence robustly
+   * DJDE thinks the parameters are cherry-picked
+	   * which ones/how?
+	   * how do these parameters compare with the ones that Daniel Park collected for the transmission-modality exploration? (See BMB's `louseplague` repo ...) What happens if we simulate epidemics across samples from DP's priors?
+* explore https://github.com/flmnh-ai/yersinia for code sources
+* check KG's equations - is there a typo in the resistant-rat-reproduction equation?
+
+## older
 
 * implement thinning more generally (check consistency throughout for scaling by dt or not)
 * update euler examples; thin properly, summarize before storing (thin as part of discrete_run?)
