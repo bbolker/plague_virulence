@@ -46,7 +46,9 @@
 Epidemic burnout occurs when a pathogen becomes extinct after causing a major epidemic wave, before it can cause a subsequent wave. Parsons et al. approximated the probability of epidemic burnout by matching a deterministic epidemic trajectory to a stochastic branching process at low prevalence. Existing asymptotic burnout theory for the susceptible--infectious--recovered model with vital dynamics assumes linear susceptible replenishment. Motivated by the possibility of density-dependent recruitment, particularly in ecological host populations, we replace the linear term by a family of susceptible recruitment functions that interpolates continuously between linear and logistic replenishment.
 [[JD: initial instead of leading below (and elsewhere in this context)]]
 In the limit of slow susceptible recruitment, the leading trajectory of the first epidemic wave is unchanged by the recruitment law. The effect of the recruitment function appears instead in the post-wave decline, where differences in replenishment dynamics produce small corrections to the susceptible trajectory that can strongly affect how deeply infection falls before susceptible replenishment permits recovery. We derive first- and second-order asymptotic approximations for this post-epidemic trajectory and for the state at which infection enters the low-prevalence regime. We then use these deterministic approximations as input to Kendall's time-inhomogeneous branching-process calculation to obtain the probability of extinction during the first epidemic trough. Matching the deterministic and stochastic descriptions in their common regime of validity yields a leading-order prediction for the trough depth and burnout probability.
-Comparisons with stochastic simulations show that our approximations are accurate over a biologically reasonable range of parameters. We show that the probability of persistence decreases as susceptible replenishment changes from linear to logistic. However, persistence can depend nonmonotonically on the basic reproduction number \(\Rzero\), and the recruitment function changes both the locations and the number of extrema in this relationship. The analysis extends the deterministic--stochastic burnout framework to a broader family of susceptible-recruitment laws and identifies both quantitative and qualitative ways in which recruitment shape modifies survival through the post-wave trough.
+Comparisons with stochastic simulations show that our approximations are accurate over a biologically reasonable range of parameters. We show that the probability of persistence decreases as susceptible replenishment changes from linear to logistic. However, persistence can depend nonmonotonically on the basic reproduction number \(\Rzero\).
+% Deferred pending stochastic validation: However, persistence can depend nonmonotonically on the basic reproduction number \(\Rzero\), and the recruitment function changes both the locations and the number of extrema in this relationship.
+ The analysis extends the deterministic--stochastic burnout framework to a broader family of susceptible-recruitment laws and identifies both quantitative and qualitative ways in which recruitment shape modifies survival through the post-wave trough.
 \end{abstract}
 
 \section{Introduction}
@@ -99,6 +101,8 @@ For \(\theta=0\), \(\hth(x)=1-x\) is the standard linear replenishment law. For 
 \hth(x)\sim x^\theta,\qquad x\to0^+,
 \]
 so \(\theta\) controls the low-density dependence of recruitment.
+
+Note that our recruitment law is different from the classical theta-logistic form \(x(1-x^\vartheta)\), where \(\vartheta>0\) \cite{GilpinCaseAyala1976}. The classical model retains approximately linear growth at low population densities, whereas our family allows different low-density recruitment behaviors. In particular, our family recovers linear replenishment, \(h_0(x)=1-x\), at \(\theta=0\), so replenishment remains nonzero even when no susceptible hosts are present. But the classical theta-logistic family does not include this linear form, and for any \(\vartheta>0\), replenishment is always zero when no susceptible hosts are present. Both expressions reduce to \(x(1-x)\) when their shape parameters equal one.
 
 The infectious growth threshold is
 \begin{equation}
@@ -1278,240 +1282,294 @@ y_{\min}\approx\Cth e^{-\dAf/\rhoeps}.
 
 \section{Numerical validation and the effect of recruitment shape}
 \label{sec:numerics}
-Sections~7.1--7.2 focus on persistence through the first epidemic trough conditional on successful establishment; Section~7.3 separately includes the establishment factor in \cref{eq:pest} to analyze unconditional persistence as a function of \(\Rzero\). For the conditional validation, we compared the boundary-layer-independent prediction \cref{eq:PBI} with adaptive tau-leap simulations of the full stochastic epidemic. Each point used 3,000 trajectories, increased to 10,000 when the initial Wilson interval was wider than 0.05. Establishment and persistence were classified by successive crossings of the infectious nullcline, and no simulated trajectories in this scan remained unresolved.
+We first compare the analytical predictions with stochastic simulations, then examine the sources of approximation error. Next, we investigate the effect of the recruitment law on persistence. To validate the predicted conditional persistence probabilities, we compared the boundary-layer-independent prediction \cref{eq:PBI} with adaptive tau-leap simulations of the full stochastic epidemic.
 
 \subsection{Stochastic validation across transmission and population size}
-Figure~\ref{fig:main-persistence} shows the small-recruitment scan, \(\rhoeps=0.01\), across \(10^6\leq K\leq10^9\) and a broad range of \(\Rzero\). Analytical curves are shown for five values of \(\theta\), while stochastic estimates at \(\theta=0,0.5,1\) test the endpoints and midpoint of the recruitment family. The theory reproduces the location, ordering, and steepening of the persistence transitions. Across all 168 simulated combinations the mean absolute probability error is 0.018; after excluding the two closest-to-critical values, \(\Rzero=1.03\) and 1.05, it is 0.0077. On the broader exact-CTMC cache, restricted to \(\rhoeps=0.01\) and \(\Rzero\geq1.15\), the mean absolute error is 0.0015. Agreement is therefore not confined to a single population size or to probabilities close to zero or one.
+Figure~\ref{fig:main-persistence} shows the conditional persistence probability as a function of \(\Rzero\) at \(\rhoeps=0.01\), for \(10^6\leq K\leq10^9\). The boundary-layer-independent approximation agrees closely with the stochastic simulation results over the parameter range shown in Figure~\ref{fig:main-persistence}.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{validation/figures/paper/main_persistence_validation.pdf}
-\caption{Conditional persistence after epidemic establishment at \(\rhoeps=0.01\). Curves are the boundary-layer-independent prediction \cref{eq:PBI} for \(\theta=0,0.25,0.5,0.75,1\); symbols are stochastic estimates for \(\theta=0,0.5,1\), and vertical bars are 95\% Wilson intervals. The probability axis is displayed on logit coordinates so that both tails remain visible; values below 0.001 or above 0.999 are shown at those limits. The adaptive tau-leap scan used 3,000--10,000 attempted epidemics at each point. Agreement is close except at the values nearest \(\Rzero=1\), most visibly for \(K=10^6\).}
+\caption{Conditional persistence after epidemic establishment at \(\rhoeps=0.01\). Curves show the boundary-layer-independent prediction \cref{eq:PBI}; points show stochastic simulation estimates, with vertical bars indicating 95\% Wilson intervals. The adaptive tau-leap scan used at least 10,000 attempted epidemics per parameter combination.}
 \label{fig:main-persistence}
 \end{figure}
 
-The recruitment-shape effect is systematic in the numerical sweep. For \(0<x<1\), increasing \(\theta\) reduces \(h_\theta(x)\); susceptible replenishment is consequently slower along the depleted post-wave path, the bottleneck is deeper, and conditional persistence is lower. The stochastic points follow the same ordering as the analytical curves in \cref{fig:main-persistence}. The magnitude is most visible where the parameters place the system in the transition between near-certain burnout and near-certain persistence. For example, at \((\rhoeps,\Rzero,K)=(0.01,1.5,10^8)\), the simulated conditional persistence probabilities are 0.998, 0.093, and 0 for \(\theta=0,0.5,1\), respectively; the corresponding predictions are 0.999, 0.124, and \(4.7\times10^{-4}\).
+\subsection{Approximation errors and range of validity}
+% BEGIN deferred Section 7.2 content
+%
+% The near-threshold regime \(\Rzero\to1^+\) requires separate treatment because the scale separation underlying the post-wave asymptotics becomes nonuniform.
+% Figure~\ref{fig:accuracy-map} localizes the discrepancy between theory and stochastic simulation at the representative size \(K=3\times10^4\). Most well-separated points have small absolute probability error. Larger errors concentrate at faster recruitment and toward \(\Rzero\to1^+\), where the fixed-\(\Rzero\) asymptotics lose separation. Small neutral crosses mark the directly computed failure of \(0<M_1<\dAf\), not a fitted or purportedly exact accuracy threshold. Across the full stochastic cache, the mean absolute error rises from 0.011 at \(\rhoeps=0.01\) to 0.018, 0.043, and 0.096 at \(\rhoeps=0.02,0.05,0.10\). At the two larger values the leading closed form commonly underestimates persistence in the transition region. The earlier curve \(\Rzero=e^{2\rhoeps}\) was only a heuristic proxy for \(\Rzero-1=O(\rhoeps)\); it is no longer used as a validity boundary.
+%
+% \begin{figure}[t]
+% \centering
+% \includegraphics[width=\textwidth]{validation/figures/paper/stochastic_error_validity_map.pdf}
+% \caption{Absolute error of the boundary-layer-independent conditional-persistence prediction against stochastic simulation at \(K=3\times10^4\). Square color gives absolute probability error on a logarithmic scale. Small neutral crosses mark points where the first-order entry estimate is inadmissible, \(M_1\notin(0,\dAf)\). This is an overlap diagnostic rather than a sharp error guarantee.}
+% \label{fig:accuracy-map}
+% \end{figure}
+%
+% \enlargethispage{2\baselineskip}
+% The ODE and Kendall diagnostics localize the remaining error (Appendix~\ref{app:numerical-diagnostics}). On points for which a entry estimate exists, replacing the numerical ODE entry by the second-order asymptotic entry changes conditional persistence by only 0.0009--0.0015 on average over \(\rhoeps=0.02\)--0.10. The errors from reducing the ODE-plus-exact-Kendall reference to the boundary-independent closed form, and from applying Laplace's method, are an order of magnitude larger. Thus second-order matching is working as intended where an overlap exists; the conspicuous failures arise mainly when that overlap disappears or the saddle approximation is no longer sharply separated. For high-accuracy calculations near this edge, the finite-entry prediction with the exact one-dimensional Kendall integral should be retained.
+%
+% [[Yuyang: To be developed: distinguish the validity conditions for asymptotic entry estimates, numerical ODE entry, numerical Kendall evaluation, the Laplace reduction, and the BI reduction. The large-R0 limits and remote extrema of the BI expression must not be interpreted as conclusions about the stochastic model without checking these conditions.]]
+% The interior-maximum Laplace approximation requires the endpoint conditions in \cref{eq:Laplace-endpoint-conditions}. Write w=\sqrt{\rhoeps\hth(\xs)/\Rzero}. Since 0\leq\xin<\xs, the requirement \xs-\xin\gg w necessarily implies w/\xs\ll1. For \hth(x)=(1-x)x^\theta,
+% \[
+% (w/\xs)^2=\rhoeps(\Rzero-1)\Rzero^{-\theta}.
+% \]
+% For fixed 0\leq\theta<1 and fixed positive \rhoeps, this necessary condition fails as \Rzero\to\infty. In particular, for \theta=0 it requires \rhoeps(\Rzero-1)\ll1. Thus the large-R0 tail of the BI formula is outside the validity of its interior-maximum Laplace derivation. At \theta=1 this particular obstruction does not grow with R0, but the full endpoint and other approximation conditions still need to be checked.
+% Numerical ODE entry combined with numerical evaluation of the unapproximated Kendall integral avoids both entry-series truncation and the interior-maximum Laplace reduction. It remains a deterministic/branching-process approximation to the stochastic epidemic, not an exact solution of that epidemic. Its use requires a descending ODE crossing of the chosen boundary-layer threshold and a valid deterministic-to-stochastic overlap; if these fail, this combination is not automatically a remedy.
+% The BI reduction additionally uses the small-remainder condition in \cref{eq:BI-log-condition}; these restrictions should be summarized here after they have been stated at the corresponding derivation steps.
+%
+% Additional exact Gillespie spot checks at \(\rhoeps=0.01\) show that increasing the population size improves agreement in some regimes but does not uniformly restore BI accuracy at high \(\Rzero\). Each parameter combination used 2,000 attempted epidemics, with conditional persistence estimated among epidemics that established. At \(\theta=0\) and \(\Rzero=128\), all established epidemics persisted for both \(K=10^5\) and \(10^6\), consistent with BI probabilities indistinguishable from one. At \(\theta=0.25\) and \(\Rzero=32\), increasing \(K\) from \(10^5\) to \(10^6\) changed the simulated conditional persistence probability from 0.441 to 1.000, compared with BI predictions of 0.672 and 0.999985. At \(\Rzero=64\), the corresponding simulated probabilities were 0 and 0.996, compared with BI predictions of 0.9994 and approximately one. At \(\Rzero=128\), however, the simulated probabilities were 0 and 0.128, whereas BI predicted probabilities approximately equal to one at both sizes. The 95\% Wilson interval for the last simulated estimate was \([0.114,0.143]\).
+%
+% These discrepancies identify an additional finite-population mechanism. Under the stochastic recruitment law used here, the susceptible recruitment rate is \(K\rhoeps(1-S/K)(S/K)^\theta\). For \(\theta>0\), this rate vanishes at \(S=0\); no susceptible hosts can then be replenished, and the remaining infectives eventually disappear. At \((\Rzero,\theta,K)=(128,0.25,10^6)\), 1,738 of the 1,992 established epidemics reached \(S=0\) and became extinct, while the remaining 254 persisted. In contrast, recruitment continues at \(S=0\) when \(\theta=0\). A large total population therefore does not by itself ensure that susceptibles remain numerous enough for a deterministic description throughout the first wave and trough. This source of error cannot be removed solely by improving the entry approximation or evaluating the Kendall integral without its Laplace reduction.
+%
+% [[Yuyang: These are preliminary, fixed-design spot checks, not an accuracy map over the full parameter range. Full counts, fixed seeds and 95\% intervals are stored in validation/data/high_R_spotcheck_20261102/ and validation/data/high_R_large_K_20261102/. The compiled exact simulator was checked against the existing R Gillespie implementation using identical seeds. Independent high-precision evaluation verified the BI values at the tested transmission/recruitment-shape pairs. Probability agreement near one does not establish accuracy of the small extinction probability or of derivatives used to classify extrema.]]
+%
+% END deferred Section 7.2 content
 
-Conditional persistence itself is nonmonotone in \(\Rzero\): its boundary-independent extrema satisfy \(L=\dd\log B_{\BI}/\dd\Rzero=0\), independently of \(K\). At \(\rhoeps=0.01\), each plotted \(\theta<1\) has a near-threshold maximum followed by a minimum and, much farther out, another maximum before its eventual decline; the minima occur at \(\Rzero\approx2.377,3.495,5.987,13.974\) for \(\theta=0,0.25,0.5,0.75\). The last minimum and the remote maxima lie beyond the range emphasized in \cref{fig:main-persistence}. For \(\theta=1\), the analytical search finds only a near-threshold maximum at \(\Rzero\approx1.0714\); the distinct large-\(\Rzero\) behavior and the distinction from unconditional extrema are detailed in Appendix~\ref{app:numerical-diagnostics}.
+\subsection{Patterns of conditional persistence}
+Figure~\ref{fig:main-persistence} shows that increasing \(\theta\) decreases the conditional persistence probability when other parameters are fixed. Biologically, a larger \(\theta\) reduces susceptible replenishment after the epidemic, slowing susceptible recovery and making extinction more likely during the first trough. Within the range shown in Figure~\ref{fig:main-persistence}, persistence is nonmonotonic in \(\Rzero\) for smaller \(\theta\), first decreasing and then increasing again. For \(\theta=0\), persistence recovers relatively early and approaches one as \(\Rzero\) increases. As \(\theta\) increases, this recovery occurs later and proceeds more slowly, or is no longer noticeable. As \(\theta\) approaches one, persistence at high \(\Rzero\) is suppressed to nearly zero. This suggests that more transmissible pathogens are more sensitive to susceptible replenishment.
 
-\subsection{Global conditional-persistence landscape}
-The same ordering persists away from the one-dimensional validation slices. Figure~\ref{fig:conditional-landscape} maps \cref{eq:PBI} over \((\Rzero,\rhoeps)\), with columns varying recruitment shape and rows separating population sizes by three orders of magnitude. Increasing \(K\) expands the high-persistence region, whereas increasing \(\theta\) contracts it and shifts its transition toward slower recruitment or larger populations. Sensitivity is strongest near the \(\theta\)-dependent transition boundary, which can move substantially: a point with near-certain persistence for one recruitment shape need not remain saturated for another. Gray cells identify where the first-order entry estimate fails the directly derived admissibility test \(0<M_1<\Delta A_f\) in \cref{eq:admissibility}, using \(y_{\rm BL}=\sqrt{y_*/K}\). The boundary-independent formula remains mathematically defined there, but its finite-entry derivation lacks an overlap check. This diagnostic is not a theorem that every unmasked cell is quantitatively accurate; the near-critical and larger-\(\rhoeps\) limitations remain visible in \cref{fig:accuracy-map}.
+Figure~\ref{fig:conditional-landscape} presents conditional persistence across different values of \(\rhoeps\), showing that the trends discussed above persist over a broader range of recruitment rates. In addition, Figure~\ref{fig:conditional-landscape} shows that increasing \(\rhoeps\) raises the conditional persistence probability. Biologically, faster susceptible replenishment allows infection to resume growth sooner, reducing the risk of extinction during the trough.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{validation/figures/paper/conditional_persistence_landscape.pdf}
-\caption{Boundary-layer-independent conditional persistence over transmission strength and recruitment rate. Columns show \(\theta=0,0.5,1\), and rows show \(K=10^6\) and \(10^9\). Gray cells fail the first-order finite-entry condition \(0<M_1<\Delta A_f\) at the specified boundary-layer threshold. This is a concrete overlap diagnostic, not a sharp accuracy boundary. Increasing recruitment nonlinearity suppresses persistence most strongly along the probability transition.}
+\caption{Boundary-layer-independent conditional persistence as a function of the basic reproduction number \(\Rzero\) and recruitment rate \(\rhoeps\). Columns show recruitment shape \(\theta=0,0.25,0.5,0.75,1\), and rows show carrying capacity \(K=10^6\) and \(10^9\).}
 \label{fig:conditional-landscape}
 \end{figure}
 
-\subsection{Unconditional persistence and its extrema}
-To compare with the qualitative structure identified for linear recruitment by Parsons et al.\ \cite{ParsonsEtAl2024}, we include the establishment factor in \cref{eq:uncond}. The conditional post-wave probability can itself be nonmonotone in \(\Rzero\); multiplication by establishment is not, by itself, the cause of nonmonotonicity. Write \(B=B_{\BI}(\Rzero)\) and \(L=\dd\log B/\dd\Rzero\). Differentiating \cref{eq:uncond} gives the exact stationary condition for this approximation,
-\begin{equation}
-G(\Rzero;\rhoeps,\theta,K)
-:=BL+\frac{e^B-1}{\Rzero(\Rzero-1)}=0.
-\label{eq:extremumG}
-\end{equation}
-The second term is positive because establishment increases monotonically with \(\Rzero\). An extremum therefore requires the post-wave factor to decline sufficiently rapidly, \(L<0\), to overcome it. Recruitment shape changes this balance through \(\Cth\), the explicit \(\Rzero^{-\theta/2}\) factor in \(B\), and the action barrier \(\dAf\). The derivatives of \(\Cth\) are taken inside its finite regularized quadrature, while derivatives of \(\dAf\) are analytical; the implementation is documented in Appendix~\ref{app:numerical-diagnostics}.
-
-Figure~\ref{fig:unconditional-structure}(a) shows unconditional persistence at \(K=10^6\), with extremum loci obtained by solving \cref{eq:extremumG}, not by differentiating a plotted grid. At the small recruitment rate \(\rhoeps=0.01\), a maximum and minimum are already present at \(\theta=0\): as \(\theta\) increases from 0 to 0.75, the maximum moves from \(\Rzero=1.182\) to 1.121, while the minimum moves from \(\Rzero=2.295\) to 12.787 and leaves the plotted \(\Rzero\leq8\) range. A minimum leaving that range is not evidence of a finite-\(\Rzero\) saddle-node. At \(\rhoeps=0.01\), \(\theta=1\), only a maximum at \(\Rzero\approx1.1109\) is detected over \(1.01\leq\Rzero\leq80\); this slice alone does not determine behavior at other \(\rhoeps\).
-
-The structure differs at larger \(\rhoeps\). At \(K=10^6\) and \(\rhoeps=0.02\) or 0.03, no extrema are detected at \(\theta=0\) over \(1.01\leq\Rzero\leq40\), but increasing \(\theta\) creates a maximum--minimum pair in this range. We define \(\theta_c(\rhoeps,K)\) only for this genuine pair-creation event, where \(G=G_{\Rzero}=0\), not as a generic threshold for nonmonotonicity. The critical pairs \((\mathcal R_{0,c},\theta_c)\) are \((2.1723,0.13691)\) and \((3.0619,0.32195)\), respectively; at \(\rhoeps=0.02\), changing \(K\) from \(10^5\) to \(10^7\) moves the pair from \((1.7122,0.01405)\) to \((2.7241,0.23957)\) \cref{fig:unconditional-structure}(b,c). A single extremum need not belong to a pair: for \(\theta=1\), the analytical \(G=0\) search finds only one maximum at \(\Rzero\approx1.0528,1.1109,1.2866,1.4750\) for \(\rhoeps=0.005,0.01,0.02,0.03\), respectively, over \(1.01\leq\Rzero\leq80\). Thus the qualitative branch structure depends on \(\rhoeps\) as well as \(\theta\). Where a pair already exists at \(\theta=0\), panel (c) shows no artificial \(\theta_c=0\) point.
-
-The representative small-\(\rhoeps\) extrema are not an artifact of the Laplace reduction. At the three minima for \(\theta=0,0.25,0.5\) and \(\rhoeps=0.01\), replacing the closed form by the finite-entry prediction with the exact Kendall integral changes conditional persistence by 1.70\%, 0.93\%, and 0.05\%, respectively. More importantly, local scans of the finite-entry, exact-Kendall unconditional probability retain both extrema just beyond the saddle-node: near \((\rhoeps,\theta)=(0.02,0.15)\), a maximum and minimum occur around \(\Rzero=1.92\) and 2.48; near \((0.03,0.34)\), they occur around 2.5 and 3.7. These checks support the qualitative branch creation, although the precise saddle-node numbers belong to the leading boundary-independent approximation.
-
-\begin{figure}[p]
+\subsection{Patterns of unconditional persistence}
+\begin{figure}[t]
 \centering
-\includegraphics[width=\textwidth]{validation/figures/paper/unconditional_persistence_structure.pdf}
-\caption{Analytically verified [[JD: consider log(-1) scaling here as well.]] structure of unconditional persistence. (a) Landscapes at \(K=10^6\) for five recruitment shapes; white dashed and solid curves are local maxima and minima obtained from \(G=0\). Gray cells fail the first-order finite-entry condition, as in \cref{fig:conditional-landscape}. (b) Continuous extremum branches obtained by one-sided continuation of \(G=0\) in \(\theta\), initialized at \(\theta=0\) or at a verified saddle-node; branches end at the plotting boundary \(\Rzero=8\) when necessary. An empty part of (b) means no extremum within the displayed \(\Rzero\) window, not global monotonicity. (c) Genuine saddle-node pair-creation boundary obtained from \(G=G_{\Rzero}=0\). No point is plotted where a pair already exists at \(\theta=0\).}
-\label{fig:unconditional-structure}
+\includegraphics[width=\textwidth]{validation/figures/paper/unconditional_persistence_validation.pdf}
+\caption{Unconditional persistence as a function of the basic reproduction number \(\Rzero\) at recruitment rate \(\rhoeps=0.01\), for different recruitment shapes \(\theta\) and carrying capacities \(K\). Colored curves show the boundary-layer-independent prediction including the establishment probability in \cref{eq:uncond}; points show stochastic simulation estimates, with vertical bars indicating 95\% Wilson intervals. The gray dashed line shows the predicted non-fizzle probability \(1-1/\Rzero\). The adaptive tau-leap scan used at least 10,000 attempted epidemics per parameter combination.}
+\label{fig:unconditional-validation}
 \end{figure}
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=.88\textwidth]{validation/figures/paper/unconditional_shape_map.pdf}
-\caption{[[JD: Possible to do something like bifurcation diagrams for a few values of $\theta$? Show maxima, with $\Rzero$ on the vertical axis and $\rho$ on the horizontal?]] Global shape classification of the leading BI unconditional-persistence curve over \(\Rzero>1\), across \((\rhoeps,\theta)\) at \(K=10^6\). The observed structures are one maximum (blue, possibly far outside Figure~\ref{fig:unconditional-structure}) and two maxima separated by one minimum (green). The black dashed line is the genuine pair-creation locus \(G=G_{\Rzero}=0\), not a generic nonmonotonicity threshold. Roots are bracketed from the analytical \(G=0\) condition through \(\Rzero=300\); the far-right maximum for \(\theta<1\) is continued using the derived large-\(\Rzero\) asymptotics. This classifies the BI expression and does not validate its quantitative accuracy at extreme \(\Rzero\).}
-\label{fig:unconditional-shape-map}
-\end{figure}
+The unconditional persistence probability is the probability that an epidemic does not fizzle and survives the first trough. Figure~\ref{fig:unconditional-validation} compares the predicted unconditional persistence probability with stochastic simulation estimates, showing close agreement over the range considered. Compared with conditional persistence, unconditional persistence is lower near \(\Rzero=1\), because most introduced epidemics fizzle before becoming established. In the cases shown, the unconditional persistence probability initially rises with \(\Rzero\) as establishment becomes more likely.
 
-The full-\(\Rzero\) shape classification in \cref{fig:unconditional-shape-map} is not inferred from the \(\Rzero\leq8\) display in Figure~\ref{fig:unconditional-structure}. At fixed finite \(K\), unconditional persistence vanishes both as \(\Rzero\to1^+\) and as \(\Rzero\to\infty\), so it must have a maximum. On the mapped \((\rhoeps,\theta)\) range, the leading BI formula has either one maximum or two maxima separated by a minimum; neither a no-extremum nor a minimum-only global region occurs. The one-maximum region can nevertheless look monotone on a finite plot: at \((\rhoeps,\theta,K)=(0.02,0.005,10^6)\), \(G=0\) has no root through \(\Rzero=300\), but its large-\(\Rzero\) continuation gives a maximum near \(\Rzero=3.2\times10^6\). For \(\theta<1\), such far-right maxima are retained in the global count, while an additional finite maximum--minimum pair is not automatic. At \(\theta=1\), only one maximum is found throughout \(0.002\leq\rhoeps\leq0.04\); an extended analytical-root scan over \(0.001\leq\rhoeps\leq1\) likewise detects no additional pair or fixed-\(\theta=1\) saddle-node. The dashed \(\theta_c\) curve marks creation of the additional maximum--minimum pair, not the onset of nonmonotonicity. Increasing \(K\) shifts this pair-creation boundary to larger \(\theta\), as the companion maps in Appendix~\ref{app:numerical-diagnostics} show.
-
-\subsection{Validity map and regions of reduced accuracy}
-The near-threshold regime \(\Rzero\to1^+\) requires separate treatment because the scale separation underlying the post-wave asymptotics becomes nonuniform.
-Figure~\ref{fig:accuracy-map} localizes the discrepancy between theory and stochastic simulation at the representative size \(K=3\times10^4\). Most well-separated points have small absolute probability error. Larger errors concentrate at faster recruitment and toward \(\Rzero\to1^+\), where the fixed-\(\Rzero\) asymptotics lose separation. Small neutral crosses mark the directly computed failure of \(0<M_1<\dAf\), not a fitted or purportedly exact accuracy threshold. Across the full stochastic cache, the mean absolute error rises from 0.011 at \(\rhoeps=0.01\) to 0.018, 0.043, and 0.096 at \(\rhoeps=0.02,0.05,0.10\). At the two larger values the leading closed form commonly underestimates persistence in the transition region. The earlier curve \(\Rzero=e^{2\rhoeps}\) was only a heuristic proxy for \(\Rzero-1=O(\rhoeps)\); it is no longer used as a validity boundary.
+Figure~\ref{fig:unconditional-landscape} presents unconditional persistence across different values of \(\rhoeps\). As with conditional persistence, increasing \(\theta\) lowers the unconditional persistence probability, whereas increasing \(\rhoeps\) raises it.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\textwidth]{validation/figures/paper/stochastic_error_validity_map.pdf}
-\caption{Absolute error of the boundary-layer-independent conditional-persistence prediction against stochastic simulation at \(K=3\times10^4\). Square color gives absolute probability error on a logarithmic scale. Small neutral crosses mark points where the first-order entry estimate is inadmissible, \(M_1\notin(0,\dAf)\). This is an overlap diagnostic rather than a sharp error guarantee.}
-\label{fig:accuracy-map}
+\includegraphics[width=\textwidth]{validation/figures/paper/unconditional_persistence_landscape.pdf}
+\caption{Boundary-layer-independent unconditional persistence as a function of the basic reproduction number \(\Rzero\) and recruitment rate \(\rhoeps\). Columns show recruitment shape \(\theta=0,0.25,0.5,0.75,1\), and rows show carrying capacity \(K=10^6\) and \(10^9\). Colors show probability on a logarithmic scale, with values at or below \(10^{-6}\) shown at the lower color limit. White dashed and solid lines mark local maxima and minima, respectively, with respect to \(\Rzero\).}
+\label{fig:unconditional-landscape}
 \end{figure}
 
-The conspicuous near-critical exception in \cref{fig:main-persistence} has the same interpretation. At \(K=10^6\) and \(\Rzero=1.03\), the theory predicts conditional persistence probabilities of 0.46--0.48, whereas the simulations give 0.05--0.08. The discrepancy occurs for all three simulated values of \(\theta\), despite the large population size, and therefore does not have the signature of a recruitment-shape or ordinary finite-\(K\) effect. Rather, \(\Rzero-1\) is then comparable to the recruitment scale, so the epidemic excursion, post-wave relaxation, and stochastic bottleneck are no longer separated. The prediction has recovered by \(\Rzero=1.075\)--1.10 in the same panel.
-
-\enlargethispage{2\baselineskip}
-The ODE and Kendall diagnostics localize the remaining error (Appendix~\ref{app:numerical-diagnostics}). On points for which a entry estimate exists, replacing the numerical ODE entry by the second-order asymptotic entry changes conditional persistence by only 0.0009--0.0015 on average over \(\rhoeps=0.02\)--0.10. The errors from reducing the ODE-plus-exact-Kendall reference to the boundary-independent closed form, and from applying Laplace's method, are an order of magnitude larger. Thus second-order matching is working as intended where an overlap exists; the conspicuous failures arise mainly when that overlap disappears or the saddle approximation is no longer sharply separated. For high-accuracy calculations near this edge, the finite-entry prediction with the exact one-dimensional Kendall integral should be retained.
+% BEGIN deferred BI derivative and extremum classification
+% The dependence of unconditional persistence on \(\Rzero\) varies with \(\rhoeps\), \(\theta\), and \(K\). We next examine when this dependence is nonmonotonic and how the locations of its maxima and minima change with these parameters.
+%
+% Write \(B=B_{\BI}(\Rzero)\) and \(L=\dd\log B/\dd\Rzero\). Differentiating \cref{eq:uncond} gives the exact stationary condition for this approximation,
+% \begin{equation}
+% G(\Rzero;\rhoeps,\theta,K)
+% :=BL+\frac{e^B-1}{\Rzero(\Rzero-1)}=0.
+% \label{eq:extremumG}
+% \end{equation}
+% We numerically locate the zeros of the derivative and determine its sign between successive zeros to classify the dependence on \(\Rzero\).
+% The second term is positive because establishment increases monotonically with \(\Rzero\). An extremum therefore requires the post-wave factor to decline sufficiently rapidly, \(L<0\), to overcome it. Recruitment shape changes this balance through \(\Cth\), the explicit \(\Rzero^{-\theta/2}\) factor in \(B\), and the action barrier \(\dAf\). The derivatives of \(\Cth\) are taken inside its finite regularized quadrature, while derivatives of \(\dAf\) are analytical; the implementation is documented in Appendix~\ref{app:numerical-diagnostics}.
+%
+% Conditional persistence itself is nonmonotone in \(\Rzero\): its boundary-independent extrema satisfy \(L=\dd\log B_{\BI}/\dd\Rzero=0\), independently of \(K\). At \(\rhoeps=0.01\), each plotted \(\theta<1\) has a near-threshold maximum followed by a minimum and, much farther out, another maximum before its eventual decline; the minima occur at \(\Rzero\approx2.377,3.495,5.987,13.974\) for \(\theta=0,0.25,0.5,0.75\). The last minimum and the remote maxima lie beyond the range emphasized in \cref{fig:main-persistence}. For \(\theta=1\), the analytical search finds only a near-threshold maximum at \(\Rzero\approx1.0714\); the distinct large-\(\Rzero\) behavior and the distinction from unconditional extrema are detailed in Appendix~\ref{app:numerical-diagnostics}.
+%
+% Figure~\ref{fig:unconditional-structure}(a) shows unconditional persistence at \(K=10^6\), with extremum loci obtained by solving \cref{eq:extremumG}, not by differentiating a plotted grid. At the small recruitment rate \(\rhoeps=0.01\), a maximum and minimum are already present at \(\theta=0\): as \(\theta\) increases from 0 to 0.75, the maximum moves from \(\Rzero=1.182\) to 1.121, while the minimum moves from \(\Rzero=2.295\) to 12.787 and leaves the plotted \(\Rzero\leq8\) range. A minimum leaving that range is not evidence of a finite-\(\Rzero\) saddle-node. At \(\rhoeps=0.01\), \(\theta=1\), only a maximum at \(\Rzero\approx1.1109\) is detected over \(1.01\leq\Rzero\leq80\); this slice alone does not determine behavior at other \(\rhoeps\).
+%
+% The structure differs at larger \(\rhoeps\). At \(K=10^6\) and \(\rhoeps=0.02\) or 0.03, no extrema are detected at \(\theta=0\) over \(1.01\leq\Rzero\leq40\), but increasing \(\theta\) creates a maximum--minimum pair in this range. We define \(\theta_c(\rhoeps,K)\) only for this genuine pair-creation event, where \(G=G_{\Rzero}=0\), not as a generic threshold for nonmonotonicity. The critical pairs \((\mathcal R_{0,c},\theta_c)\) are \((2.1723,0.13691)\) and \((3.0619,0.32195)\), respectively; at \(\rhoeps=0.02\), changing \(K\) from \(10^5\) to \(10^7\) moves the pair from \((1.7122,0.01405)\) to \((2.7241,0.23957)\) \cref{fig:unconditional-structure}(b,c). A single extremum need not belong to a pair: for \(\theta=1\), the analytical \(G=0\) search finds only one maximum at \(\Rzero\approx1.0528,1.1109,1.2866,1.4750\) for \(\rhoeps=0.005,0.01,0.02,0.03\), respectively, over \(1.01\leq\Rzero\leq80\). Thus the qualitative branch structure depends on \(\rhoeps\) as well as \(\theta\). Where a pair already exists at \(\theta=0\), panel (c) shows no artificial \(\theta_c=0\) point.
+%
+% The representative small-\(\rhoeps\) extrema are not an artifact of the Laplace reduction. At the three minima for \(\theta=0,0.25,0.5\) and \(\rhoeps=0.01\), replacing the closed form by the finite-entry prediction with the exact Kendall integral changes conditional persistence by 1.70\%, 0.93\%, and 0.05\%, respectively. More importantly, local scans of the finite-entry, exact-Kendall unconditional probability retain both extrema just beyond the saddle-node: near \((\rhoeps,\theta)=(0.02,0.15)\), a maximum and minimum occur around \(\Rzero=1.92\) and 2.48; near \((0.03,0.34)\), they occur around 2.5 and 3.7. These checks support the qualitative branch creation, although the precise saddle-node numbers belong to the leading boundary-independent approximation.
+%
+% \begin{figure}[p]
+% \centering
+% \includegraphics[width=\textwidth]{validation/figures/paper/unconditional_persistence_structure.pdf}
+% \caption{Analytically verified [[JD: consider log(-1) scaling here as well.]] structure of unconditional persistence. (a) Landscapes at \(K=10^6\) for five recruitment shapes; white dashed and solid curves are local maxima and minima obtained from \(G=0\). Gray cells fail the first-order finite-entry condition, as in \cref{fig:conditional-landscape}. (b) Continuous extremum branches obtained by one-sided continuation of \(G=0\) in \(\theta\), initialized at \(\theta=0\) or at a verified saddle-node; branches end at the plotting boundary \(\Rzero=8\) when necessary. An empty part of (b) means no extremum within the displayed \(\Rzero\) window, not global monotonicity. (c) Genuine saddle-node pair-creation boundary obtained from \(G=G_{\Rzero}=0\). No point is plotted where a pair already exists at \(\theta=0\).}
+% \label{fig:unconditional-structure}
+% \end{figure}
+%
+% \begin{figure}[H]
+% \centering
+% \includegraphics[width=.88\textwidth]{validation/figures/paper/unconditional_shape_map.pdf}
+% \caption{[[JD: Possible to do something like bifurcation diagrams for a few values of $\theta$? Show maxima, with $\Rzero$ on the vertical axis and $\rho$ on the horizontal?]] Global shape classification of the leading BI unconditional-persistence curve over \(\Rzero>1\), across \((\rhoeps,\theta)\) at \(K=10^6\). The observed structures are one maximum (blue, possibly far outside Figure~\ref{fig:unconditional-structure}) and two maxima separated by one minimum (green). The black dashed line is the genuine pair-creation locus \(G=G_{\Rzero}=0\), not a generic nonmonotonicity threshold. Roots are bracketed from the analytical \(G=0\) condition through \(\Rzero=300\); the far-right maximum for \(\theta<1\) is continued using the derived large-\(\Rzero\) asymptotics. This classifies the BI expression and does not validate its quantitative accuracy at extreme \(\Rzero\).}
+% \label{fig:unconditional-shape-map}
+% \end{figure}
+%
+% The full-\(\Rzero\) shape classification in \cref{fig:unconditional-shape-map} is not inferred from the \(\Rzero\leq8\) display in Figure~\ref{fig:unconditional-structure}. At fixed finite \(K\), unconditional persistence vanishes both as \(\Rzero\to1^+\) and as \(\Rzero\to\infty\), so it must have a maximum. On the mapped \((\rhoeps,\theta)\) range, the leading BI formula has either one maximum or two maxima separated by a minimum; neither a no-extremum nor a minimum-only global region occurs. The one-maximum region can nevertheless look monotone on a finite plot: at \((\rhoeps,\theta,K)=(0.02,0.005,10^6)\), \(G=0\) has no root through \(\Rzero=300\), but its large-\(\Rzero\) continuation gives a maximum near \(\Rzero=3.2\times10^6\). For \(\theta<1\), such far-right maxima are retained in the global count, while an additional finite maximum--minimum pair is not automatic. At \(\theta=1\), only one maximum is found throughout \(0.002\leq\rhoeps\leq0.04\); an extended analytical-root scan over \(0.001\leq\rhoeps\leq1\) likewise detects no additional pair or fixed-\(\theta=1\) saddle-node. The dashed \(\theta_c\) curve marks creation of the additional maximum--minimum pair, not the onset of nonmonotonicity. Increasing \(K\) shifts this pair-creation boundary to larger \(\theta\), as the companion maps in Appendix~\ref{app:numerical-diagnostics} show.
+%
+% END deferred BI derivative and extremum classification
 
 \clearpage
 \section{Discussion}
 \label{sec:discussion}
-The main conclusion is that the asymptotic burnout framework developed for linear susceptible replenishment extends quantitatively to the broader family \(\hth(x)=(1-x)x^\theta\). The leading first-wave epidemic trajectory is shared across this family, while the recruitment law enters through the post-wave corrections that determine the low-prevalence trough and the subsequent extinction calculation. In the well-separated regime the resulting closed-form persistence probability follows the full stochastic simulations closely across population size, transmission strength, and recruitment shape.
+We extend the framework of Parsons et al. for estimating epidemic burnout from linear susceptible replenishment to the recruitment family \(\hth(x)=(1-x)x^\theta\) to account for density-dependent recruitment in animal host populations. The leading-order trajectory of the first epidemic wave is independent of the recruitment law. Recruitment affects the post-wave trajectory through the first- and second-order corrections derived here. We use the corrected trajectory to estimate the entry state for a time-inhomogeneous birth--death process, which gives the extinction probability during the first trough.
 
-Within this family, the pointwise effect of recruitment shape has a clear direction. Increasing \(\theta\) suppresses recruitment whenever susceptibles have been depleted below carrying capacity, deepens the post-wave bottleneck, and reduces conditional persistence at fixed \((\Rzero,\rhoeps,K)\). The practical size of this effect is strongly parameter dependent: it is negligible when every recruitment law already predicts almost certain burnout or persistence, but can markedly displace the transition region in \((\Rzero,\rhoeps,K)\). This dependence is a post-wave effect that coexists with the \(\theta\)-independent leading geometry of the first epidemic wave.
+In the parameter ranges examined, increasing \(\theta\) reduces conditional persistence. For \(0<x<1\), a larger \(\theta\) gives a lower susceptible recruitment rate. Slower replenishment delays the recovery of susceptibles, leaving infection at low prevalence for longer and increasing the opportunity for extinction. When the persistence probabilities are all close to zero or all close to one, differences between recruitment laws are small, while these differences are more pronounced in the intermediate transition region.
 
-The global effect is richer than this pointwise ordering. Conditional post-wave persistence may already be nonmonotone in \(\Rzero\), whereas the establishment factor \(1-1/\Rzero\) is strictly increasing. The analytical condition \cref{eq:extremumG} shows that extrema of their product occur only when the post-wave contribution decreases rapidly enough to outweigh increasing establishment. At fixed finite \(K\), the unconditional BI probability returns to zero at large \(\Rzero\): algebraically for \(\theta<1\), because \(\Cth\propto\Rzero^{-1}\), and exponentially for \(\theta=1\), because the action grows linearly. Thus \(\theta=1\) is a qualitative boundary in decay rate, not in the limiting probability. At \(\rhoeps=0.01\), increasing \(\theta\) moves the finite-region maximum and minimum in opposite directions; a minimum leaving a plotting window is not evidence of annihilation. At larger \(\rhoeps\), \(G=G_{\Rzero}=0\) confirms creation of an additional pair through a genuine saddle-node. The shape map shows that this pair is not automatic for \(\theta<1\), and that its creation value \(\theta_c\) depends on \((\rhoeps,K)\) rather than marking a generic onset of nonmonotonicity.
+% BEGIN deferred discussion of BI global extrema
+% The global effect is richer than this pointwise ordering. Conditional post-wave persistence may already be nonmonotone in \(\Rzero\), whereas the establishment factor \(1-1/\Rzero\) is strictly increasing. The analytical condition \cref{eq:extremumG} shows that extrema of their product occur only when the post-wave contribution decreases rapidly enough to outweigh increasing establishment. At fixed finite \(K\), the unconditional BI probability returns to zero at large \(\Rzero\): algebraically for \(\theta<1\), because \(\Cth\propto\Rzero^{-1}\), and exponentially for \(\theta=1\), because the action grows linearly. Thus \(\theta=1\) is a qualitative boundary in decay rate, not in the limiting probability. At \(\rhoeps=0.01\), increasing \(\theta\) moves the finite-region maximum and minimum in opposite directions; a minimum leaving a plotting window is not evidence of annihilation. At larger \(\rhoeps\), \(G=G_{\Rzero}=0\) confirms creation of an additional pair through a genuine saddle-node. The shape map shows that this pair is not automatic for \(\theta<1\), and that its creation value \(\theta_c\) depends on \((\rhoeps,K)\) rather than marking a generic onset of nonmonotonicity.
+%
+% END deferred discussion of BI global extrema
 
-This extension is biologically relevant because the form of susceptible recruitment depends on the host population being modeled. Linear replenishment is a convenient approximation for demographic turnover in many standard human-disease SIR models, whereas ecological host populations may exhibit stronger density dependence as population size approaches a carrying capacity. The present family provides a simple interpolation between these cases. The analysis therefore makes explicit that assumptions about host demography can affect post-wave persistence even when the leading first epidemic wave is unchanged.
+Our results suggest that host populations with similar transmission and recruitment rates can differ in epidemic persistence because of differences in the density dependence of susceptible recruitment. When recruitment is more strongly reduced at low susceptible densities, infection is less likely to survive until susceptibles recover. This makes the form of susceptible recruitment important when assessing whether an epidemic can persist in an animal population.
 
-Several limitations delimit the present theory. First, the asymptotic construction assumes slow susceptible recruitment, \(\rhoeps\to0\), with fixed \(\Rzero>1\). The simulations show directly that a different near-critical analysis is required when \(\Rzero-1\) approaches the recruitment scale. Second, the deterministic entry state neglects finite-population fluctuations, including variability in the susceptible state inherited from the first wave; these can matter at smaller \(K\). Third, the time-inhomogeneous branching-process approximation is designed for the low-prevalence phase and is not intended to replace full stochastic simulation of the complete epidemic. Finally, \(\hth(x)=(1-x)x^\theta\) is still a restricted one-parameter family and does not represent all biologically plausible recruitment mechanisms.
+Our model and approximation have several limitations. The recruitment function \(\hth(x)\) is a simplified description of host population growth and does not explicitly capture all the demographic mechanisms operating in animal populations.
 
-These limitations suggest several directions for future work. A natural first extension is to replace the one-parameter family by a more general recruitment function \(h(x)\) and determine which parts of the matching and burnout calculation depend only on local properties of \(h\) and which require its global form. Broader transmission structures are distinct because they may alter the leading epidemic geometry itself. Other extensions could incorporate seasonal forcing, spatial or host heterogeneity, or a stochastic treatment of the entry state. A further empirical direction would be to estimate recruitment functions from host-demographic data and quantify how uncertainty in those functions propagates into predicted burnout probabilities.
+The asymptotic analysis also assumes slow susceptible recruitment, with \(\rhoeps\ll1\) and fixed \(\Rzero>1\). The asymptotic approximation to the first-wave epidemic trajectory assumes that the epidemic develops much faster than susceptibles are replenished. As \(\Rzero\) approaches one, infection grows more slowly, so susceptible replenishment may no longer be slow relative to epidemic growth. The approximation error may therefore increase. In addition, the deterministic description requires susceptible numbers to remain sufficiently large. Random fluctuations in susceptible numbers can increase the risk of extinction by depleting susceptibles to zero. In the stochastic model used here, recruitment vanishes at \(S=0\) for \(\theta>0\), preventing susceptible replenishment and leading to extinction of the remaining infection. Our approximation treats susceptible numbers deterministically and does not capture this route to extinction, so it can overestimate persistence when \(\Rzero\) is large.
 
-Overall, generalized susceptible recruitment changes the post-wave trajectory without changing the leading first-wave orbit. Extending the existing burnout approximation to this setting connects host-demographic assumptions to both the magnitude and the nonmonotone structure of post-wave persistence. When a valid finite entry and deterministic-to-stochastic overlap remain, the exact one-dimensional Kendall integral can replace an inaccurate Laplace or boundary-independent reduction; when that overlap or scale separation fails, full stochastic simulation or a different asymptotic treatment is needed.
+Our analysis only considers whether a single-strain epidemic would go extinct in a well-mixed population and does not account for other epidemic dynamics such as spatial heterogeneity, metapopulation dynamics, or competition between pathogen strains.
 
-\appendix
-\section{Implementation and diagnostic quantities}
-\label{app:numerical-diagnostics}
-\subsection{Conditional extrema and the large-\(\Rzero\) limit}
-For \(P_c=1-e^{-B_{\BI}}\), direct differentiation gives
-\begin{equation}
-\frac{\dd P_c}{\dd\Rzero}=e^{-B_{\BI}}B_{\BI}L,
-\qquad
-L=(\log\Cth)'+\frac{1}{2(\Rzero-1)}
--\frac{\theta}{2\Rzero}-\frac{\dAf'}{\rhoeps}.
-\label{eq:conditionalL}
-\end{equation}
-Thus the sign changes of \(L\), rather than differences of sampled probabilities, classify conditional extrema. The factor \(K\) enters \(\log B_{\BI}\) only through \(\log K\), so every BI conditional-extremum location is exactly independent of \(K\). This differs from the unconditional condition \(G=0\) in \cref{eq:extremumG}, which contains \(B\) and hence depends on \(K\).
+These limitations suggest several directions for future work. A stochastic treatment of susceptible recovery and the entry state would allow the framework to address regimes in which fluctuations in susceptible numbers affect persistence.
 
-At \(\rhoeps=0.01\), analytical-derivative root searches give the successive maximum, minimum, and remote maximum at \(\Rzero\approx(1.093717,2.377372,101.670522)\) for \(\theta=0\), \((1.086160,3.494824,413.8)\) for \(\theta=0.25\), \((1.080250,5.986866,7.904\times10^3)\) for \(\theta=0.5\), and \((1.075435,13.973974,6.988\times10^7)\) for \(\theta=0.75\). The last three remote-maxima values use the large-\(\Rzero\) continuation below, avoiding underflow in \(x_f\); the near-threshold extrema and the \(\theta=0\) remote maximum use the full regularized derivative. For \(\theta=1\), the sole detected zero is a maximum at \(\Rzero=1.071397\); no later minimum is detected on the numerically accessible finite range. These are properties of the leading BI formula, not additional stochastic-validation claims.
+Our results could also guide the development of models and large-scale simulations of more complex epidemic dynamics, such as metapopulation persistence, strain competition, and pathogen evolution.
 
-To determine the eventual sign without extrapolating a finite plot, use \(x_f=-W_0(-\Rzero e^{-\Rzero})/\Rzero\sim e^{-\Rzero}\). For each fixed \(0\leq\theta<1\), setting \(u=x_f e^s\) in the regularized quadrature isolates the \(-\Rzero\) outer contribution. The remaining lower-end integral tends to
-\[
-c_\theta=\int_0^\infty\left\{\frac{e^{-(1-\theta)s}}{s}
--\frac{1}{e^s-1}\right\}\dd s
-=-\gamma_{\rm E}-\log(1-\theta),
-\]
-where the difference is finite at \(s=0\). Splitting the transformed integral into a fixed lower-end interval and its exponentially decaying tail, then differentiating under the same split, gives \(J_\theta/\tilde a=-\Rzero+c_\theta+o(1)\), \(\log\Cth=-\log\Rzero+c_\theta+o(1)\), and \((\log\Cth)'=-1/\Rzero+o(1/\Rzero)\). Meanwhile \(\dAf'=-1/[(2-\theta)\Rzero^{2-\theta}]+O(\Rzero^{-(3-\theta)})+O(e^{-(1-\theta)\Rzero})\). Consequently,
-\begin{equation}
-L=-\frac{1+\theta}{2\Rzero}
-+\frac{1}{\rhoeps(2-\theta)\Rzero^{2-\theta}}
-+o(\Rzero^{-1})<0
-\qquad(0\leq\theta<1,\ \Rzero\to\infty).
-\label{eq:LlargeSublinear}
-\end{equation}
-The remote maximum follows from balancing the two displayed terms, giving \(\Rzero\sim[2/\{\rhoeps(2-\theta)(1+\theta)\}]^{1/(1-\theta)}\) when that root is asymptotically large. At \(\theta=1\), the amplitude instead approaches \(e^{-1}\), with \((\log C_1)'=O(\Rzero^{-2})\), and \(\dAf'=1-1/\Rzero+O(\Rzero^{-2})\); hence \(L=-1/\rhoeps+O(\Rzero^{-1})<0\). The large-\(\Rzero\) decline therefore holds at both endpoints, although the action term changes qualitatively at \(\theta=1\).
-
-Writing \(\delta=1-\theta\to0^+\), the minimum occurs in the crossover where \(x_f^\delta\sim e^{-\delta\Rzero}\) competes with \(\int_0^{1/\Rzero}x^\delta/(1-x)\,\dd x\sim\Rzero^{-1-\delta}/(1+\delta)\). The amplitude derivative contributes at order \(1/\Rzero\), not at order one, so this balance yields \(\delta\Rzero\sim\log\Rzero\) and
-\begin{equation}
-\mathcal R_{0,\min}(\theta)\sim\frac{\log[1/(1-\theta)]}{1-\theta}
-\qquad(\theta\to1^-)
-\label{eq:conditionalMinScaling}
-\end{equation}
-at leading logarithmic order. Numerical continuation gives minima at \(\Rzero\approx42.10,97.23,290.75\) for \(\theta=0.9,0.95,0.98\), respectively; the minimum escapes to infinity rather than meeting the near-threshold maximum at finite \(\Rzero\). The remote maximum diverges still faster. The asymptotic statements establish eventual signs and escape scales; the finite-range root count is a numerical observation, not a global root-count theorem.
-
-\subsection{Derivative implementation and diagnostic quantities}
-For the extremum calculation, differentiating the implicit final-size equation gives
-\begin{equation}
-x_f'=\frac{x_f(x_f-1)}{1-\Rzero x_f}.
-\end{equation}
-The action barrier is differentiated analytically rather than by differencing its values:
-\begin{align}
-\dAf'&=x_f^{1-\theta}-\int_{x_f}^{1/\Rzero}\frac{x^{1-\theta}}{1-x}\dd x,\\
-\dAf''&=\frac{\Rzero^{\theta-2}}{\Rzero-1}
--\frac{x_f^{1-\theta}[(1-\theta)+\theta x_f]}{1-\Rzero x_f}.
-\end{align}
-The matching amplitude \(\Cth\) is a fully specified semi-analytical quantity, not a fitted coefficient. Writing \(x_*=1/\Rzero\), \(\tilde a=(1-x_f)x_f^{\theta-1}\), and
-\begin{equation}
-q(u;\Rzero,\theta)=\frac{(x_*-u)h_\theta(u)}{u^2F(u;\Rzero)}
--\frac{\tilde a}{u-x_f},
-\end{equation}
-its regularized quadrature is \(J_\theta=\int_{x_f}^{1}q(u;\Rzero,\theta)\dd u\) and
-\begin{equation}
-\log\Cth=\log(1-x_f)+\log(x_*-x_f)-\log x_f+\frac{J_\theta}{\tilde a}.
-\end{equation}
-For the directly evaluated \(\Rzero\) range, set \(u=x_f e^s\), \(0<s<-\log x_f\), and then map \(s=t(-\log x_f)\) to fixed limits \(0<t<1\). The integrand for \(J_\theta/\tilde a\) becomes
-\[
-\frac{(x_*-u)(1-u)e^{(\theta-1)s}}{(1-x_f)F(u;\Rzero)}
--\frac{e^s}{e^s-1},
-\qquad F(x_f e^s;\Rzero)=x_f(1-e^s)+\frac{s}{\Rzero},
-\]
-whose apparent lower-end singularities cancel. The implementation propagates the first two \(\Rzero\)-derivatives through this fixed-limits regularized quadrature and through \(\log\Cth\); finite differences are used only to check the result.
-
-In particular,
-\begin{align}
-L&=(\log\Cth)'+\frac{1}{2(\Rzero-1)}-\frac{\theta}{2\Rzero}-\frac{\dAf'}{\rhoeps},\\
-L'&=(\log\Cth)''-\frac{1}{2(\Rzero-1)^2}+\frac{\theta}{2\Rzero^2}-\frac{\dAf''}{\rhoeps},
-\end{align}
-and the saddle-node test uses
-\begin{equation}
-G_{\Rzero}=B(L^2+L')-\frac{(2\Rzero-1)(e^B-1)}{\Rzero^2(\Rzero-1)^2}
-+\frac{e^BBL}{\Rzero(\Rzero-1)}.
-\end{equation}
-The numerical solver evaluates \(G/B\) and \(G_{\Rzero}/B\) to avoid underflow when \(B\) is very small; these have the same simultaneous zeros as the unscaled equations for \(B>0\). At the reported critical pairs the largest scaled residual is below \(2\times10^{-11}\). Quadrature-level derivatives agree with centered finite-difference diagnostics at representative points, without using finite differences to locate extrema or saddle-nodes.
-
-\subsection{Global unconditional-shape classification}
-Let \(\varepsilon=\Rzero-1\to0^+\). The final-size roots coalesce as \(x_f=1-2\varepsilon+O(\varepsilon^2)\) and \(x_*=1-\varepsilon+O(\varepsilon^2)\). Rescaling the regularized amplitude integral across this shrinking interval gives \(J_\theta/\tilde a\to-2\), uniformly for fixed \(0\leq\theta\leq1\), and hence \(\Cth\sim2e^{-2}\varepsilon^2\). Since \(\dAf=O(\varepsilon)\), the BI exponent and unconditional persistence obey
-\[
-B_{\BI}\sim2e^{-2}K\sqrt{\frac{\rhoeps}{2\pi}}\,\varepsilon^{5/2},
-\qquad
-P_{\rm persist,uncond}\sim2e^{-2}K\sqrt{\frac{\rhoeps}{2\pi}}\,\varepsilon^{7/2}.
-\]
-Thus the BI curve starts at zero and initially increases. These are endpoint properties of the BI expression, whose finite-\(\rhoeps\) accuracy close to \(\Rzero=1\) remains nonuniform.
-
-At the opposite endpoint, the amplitude asymptotic derived above is decisive. For fixed \(0\leq\theta<1\), writing \(\delta=1-\theta\), the action satisfies \(\dAf\sim[\delta(1+\delta)\Rzero^\delta]^{-1}\to0\), while \(\Cth\sim e^{-\gamma_{\rm E}}/(\delta\Rzero)\). Therefore
-\begin{equation}
-B_{\BI}\sim\frac{K e^{-\gamma_{\rm E}}}{1-\theta}
-\sqrt{\frac{\rhoeps}{2\pi}}\,
-\Rzero^{-(1+\theta)/2},
-\qquad
-P_{\rm persist,uncond}\sim B_{\BI}\to0.
-\label{eq:uncondLargeSublinear}
-\end{equation}
-In particular, the far-tail derivative is negative, not positive: dropping the \(\Cth\propto\Rzero^{-1}\) factor would give the wrong endpoint conclusion. For \(\theta=1\), \(\Cth\to e^{-1}\) but \(\dAf'=1-1/\Rzero+O(\Rzero^{-2})\), so \(\dAf=\Rzero-\log\Rzero+O(1)\) and \(B_{\BI}\to0\) exponentially. The \(\theta=1\) endpoint is thus qualitatively different in decay rate, but not in the limiting value \(P_{\rm persist,uncond}(\infty)=0\). Together with the near-threshold rise, both endpoint laws require at least one local maximum; a no-extremum or minimum-only global shape is excluded.
-
-For \cref{fig:unconditional-shape-map}, the analytical \(G/B\) condition was bracketed on a dense grid spanning \(1.001\leq\Rzero\leq300\), with each root refined and classified by the sign of \(G_{\Rzero}\). The \(\theta\)-grid reaches 0.975 before the separate endpoint \(\theta=1\); the tracked finite minimum remains below \(\Rzero=300\) on this grid. For \(\theta<1\), a further maximum was located by solving the large-\(\Rzero\) continuation obtained from \cref{eq:uncondLargeSublinear} and the corresponding action expansion. Thus zero finite-window roots correspond to one remote maximum, while a finite maximum--minimum sequence is followed by a remote second maximum. This tail continuation is essential for shape counting but can lie far beyond the regime of quantitative stochastic validation. No extra finite-window roots or minimum-only cases were found on the mapped grid.
-
-Figure~\ref{fig:supp-shape-map} compares the same classification at three population sizes. At \(\rhoeps=0.02\), the pair-creation value moves from \(\theta_c\approx0.0141\) at \(K=10^5\) to 0.1369 at \(10^6\) and 0.2396 at \(10^7\). Increasing \(K\) therefore enlarges the one-maximum region and contracts the region with the additional maximum--minimum pair; the dependence is not merely a shift of plotted root locations.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{validation/figures/paper/unconditional_shape_map_K_comparison.pdf}
-\caption{Unconditional-persistence shape maps for \(K=10^5,10^6,10^7\), classified as in \cref{fig:unconditional-shape-map}. The dashed line in each panel is the genuine \(G=G_{\Rzero}=0\) pair-creation locus. Higher \(K\) moves this boundary toward larger \(\theta\); the endpoint \(\theta=1\) remains a one-maximum curve over the displayed \(\rhoeps\) range.}
-\label{fig:supp-shape-map}
-\end{figure}
-
-Figure~\ref{fig:supp-diagnostics} summarizes the numerical error isolation. Panel (a) compares the boundary-layer-independent prediction with stochastic simulation. Panel (b) compares approximation layers where a finite entry exists, using the numerical ODE entry and exact Kendall integral as the reference. The small second-order entry error shows that matching is not the principal source of the visible discrepancies; the larger closed-form and Laplace differences reflect weakening scale separation.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{validation/figures/paper/accuracy_diagnostics_supplement.pdf}
-\caption{Supplementary accuracy diagnostics. (a) Mean absolute error of the boundary-layer-independent conditional persistence probability against all cached stochastic estimates at each \(\rhoeps\). (b) Mean absolute probability differences on finite-entry points of the ODE scan. ``BI closed form'' compares \cref{eq:PBI} with the numerical-ODE-entry, exact-Kendall reference; ``Laplace step'' replaces exact Kendall by its saddle approximation while retaining the ODE entry; the other curves replace the ODE entry by the first- or second-order asymptotic entry while retaining exact Kendall. The second-order entry contribution remains near \(10^{-3}\), whereas loss in the closed-form and Laplace reductions is larger.}
-\label{fig:supp-diagnostics}
-\end{figure}
-
-A numerical implementation should retain diagnostics that identify which approximation layer is failing. Useful quantities include
-\[
-\frac{y_{\min}^{\rm ODE}}{\yin},
-\qquad
-\frac{x_{\rm in}^{(1)}-x_{\rm in}^{\rm ODE}}{x_{\rm in}^{\rm ODE}},
-\qquad
-\frac{x_{\rm in}^{(2)}-x_{\rm in}^{\rm ODE}}{x_{\rm in}^{\rm ODE}},
-\]
-together with the action errors
-\[
-\Delta\Lambda_j=
-\frac{\Ath(x_{\rm in}^{\rm ODE})-\Ath(x_{\rm in}^{(j)})}{\rhoeps},
-\qquad j=1,2,
-\]
-and separate exact-Kendall and Laplace burnout exponents. The regularized quadrature defining \(\Dth\) should also be tested for endpoint-treatment and numerical-precision sensitivity.
-
-For repeated parameter studies, a natural computational decomposition is:
-\begin{enumerate}[leftmargin=2em]
-\item for each \((\Rzero,\theta)\), compute \(\xf\), \(\Cth\), and \(\Dth\);
-\item for each \((\rhoeps,K)\), compute \(y_*\) and the chosen boundary-layer threshold if the finite-boundary route is used;
-\item solve \cref{eq:actionentry} for first- or second-order entry and evaluate the exact one-dimensional Kendall integral for the high-accuracy finite-boundary prediction;
-\item evaluate \cref{eq:BBI} for a boundary-layer-independent closed form;
-\item record no-entry status, action size, and the difference between first- and second-order predictions as validity diagnostics.
-\end{enumerate}
+% BEGIN deferred appendix
+% \appendix
+% \section{Implementation and diagnostic quantities}
+% \label{app:numerical-diagnostics}
+% BEGIN deferred appendix BI derivatives and global classification
+% \subsection{Conditional extrema and the large-\(\Rzero\) limit}
+% For \(P_c=1-e^{-B_{\BI}}\), direct differentiation gives
+% \begin{equation}
+% \frac{\dd P_c}{\dd\Rzero}=e^{-B_{\BI}}B_{\BI}L,
+% \qquad
+% L=(\log\Cth)'+\frac{1}{2(\Rzero-1)}
+% -\frac{\theta}{2\Rzero}-\frac{\dAf'}{\rhoeps}.
+% \label{eq:conditionalL}
+% \end{equation}
+% Thus the sign changes of \(L\), rather than differences of sampled probabilities, classify conditional extrema. The factor \(K\) enters \(\log B_{\BI}\) only through \(\log K\), so every BI conditional-extremum location is exactly independent of \(K\). This differs from the unconditional condition \(G=0\) in \cref{eq:extremumG}, which contains \(B\) and hence depends on \(K\).
+%
+% At \(\rhoeps=0.01\), analytical-derivative root searches give the successive maximum, minimum, and remote maximum at \(\Rzero\approx(1.093717,2.377372,101.670522)\) for \(\theta=0\), \((1.086160,3.494824,413.8)\) for \(\theta=0.25\), \((1.080250,5.986866,7.904\times10^3)\) for \(\theta=0.5\), and \((1.075435,13.973974,6.988\times10^7)\) for \(\theta=0.75\). The last three remote-maxima values use the large-\(\Rzero\) continuation below, avoiding underflow in \(x_f\); the near-threshold extrema and the \(\theta=0\) remote maximum use the full regularized derivative. For \(\theta=1\), the sole detected zero is a maximum at \(\Rzero=1.071397\); no later minimum is detected on the numerically accessible finite range. These are properties of the leading BI formula, not additional stochastic-validation claims.
+%
+% To determine the eventual sign without extrapolating a finite plot, use \(x_f=-W_0(-\Rzero e^{-\Rzero})/\Rzero\sim e^{-\Rzero}\). For each fixed \(0\leq\theta<1\), setting \(u=x_f e^s\) in the regularized quadrature isolates the \(-\Rzero\) outer contribution. The remaining lower-end integral tends to
+% \[
+% c_\theta=\int_0^\infty\left\{\frac{e^{-(1-\theta)s}}{s}
+% -\frac{1}{e^s-1}\right\}\dd s
+% =-\gamma_{\rm E}-\log(1-\theta),
+% \]
+% where the difference is finite at \(s=0\). Splitting the transformed integral into a fixed lower-end interval and its exponentially decaying tail, then differentiating under the same split, gives \(J_\theta/\tilde a=-\Rzero+c_\theta+o(1)\), \(\log\Cth=-\log\Rzero+c_\theta+o(1)\), and \((\log\Cth)'=-1/\Rzero+o(1/\Rzero)\). Meanwhile \(\dAf'=-1/[(2-\theta)\Rzero^{2-\theta}]+O(\Rzero^{-(3-\theta)})+O(e^{-(1-\theta)\Rzero})\). Consequently,
+% \begin{equation}
+% L=-\frac{1+\theta}{2\Rzero}
+% +\frac{1}{\rhoeps(2-\theta)\Rzero^{2-\theta}}
+% +o(\Rzero^{-1})<0
+% \qquad(0\leq\theta<1,\ \Rzero\to\infty).
+% \label{eq:LlargeSublinear}
+% \end{equation}
+% The remote maximum follows from balancing the two displayed terms, giving \(\Rzero\sim[2/\{\rhoeps(2-\theta)(1+\theta)\}]^{1/(1-\theta)}\) when that root is asymptotically large. At \(\theta=1\), the amplitude instead approaches \(e^{-1}\), with \((\log C_1)'=O(\Rzero^{-2})\), and \(\dAf'=1-1/\Rzero+O(\Rzero^{-2})\); hence \(L=-1/\rhoeps+O(\Rzero^{-1})<0\). The large-\(\Rzero\) decline therefore holds at both endpoints, although the action term changes qualitatively at \(\theta=1\).
+%
+% Writing \(\delta=1-\theta\to0^+\), the minimum occurs in the crossover where \(x_f^\delta\sim e^{-\delta\Rzero}\) competes with \(\int_0^{1/\Rzero}x^\delta/(1-x)\,\dd x\sim\Rzero^{-1-\delta}/(1+\delta)\). The amplitude derivative contributes at order \(1/\Rzero\), not at order one, so this balance yields \(\delta\Rzero\sim\log\Rzero\) and
+% \begin{equation}
+% \mathcal R_{0,\min}(\theta)\sim\frac{\log[1/(1-\theta)]}{1-\theta}
+% \qquad(\theta\to1^-)
+% \label{eq:conditionalMinScaling}
+% \end{equation}
+% at leading logarithmic order. Numerical continuation gives minima at \(\Rzero\approx42.10,97.23,290.75\) for \(\theta=0.9,0.95,0.98\), respectively; the minimum escapes to infinity rather than meeting the near-threshold maximum at finite \(\Rzero\). The remote maximum diverges still faster. The asymptotic statements establish eventual signs and escape scales; the finite-range root count is a numerical observation, not a global root-count theorem.
+%
+% \subsection{Derivative implementation and diagnostic quantities}
+% For the extremum calculation, differentiating the implicit final-size equation gives
+% \begin{equation}
+% x_f'=\frac{x_f(x_f-1)}{1-\Rzero x_f}.
+% \end{equation}
+% The action barrier is differentiated analytically rather than by differencing its values:
+% \begin{align}
+% \dAf'&=x_f^{1-\theta}-\int_{x_f}^{1/\Rzero}\frac{x^{1-\theta}}{1-x}\dd x,\\
+% \dAf''&=\frac{\Rzero^{\theta-2}}{\Rzero-1}
+% -\frac{x_f^{1-\theta}[(1-\theta)+\theta x_f]}{1-\Rzero x_f}.
+% \end{align}
+% The matching amplitude \(\Cth\) is a fully specified semi-analytical quantity, not a fitted coefficient. Writing \(x_*=1/\Rzero\), \(\tilde a=(1-x_f)x_f^{\theta-1}\), and
+% \begin{equation}
+% q(u;\Rzero,\theta)=\frac{(x_*-u)h_\theta(u)}{u^2F(u;\Rzero)}
+% -\frac{\tilde a}{u-x_f},
+% \end{equation}
+% its regularized quadrature is \(J_\theta=\int_{x_f}^{1}q(u;\Rzero,\theta)\dd u\) and
+% \begin{equation}
+% \log\Cth=\log(1-x_f)+\log(x_*-x_f)-\log x_f+\frac{J_\theta}{\tilde a}.
+% \end{equation}
+% For the directly evaluated \(\Rzero\) range, set \(u=x_f e^s\), \(0<s<-\log x_f\), and then map \(s=t(-\log x_f)\) to fixed limits \(0<t<1\). The integrand for \(J_\theta/\tilde a\) becomes
+% \[
+% \frac{(x_*-u)(1-u)e^{(\theta-1)s}}{(1-x_f)F(u;\Rzero)}
+% -\frac{e^s}{e^s-1},
+% \qquad F(x_f e^s;\Rzero)=x_f(1-e^s)+\frac{s}{\Rzero},
+% \]
+% whose apparent lower-end singularities cancel. The implementation propagates the first two \(\Rzero\)-derivatives through this fixed-limits regularized quadrature and through \(\log\Cth\); finite differences are used only to check the result.
+%
+% In particular,
+% \begin{align}
+% L&=(\log\Cth)'+\frac{1}{2(\Rzero-1)}-\frac{\theta}{2\Rzero}-\frac{\dAf'}{\rhoeps},\\
+% L'&=(\log\Cth)''-\frac{1}{2(\Rzero-1)^2}+\frac{\theta}{2\Rzero^2}-\frac{\dAf''}{\rhoeps},
+% \end{align}
+% and the saddle-node test uses
+% \begin{equation}
+% G_{\Rzero}=B(L^2+L')-\frac{(2\Rzero-1)(e^B-1)}{\Rzero^2(\Rzero-1)^2}
+% +\frac{e^BBL}{\Rzero(\Rzero-1)}.
+% \end{equation}
+% The numerical solver evaluates \(G/B\) and \(G_{\Rzero}/B\) to avoid underflow when \(B\) is very small; these have the same simultaneous zeros as the unscaled equations for \(B>0\). At the reported critical pairs the largest scaled residual is below \(2\times10^{-11}\). Quadrature-level derivatives agree with centered finite-difference diagnostics at representative points, without using finite differences to locate extrema or saddle-nodes.
+%
+% \subsection{Global unconditional-shape classification}
+% Let \(\varepsilon=\Rzero-1\to0^+\). The final-size roots coalesce as \(x_f=1-2\varepsilon+O(\varepsilon^2)\) and \(x_*=1-\varepsilon+O(\varepsilon^2)\). Rescaling the regularized amplitude integral across this shrinking interval gives \(J_\theta/\tilde a\to-2\), uniformly for fixed \(0\leq\theta\leq1\), and hence \(\Cth\sim2e^{-2}\varepsilon^2\). Since \(\dAf=O(\varepsilon)\), the BI exponent and unconditional persistence obey
+% \[
+% B_{\BI}\sim2e^{-2}K\sqrt{\frac{\rhoeps}{2\pi}}\,\varepsilon^{5/2},
+% \qquad
+% P_{\rm persist,uncond}\sim2e^{-2}K\sqrt{\frac{\rhoeps}{2\pi}}\,\varepsilon^{7/2}.
+% \]
+% Thus the BI curve starts at zero and initially increases. These are endpoint properties of the BI expression, whose finite-\(\rhoeps\) accuracy close to \(\Rzero=1\) remains nonuniform.
+%
+% At the opposite endpoint, the amplitude asymptotic derived above is decisive. For fixed \(0\leq\theta<1\), writing \(\delta=1-\theta\), the action satisfies \(\dAf\sim[\delta(1+\delta)\Rzero^\delta]^{-1}\to0\), while \(\Cth\sim e^{-\gamma_{\rm E}}/(\delta\Rzero)\). Therefore
+% \begin{equation}
+% B_{\BI}\sim\frac{K e^{-\gamma_{\rm E}}}{1-\theta}
+% \sqrt{\frac{\rhoeps}{2\pi}}\,
+% \Rzero^{-(1+\theta)/2},
+% \qquad
+% P_{\rm persist,uncond}\sim B_{\BI}\to0.
+% \label{eq:uncondLargeSublinear}
+% \end{equation}
+% In particular, the far-tail derivative is negative, not positive: dropping the \(\Cth\propto\Rzero^{-1}\) factor would give the wrong endpoint conclusion. For \(\theta=1\), \(\Cth\to e^{-1}\) but \(\dAf'=1-1/\Rzero+O(\Rzero^{-2})\), so \(\dAf=\Rzero-\log\Rzero+O(1)\) and \(B_{\BI}\to0\) exponentially. The \(\theta=1\) endpoint is thus qualitatively different in decay rate, but not in the limiting value \(P_{\rm persist,uncond}(\infty)=0\). Together with the near-threshold rise, both endpoint laws require at least one local maximum; a no-extremum or minimum-only global shape is excluded.
+%
+% For \cref{fig:unconditional-shape-map}, the analytical \(G/B\) condition was bracketed on a dense grid spanning \(1.001\leq\Rzero\leq300\), with each root refined and classified by the sign of \(G_{\Rzero}\). The \(\theta\)-grid reaches 0.975 before the separate endpoint \(\theta=1\); the tracked finite minimum remains below \(\Rzero=300\) on this grid. For \(\theta<1\), a further maximum was located by solving the large-\(\Rzero\) continuation obtained from \cref{eq:uncondLargeSublinear} and the corresponding action expansion. Thus zero finite-window roots correspond to one remote maximum, while a finite maximum--minimum sequence is followed by a remote second maximum. This tail continuation is essential for shape counting but can lie far beyond the regime of quantitative stochastic validation. No extra finite-window roots or minimum-only cases were found on the mapped grid.
+%
+% Figure~\ref{fig:supp-shape-map} compares the same classification at three population sizes. At \(\rhoeps=0.02\), the pair-creation value moves from \(\theta_c\approx0.0141\) at \(K=10^5\) to 0.1369 at \(10^6\) and 0.2396 at \(10^7\). Increasing \(K\) therefore enlarges the one-maximum region and contracts the region with the additional maximum--minimum pair; the dependence is not merely a shift of plotted root locations.
+%
+% \begin{figure}[H]
+% \centering
+% \includegraphics[width=\textwidth]{validation/figures/paper/unconditional_shape_map_K_comparison.pdf}
+% \caption{Unconditional-persistence shape maps for \(K=10^5,10^6,10^7\), classified as in \cref{fig:unconditional-shape-map}. The dashed line in each panel is the genuine \(G=G_{\Rzero}=0\) pair-creation locus. Higher \(K\) moves this boundary toward larger \(\theta\); the endpoint \(\theta=1\) remains a one-maximum curve over the displayed \(\rhoeps\) range.}
+% \label{fig:supp-shape-map}
+% \end{figure}
+%
+% END deferred appendix BI derivatives and global classification
+%
+% Figure~\ref{fig:supp-diagnostics} summarizes the numerical error isolation. Panel (a) compares the boundary-layer-independent prediction with stochastic simulation. Panel (b) compares approximation layers where a finite entry exists, using the numerical ODE entry and exact Kendall integral as the reference. The small second-order entry error shows that matching is not the principal source of the visible discrepancies; the larger closed-form and Laplace differences reflect weakening scale separation.
+%
+% \begin{figure}[H]
+% \centering
+% \includegraphics[width=\textwidth]{validation/figures/paper/accuracy_diagnostics_supplement.pdf}
+% \caption{Supplementary accuracy diagnostics. (a) Mean absolute error of the boundary-layer-independent conditional persistence probability against all cached stochastic estimates at each \(\rhoeps\). (b) Mean absolute probability differences on finite-entry points of the ODE scan. ``BI closed form'' compares \cref{eq:PBI} with the numerical-ODE-entry, exact-Kendall reference; ``Laplace step'' replaces exact Kendall by its saddle approximation while retaining the ODE entry; the other curves replace the ODE entry by the first- or second-order asymptotic entry while retaining exact Kendall. The second-order entry contribution remains near \(10^{-3}\), whereas loss in the closed-form and Laplace reductions is larger.}
+% \label{fig:supp-diagnostics}
+% \end{figure}
+%
+% A numerical implementation should retain diagnostics that identify which approximation layer is failing. Useful quantities include
+% \[
+% \frac{y_{\min}^{\rm ODE}}{\yin},
+% \qquad
+% \frac{x_{\rm in}^{(1)}-x_{\rm in}^{\rm ODE}}{x_{\rm in}^{\rm ODE}},
+% \qquad
+% \frac{x_{\rm in}^{(2)}-x_{\rm in}^{\rm ODE}}{x_{\rm in}^{\rm ODE}},
+% \]
+% together with the action errors
+% \[
+% \Delta\Lambda_j=
+% \frac{\Ath(x_{\rm in}^{\rm ODE})-\Ath(x_{\rm in}^{(j)})}{\rhoeps},
+% \qquad j=1,2,
+% \]
+% and separate exact-Kendall and Laplace burnout exponents. The regularized quadrature defining \(\Dth\) should also be tested for endpoint-treatment and numerical-precision sensitivity.
+%
+% For repeated parameter studies, a natural computational decomposition is:
+% \begin{enumerate}[leftmargin=2em]
+% \item for each \((\Rzero,\theta)\), compute \(\xf\), \(\Cth\), and \(\Dth\);
+% \item for each \((\rhoeps,K)\), compute \(y_*\) and the chosen boundary-layer threshold if the finite-boundary route is used;
+% \item solve \cref{eq:actionentry} for first- or second-order entry and evaluate the exact one-dimensional Kendall integral for the high-accuracy finite-boundary prediction;
+% \item evaluate \cref{eq:BBI} for a boundary-layer-independent closed form;
+% \item record no-entry status, action size, and the difference between first- and second-order predictions as validity diagnostics.
+% \end{enumerate}
+%
+% END deferred appendix
 
 \begin{thebibliography}{9}
 \bibitem{ParsonsEarn2024}
@@ -1535,6 +1593,10 @@ P. Whittle,
 C. M. Bender and S. A. Orszag,
 \newblock \emph{Advanced Mathematical Methods for Scientists and Engineers},
 \newblock McGraw-Hill, New York (1978).
+\bibitem{GilpinCaseAyala1976}
+M. E. Gilpin, T. J. Case, and F. J. Ayala,
+\newblock \(\theta\)-Selection,
+\newblock \emph{Mathematical Biosciences} 32(1--2), 131--139 (1976).
 \end{thebibliography}
 
 \end{document}

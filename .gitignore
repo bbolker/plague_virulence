@@ -625,3 +625,12 @@ cpdir/
 *.newfile
 *.newdiff
 *.blame
+
+# Burnout extension: publish final paper figures, keep raw runs and caches local.
+!burnout_extension/validation/figures/paper/*.pdf
+/burnout_extension/validation/data/
+/burnout_extension/validation/**/__pycache__/
+/burnout_extension/validation/**/*.pyc
+/burnout_extension/validation/src/*.o
+/burnout_extension/validation/src/*.so
+/burnout_extension/validation/figures/before_*/

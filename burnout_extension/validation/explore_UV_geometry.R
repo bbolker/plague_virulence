@@ -1,0 +1,4 @@
+source('validation/R/theory.R');source('validation/R/extrema.R');library(data.table)
+ths<-c(seq(0,.95,.025),.975,.99,1);rr<-unique(c(1+exp(seq(log(.0001),log(9),length.out=400)),exp(seq(log(10),log(600),length.out=180))))
+z<-rbindlist(lapply(ths,function(th)rbindlist(lapply(rr,function(r){cd<-C_log_derivatives(r,th);ad<-action_barrier_derivatives(r,th);q<-r*(r-1);qp<-2*r-1;c0<-cd['d1']+1/(2*(r-1))-th/(2*r);c1<-cd['d2']-1/(2*(r-1)^2)+th/(2*r^2);data.table(R0=r,theta=th,U=as.numeric(-q*c0),U1=as.numeric(-q*(qp*c0+q*c1)),V=as.numeric(q*ad['d1']),V1=as.numeric(q*(qp*ad['d1']+q*ad['d2'])))}))))
+fwrite(z,'validation/data/critical_geometry_UV.csv');print(z[,.(minU1=min(U1),maxU1=max(U1),V1changes=sum(diff(sign(V1))!=0),U1changes=sum(diff(sign(U1))!=0)),by=theta]);q<-z[V1<0 & U1>0];q[,ratio:=-U1/V1];print(q[,.(ratio_turns=sum(diff(sign(diff(ratio)))!=0)),by=theta])

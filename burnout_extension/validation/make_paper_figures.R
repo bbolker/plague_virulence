@@ -12,7 +12,9 @@ library(ggplot2)
 out_dir <- 'validation/figures/paper'
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 
-pal_theta <- c(`0` = '#0072B2', `0.5` = '#E69F00', `1` = '#009E73')
+theta_values <- seq(0, 1, by = .25)
+pal_theta <- c(`0` = '#0072B2', `0.25` = '#56B4E9', `0.5` = '#009E73',
+               `0.75` = '#E69F00', `1` = '#D55E00')
 clip_prob <- function(x, eps = 1e-3) pmin(1 - eps, pmax(eps, x))
 prob_breaks <- c(.001, .01, .05, .25, .5, .75, .95, .99, .999)
 theme_paper <- theme_bw(base_size = 10.5) +
@@ -23,24 +25,38 @@ theme_paper <- theme_bw(base_size = 10.5) +
         legend.position = 'bottom',
         legend.box = 'horizontal',
         plot.margin = margin(5.5, 7, 5.5, 5.5))
-x_label_R0 <- paste0(intToUtf8(0x211B), intToUtf8(0x2080),
-                     ' - 1 (log scale)')
+x_label_R0 <- bquote(.(intToUtf8(0x211B))[0] - 1 ~ '(log scale)')
+fig1_math_family <- 'serif'
+if (capabilities('aqua')) {
+  grDevices::quartzFonts(STIX = grDevices::quartzFont(
+    c('STIXGeneral-Regular', 'STIXGeneral-Bold',
+      'STIXGeneral-Italic', 'STIXGeneral-BoldItalic')))
+  fig1_math_family <- 'STIX'
+}
 
 # Figure 1: direct validation in the largest, cleanest common stochastic scan.
-sim <- fread('validation/data/fig11_scan_results.csv')
-curve_grid <- unique(fread('validation/data/fig11_scan_analytic.csv')[,
-  .(rho, theta, K, R0)])
+source('validation/R/validation_plot_data.R')
+validation_input <- load_validation_plot_data()
+sim <- validation_input$sim
+curve_grid <- CJ(rho = .01, theta = theta_values,
+                 K = c(1e6, 1e7, 1e8, 1e9),
+                 R0 = 1 + exp(seq(log(.03), log(validation_input$Rmax-1),
+                                  length.out = if(validation_input$extended)800 else 400)))
 curve_grid[, prediction := vapply(seq_len(.N), function(i)
-  bi_quantities(R0[i], rho[i], theta[i], K[i])$P_conditional, numeric(1))]
+  stable_validation_probability(R0[i],rho[i],theta[i],K[i],conditional=TRUE),numeric(1))]
+validation_x_breaks <- if(validation_input$extended) c(.03,.1,.3,1,3,10,30,100) else
+  c(.03,.05,.1,.2,.5,1,2,5)
+validation_x_labels <- if(validation_input$extended) c('0.03','0.1','0.3','1','3','10','30','100') else
+  c('0.03','0.05','0.10','0.20','0.50','1','2','5')
 
 sim_plot <- copy(sim)
 sim_plot[, `:=`(estimate_display = clip_prob(P_conditional),
                 low_display = clip_prob(cond_low),
                 high_display = clip_prob(cond_high),
-                theta_label = factor(theta, levels = c(0, .5, 1)))]
+                theta_label = factor(theta, levels = theta_values))]
 curve_plot <- copy(curve_grid)
 curve_plot[, `:=`(prediction_display = clip_prob(prediction),
-                  theta_label = factor(theta, levels = c(0, .5, 1)))]
+                  theta_label = factor(theta, levels = theta_values))]
 
 fig1 <- ggplot() +
   geom_line(data = curve_plot,
@@ -51,28 +67,40 @@ fig1 <- ggplot() +
                     colour = theta_label),
                 width = 0, linewidth = .35, alpha = .75) +
   geom_point(data = sim_plot,
-             aes(R0 - 1, qlogis(estimate_display), colour = theta_label,
-                 shape = theta_label),
-             size = 1.8, stroke = .45) +
+             aes(R0 - 1, qlogis(estimate_display), colour = theta_label),
+             shape = 16, size = 1.8, stroke = .45) +
   facet_wrap(~K, ncol = 2,
-             labeller = labeller(K = function(x)
-               paste0('K = ', format(as.numeric(x), scientific = TRUE)))) +
-  scale_x_log10(breaks = c(.03, .05, .1, .2, .5, 1, 2, 5),
-                labels = c('.03', '.05', '.10', '.20', '.50', '1', '2', '5')) +
+             labeller = as_labeller(function(x)
+               paste0('italic(K) == 10^', round(log10(as.numeric(x)))),
+               default = label_parsed)) +
+  scale_x_log10(breaks = validation_x_breaks, labels = validation_x_labels) +
   scale_y_continuous(breaks = qlogis(prob_breaks),
                      labels = format(prob_breaks, trim = TRUE),
                      limits = qlogis(c(.001, .999)),
                      expand = expansion(mult = c(.015, .015))) +
   scale_colour_manual(values = pal_theta, name = expression(theta)) +
-  scale_shape_manual(values = c(16, 17, 15), name = expression(theta)) +
   labs(x = x_label_R0,
        y = 'Conditional persistence probability') +
-  guides(colour = guide_legend(override.aes = list(linewidth = .9, size = 2.2)),
-         shape = 'none') + theme_paper +
-  theme(axis.title.x = element_text(family = 'Cambria Math'))
+  guides(colour = guide_legend(override.aes = list(linewidth = .9, size = 2.2,
+                                                 shape = 16))) + theme_paper +
+  theme(axis.title.x = element_text(family = fig1_math_family))
 
-ggsave(file.path(out_dir, 'main_persistence_validation.pdf'), fig1,
-       width = 7.15, height = 5.45, device = cairo_pdf)
+# Quartz embeds native macOS fonts without requiring XQuartz/Cairo libraries.
+fig1_device <- if (capabilities('aqua')) {
+  function(filename, width, height, ...) {
+    grDevices::quartz(file = filename, type = 'pdf',
+                     width = width, height = height, ...)
+  }
+} else grDevices::cairo_pdf
+fig1_file <- file.path(out_dir, 'main_persistence_validation.pdf')
+fig1_tmp <- tempfile(pattern = '.fig1-', tmpdir = out_dir, fileext = '.pdf')
+ggsave(fig1_tmp, fig1, width = 7.15, height = 5.45, device = fig1_device)
+stopifnot(file.rename(fig1_tmp, fig1_file))
+
+if ('--fig1-only' %in% commandArgs(trailingOnly = TRUE)) {
+  message('Figure 1 written to ', out_dir)
+  quit(save = 'no', status = 0)
+}
 
 # Figure 2: a directly interpretable population-size threshold.  Because
 # B_BI is linear in K, K_50 = log(2)/(B_BI/K).

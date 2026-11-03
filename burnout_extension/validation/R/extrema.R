@@ -58,15 +58,15 @@ C_log_derivatives <- local({
     sj <- .jmul(smax, .jconst(tt))
     em1 <- .jexpm1(sj)
     es <- .jadd(one, em1)
-    uj <- .jmul(fj, es)
-    Fj <- .jadd(.jneg(.jmul(fj, em1)), .jdiv(sj, Rj))
+    uj <- .jexp(.jadd(.jlog(fj), sj))
+    Fj <- .jadd(.jsub(fj, uj), .jdiv(sj, Rj))
     # Cancel powers of x_f symbolically before evaluating the quadrature:
     # (h(u)/u)/a_tilde = (1-u) exp((theta-1)s)/(1-x_f).
     # The uncancelled form overflows/underflows at large R0.
     decay <- .jexp(.jmul(.jconst(theta - 1), sj))
     first <- .jdiv(.jmul(.jmul(.jsub(xsj, uj), .jsub(one, uj)), decay),
                    .jmul(.jsub(one, fj), Fj))
-    second <- .jdiv(es, em1)
+    second <- .jinv(.jneg(.jexpm1(.jneg(sj))))
     qj <- .jsub(first, second)
     intj <- .jet(sum(ww * qj$v), sum(ww * qj$d1), sum(ww * qj$d2))
     J_over_at <- .jmul(smax, intj)

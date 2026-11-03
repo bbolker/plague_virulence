@@ -126,6 +126,36 @@ simulate_counts_batch <- function(cl,R0,rho,theta,K,n_attempts,seed) {
   colSums(do.call(rbind,ans))
 }
 
+# Classify first-trough recovery in chronological order. The turning condition
+# matches one_ctmc(): after the first trough, susceptible drift must be positive,
+# then negative, before (or at) the next downward crossing of x*.
+classify_first_trough <- function(S,I,R0,rho,theta,K) {
+  stopifnot(length(S)==length(I),length(S)>0L)
+  n <- length(S); xs <- 1/R0
+  extinct <- which(I==0)
+  extinction <- if(length(extinct)) extinct[1L] else Inf
+  peaks <- if(n>1L) which(S[-n]/K>xs & S[-1L]/K<=xs & I[-1L]>0)+1L else integer()
+  if(!length(peaks))
+    return(c(established=FALSE,persist=if(is.finite(extinction)) FALSE else NA))
+  first_peak <- peaks[1L]
+  troughs <- if(n>1L) which(S[-n]/K<xs & S[-1L]/K>=xs & I[-1L]>0)+1L else integer()
+  troughs <- troughs[troughs>first_peak & troughs<extinction]
+  if(length(troughs)) {
+    first_trough <- troughs[1L]
+    after <- seq.int(first_trough,n)
+    drift <- rho*pmax(K-S,0)*(S/K)^theta-R0*S*I/K
+    positive <- after[drift[after]>0 & after<extinction]
+    if(length(positive)) {
+      negative <- after[after>positive[1L] & drift[after]<0 & after<extinction]
+      if(length(negative)) {
+        next_peak <- peaks[peaks>first_trough & peaks>=negative[1L] & peaks<extinction]
+        if(length(next_peak)) return(c(established=TRUE,persist=TRUE))
+      }
+    }
+  }
+  c(established=TRUE,persist=if(is.finite(extinction)) FALSE else NA)
+}
+
 # Adaptive tau-leaping counterpart of one_ctmc().  Classification uses the
 # same sequence of susceptible-nullcline crossings as the exact simulator;
 # tau-leaping changes only how the CTMC trajectory is generated.
@@ -144,26 +174,7 @@ one_adaptive_tau <- function(R0,rho,theta,K,tf=max(500,20/rho),
     c(S=K-1,I=1),transitions,rates,
     list(R0=R0,rho=rho,theta=theta,K=K),tf=tf,
     tl.params=list(epsilon=tau_epsilon,extraChecks=TRUE))
-  S <- z[,'S']; I <- z[,'I']; xs <- 1/R0
-  below <- S/K <= xs
-  peak <- which(!below[-length(below)] & below[-1L] & I[-1L]>0)+1L
-  if(!length(peak)) return(c(established=FALSE,persist=FALSE))
-  first_peak <- peak[1L]
-  if(first_peak>=length(S)) return(c(established=TRUE,persist=NA))
-  after_peak <- seq.int(first_peak+1L,length(S))
-  trough <- after_peak[which(below[after_peak-1L] & !below[after_peak] &
-                               I[after_peak]>0)]
-  extinct <- which(I==0)
-  if(!length(trough)) {
-    if(length(extinct)) return(c(established=TRUE,persist=FALSE))
-    return(c(established=TRUE,persist=NA))
-  }
-  first_trough <- trough[1L]
-  if(length(extinct) && extinct[1L]>first_trough)
-    return(c(established=TRUE,persist=FALSE))
-  next_peak <- peak[peak>first_trough]
-  if(length(next_peak)) return(c(established=TRUE,persist=TRUE))
-  c(established=TRUE,persist=NA)
+  classify_first_trough(z[,'S'],z[,'I'],R0,rho,theta,K)
 }
 
 simulate_counts_batch_tau <- function(cl,R0,rho,theta,K,n_attempts,seed,

@@ -118,12 +118,12 @@ ggsave(file.path(out_dir, 'main_persistence_validation.pdf'), fig1,
        width = 7.15, height = 5.35, device = cairo_pdf)
 
 # Figure 2: dense conditional-persistence landscape.
-conditional_cache <- 'validation/data/paper_conditional_landscape.csv'
+conditional_cache <- 'validation/data/paper_conditional_landscape_theta5.csv'
 conditional <- read_cache(conditional_cache)
 if (is.null(conditional)) {
   R_land <- seq(1.05, 8, length.out = 300)
   rho_land <- exp(seq(log(.001), log(.05), length.out = 170))
-  core <- core_grid(R_land, theta3)
+  core <- core_grid(R_land, theta5)
   conditional <- rbindlist(lapply(c(1e6, 1e9), function(Kv) {
     z <- cross_join_rho(core, rho_land)
     z <- add_probabilities(z, Kv)
@@ -134,23 +134,48 @@ if (is.null(conditional)) {
   fwrite(conditional, conditional_cache)
 }
 conditional[, `:=`(
-  theta_label = factor(sprintf('theta == %g', theta), levels = sprintf('theta == %g', theta3)),
+  theta_label = factor(sprintf('theta == %g', theta), levels = sprintf('theta == %g', theta5)),
   K_label = factor(sprintf('K == 10^%d', round(log10(K))),
                    levels = sprintf('K == 10^%d', c(6, 9))),
-  probability_display = fifelse(finite_entry, P_conditional, NA_real_))]
-fig2 <- ggplot(conditional, aes(R0, rho, fill = probability_display)) +
-  geom_raster(interpolate = FALSE) +
+  probability_display = pmin(.999, pmax(.001, P_conditional)))]
+land_dx <- min(diff(sort(unique(conditional$R0))))
+land_dlogrho <- min(diff(log(sort(unique(conditional$rho)))))
+fig2 <- ggplot(conditional, aes(fill = probability_display)) +
+  geom_rect(aes(xmin = pmax(.05, R0 - 1 - land_dx / 2),
+                xmax = pmin(7, R0 - 1 + land_dx / 2),
+                ymin = rho * exp(-land_dlogrho / 2),
+                ymax = rho * exp(land_dlogrho / 2))) +
   facet_grid(K_label ~ theta_label, labeller = label_parsed) +
   scale_y_log10(breaks = c(.001, .002, .005, .01, .02, .05),
                 labels = c('.001', '.002', '.005', '.01', '.02', '.05')) +
-  scale_x_continuous(breaks = 1:8, expand = c(0, 0)) +
-  scale_fill_viridis_c(option = 'C', limits = c(0, 1), na.value = 'grey72',
-                       name = 'Conditional\npersistence') +
-  labs(x = x_label_R0, y = expression(rho)) + theme_paper +
+  scale_x_log10(breaks = c(.05, .1, .25, .5, 1, 2, 4, 7),
+                labels = c('.05', '.1', '.25', '.5', '1', '2', '4', '7'),
+                expand = c(0, 0)) +
+  scale_fill_viridis_c(option = 'D', limits = c(.001, .999),
+                       transform = scales::transform_logit(),
+                       breaks = c(.001, .01, .1, .5, .9, .99, .999),
+                       labels = c('≤0.001', '0.01', '0.1', '0.5', '0.9', '0.99', '≥0.999'),
+                       name = 'Conditional\npersistence\n(logit scale)') +
+  labs(x = bquote(.(intToUtf8(0x211B))[0] - 1 ~ '(log scale)'),
+       y = expression(rho)) + theme_paper +
   theme(axis.title.x = element_text(family = 'Cambria Math'),
+        axis.title.y = element_text(angle = 0, vjust = .5),
+        strip.text.y.right = element_text(angle = 0),
         legend.position = 'right', panel.spacing = unit(.45, 'lines'))
-ggsave(file.path(out_dir, 'conditional_persistence_landscape.pdf'), fig2,
-       width = 7.15, height = 4.65, device = cairo_pdf)
+if (capabilities('aqua')) {
+  quartzFonts(STIX = quartzFont(c('STIXGeneral-Regular', 'STIXGeneral-Bold',
+                                 'STIXGeneral-Italic', 'STIXGeneral-BoldItalic')))
+  # Use vector cells and a continuous gradient to avoid inverted Quartz rasters.
+  fig2 <- fig2 + guides(fill = guide_colourbar(display = 'gradient')) +
+    theme(axis.title.x = element_text(family = 'STIX'))
+  quartz(file = file.path(out_dir, 'conditional_persistence_landscape.pdf'),
+         type = 'pdf', width = 10.5, height = 4.65)
+  print(fig2)
+  dev.off()
+} else {
+  ggsave(file.path(out_dir, 'conditional_persistence_landscape.pdf'), fig2,
+         width = 10.5, height = 4.65, device = cairo_pdf)
+}
 
 # Figure 3: unconditional landscape and analytically continued extremum structure.
 struct_R <- seq(1.05, 8, length.out = 360)
