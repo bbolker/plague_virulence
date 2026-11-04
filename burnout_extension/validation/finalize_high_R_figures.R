@@ -4,7 +4,9 @@ stopifnot(requireNamespace('data.table',quietly=TRUE))
 source('validation/R/validation_plot_data.R')
 z<-load_validation_plot_data()
 stopifnot(z$extended,nrow(z$sim)==460L)
-backup<-'validation/figures/before_high_R_extension_20261102'
+if('--require-guarded' %in% commandArgs(trailingOnly=TRUE))stopifnot(z$corrected)
+backup<-if(z$corrected)'validation/figures/before_tau_boundary_correction_20261104' else
+ 'validation/figures/before_high_R_extension_20261102'
 dir.create(backup,recursive=TRUE,showWarnings=FALSE)
 for(name in c('main_persistence_validation.pdf','unconditional_persistence_validation.pdf')){
  src<-file.path('validation/figures/paper',name);dst<-file.path(backup,name)
@@ -19,8 +21,11 @@ for(script in c('validation/make_paper_figures.R','validation/make_unconditional
 }
 writeLines(c('Both validation PDFs updated after all 180 high-R parameter combinations completed.',
  'Original 280 display rows, including the pooled replacement point, preserved.',
+ if(z$corrected)'180 corrected combinations: boundary-guarded adaptive tau with SSA fallback, 10000 attempts each, epsilon=.01, event budget=.01, small-count threshold=100.' else
  '180 new combinations, 10000 attempts each, epsilon=.01, 8 workers.',
  'Conditional and unconditional probabilities use the same epidemic trajectories.',
  'Stable log-coordinate C/action calculations used for both theoretical curves.',
- paste('Completed:',Sys.time())), 'validation/data/fig1_high_R_figures_completed.txt')
+ paste('Source:',z$source),paste('Completed:',Sys.time())),
+ if(z$corrected)'validation/data/fig1_high_R_guarded_figures_completed.txt' else
+ 'validation/data/fig1_high_R_figures_completed.txt')
 cat('Both extended validation PDFs complete.\n')

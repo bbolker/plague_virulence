@@ -1285,7 +1285,7 @@ y_{\min}\approx\Cth e^{-\dAf/\rhoeps}.
 We first compare the analytical predictions with stochastic simulations, then examine the sources of approximation error. Next, we investigate the effect of the recruitment law on persistence. To validate the predicted conditional persistence probabilities, we compared the boundary-layer-independent prediction \cref{eq:PBI} with adaptive tau-leap simulations of the full stochastic epidemic.
 
 \subsection{Stochastic validation across transmission and population size}
-Figure~\ref{fig:main-persistence} shows the conditional persistence probability as a function of \(\Rzero\) at \(\rhoeps=0.01\), for \(10^6\leq K\leq10^9\). The boundary-layer-independent approximation agrees closely with the stochastic simulation results over the parameter range shown in Figure~\ref{fig:main-persistence}.
+Figure~\ref{fig:main-persistence} shows the conditional persistence probability as a function of \(\Rzero\) at \(\rhoeps=0.01\), for \(10^6\leq K\leq10^9\). The boundary-layer-independent approximation agrees closely with the stochastic simulation results over much of the tested range, but substantial discrepancies occur at high \(\Rzero\) for some combinations of \(\theta\) and \(K\).
 
 \begin{figure}[t]
 \centering
@@ -1295,6 +1295,30 @@ Figure~\ref{fig:main-persistence} shows the conditional persistence probability 
 \end{figure}
 
 \subsection{Approximation errors and range of validity}
+We next examine the sources of the discrepancies between the analytical approximation and stochastic simulations. For some combinations of recruitment shape and population size, the BI approximation substantially overestimates conditional persistence at high \(\Rzero\).
+
+Table~\ref{tab:high-R-discrepancy} illustrates this discrepancy at \(\rhoeps=0.01\), \(\theta=0.25\), and \(K=10^6\).
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{rrrrrr}
+\toprule
+\(\Rzero\) & Established & Persisted & Extinct after reaching \(S=0\) & \(P_{\rm persist\mid est}\) (simulation) & \(P_{\rm persist\mid est}^{\BI}\) \\
+\midrule
+32  & 9,675 & 9,675 & 0     & 1.00000 & 0.99999 \\
+64  & 9,839 & 9,808 & 31    & 0.99685 & 1.00000 \\
+96  & 9,891 & 7,259 & 2,632 & 0.73390 & 1.00000 \\
+128 & 9,924 & 1,401 & 8,523 & 0.14117 & 1.00000 \\
+\bottomrule
+\end{tabular}
+\caption{Conditional persistence at \(\rhoeps=0.01\), \(\theta=0.25\), and \(K=10^6\). Each parameter combination used 10,000 attempted epidemics. The simulation probability is the number that persisted divided by the number that established. Probabilities are rounded to five decimal places.}
+\label{tab:high-R-discrepancy}
+\end{table}
+
+In the groups with larger discrepancies, a substantial fraction of established epidemic trajectories reached \(S=0\). Note that for \(\theta>0\), recruitment depends on the presence of susceptible hosts. Once susceptibles are depleted to zero, host replenishment stops and no further infections can occur, leading to extinction. But our approximation treats susceptible numbers deterministically and does not capture this route to extinction, so it can overestimate the persistence probability.
+
+
 % BEGIN deferred Section 7.2 content
 %
 % The near-threshold regime \(\Rzero\to1^+\) requires separate treatment because the scale separation underlying the post-wave asymptotics becomes nonuniform.
