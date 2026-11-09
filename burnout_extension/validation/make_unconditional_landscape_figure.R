@@ -10,7 +10,7 @@ library(ggplot2)
 
 out_dir <- 'validation/figures/paper'
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
-scan_version <- 'section7_analytic_extrema_v2'
+scan_version <- 'section7_landscape_R32_stable_v4'
 theta5 <- seq(0, 1, by = .25)
 theta3 <- c(0, .5, 1)
 pal5 <- c('#0072B2', '#56B4E9', '#009E73', '#E69F00', '#D55E00')
@@ -34,11 +34,11 @@ prob_conditional <- function(log_B) {
 }
 core_one <- function(R0, theta) {
   xf <- x_final(R0); xs <- 1 / R0
-  C <- C_explicit(R0, theta); delta <- 1 - R0 * xf
+  logC <- unname(C_log_derivatives(R0, theta)['logC']); C <- exp(logC); delta <- 1 - R0 * xf
   data.table(R0 = R0, theta = theta, xf = xf, delta = delta,
-             hf = h_theta(xf, theta), C = C, logC = log(C),
+             hf = h_theta(xf, theta), C = C, logC = logC,
              hstar = h_theta(xs, theta),
-             DeltaA = action_diff(xf, xs, R0, theta))
+             DeltaA = unname(action_barrier_derivatives(R0, theta)['value']))
 }
 core_grid <- function(R0_values, theta_values) {
   g <- CJ(R0 = R0_values, theta = theta_values)
@@ -78,11 +78,11 @@ cross_join_rho <- function(core, rho_values) {
 }
 
 # Figure 2: dense conditional-persistence landscape.
-conditional_cache <- 'validation/data/paper_conditional_landscape_theta5.csv'
+conditional_cache <- 'validation/data/paper_conditional_landscape_theta5_R32.csv'
 conditional <- read_cache(conditional_cache)
 if (is.null(conditional)) {
-  R_land <- seq(1.05, 8, length.out = 300)
-  rho_land <- exp(seq(log(.001), log(.05), length.out = 170))
+  R_land <- 1 + exp(seq(log(.05), log(31), length.out = 320))
+  rho_land <- exp(seq(log(.001), log(.05), length.out = 130))
   core <- core_grid(R_land, theta5)
   conditional <- rbindlist(lapply(c(1e6, 1e9), function(Kv) {
     z <- cross_join_rho(core, rho_land)
@@ -98,18 +98,18 @@ conditional[, `:=`(
   K_label = factor(sprintf('K == 10^%d', round(log10(K))),
                    levels = sprintf('K == 10^%d', c(6, 9))),
   probability_display = pmax(1e-6, P_unconditional))]
-land_dx <- min(diff(sort(unique(conditional$R0))))
+land_dlogR <- min(diff(log(sort(unique(conditional$R0))-1)))
 land_dlogrho <- min(diff(log(sort(unique(conditional$rho)))))
 fig2 <- ggplot(conditional, aes(fill = probability_display)) +
-  geom_rect(aes(xmin = pmax(.05, R0 - 1 - land_dx / 2),
-                xmax = pmin(7, R0 - 1 + land_dx / 2),
+  geom_rect(aes(xmin = pmax(.05, (R0 - 1) * exp(-land_dlogR / 2)),
+                xmax = pmin(31, (R0 - 1) * exp(land_dlogR / 2)),
                 ymin = rho * exp(-land_dlogrho / 2),
                 ymax = rho * exp(land_dlogrho / 2))) +
   facet_grid(K_label ~ theta_label, labeller = label_parsed) +
   scale_y_log10(breaks = c(.001, .002, .005, .01, .02, .05),
-                labels = c('.001', '.002', '.005', '.01', '.02', '.05')) +
-  scale_x_log10(breaks = c(.05, .1, .25, .5, 1, 2, 4, 7),
-                labels = c('.05', '.1', '.25', '.5', '1', '2', '4', '7'),
+                labels = c('0.001', '0.002', '0.005', '0.01', '0.02', '0.05')) +
+  scale_x_log10(breaks = c(.1, .3, 1, 3, 10, 30),
+                labels = c('0.1', '0.3', '1', '3', '10', '30'),
                 expand = c(0, 0)) +
   scale_fill_viridis_c(option = 'C', limits = c(1e-6, 1),
                        transform = scales::transform_log10(),
@@ -122,16 +122,16 @@ fig2 <- ggplot(conditional, aes(fill = probability_display)) +
         axis.title.y = element_text(angle = 0, vjust = .5),
         strip.text.y.right = element_text(angle = 0),
         legend.position = 'right', panel.spacing = unit(.45, 'lines'))
-ext_path <- 'validation/data/unconditional_landscape_extrema_theta5_K2.csv'
+ext_path <- 'validation/data/unconditional_landscape_extrema_theta5_K2_R32.csv'
 if (file.exists(ext_path)) {
   extrema_display <- fread(ext_path)
 } else {
   extrema_display <- rbindlist(lapply(c(1e6, 1e9), function(kv)
     rbindlist(lapply(theta5, function(th)
       rbindlist(lapply(exp(seq(log(.001), log(.05), length.out = 180)), function(rv) {
-        ans <- as.data.table(find_extrema_analytic(rv, th, kv, Rmax = 8, n_bracket = 300))
+        ans <- as.data.table(find_extrema_analytic(rv, th, kv, Rmax = 32, n_bracket = 500))
         if (!nrow(ans)) return(NULL)
-        ans <- ans[R0_ext >= 1.05 & R0_ext <= 8]
+        ans <- ans[R0_ext >= 1.05 & R0_ext <= 32]
         ans[, `:=`(theta = th, K = kv, rho = rv)]
         ans
       }), fill = TRUE)), fill = TRUE)), fill = TRUE)

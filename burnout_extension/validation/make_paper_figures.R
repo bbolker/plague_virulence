@@ -37,10 +37,11 @@ if (capabilities('aqua')) {
 # Figure 1: direct validation in the largest, cleanest common stochastic scan.
 source('validation/R/validation_plot_data.R')
 validation_input <- load_validation_plot_data()
-sim <- validation_input$sim
+display_Rmax <- validation_input$Rmax
+sim <- validation_input$sim[R0 <= display_Rmax]
 curve_grid <- CJ(rho = .01, theta = theta_values,
                  K = c(1e6, 1e7, 1e8, 1e9),
-                 R0 = 1 + exp(seq(log(.03), log(validation_input$Rmax-1),
+                 R0 = 1 + exp(seq(log(.03), log(display_Rmax-1),
                                   length.out = if(validation_input$extended)800 else 400)))
 curve_grid[, prediction := vapply(seq_len(.N), function(i)
   stable_validation_probability(R0[i],rho[i],theta[i],K[i],conditional=TRUE),numeric(1))]
