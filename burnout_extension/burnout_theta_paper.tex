@@ -1,5 +1,5 @@
 \documentclass[11pt]{article}
-\usepackage[margin=1in]{geometry}
+%% \usepackage[margin=1in]{geometry}
 \usepackage{amsmath,amssymb,mathtools,bm}
 \usepackage{booktabs}
 \usepackage{microtype}
@@ -37,9 +37,18 @@
 \newcommand{\dd}{\,\mathrm d}
 \newcommand{\BI}{\mathrm{BI}}
 
+\newcommand{\comment}{RENEW the comment command}
+\renewcommand{\comment}[3]{}
+\renewcommand{\comment}[3]{\textcolor{#1}{\textbf{[#2: }\textit{#3}\textbf{]}}}
+\newcommand{\jd}[1]{\comment{blue}{JD}{#1}}
+\newcommand{\bb}[1]{\comment{cyan}{BMB}{#1}}
+\newcommand{\RR}{\ensuremath{{\mathcal R}}}
+\newcommand{\Rx}[1]{\ensuremath{\RR_{\mathrm{#1}}}}
+\newcommand{\Ro}{\Rx{0}}
+
 \title{Epidemic Burnout under General Susceptible Recruitment}
 \author{Draft manuscript}
-\date{September 2026}
+\date{\today}
 
 \begin{document}
 \maketitle
@@ -62,7 +71,7 @@ To connect linear and logistic susceptible replenishment, we consider the recrui
 g_\theta(S)=r(K-S)\left(\frac{S}{K}\right)^\theta,\qquad 0\leq\theta\leq1.
 \label{eq:dimensional-recruitment}
 \end{equation}
-Here, \(S\) is the number of susceptible hosts, \(r\) is a recruitment-rate parameter, and \(K\) is the reference population size. When \(\theta=0\), recruitment is linear, \(g_0(S)=r(K-S)\). When \(\theta=1\), it takes the logistic form \(g_1(S)=rS(1-S/K)\). This formulation allows us to study how changing the susceptible-recruitment law alters the post-wave trough and the probability of epidemic persistence.
+Here, \(S\) is the number of susceptible hosts, \(r\) is a recruitment-rate parameter, and \(K\) is the reference population size. When \(\theta=0\), recruitment is linear, \(g_0(S)=r(K-S)\). When \(\theta=1\), it takes the logistic form \(g_1(S)=rS(1-S/K)\). This formulation allows us to study how changing the susceptible-recruitment law alters the post-wave trough and the probability of epidemic persistence. \jd{Maybe briefly explain post-wave in main text as well as in Abstract (decline after a big peak?)}
 
 A key simplification is that the leading-order trajectory of the first epidemic wave, obtained by neglecting susceptible recruitment, does not depend on \(\theta\). The effect of the recruitment law appears in the corrections to this trajectory as the epidemic declines toward low prevalence. These corrections determine how deeply infection falls after the first wave and therefore affect the subsequent probability of burnout.
 
@@ -74,6 +83,7 @@ The paper is organized as follows. Section~\ref{sec:model} introduces the genera
 \label{sec:model}
 \subsection{Model and parameter regime}
 
+\jd{Is it too late to change $\delta$ into a more standard $\gamma$?}
 We consider an SIR-type model with susceptible population \(S(t)\) and infectious population \(I(t)\):
 \begin{align}
 \frac{\dd S}{\dd t} &= g_\theta(S)-\beta\frac{SI}{K},\label{eq:dimensional-models}\\
@@ -137,8 +147,9 @@ Within the boundary layer, we describe infection by a time-inhomogeneous birth--
 \label{eq:low-prevalence-loss-condition}
 \end{equation}
 For this low-prevalence approximation, we use \(y\ll y_*\).
+\jd{Can this s.~be clarified?}
 
-We choose a boundary-layer threshold \(\yin\) where both descriptions apply. It must therefore satisfy
+We choose a boundary-layer threshold \(\yin\) where both \jd{use equation numbers} descriptions apply. It must therefore satisfy
 \begin{equation}
 K^{-1}\ll\yin\ll y_*,
 \label{eq:matching-overlap}
@@ -157,7 +168,9 @@ Figure~\ref{fig:phaseplane-framework} illustrates the epidemic trajectory and it
 \begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{validation/figures/paper/phaseplane_framework.pdf}
-\caption{Phase-plane trajectories of the generalized SIR model on (a) linear and (b) logarithmic infectious-fraction scales. The boundary-layer threshold is \(\yin=\sqrt{y_*/K}\), as defined in \cref{eq:ybl}.}
+\caption{
+	Phase-plane trajectories of the generalized SIR model on (a) linear and (b) logarithmic infectious-fraction scales. The boundary-layer threshold is \(\yin=\sqrt{y_*/K}\), as defined in \cref{eq:ybl}.\bb{If convenient, change the \Ro\ style in the figure to match MS.}
+}
 \label{fig:phaseplane-framework}
 \end{figure}
 
