@@ -64,5 +64,5 @@ Note effects of [1] generation interval/infectious period distribution; [2] demo
     * flea travel/colonization decoupled from rat movement?
     * estimate coupling (somehow) from plague movement? (Fisher equation etc)
     * how strongly can we assume that transmission is decoupled from infectious period/rat survival?
-    * look over Keeling and Gilligan
+    * look over Keeling and Gilligan (see `notes/keeling_gilligan_plan.md`)
     * are we off-base in not considering the sylvatic component? https://journals-asm-org.libaccess.lib.mcmaster.ca/cms/10.1128/aem.01658-25/asset/48d7afed-77ed-4bea-9292-91ec846f371d/assets/images/large/aem.01658-25.f001.jpg
