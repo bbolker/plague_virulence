@@ -100,14 +100,23 @@ conditional[, `:=`(
   probability_display = pmax(1e-6, P_unconditional))]
 land_dlogR <- min(diff(log(sort(unique(conditional$R0))-1)))
 land_dlogrho <- min(diff(log(sort(unique(conditional$rho)))))
-fig2 <- ggplot(conditional, aes(fill = probability_display)) +
+# The grid is evenly spaced in log(R0 - 1) and log(rho), so it is a regular
+# raster on the log axes. Quartz PDF output inverts rasters, so the macOS
+# branch draws vector cells instead.
+landscape_cells <- if (capabilities('aqua')) {
   geom_rect(aes(xmin = pmax(.05, (R0 - 1) * exp(-land_dlogR / 2)),
                 xmax = pmin(31, (R0 - 1) * exp(land_dlogR / 2)),
                 ymin = rho * exp(-land_dlogrho / 2),
-                ymax = rho * exp(land_dlogrho / 2))) +
+                ymax = rho * exp(land_dlogrho / 2)))
+} else {
+  geom_raster(aes(R0 - 1, rho), interpolate = FALSE)
+}
+fig2 <- ggplot(conditional, aes(fill = probability_display)) +
+  landscape_cells +
   facet_grid(K_label ~ theta_label, labeller = label_parsed) +
   scale_y_log10(breaks = c(.001, .002, .005, .01, .02, .05),
-                labels = c('0.001', '0.002', '0.005', '0.01', '0.02', '0.05')) +
+                labels = c('0.001', '0.002', '0.005', '0.01', '0.02', '0.05'),
+                expand = c(0, 0)) +
   scale_x_log10(breaks = c(.1, .3, 1, 3, 10, 30),
                 labels = c('0.1', '0.3', '1', '3', '10', '30'),
                 expand = c(0, 0)) +
@@ -144,9 +153,9 @@ fig2 <- fig2 +
   geom_path(data = extrema_display[order(K, theta, type, rho)],
             aes(R0_ext - 1, rho, linetype = type,
                 group = interaction(K, theta, type)),
-            inherit.aes = FALSE, colour = 'white', linewidth = .55) +
+            inherit.aes = FALSE, colour = 'grey50', linewidth = .55) +
   scale_linetype_manual(values = c('Local maximum' = 'dashed', 'Local minimum' = 'solid'), name = NULL) +
-  guides(linetype = guide_legend(override.aes = list(colour = 'black')))
+  guides(linetype = guide_legend(override.aes = list(colour = 'grey50')))
 
 if (capabilities('aqua')) {
   quartzFonts(STIX = quartzFont(c('STIXGeneral-Regular', 'STIXGeneral-Bold',

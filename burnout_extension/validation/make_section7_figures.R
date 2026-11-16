@@ -77,7 +77,11 @@ cross_join_rho <- function(core, rho_values) {
   z
 }
 
-if (!'--conditional-landscape-only' %in% commandArgs(trailingOnly = TRUE)) {
+## --conditional-landscape-only: Figure 2 only.
+## --analytic-only: Figures 2 and 3, which need no stochastic simulation output.
+script_args <- commandArgs(trailingOnly = TRUE)
+analytic_only <- '--analytic-only' %in% script_args
+if (!any(c('--conditional-landscape-only', '--analytic-only') %in% script_args)) {
 # Figure 1: stochastic validation with five analytical recruitment shapes.
 sim_large <- fread('validation/data/fig11_scan_results.csv')
 R_validation <- sort(unique(c(seq(1.03, 1.3, length.out = 90),
@@ -143,14 +147,23 @@ conditional[, `:=`(
   probability_display = pmin(.999, pmax(.001, P_conditional)))]
 land_dlogR <- min(diff(log(sort(unique(conditional$R0))-1)))
 land_dlogrho <- min(diff(log(sort(unique(conditional$rho)))))
-fig2 <- ggplot(conditional, aes(fill = probability_display)) +
+# The grid is evenly spaced in log(R0 - 1) and log(rho), so it is a regular
+# raster on the log axes. Quartz PDF output inverts rasters, so the macOS
+# branch draws vector cells instead.
+landscape_cells <- if (capabilities('aqua')) {
   geom_rect(aes(xmin = pmax(.05, (R0 - 1) * exp(-land_dlogR / 2)),
                 xmax = pmin(31, (R0 - 1) * exp(land_dlogR / 2)),
                 ymin = rho * exp(-land_dlogrho / 2),
-                ymax = rho * exp(land_dlogrho / 2))) +
+                ymax = rho * exp(land_dlogrho / 2)))
+} else {
+  geom_raster(aes(R0 - 1, rho), interpolate = FALSE)
+}
+fig2 <- ggplot(conditional, aes(fill = probability_display)) +
+  landscape_cells +
   facet_grid(K_label ~ theta_label, labeller = label_parsed) +
   scale_y_log10(breaks = c(.001, .002, .005, .01, .02, .05),
-                labels = c('0.001', '0.002', '0.005', '0.01', '0.02', '0.05')) +
+                labels = c('0.001', '0.002', '0.005', '0.01', '0.02', '0.05'),
+                expand = c(0, 0)) +
   scale_x_log10(breaks = c(.1, .3, 1, 3, 10, 30),
                 labels = c('0.1', '0.3', '1', '3', '10', '30'),
                 expand = c(0, 0)) +
@@ -213,7 +226,7 @@ display_extrema[, theta_label := factor(sprintf('theta == %g', theta),
 landscape3 <- ggplot(unconditional, aes(R0, rho, fill = probability_display)) +
   geom_raster(interpolate = FALSE) +
   geom_line(data = display_extrema, aes(R0_ext, rho, linetype = type),
-            inherit.aes = FALSE, colour = 'white', linewidth = .55) +
+            inherit.aes = FALSE, colour = 'grey50', linewidth = .55) +
   facet_wrap(~theta_label, ncol = 3, labeller = label_parsed) +
   scale_y_log10(breaks = c(.001, .003, .01, .03), labels = c('.001', '.003', '.01', '.03')) +
   scale_x_continuous(breaks = c(1, 2, 4, 6, 8), expand = c(0, 0)) +
@@ -222,10 +235,33 @@ landscape3 <- ggplot(unconditional, aes(R0, rho, fill = probability_display)) +
   scale_linetype_manual(values = c('Local maximum' = 'dashed',
                                    'Local minimum' = 'solid'), name = NULL) +
   labs(x = x_label_R0, y = expression(rho), title = '(a) Unconditional persistence') +
-  guides(linetype = guide_legend(override.aes = list(colour = 'black'))) +
+  guides(linetype = guide_legend(override.aes = list(colour = 'grey50'))) +
   theme_paper + theme(axis.title.x = element_text(family = 'Cambria Math'),
                       legend.position = 'right', plot.title = element_text(size = 10, face = 'bold'),
                       panel.spacing = unit(.35, 'lines'))
+
+# The saddle-node table seeds the branch continuation below, so it must exist
+# before the branch cache is built.
+critical_cache <- 'validation/data/paper_theta_critical.csv'
+critical_version <- 'direct_G_GR_v1'
+critical <- if (file.exists(critical_cache)) fread(critical_cache) else NULL
+if (!is.null(critical) && (!'critical_version' %in% names(critical) ||
+    !identical(unique(critical$critical_version), critical_version))) critical <- NULL
+if (is.null(critical)) {
+  critical <- rbindlist(lapply(c(1e5, 1e6, 1e7), function(Kv) {
+    rbindlist(lapply(seq(.014, .03, by = .002), function(rv) {
+      ans <- as.data.table(solve_saddle_node(rv, Kv))
+      if (!nrow(ans)) return(data.table())
+      ans <- ans[theta_c >= 0 & theta_c <= 1]
+      if (!nrow(ans)) return(data.table())
+      ans <- ans[which.min(residual)]
+      ans[, `:=`(K = Kv, rho = rv, scan_version = scan_version,
+                 critical_version = critical_version)]
+      ans
+    }), fill = TRUE)
+  }))
+  fwrite(critical, critical_cache)
+}
 
 branch_cache <- 'validation/data/paper_extrema_branches.csv'
 branch_version <- 'one_sided_continuation_v2'
@@ -233,7 +269,7 @@ branches <- read_cache(branch_cache)
 if (!is.null(branches) && (!'branch_version' %in% names(branches) ||
     !identical(unique(branches$branch_version), branch_version))) branches <- NULL
 if (is.null(branches)) {
-  critical_seed <- fread('validation/data/paper_theta_critical.csv')[K == 1e6]
+  critical_seed <- critical[K == 1e6]
   # Both branches move one-sidedly on these four rho slices. Bracketing from
   # the previous root tracks the same stationary point and stops the minimum
   # cleanly when it leaves the displayed R0 <= 8 window.
@@ -303,26 +339,6 @@ branch_plot <- ggplot(branches, aes(theta, R0_ext, colour = type,
   theme(legend.position = 'bottom', plot.title = element_text(size = 10, face = 'bold'),
         axis.title.y = element_text(family = 'Cambria Math'))
 
-critical_cache <- 'validation/data/paper_theta_critical.csv'
-critical_version <- 'direct_G_GR_v1'
-critical <- if (file.exists(critical_cache)) fread(critical_cache) else NULL
-if (!is.null(critical) && (!'critical_version' %in% names(critical) ||
-    !identical(unique(critical$critical_version), critical_version))) critical <- NULL
-if (is.null(critical)) {
-  critical <- rbindlist(lapply(c(1e5, 1e6, 1e7), function(Kv) {
-    rbindlist(lapply(seq(.014, .03, by = .002), function(rv) {
-      ans <- as.data.table(solve_saddle_node(rv, Kv))
-      if (!nrow(ans)) return(data.table())
-      ans <- ans[theta_c >= 0 & theta_c <= 1]
-      if (!nrow(ans)) return(data.table())
-      ans <- ans[which.min(residual)]
-      ans[, `:=`(K = Kv, rho = rv, scan_version = scan_version,
-                 critical_version = critical_version)]
-      ans
-    }), fill = TRUE)
-  }))
-  fwrite(critical, critical_cache)
-}
 critical[, K_label := factor(sprintf('10^%d', round(log10(K))),
                              levels = sprintf('10^%d', 5:7))]
 critical_plot <- ggplot(critical, aes(rho, theta_c, colour = K_label)) +
@@ -344,6 +360,8 @@ print(landscape3, vp = grid::viewport(layout.pos.row = 1, layout.pos.col = 1:2))
 print(branch_plot, vp = grid::viewport(layout.pos.row = 2, layout.pos.col = 1))
 print(critical_plot, vp = grid::viewport(layout.pos.row = 2, layout.pos.col = 2))
 dev.off()
+
+if (analytic_only) quit(save = 'no', status = 0)
 
 checks <- rbindlist(lapply(c(0, .25, .5), function(th) {
   row <- as.data.table(find_extrema_analytic(.01, th, 1e6, Rmax = 40))[
