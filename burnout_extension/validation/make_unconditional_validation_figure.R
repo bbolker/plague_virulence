@@ -1,4 +1,5 @@
 source('validation/R/theory.R')
+source(here::here('graphics_utils.R'))
 
 stopifnot(
   requireNamespace('data.table', quietly = TRUE),
@@ -25,7 +26,7 @@ theme_paper <- theme_bw(base_size = 10.5) +
         legend.position = 'bottom',
         legend.box = 'horizontal',
         plot.margin = margin(5.5, 7, 5.5, 5.5))
-x_label_R0 <- bquote(.(intToUtf8(0x211B))[0] - 1 ~ '(log scale)')
+x_label_R0 <- bquote(.(intToUtf8(0x211B))[0])
 fig1_math_family <- 'serif'
 if (capabilities('aqua')) {
   grDevices::quartzFonts(STIX = grDevices::quartzFont(
@@ -45,10 +46,9 @@ curve_grid <- CJ(rho = .01, theta = theta_values,
                                   length.out = if(validation_input$extended)800 else 400)))
 curve_grid[, prediction := vapply(seq_len(.N), function(i)
   stable_validation_probability(R0[i],rho[i],theta[i],K[i],conditional=FALSE),numeric(1))]
-validation_x_breaks <- if(validation_input$extended) c(.03,.1,.3,1,3,10,30,100) else
-  c(.03,.05,.1,.2,.5,1,2,5)
-validation_x_labels <- if(validation_input$extended) c('0.03','0.1','0.3','1','3','10','30','100') else
-  c('0.03','0.05','0.10','0.20','0.50','1','2','5')
+# x axis: R0 positioned on log10(R0 - 1), labelled in R0 units
+validation_x_breaks <- if(validation_input$extended) c(1.03,1.1,1.3,2,4,10,30,100) else
+  c(1.03,1.05,1.1,1.2,1.5,2,3,6)
 
 sim_plot <- copy(sim)
 sim_plot[, `:=`(estimate_display = clip_prob(P_unconditional),
@@ -63,24 +63,24 @@ nonfizzle <- unique(curve_grid[, .(R0, K)])
 nonfizzle[, probability := 1 - 1/R0]
 fig1 <- ggplot() +
   geom_line(data = nonfizzle,
-            aes(R0 - 1, qlogis(clip_prob(probability)), linetype = 'Non-fizzle'),
+            aes(R0, qlogis(clip_prob(probability)), linetype = 'Non-fizzle'),
             colour = 'grey35', linewidth = .65) +
   scale_linetype_manual(values = c('Non-fizzle' = 'dashed'), name = NULL) +
   geom_line(data = curve_plot,
-            aes(R0 - 1, qlogis(prediction_display), colour = theta_label),
+            aes(R0, qlogis(prediction_display), colour = theta_label),
             linewidth = .9) +
   geom_errorbar(data = sim_plot,
-                aes(R0 - 1, ymin = qlogis(low_display), ymax = qlogis(high_display),
+                aes(R0, ymin = qlogis(low_display), ymax = qlogis(high_display),
                     colour = theta_label),
                 width = 0, linewidth = .35, alpha = .75) +
   geom_point(data = sim_plot,
-             aes(R0 - 1, qlogis(estimate_display), colour = theta_label),
+             aes(R0, qlogis(estimate_display), colour = theta_label),
              shape = 16, size = 1.8, stroke = .45) +
   facet_wrap(~K, ncol = 2,
              labeller = as_labeller(function(x)
                paste0('italic(K) == 10^', round(log10(as.numeric(x)))),
                default = label_parsed)) +
-  scale_x_log10(breaks = validation_x_breaks, labels = validation_x_labels) +
+  scale_x_log10_shifted(breaks = validation_x_breaks) +
   scale_y_continuous(breaks = qlogis(prob_breaks),
                      labels = format(prob_breaks, trim = TRUE),
                      limits = qlogis(c(.001, .999)),

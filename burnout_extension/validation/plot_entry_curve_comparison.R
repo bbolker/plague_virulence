@@ -1,5 +1,6 @@
 # Original fixed Fig. 1 grid and all its stochastic points; no simulation reruns.
 source('validation/R/theory.R')
+source(here::here('graphics_utils.R'))
 source('validation/R/kendall.R')
 source('validation/R/ode_reference.R')
 source('validation/R/validation_plot_data.R')
@@ -67,13 +68,13 @@ base<-theme_bw(base_size=11)+theme(panel.grid.minor=element_blank(),
  panel.grid.major=element_line(colour='grey90',linewidth=.25),
  strip.background=element_rect(fill='grey94'),legend.position='bottom',
  plot.caption=element_text(hjust=0,size=8.5),legend.box='vertical',axis.title.x=element_text(family=if(capabilities('aqua'))'STIX' else 'serif'))
-axes<-list(scale_x_log10(breaks=c(.03,.1,.3,1,3,5),labels=c('0.03','0.1','0.3','1','3','5')),
+axes<-list(scale_x_log10_shifted(breaks=c(1.03,1.1,1.3,2,4,6)),
  scale_y_continuous(breaks=qlogis(breaks),labels=format(breaks,trim=TRUE),limits=qlogis(c(.001,.999))),
- labs(x=bquote(.(intToUtf8(0x211B))[0]-1~'(log scale)'),y='Conditional persistence probability'))
-p<-ggplot()+geom_line(data=long[is.finite(yp)],aes(R0-1,yp,colour=theta_label,linetype=method,
+ labs(x=bquote(.(intToUtf8(0x211B))[0]),y='Conditional persistence probability'))
+p<-ggplot()+geom_line(data=long[is.finite(yp)],aes(R0,yp,colour=theta_label,linetype=method,
  group=interaction(theta,method,segment)),linewidth=.72)+
- geom_errorbar(data=sim,aes(R0-1,ymin=lo,ymax=hi,colour=theta_label),width=0,linewidth=.3,alpha=.65)+
- geom_point(data=sim,aes(R0-1,yp,colour=theta_label),shape=16,size=1.65)+
+ geom_errorbar(data=sim,aes(R0,ymin=lo,ymax=hi,colour=theta_label),width=0,linewidth=.3,alpha=.65)+
+ geom_point(data=sim,aes(R0,yp,colour=theta_label),shape=16,size=1.65)+
  facet_wrap(~K,ncol=2,labeller=as_labeller(function(x)paste0('italic(K)==10^',round(log10(as.numeric(x)))),default=label_parsed))+
  scale_colour_manual(values=pal,name=expression(theta))+
  scale_linetype_manual(values=c('BI'='solid','First-order entry + Kendall'='dashed','Second-order entry + Kendall'='dotdash'),name=NULL)+
@@ -84,10 +85,10 @@ for(d in c('long','sim')){
  z<-get(d);z[,theta_facet:=factor(sprintf('theta==%g',theta),levels=sprintf('theta==%g',seq(0,1,.25)))];
  z[,K_facet:=factor(sprintf('K==10^%d',round(log10(K))),levels=sprintf('K==10^%d',6:9))];assign(d,z)
 }
-pdetail<-ggplot()+geom_line(data=long[is.finite(yp)],aes(R0-1,yp,colour=method,linetype=method,
+pdetail<-ggplot()+geom_line(data=long[is.finite(yp)],aes(R0,yp,colour=method,linetype=method,
  group=interaction(method,segment)),linewidth=.65)+
- geom_errorbar(data=sim,aes(R0-1,ymin=lo,ymax=hi),width=0,linewidth=.25,alpha=.5)+
- geom_point(data=sim,aes(R0-1,yp),colour='black',shape=16,size=1.1)+
+ geom_errorbar(data=sim,aes(R0,ymin=lo,ymax=hi),width=0,linewidth=.25,alpha=.5)+
+ geom_point(data=sim,aes(R0,yp),colour='black',shape=16,size=1.1)+
  facet_grid(theta_facet~K_facet,labeller=label_parsed)+
  scale_colour_manual(values=method_pal,name=NULL)+
  scale_linetype_manual(values=c('BI'='solid','First-order entry + Kendall'='dashed','Second-order entry + Kendall'='dotdash'),name=NULL)+axes+base+
@@ -104,7 +105,7 @@ save_plot(pdetail,'entry_curve_comparison_by_theta',11.5,10)
 cat('DONE: curve comparison previews\n')
 if ('--paper-export' %in% commandArgs(trailingOnly=TRUE)) {
  paper_plot<-pdetail+labs(caption=NULL)+
-  scale_x_log10(breaks=c(.03,.1,.3,1,3),labels=c('0.03','0.1','0.3','1','3'))+
+  scale_x_log10_shifted(breaks=c(1.03,1.1,1.3,2,4))+
   scale_y_continuous(breaks=qlogis(c(.001,.01,.05,.5,.95,.99,.999)),
    labels=c('0.001','0.010','0.050','0.500','0.950','0.990','0.999'),
    limits=qlogis(c(.001,.999)))+

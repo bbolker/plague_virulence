@@ -41,18 +41,26 @@ trans_log10_shifted <- function(offset = 1) {
     inverse   = function(x) offset + 10^x)
 }
 
-scale_x_log10_shifted <- function(offset = 1, n = 10, ...) {
+## `breaks` (in original units) overrides the automatic choice, e.g.
+## breaks = c(1.03, 1.1, 1.3, 2, 4, 10, 30, 100)
+shifted_log_breaks <- function(offset = 1, n = 10) {
+  function(lims) offset + axisTicks(log10(range(lims) - offset), log = TRUE, n = n)
+}
+
+scale_x_log10_shifted <- function(offset = 1, n = 10,
+                                  breaks = shifted_log_breaks(offset, n), ...) {
   ggplot2::scale_x_continuous(
     trans = trans_log10_shifted(offset),
-    breaks = function(lims) offset + axisTicks(log10(range(lims) - offset), log = TRUE, n = n),
+    breaks = breaks,
     labels = function(b) format(b, trim = TRUE, drop0trailing = TRUE),
     ...)
 }
 
-scale_y_log10_shifted <- function(offset = 1, n = 10, ...) {
+scale_y_log10_shifted <- function(offset = 1, n = 10,
+                                  breaks = shifted_log_breaks(offset, n), ...) {
   ggplot2::scale_y_continuous(
     trans = trans_log10_shifted(offset),
-    breaks = function(lims) offset + axisTicks(log10(range(lims) - offset), log = TRUE, n = n),
+    breaks = breaks,
     labels = function(b) format(b, trim = TRUE, drop0trailing = TRUE),
     ...)
 }

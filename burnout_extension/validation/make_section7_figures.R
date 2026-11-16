@@ -1,4 +1,5 @@
 source('validation/R/theory.R')
+source(here::here('graphics_utils.R'))
 source('validation/R/kendall.R')
 source('validation/R/extrema.R')
 
@@ -151,12 +152,12 @@ land_dlogrho <- min(diff(log(sort(unique(conditional$rho)))))
 # raster on the log axes. Quartz PDF output inverts rasters, so the macOS
 # branch draws vector cells instead.
 landscape_cells <- if (capabilities('aqua')) {
-  geom_rect(aes(xmin = pmax(.05, (R0 - 1) * exp(-land_dlogR / 2)),
-                xmax = pmin(31, (R0 - 1) * exp(land_dlogR / 2)),
+  geom_rect(aes(xmin = 1 + pmax(.05, (R0 - 1) * exp(-land_dlogR / 2)),
+                xmax = 1 + pmin(31, (R0 - 1) * exp(land_dlogR / 2)),
                 ymin = rho * exp(-land_dlogrho / 2),
                 ymax = rho * exp(land_dlogrho / 2)))
 } else {
-  geom_raster(aes(R0 - 1, rho), interpolate = FALSE)
+  geom_raster(aes(R0, rho), interpolate = FALSE)
 }
 fig2 <- ggplot(conditional, aes(fill = probability_display)) +
   landscape_cells +
@@ -164,15 +165,13 @@ fig2 <- ggplot(conditional, aes(fill = probability_display)) +
   scale_y_log10(breaks = c(.001, .002, .005, .01, .02, .05),
                 labels = c('0.001', '0.002', '0.005', '0.01', '0.02', '0.05'),
                 expand = c(0, 0)) +
-  scale_x_log10(breaks = c(.1, .3, 1, 3, 10, 30),
-                labels = c('0.1', '0.3', '1', '3', '10', '30'),
-                expand = c(0, 0)) +
+  scale_x_log10_shifted(breaks = c(1.1, 1.3, 2, 4, 10, 30), expand = c(0, 0)) +
   scale_fill_viridis_c(option = 'D', limits = c(.001, .999),
                        transform = scales::transform_logit(),
                        breaks = c(.001, .01, .1, .5, .9, .99, .999),
                        labels = c('≤0.001', '0.01', '0.1', '0.5', '0.9', '0.99', '≥0.999'),
                        name = 'Conditional\npersistence\n(logit scale)') +
-  labs(x = bquote(.(intToUtf8(0x211B))[0] - 1 ~ '(log scale)'),
+  labs(x = bquote(.(intToUtf8(0x211B))[0]),
        y = expression(rho)) + theme_paper +
   theme(axis.title.x = element_text(family = 'Cambria Math'),
         axis.title.y = element_text(angle = 0, vjust = .5),
