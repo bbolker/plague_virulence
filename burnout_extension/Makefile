@@ -1,6 +1,7 @@
 R=R CMD BATCH --vanilla
 DATADIR=validation/data
 SIMFILES=$(DATADIR)/stochastic_scan_results.csv $(DATADIR)/stochastic_scan_analytic.csv $(DATADIR)/fig11_scan_analytic.csv
+ALL: paper
 
 .PHONY: paper-figures paper landscape-figures
 

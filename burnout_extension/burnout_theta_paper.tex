@@ -1,5 +1,7 @@
 \documentclass[11pt]{article}
 %% \usepackage[margin=1in]{geometry}
+%% BMB: are all of the LaTeX packages necessary? Minimizing package use
+%%   makes the workflow more robust ...
 \usepackage{amsmath,amssymb,mathtools,bm}
 \usepackage{booktabs}
 \usepackage{microtype}
@@ -169,7 +171,7 @@ Figure~\ref{fig:phaseplane-framework} illustrates the epidemic trajectory and it
 \centering
 \includegraphics[width=\textwidth]{validation/figures/paper/phaseplane_framework.pdf}
 \caption{
-	Phase-plane trajectories of the generalized SIR model on (a) linear and (b) logarithmic infectious-fraction scales. The boundary-layer threshold is \(\yin=\sqrt{y_*/K}\), as defined in \cref{eq:ybl}.\bb{If convenient, change the \Ro\ style in the figure to match MS.}
+	Phase-plane trajectories of the generalized SIR model on (a) linear and (b) logarithmic infectious-fraction scales. The boundary-layer threshold is \(\yin=\sqrt{y_*/K}\), as defined in \cref{eq:ybl}.\bb{If convenient, change the \Ro\ style in the figure to match MS; in particular, try the {\tt tikzDevice} package. We might not need the grid lines? (Given this paper is going to be read by a highly technical audience, maybe we don't even need the linear view (left panel)?)}
 }
 \label{fig:phaseplane-framework}
 \end{figure}
@@ -209,7 +211,7 @@ To determine \(Y_1(x)\), we substitute the trajectory expansion into the exact p
 \frac{(\Rzero x-1)y}{\rhoeps\hth(x)-\Rzero xy}.
 \label{eq:phaseplane}
 \end{equation}
-We first construct the trajectory expansion in the original variables \(x\) and \(y\). This is called the outer expansion: it describes the epidemic trajectory away from regions where the expansion ceases to be valid and a rescaling of the variables is needed. We will identify and treat these regions below.
+We first construct the trajectory expansion in the original variables \(x\) and \(y\). This is called the \emph{outer expansion}: it describes the epidemic trajectory away from regions where the expansion ceases to be valid and a rescaling of the variables is needed. We will identify and treat these regions below.
 To derive the correction equation, we first rewrite \cref{eq:phaseplane} as
 \[
 \bigl[\rhoeps\hth(x)-\Rzero xy\bigr]y'=(\Rzero x-1)y,
@@ -429,7 +431,7 @@ y=\rhoeps v,
 x=\xf+\rhoeps u_1(v)+O(\rhoeps^2).
 \label{eq:corner}
 \end{equation}
-These variables describe the corner layer near the turn in the susceptible trajectory, following Parsons and Earn \cite{ParsonsEarn2024}.
+These variables describe the corner layer near the turn in the susceptible trajectory, following Parsons and Earn \cite{ParsonsEarn2024} \bb{would it be possible to annotate this region in Figure 1 ... ?}.
 We now substitute \cref{eq:corner} into \cref{eq:inverse-phaseplane} to determine \(u_1(v)\). With \(\rhoeps\) held fixed, differentiation with respect to \(v\) gives
 \[
 \frac{\dd y}{\dd v}=\rhoeps,
@@ -532,7 +534,7 @@ x\approx\xf+\rhoeps aL+by.
 We now estimate the burnout probability starting from the state \((\xin,\yin)\) at entry into the boundary layer.
 
 \subsection{The birth--death process and Kendall's formula}
-We take \(\tau=0\) at entry into the boundary layer, with susceptible fraction \(\xin\) and \(m=K\yin\) infectious individuals. In the boundary layer, we neglect susceptible loss through infection, \(\Rzero xy\), relative to recruitment, \(\rhoeps\hth(x)\), as specified in \cref{eq:low-prevalence-loss-condition}. We therefore approximate susceptible recovery by the solution of
+We take \(\tau=0\) at entry into the boundary layer, with susceptible fraction \(\xin\) and \(m=K\yin\) infectious individuals. In the boundary layer, we neglect susceptible loss through infection, \(\Rzero xy\), relative to recruitment, \(\rhoeps\hth(x)\), as specified in \cref{eq:low-prevalence-loss-condition}. \bb{In general might be useful to note where we are following Parsons et al. (and where we are diverging) \ldots this part is following P\&E except for using a different expression for the demography, right?} We therefore approximate susceptible recovery by the solution of
 \begin{equation}
 \frac{\dd x}{\dd\tau}=\rhoeps\hth(x),\qquad x(0)=\xin.
 \label{eq:branching-background}
@@ -566,7 +568,7 @@ Using the susceptible recovery equation \cref{eq:branching-background} and the i
 \approx\frac{\Rzero x-1}{\rhoeps\hth(x)}.
 \label{eq:logy-versus-x}
 \end{equation}
-We define the action function \(\Ath(x)\) by
+We define the \emph{action function} \bb{is it worth commenting on this name? I recall Todd explained where this comes from/connects to, but I've forgotten ...} \(\Ath(x)\) by
 \begin{equation}
 \Ath'(x)=\frac{1-\Rzero x}{\hth(x)}
 =\frac{1-\Rzero x}{(1-x)x^\theta}.
@@ -631,6 +633,7 @@ up to additive constants.
 
 \subsection{Burnout and persistence probabilities}
 In the birth--death approximation, the susceptible fraction \(x(\tau)\) is prescribed deterministically, and infectious individuals produce new infections and are removed independently at the per-capita rates in \cref{eq:branching-rates}. The \(m=K\yin\) infectious individuals present at boundary-layer entry therefore generate independent lineages. Burnout occurs if all these lineages become extinct, giving
+\bb{note that the 'est' subscript refers to establishment? (set up some TeX macros for these subscripts?)}
 \begin{equation}
 P_{\rm burn\mid est}\approx q_1^{\,m}
 =\left[\frac{\mathcal{I}(\xin)}{1+\mathcal{I}(\xin)}\right]^{K\yin}.
@@ -880,17 +883,20 @@ y_{\min}\approx\Cth e^{-\dAf/\rhoeps}.
 
 \section{Numerical validation and the effect of recruitment shape}
 \label{sec:numerics}
-We use the BI approximation for the results below because it gives the best overall agreement with simulations on the comparison grid and covers a broader parameter range than the first- and second-order entry approximations (Appendix~\ref{app:approximation-comparison}).
+We use the boundary-independent (BI) approximation for the results below because it gives the best overall agreement with simulations on the comparison grid and covers a broader parameter range than the first- and second-order entry approximations (Appendix~\ref{app:approximation-comparison}).
 
-We first compare the analytical predictions with stochastic simulations, then examine the sources of approximation error. Next, we investigate the effect of the recruitment law on persistence. To validate the predicted conditional persistence probabilities, we compared the boundary-layer-independent prediction \cref{eq:PBI} with adaptive tau-leap simulations of the full stochastic epidemic.
+We first compare the analytical predictions with stochastic simulations, then examine the sources of approximation error. Next, we investigate the effect of the recruitment law on persistence. To validate the predicted conditional persistence probabilities, we compared the boundary-layer-independent prediction \cref{eq:PBI} with adaptive tau-leap simulations \bb{ref? something general for adaptive tau-leaping algorithm, plus a reference (maybe elsewhere if you go into more technical details later?) to the R package: use \texttt{citation("adaptivetau")} to get the correct/preferred reference} of the full stochastic epidemic.
 
 \subsection{Stochastic validation across transmission and population size}
-Figure~\ref{fig:main-persistence} shows the conditional persistence probability as a function of \(\Rzero\) at \(\rhoeps=0.01\), for \(10^6\leq K\leq10^9\). The boundary-layer-independent approximation agrees closely with the stochastic simulation results over much of the tested range, but substantial discrepancies occur at high \(\Rzero\) for some combinations of \(\theta\) and \(K\).
+Figure~\ref{fig:main-persistence} shows the conditional persistence probability as a function of \(\Rzero\) at \(\rhoeps=0.01\), for \(10^6\leq K\leq10^9\).
+\bb{weren't we also looking at lower values of $K$ in previous iterations? They might be relevant for the plague metapop stuff \ldots this isn't really necessary, though, especially if there's nothing qualitatively new/interesting for lower $K$}
+The boundary-layer-independent approximation agrees closely with the stochastic simulation results over much of the tested range, but substantial discrepancies occur at high \(\Rzero\) for some combinations of \(\theta\) and \(K\). \bb{were there also low-$K$ deviations for lower $K$ values?}
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{validation/figures/paper/main_persistence_validation.pdf}
-\caption{Conditional persistence after epidemic establishment at \(\rhoeps=0.01\). Curves show the boundary-layer-independent prediction \cref{eq:PBI}; points show stochastic simulation estimates, with vertical bars indicating 95\% Wilson intervals. The adaptive tau-leap scan used at least 10,000 attempted epidemics per parameter combination.}
+\caption{Conditional persistence after epidemic establishment at \(\rhoeps=0.01\). Curves show the boundary-layer-independent prediction \cref{eq:PBI}; points show stochastic simulation estimates, with vertical bars indicating 95\% Wilson intervals. The adaptive tau-leap scan used at least 10,000 attempted epidemics per parameter combination. \bb{maybe sparser y-axis ticks/grid-lines?}
+}
 \label{fig:main-persistence}
 \end{figure}
 
@@ -917,10 +923,9 @@ Table~\ref{tab:high-R-discrepancy} illustrates this discrepancy at \(\rhoeps=0.0
 \label{tab:high-R-discrepancy}
 \end{table}
 
-In the groups with larger discrepancies, a substantial fraction of established epidemic trajectories reached \(S=0\). Note that for \(\theta>0\), recruitment depends on the presence of susceptible hosts. Once susceptibles are depleted to zero, host replenishment stops and no further infections can occur, leading to extinction. But our approximation treats susceptible numbers deterministically and does not capture this route to extinction, so it can overestimate the persistence probability.
+In the groups with larger discrepancies, a substantial fraction of established epidemic trajectories reached \(S=0\). Note that for \(\theta>0\), recruitment depends on the presence of susceptible hosts. Once susceptibles are depleted to zero, host replenishment stops and no further infections can occur, leading to extinction. But \bb{Because?} our approximation treats susceptible numbers deterministically and does not capture this route to extinction, so it can overestimate the persistence probability.
 
-
-
+\bb{funny that we have problems for $\theta \approx 0$ (technically $\ll 1$) but not for $\theta=0$ --- I guess this means there's a weird limit? (i.e. very small $\theta$ is bad but if we go all the way to the $\theta=0$ limit we're OK because we implicitly have an infinite replenishment rate?) Possibly worth commenting on in slightly more detail?}
 
 % BEGIN deferred Section 7.2 content
 %
@@ -964,8 +969,8 @@ To examine conditional persistence across different recruitment rates, we plot i
 \begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{validation/figures/paper/conditional_persistence_landscape.pdf}
-\caption{Boundary-layer-independent conditional persistence as a function of the basic reproduction number \(\Rzero\) and recruitment rate \(\rhoeps\). Columns show recruitment shape \(\theta=0,0.25,0.5,0.75,1\), and rows show carrying capacity \(K=10^6\) and \(10^9\). \bb{consider using scale\_y\_continuous expand argument to get rid of whitespace within frames; use geom\_raster instead of geom\_tile}
-}
+\caption{Boundary-layer-independent conditional persistence as a function of the basic reproduction number \(\Rzero\) and recruitment rate \(\rhoeps\). Columns show recruitment shape \(\theta=0,0.25,0.5,0.75,1\), and rows show carrying capacity \(K=10^6\) and \(10^9\).
+} % caption
 \label{fig:conditional-landscape}
 \end{figure}
 
@@ -984,7 +989,7 @@ Figure~\ref{fig:unconditional-landscape} presents unconditional persistence acro
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=\textwidth]{validation/figures/paper/unconditional_persistence_landscape.pdf}
-\caption{Boundary-layer-independent unconditional persistence as a function of the basic reproduction number \(\Rzero\) and recruitment rate \(\rhoeps\). Columns show recruitment shape \(\theta=0,0.25,0.5,0.75,1\), and rows show carrying capacity \(K=10^6\) and \(10^9\). Colors show probability on a logarithmic scale, with values at or below \(10^{-6}\) shown at the lower color limit. White dashed and solid lines mark local maxima and minima, respectively, with respect to \(\Rzero\).}
+\caption{Boundary-layer-independent unconditional persistence as a function of the basic reproduction number \(\Rzero\) and recruitment rate \(\rhoeps\). Columns show recruitment shape \(\theta=0,0.25,0.5,0.75,1\), and rows show carrying capacity \(K=10^6\) and \(10^9\). Colors show probability on a logarithmic scale, with values at or below \(10^{-6}\) shown at the lower color limit. Grey dashed and solid lines mark local maxima and minima, respectively, with respect to \(\Rzero\).}
 \label{fig:unconditional-landscape}
 \end{figure}
 
