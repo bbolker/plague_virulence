@@ -9,7 +9,7 @@ current: target
 vim_session:
 	bash -ic "vi extras.mk target.mk Makefile"
 
-Sources += $(wildcard *.MK) Makefile .gitignore
+Sources = Makefile .gitignore $(wildcard *.MK)
 Ignore += extras.mk 
 
 ######################################################################
