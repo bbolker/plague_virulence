@@ -87,7 +87,7 @@ The paper is organized as follows. Section~\ref{sec:model} introduces the genera
 \label{sec:model}
 \subsection{Model and parameter regime}
 
-\jd{Is it too late to change $\delta$ into a more standard $\gamma$?}
+\jd{We don't need $\delta$; just use $\gamma+\mu$ until you rescale.}
 We consider an SIR-type model with susceptible population \(S(t)\) and infectious population \(I(t)\):
 \begin{align}
 \frac{\dd S}{\dd t} &= g_\theta(S)-\beta\frac{SI}{K},\label{eq:dimensional-models}\\
@@ -153,7 +153,7 @@ Within the boundary layer, we describe infection by a time-inhomogeneous birth--
 For this low-prevalence approximation, we use \(y\ll y_*\).
 \jd{Can this s.~be clarified?}
 
-We choose a boundary-layer threshold \(\yin\) where both \jd{use equation numbers} descriptions apply. It must therefore satisfy
+We choose a boundary-layer threshold \(\yin\) where both descriptions apply. It must therefore satisfy
 \begin{equation}
 K^{-1}\ll\yin\ll y_*,
 \label{eq:matching-overlap}
@@ -535,8 +535,6 @@ x\approx\xf+\rhoeps aL+by.
 \section{Burnout probability from the boundary-layer entry state}
 \label{sec:action}
 We now estimate the burnout probability starting from the state \((\xin,\yin)\) at entry into the boundary layer.
-
-\jd{We should talk a bit about organization soon. I am not understanding everything about the argument, but I was surprised to find the Kendall argument here before the BL-independent stuff in the next section. What are the arguments for doing it this way vs.\ reversing it?}
 
 \subsection{The birth--death process and Kendall's formula}
 We take \(\tau=0\) at entry into the boundary layer, with susceptible fraction \(\xin\) and \(m=K\yin\) infectious individuals. In the boundary layer, we neglect susceptible loss through infection, \(\Rzero xy\), relative to recruitment, \(\rhoeps\hth(x)\), as specified in \cref{eq:low-prevalence-loss-condition}. \bb{In general might be useful to note where we are following Parsons et al. (and where we are diverging) \ldots this part is following P\&E except for using a different expression for the demography, right?} We therefore approximate susceptible recovery by the solution of
