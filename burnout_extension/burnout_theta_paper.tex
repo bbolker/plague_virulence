@@ -266,6 +266,7 @@ The singularity is therefore removable, and extending the right-hand side by con
 Y_1'(1)=-\frac1{\Rzero}.
 \label{eq:first-order-endpoint-value}
 \end{equation}
+\bb{maybe remind us that this is a derivative with respect to $x$ (susceptible density), and $x$ will decrease as we move away from the starting point, so this is a positive divergence in the trajectory with time?}
 
 \section{Singular matching near the post-epidemic state}
 \label{sec:matching}
@@ -887,6 +888,7 @@ y_{\min}\approx\Cth e^{-\dAf/\rhoeps}.
 \label{sec:numerics}
 
 \bb{I'm still not 100\% clear on first-order vs second-order vs BI. I probably just need to read this all again ... maybe we can have a little bit more of a road map for why we went to all the work of doing both approximations and then looked at everything with a BI approximation? Is this because the ordered approximations are more elegant/require less numerical computation? Or do the BI results really depend in some way on having derived the first-order results?}
+\bb{(after meeting with JD). I think I understand this a little bit better now. We still use the first-order approximation to get quantities like $x^*$, $y^*$, etc. --- we just don't pick an explicit value for the boundary layer $y$ in terms of these approximated quantities. Right? It would help to spell this out a bit more ...}
 
 We use the boundary-independent (BI) approximation for the results below because it gives the best overall agreement with simulations on the comparison grid and covers a broader parameter range than the first- and second-order entry approximations (Appendix~\ref{app:approximation-comparison}).
 
