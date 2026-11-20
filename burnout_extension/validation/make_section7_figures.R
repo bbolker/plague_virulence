@@ -17,6 +17,59 @@ theta3 <- c(0, .5, 1)
 pal5 <- c('#0072B2', '#56B4E9', '#009E73', '#E69F00', '#D55E00')
 x_label_R0 <- paste0(intToUtf8(0x211B), intToUtf8(0x2080))
 
+## Output backend for the landscape figures: tikz when requested (--tikz
+## argument or FIG_BACKEND=tikz), Quartz on macOS, otherwise cairo PDF.
+## Quartz PDF output inverts rasters, so only the Quartz backend draws the
+## landscapes as vector cells. tikz output must use rasters: thousands of
+## vector cells make LaTeX very slow or exhaust its memory.
+fig_backend <- if ('--tikz' %in% commandArgs(trailingOnly = TRUE) ||
+                   Sys.getenv('FIG_BACKEND') == 'tikz') {
+  'tikz'
+} else if (capabilities('aqua')) 'quartz' else 'cairo'
+use_tikz <- fig_backend == 'tikz'
+## Landscape labels: LaTeX strings under tikz, plotmath otherwise.
+theta_lab <- function(th) {
+  if (use_tikz) sprintf('$\\theta = %g$', th) else sprintf('theta == %g', th)
+}
+K_lab <- function(K) {
+  e <- round(log10(K))
+  if (use_tikz) sprintf('$K = 10^{%d}$', e) else sprintf('K == 10^%d', e)
+}
+landscape_labeller <- if (use_tikz) label_value else label_parsed
+landscape_xlab <- if (use_tikz) '$\\mathcal{R}_0$' else bquote(.(intToUtf8(0x211B))[0])
+landscape_ylab <- if (use_tikz) '$\\rho$' else expression(rho)
+## Write a landscape figure to out_dir/<name>.{pdf,tex} with the chosen backend.
+save_landscape <- function(p, name, width = 10.5, height = 4.65) {
+  switch(fig_backend,
+    tikz = {
+      tex_file <- file.path(out_dir, paste0(name, '.tex'))
+      tikzDevice::tikz(tex_file, width = width, height = height)
+      print(p + theme(axis.title.x = element_text(family = '')))
+      dev.off()
+      ## tikzDevice refers to its raster PNGs by bare file name, and \pgfimage
+      ## ignores \graphicspath, so prefix the path relative to the directory
+      ## the paper is compiled from (the same one these scripts run from).
+      tex <- readLines(tex_file)
+      writeLines(gsub(paste0('{', name, '_ras'),
+                      paste0('{', out_dir, '/', name, '_ras'), tex, fixed = TRUE),
+                 tex_file)
+    },
+    quartz = {
+      quartzFonts(STIX = quartzFont(c('STIXGeneral-Regular', 'STIXGeneral-Bold',
+                                     'STIXGeneral-Italic', 'STIXGeneral-BoldItalic')))
+      ## Vector cells need a continuous gradient in the colour bar, too.
+      p <- p + guides(fill = guide_colourbar(display = 'gradient', order = 1)) +
+        theme(axis.title.x = element_text(family = 'STIX'))
+      quartz(file = file.path(out_dir, paste0(name, '.pdf')),
+             type = 'pdf', width = width, height = height)
+      print(p)
+      dev.off()
+    },
+    cairo = ggsave(file.path(out_dir, paste0(name, '.pdf')), p,
+                   width = width, height = height, device = cairo_pdf))
+  invisible(NULL)
+}
+
 theme_paper <- theme_bw(base_size = 9.5) +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_line(linewidth = .22, colour = 'grey88'),
@@ -142,16 +195,15 @@ if (is.null(conditional)) {
   fwrite(conditional, conditional_cache)
 }
 conditional[, `:=`(
-  theta_label = factor(sprintf('theta == %g', theta), levels = sprintf('theta == %g', theta5)),
-  K_label = factor(sprintf('K == 10^%d', round(log10(K))),
-                   levels = sprintf('K == 10^%d', c(6, 9))),
+  theta_label = factor(theta_lab(theta), levels = theta_lab(theta5)),
+  K_label = factor(K_lab(K), levels = K_lab(c(1e6, 1e9))),
   probability_display = pmin(.999, pmax(.001, P_conditional)))]
 land_dlogR <- min(diff(log(sort(unique(conditional$R0))-1)))
 land_dlogrho <- min(diff(log(sort(unique(conditional$rho)))))
 # The grid is evenly spaced in log(R0 - 1) and log(rho), so it is a regular
-# raster on the log axes. Quartz PDF output inverts rasters, so the macOS
-# branch draws vector cells instead.
-landscape_cells <- if (capabilities('aqua')) {
+# raster on the log axes. Quartz PDF output inverts rasters, so the Quartz
+# backend draws vector cells instead.
+landscape_cells <- if (fig_backend == 'quartz') {
   geom_rect(aes(xmin = 1 + pmax(.05, (R0 - 1) * exp(-land_dlogR / 2)),
                 xmax = 1 + pmin(31, (R0 - 1) * exp(land_dlogR / 2)),
                 ymin = rho * exp(-land_dlogrho / 2),
@@ -161,7 +213,7 @@ landscape_cells <- if (capabilities('aqua')) {
 }
 fig2 <- ggplot(conditional, aes(fill = probability_display)) +
   landscape_cells +
-  facet_grid(K_label ~ theta_label, labeller = label_parsed) +
+  facet_grid(K_label ~ theta_label, labeller = landscape_labeller) +
   scale_y_log10(breaks = c(.001, .002, .005, .01, .02, .05),
                 labels = c('0.001', '0.002', '0.005', '0.01', '0.02', '0.05'),
                 expand = c(0, 0)) +
@@ -169,28 +221,16 @@ fig2 <- ggplot(conditional, aes(fill = probability_display)) +
   scale_fill_viridis_c(option = 'D', limits = c(.001, .999),
                        transform = scales::transform_logit(),
                        breaks = c(.001, .01, .1, .5, .9, .99, .999),
-                       labels = c('≤0.001', '0.01', '0.1', '0.5', '0.9', '0.99', '≥0.999'),
+                       labels = c(if (use_tikz) '$\\le 0.001$' else '≤0.001',
+                                  '0.01', '0.1', '0.5', '0.9', '0.99',
+                                  if (use_tikz) '$\\ge 0.999$' else '≥0.999'),
                        name = 'Conditional\npersistence\n(logit scale)') +
-  labs(x = bquote(.(intToUtf8(0x211B))[0]),
-       y = expression(rho)) + theme_paper +
+  labs(x = landscape_xlab, y = landscape_ylab) + theme_paper +
   theme(axis.title.x = element_text(family = 'Cambria Math'),
         axis.title.y = element_text(angle = 0, vjust = .5),
         strip.text.y.right = element_text(angle = 0),
         legend.position = 'right', panel.spacing = unit(.45, 'lines'))
-if (capabilities('aqua')) {
-  quartzFonts(STIX = quartzFont(c('STIXGeneral-Regular', 'STIXGeneral-Bold',
-                                 'STIXGeneral-Italic', 'STIXGeneral-BoldItalic')))
-  # Use vector cells and a continuous gradient to avoid inverted Quartz rasters.
-  fig2 <- fig2 + guides(fill = guide_colourbar(display = 'gradient')) +
-    theme(axis.title.x = element_text(family = 'STIX'))
-  quartz(file = file.path(out_dir, 'conditional_persistence_landscape.pdf'),
-         type = 'pdf', width = 10.5, height = 4.65)
-  print(fig2)
-  dev.off()
-} else {
-  ggsave(file.path(out_dir, 'conditional_persistence_landscape.pdf'), fig2,
-         width = 10.5, height = 4.65, device = cairo_pdf)
-}
+save_landscape(fig2, 'conditional_persistence_landscape')
 
 if ('--conditional-landscape-only' %in% commandArgs(trailingOnly = TRUE)) quit(save='no', status=0)
 
