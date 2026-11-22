@@ -1,5 +1,11 @@
 # To do
 
+## newest (22 November 2026)
+
+* finish the burnout-extension paper! finalize the version for YZ's thesis, then work on any changes we want for submission (motivation from plague virulence problems, wordsmithing, anything required for journal formats). Bull Math Biol? 
+* Note (from King et al 2009 _Am Nat_): Keeling (2000) examined the mathematical underpinnings of the invasion-persistence trade-off in infinite metapopulations. He showed that, in competition between a highly transmissible but extinction-prone strain and a strain that is less prone to extinction but is also less transmissible, evolution may favor either strain, depending on within-patch relative competitive ability, patch-level relative extinction rate, and degree of stochasticity (itself related to patch size).  (The citation is: Keeling, M. 2000. Evolutionary trade-offs at two time-scales: competition versus persistence. Proceedings of the Royal Society B: Biological Sciences 267:385–391.)
+* investigation of Keeling-Gilligan parameters, model structures is here: https://github.com/bbolker/plague_kg_comp
+
 ## newer (3 November 2026)
 
 * getting invasion of high-R0 resident by low-R0 invader is hard, in the ranges where the resident can persist at intermediate metapopulation occupancy
