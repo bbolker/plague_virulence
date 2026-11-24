@@ -6,6 +6,10 @@ bibliography: virulence.bib
 
 <!-- don't edit the .md file directly! make it from README.qmd -->
 
+## New links 2026 November
+
+JD's [old incidence stuff](http://dushoff.github.io/notebook/outputs/incfuns.comb.jax.html), plus [(code only) the new “hazard” approach.](https://github.com/dushoff/notebook/blob/master/incidence.R) JD should fill in more soon.
+
 ## overview
 
 This repo started with a collection of ideas about how to *verbally* explain the evolution of attenuated virulence noted by @sidhuAttenuationVirulenceYersinia2025, to a series of models trying to instantiate and explore those verbal models; conceptually, this builds on @Pars+2024, although we have moved some distance from those analytical models. We started with analytical (patch-occupancy, Levins-style) models that used final-size and burnout equations to model demographic changes and probabilities of extinction with a time step of a single (synchronized!) epidemic "season"; a "2-D" version of this considered only a 2D state space for the metapopulation (proportion of patches infected, average patch population size); the 3-D version tracked proportion infected as well as average pop size for both susceptible and infectious patches) model. We could do more analysis on the 2D (`/fixedns` subdir) than the 3D (`/3d` subdir) model, but these models convinced us that there were at least some plausible parameter ranges (`/parameters`) where a reduced within-patch $R_0$ could lead to higher patch occupancy (these were all single-strain models).
