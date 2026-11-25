@@ -3,14 +3,29 @@
 ## newest (22 November 2026)
 
 * finish the burnout-extension paper! finalize the version for YZ's thesis, then work on any changes we want for submission (motivation from plague virulence problems, wordsmithing, anything required for journal formats). Bull Math Biol? 
+* **incidence functions**:
+   * JD’s [old incidence
+stuff](http://dushoff.github.io/notebook/outputs/incfuns.comb.jax.html),
+plus [(code only) the new “hazard”
+approach.](https://github.com/dushoff/notebook/blob/master/incidence.R)
+   * extend the burnout expressions to allow for alternate incidence functions. We probably *don't* want to write a whole separate paper (that would be many pages long) with all the new derivations; we're more interested in what the qualitative changes are. Compare analytical and computational results ... (gets a little bit annoying because we have yet another parameter dimension to compare across -- maybe restrict to logistic demography?) (K, R0, rho, theta [demography shape], initial conditions ... plus several separate functional forms ("hazard", "power-law", "saturating") + half-maximum parameter. Either completely stochastic or hybrid, i.e. integrate the ODE until the trough, then do the branching-process calculation ... (if we go hybrid, would probably need to do at least some checks ... not obvious whether we should even bother with hybrid ...)
+   * go back to the question about evolution and metapopulations:
+       * 'transition' simulations (see below)
+* read and compare papers by Keeling (2000), Keeling and Gilligan (2000a, 2000b)
+   * functional forms do they use? do they use a difference incidence function?
+   * what parameters do they use?
+
 * Note (from King et al 2009 _Am Nat_): Keeling (2000) examined the mathematical underpinnings of the invasion-persistence trade-off in infinite metapopulations. He showed that, in competition between a highly transmissible but extinction-prone strain and a strain that is less prone to extinction but is also less transmissible, evolution may favor either strain, depending on within-patch relative competitive ability, patch-level relative extinction rate, and degree of stochasticity (itself related to patch size).  (The citation is: Keeling, M. 2000. Evolutionary trade-offs at two time-scales: competition versus persistence. Proceedings of the Royal Society B: Biological Sciences 267:385–391.)
 * investigation of Keeling-Gilligan parameters, model structures is here: https://github.com/bbolker/plague_kg_comp
 
 ## newer (3 November 2026)
 
-* getting invasion of high-R0 resident by low-R0 invader is hard, in the ranges where the resident can persist at intermediate metapopulation occupancy
-* consider a 'transition' run, where we adapt $K$ and $\alpha$ logistically from high values (early-pandemic) to low values (late-pandemic), with a constant mutational input/immigration of lower-R0 strains; can we get a high- to low-R0 strain emergence/transition in this way?
+* getting invasion of high-R0 resident by low-R0 invader is hard, in the ranges where the resident can persist at intermediate metapopulation occupancy: consider a 'transition' run, where we adapt $K$ and $\alpha$ logistically from high values (early-pandemic) to low values (late-pandemic), with a constant mutational input/immigration of lower-R0 strains; can we get a high- to low-R0 strain emergence/transition in this way?
+   * e.g. four-parameter logistic: `alpha = alpha_high + (alpha_high-alpha_low)*(1+exp(-(t-t_center)/scale))`: `alpha_high` is starting value, `alpha_low` is ending value, `t_center` is the middle of the transition, `scale` (years) determines the speed of the transition.  Similarly for `K`.
+   * simulating mutation as a constant 'immigration rate' of the low-virulence strain
+   * a more thorough mutation model (which we probably don't to bother with!!) would keep an entire distribution of virulence values, e.g. compare Park and Bolker HIV virulence paper), essentially a PDE with diffusion in the virulence dimension
 * revisit questions of metapopulation persistence; e.g. Keeling and Gilligan 2000 have a model that purportedly enables metapopulation persistence robustly
+   
    * DJDE thinks the parameters are cherry-picked
 	   * which ones/how?
 	   * how do these parameters compare with the ones that Daniel Park collected for the transmission-modality exploration? (See BMB's `louseplague` repo ...) What happens if we simulate epidemics across samples from DP's priors?
