@@ -8,6 +8,7 @@ library(data.table)
 library(ggplot2)
 sim<-fread('validation/data/direct_entry_comparison_original_grid.csv',integer64='double')
 stopifnot(nrow(sim)==280L)
+sim <- exact_binomial_intervals(sim)
 C_explicit<-function(R0,theta)exp(unname(C_log_derivatives(R0,theta)['logC']))
 rr<-sort(unique(c(1+exp(seq(log(.03),log(5),length.out=80)),sim$R0)))
 keys<-CJ(R0=rr,theta=seq(0,1,.25))
@@ -61,7 +62,9 @@ sim[,theta_label:=factor(theta,levels=seq(0,1,.25))]
 clip<-function(p)pmax(.001,pmin(.999,p))
 long[,yp:=qlogis(clip(prediction))]
 sim[,`:=`(yp=qlogis(clip(P_conditional)),lo=qlogis(clip(cond_low)),hi=qlogis(clip(cond_high)))]
-breaks<-c(.001,.01,.05,.25,.5,.75,.95,.99,.999)
+# First valid sampled point of each finite-threshold approximation.
+starts<-long[method!='BI' & is.finite(prediction),.SD[which.min(R0)],by=.(K,theta,method)]
+breaks<-c(.001,.01,.5,.99,.999)
 pal<-c('#0072B2','#56B4E9','#009E73','#E69F00','#D55E00')
 if(capabilities('aqua')) quartzFonts(STIX=quartzFont(c('STIXGeneral-Regular','STIXGeneral-Bold','STIXGeneral-Italic','STIXGeneral-BoldItalic')))
 base<-theme_bw(base_size=11)+theme(panel.grid.minor=element_blank(),
@@ -70,29 +73,31 @@ base<-theme_bw(base_size=11)+theme(panel.grid.minor=element_blank(),
  plot.caption=element_text(hjust=0,size=8.5),legend.box='vertical',axis.title.x=element_text(family=if(capabilities('aqua'))'STIX' else 'serif'))
 axes<-list(scale_x_log10_shifted(breaks=c(1.03,1.1,1.3,2,4,6)),
  scale_y_continuous(breaks=qlogis(breaks),labels=format(breaks,trim=TRUE),limits=qlogis(c(.001,.999))),
- labs(x=bquote(.(intToUtf8(0x211B))[0]),y='Conditional persistence probability'))
+ labs(x=bquote(.(intToUtf8(0x211B))[0]),y='Conditional persistence probability (logit scale)'))
 p<-ggplot()+geom_line(data=long[is.finite(yp)],aes(R0,yp,colour=theta_label,linetype=method,
  group=interaction(theta,method,segment)),linewidth=.72)+
+ geom_point(data=starts,aes(R0,yp,colour=theta_label),shape=16,size=1.65,show.legend=FALSE)+
  geom_errorbar(data=sim,aes(R0,ymin=lo,ymax=hi,colour=theta_label),width=0,linewidth=.3,alpha=.65)+
  geom_point(data=sim,aes(R0,yp,colour=theta_label),shape=16,size=1.65)+
  facet_wrap(~K,ncol=2,labeller=as_labeller(function(x)paste0('italic(K)==10^',round(log10(as.numeric(x)))),default=label_parsed))+
  scale_colour_manual(values=pal,name=expression(theta))+
  scale_linetype_manual(values=c('BI'='solid','First-order entry + Kendall'='dashed','Second-order entry + Kendall'='dotdash'),name=NULL)+
- axes+base+labs(caption='All 280 original simulation points are retained (rho = 0.01). Curves stop where the ODE has no threshold crossing or the entry estimate is inadmissible.\nPoints: simulations; bars: 95% Wilson intervals. All three predictions are conditional on establishment.')
+ axes+base+labs(caption='All 280 original simulation points are retained (rho = 0.01). Curves stop where the ODE has no threshold crossing or the entry estimate is inadmissible.\nPoints: simulations; bars: 95% exact binomial confidence intervals. All three predictions are conditional on establishment.')
 # A second layout separates theta to make the method differences easy to read.
 method_pal<-c('BI'='#0072B2','First-order entry + Kendall'='#888888','Second-order entry + Kendall'='#D55E00')
-for(d in c('long','sim')){
+for(d in c('long','sim','starts')){
  z<-get(d);z[,theta_facet:=factor(sprintf('theta==%g',theta),levels=sprintf('theta==%g',seq(0,1,.25)))];
  z[,K_facet:=factor(sprintf('K==10^%d',round(log10(K))),levels=sprintf('K==10^%d',6:9))];assign(d,z)
 }
 pdetail<-ggplot()+geom_line(data=long[is.finite(yp)],aes(R0,yp,colour=method,linetype=method,
  group=interaction(method,segment)),linewidth=.65)+
+ geom_point(data=starts,aes(R0,yp,colour=method),shape=16,size=1.1,show.legend=FALSE)+
  geom_errorbar(data=sim,aes(R0,ymin=lo,ymax=hi),width=0,linewidth=.25,alpha=.5)+
  geom_point(data=sim,aes(R0,yp),colour='black',shape=16,size=1.1)+
  facet_grid(theta_facet~K_facet,labeller=label_parsed)+
  scale_colour_manual(values=method_pal,name=NULL)+
  scale_linetype_manual(values=c('BI'='solid','First-order entry + Kendall'='dashed','Second-order entry + Kendall'='dotdash'),name=NULL)+axes+base+
- labs(caption='Same full parameter grid as the four-panel layout. Black points: simulations; bars: 95% Wilson intervals.\nOne theta per row; one carrying capacity per column. No selection by simulation probability or prediction error.')
+ labs(caption='Same full parameter grid as the four-panel layout. Black points: simulations; bars: 95% exact binomial confidence intervals.\nOne theta per row; one carrying capacity per column. No selection by simulation probability or prediction error.')
 out<-'validation/figures/previews';dir.create(out,recursive=TRUE,showWarnings=FALSE)
 save_plot<-function(p,name,w,h){
  if(capabilities('aqua')){
@@ -106,12 +111,14 @@ cat('DONE: curve comparison previews\n')
 if ('--paper-export' %in% commandArgs(trailingOnly=TRUE)) {
  paper_plot<-pdetail+labs(caption=NULL)+
   scale_x_log10_shifted(breaks=c(1.03,1.1,1.3,2,4))+
-  scale_y_continuous(breaks=qlogis(c(.001,.01,.05,.5,.95,.99,.999)),
-   labels=c('0.001','0.010','0.050','0.500','0.950','0.990','0.999'),
+  scale_y_continuous(breaks=qlogis(c(.001,.01,.5,.99,.999)),
+   labels=c('0.001','0.010','0.500','0.990','0.999'),
    limits=qlogis(c(.001,.999)))+
   theme(axis.text=element_text(size=8.5),strip.text=element_text(size=9),legend.text=element_text(size=9))
  paper_file<-'validation/figures/paper/entry_approximation_comparison.pdf'
  if(capabilities('aqua')){
   quartz(file=paper_file,type='pdf',width=7.15,height=8);print(paper_plot);dev.off()
  }else ggsave(paper_file,paper_plot,width=7.15,height=8,device=cairo_pdf)
+ source('validation/R/paper_graphics.R')
+ paper_save_plot(paper_plot, 'entry_approximation_comparison', 6.8, 7.2, appendix=TRUE)
 }

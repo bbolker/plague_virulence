@@ -43,16 +43,11 @@ save_landscape <- function(p, name, width = 10.5, height = 4.65) {
   switch(fig_backend,
     tikz = {
       tex_file <- file.path(out_dir, paste0(name, '.tex'))
-      tikzDevice::tikz(tex_file, width = width, height = height)
+      source('validation/R/paper_graphics.R')
+      paper_tikz_open(tex_file, width, height, pointsize = 10)
       print(p + theme(axis.title.x = element_text(family = '')))
       dev.off()
-      ## tikzDevice refers to its raster PNGs by bare file name, and \pgfimage
-      ## ignores \graphicspath, so prefix the path relative to the directory
-      ## the paper is compiled from (the same one these scripts run from).
-      tex <- readLines(tex_file)
-      writeLines(gsub(paste0('{', name, '_ras'),
-                      paste0('{', out_dir, '/', name, '_ras'), tex, fixed = TRUE),
-                 tex_file)
+      paper_compile(tex_file)
     },
     quartz = {
       quartzFonts(STIX = quartzFont(c('STIXGeneral-Regular', 'STIXGeneral-Bold',
@@ -146,7 +141,7 @@ validation_curves <- rbindlist(lapply(sort(unique(sim_large$K)), function(Kv) {
   z[, K := Kv]; z
 }))
 clip_prob <- function(x, eps = 1e-3) pmin(1 - eps, pmax(eps, x))
-prob_breaks <- c(.001, .01, .05, .25, .5, .75, .95, .99, .999)
+prob_breaks <- c(.001, .01, .5, .99, .999)
 validation_curves[, `:=`(probability_display = clip_prob(P_conditional),
                          theta_label = factor(theta, levels = theta5))]
 sim_large[, `:=`(estimate_display = clip_prob(P_conditional),
@@ -169,7 +164,7 @@ fig1 <- ggplot() +
   scale_colour_manual(values = pal5, name = expression(theta), drop = FALSE) +
   scale_shape_manual(values = c(`0` = 16, `0.5` = 17, `1` = 15),
                      name = expression(theta), na.translate = FALSE) +
-  labs(x = x_label_R0, y = 'Conditional persistence probability') +
+  labs(x = x_label_R0, y = 'Conditional persistence probability (logit scale)') +
   guides(colour = guide_legend(override.aes = list(linewidth = .85, size = 2)),
          shape = 'none') +
   theme_paper + theme(axis.title.x = element_text(family = 'Cambria Math'))
@@ -220,9 +215,9 @@ fig2 <- ggplot(conditional, aes(fill = probability_display)) +
   scale_x_log10_shifted(breaks = c(1.1, 1.3, 2, 4, 10, 30), expand = c(0, 0)) +
   scale_fill_viridis_c(option = 'D', limits = c(.001, .999),
                        transform = scales::transform_logit(),
-                       breaks = c(.001, .01, .1, .5, .9, .99, .999),
+                       breaks = c(.001, .01, .5, .99, .999),
                        labels = c(if (use_tikz) '$\\le 0.001$' else '≤0.001',
-                                  '0.01', '0.1', '0.5', '0.9', '0.99',
+                                  '0.01', '0.5', '0.99',
                                   if (use_tikz) '$\\ge 0.999$' else '≥0.999'),
                        name = 'Conditional\npersistence\n(logit scale)') +
   labs(x = landscape_xlab, y = landscape_ylab) + theme_paper +

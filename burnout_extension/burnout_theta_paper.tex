@@ -38,6 +38,10 @@
 \newcommand{\dAf}{\Delta A_f}
 \newcommand{\dd}{\,\mathrm d}
 \newcommand{\BI}{\mathrm{BI}}
+\newcommand{\est}{\mathrm{est}}
+\newcommand{\burn}{\mathrm{burn}}
+\newcommand{\persist}{\mathrm{persist}}
+\newcommand{\uncond}{\mathrm{uncond}}
 
 \newcommand{\comment}{RENEW the comment command}
 \renewcommand{\comment}[3]{}
@@ -57,7 +61,7 @@
 
 \begin{abstract}
 Epidemic burnout occurs when a pathogen becomes extinct after causing a major epidemic wave, before it can cause a subsequent wave. Parsons et al. approximated the probability of epidemic burnout by matching a deterministic epidemic trajectory to a stochastic branching process at low prevalence. Existing asymptotic burnout theory for the susceptible--infectious--recovered model with vital dynamics assumes linear susceptible replenishment. Motivated by the possibility of density-dependent recruitment, particularly in ecological host populations, we replace the linear term by a family of susceptible recruitment functions that interpolates continuously between linear and logistic replenishment.
-In the limit of slow susceptible recruitment, the leading-order trajectory of the first epidemic wave is unchanged by the recruitment law. The effect of the recruitment function appears instead in the post-wave decline, where differences in replenishment dynamics produce small corrections to the susceptible trajectory that can strongly affect how deeply infection falls before susceptible replenishment permits recovery. We derive first- and second-order asymptotic approximations for this post-epidemic trajectory and for the state at which infection enters the low-prevalence regime. We then use these deterministic approximations as input to Kendall's time-inhomogeneous branching-process calculation to obtain the probability of extinction during the first epidemic trough. Matching the deterministic and stochastic descriptions in their common regime of validity yields a leading-order prediction for the trough depth and burnout probability.
+In the limit of slow susceptible recruitment, the leading-order trajectory of the first epidemic wave is unchanged by the recruitment law. The effect of the recruitment function appears instead in the post-wave decline, when infection prevalence falls after the first epidemic peak. During this phase, differences in replenishment dynamics produce small corrections to the susceptible trajectory that can strongly affect how deeply infection falls before susceptible replenishment permits recovery. We derive first- and second-order asymptotic approximations for this post-epidemic trajectory and for the state at which infection enters the low-prevalence regime. We then use these deterministic approximations as input to Kendall's time-inhomogeneous branching-process calculation to obtain the probability of extinction during the first epidemic trough. Matching the deterministic and stochastic descriptions in their common regime of validity yields a leading-order prediction for the trough depth and burnout probability.
 Comparisons with stochastic simulations show that our approximations are accurate over a biologically reasonable range of parameters. We show that the probability of persistence decreases as susceptible replenishment changes from linear to logistic. However, persistence can depend non-monotonically on the basic reproduction number \(\Rzero\).
 % Deferred pending stochastic validation: However, persistence can depend nonmonotonically on the basic reproduction number \(\Rzero\), and the recruitment function changes both the locations and the number of extrema in this relationship.
  The analysis extends the deterministic--stochastic burnout framework to a broader family of susceptible-recruitment laws and identifies both quantitative and qualitative ways in which recruitment shape modifies survival through the post-wave trough.
@@ -65,7 +69,7 @@ Comparisons with stochastic simulations show that our approximations are accurat
 
 \section{Introduction}
 
-\bb{General notes for figures: (1) larger text (as always); try adjusting \texttt{base\_size} or output size; (2) whenever possible, spell out parameter meaning as well as giving the symbol, e.g. ``replenishment rate ($\rho$)''. (Maybe not needed for carrying capacity, almost certainly not for $\Rzero$.) Definitely consider \texttt{tikzDevice} for final version.}
+
 Large epidemic outbreaks can end in two qualitatively different ways. Infection may persist after the first epidemic wave and recover as susceptible hosts are replenished, or it may disappear while prevalence is still very low. The second outcome is often described as epidemic burnout. Full stochastic simulation can capture both the epidemic wave and the subsequent extinction process, but repeated simulation becomes costly when persistence probabilities must be evaluated across large parameter ranges. A useful approximation is therefore to describe the macroscopic epidemic wave deterministically and treat the low-prevalence phase stochastically.
 
 Parsons and Earn developed uniform asymptotic phase-plane approximations for the SIR model with vital dynamics, and Parsons, Bolker, Dushoff, and Earn subsequently coupled this deterministic structure to a time-inhomogeneous branching-process calculation of first-trough burnout probability \cite{ParsonsEarn2024,ParsonsEtAl2024}. In that setting susceptible replenishment is linear. Here we ask how the same analytical framework changes when susceptible recruitment is density dependent. Standard human-disease SIR models often assume that new susceptible hosts are added at a constant rate and that deaths occur at a constant per-capita rate, giving linear susceptible replenishment. However, when studying epidemics in animal populations, we may need to account for density-dependent host reproduction. Animal populations, such as rodents, often follow a logistic growth pattern. Their growth slows when approaching carrying capacity because food and other resources become limiting. This motivates extending the burnout framework beyond linear susceptible replenishment to include logistic and intermediate recruitment functions.
@@ -75,7 +79,7 @@ To connect linear and logistic susceptible replenishment, we consider the recrui
 g_\theta(S)=r(K-S)\left(\frac{S}{K}\right)^\theta,\qquad 0\leq\theta\leq1.
 \label{eq:dimensional-recruitment}
 \end{equation}
-Here, \(S\) is the number of susceptible hosts, \(r\) is a recruitment-rate parameter, and \(K\) is the reference population size. When \(\theta=0\), recruitment is linear, \(g_0(S)=r(K-S)\). When \(\theta=1\), it takes the logistic form \(g_1(S)=rS(1-S/K)\). This formulation allows us to study how changing the susceptible-recruitment law alters the post-wave trough and the probability of epidemic persistence. \jd{Maybe briefly explain post-wave in main text as well as in Abstract (decline after a big peak?)}
+Here, \(S\) is the number of susceptible hosts, \(r\) is a recruitment-rate parameter, and \(K\) is the reference population size. When \(\theta=0\), recruitment is linear, \(g_0(S)=r(K-S)\). When \(\theta=1\), it takes the logistic form \(g_1(S)=rS(1-S/K)\). This formulation allows us to study how changing the susceptible-recruitment law alters the post-wave trough and the probability of epidemic persistence.
 
 A key simplification is that the leading-order trajectory of the first epidemic wave, obtained by neglecting susceptible recruitment, does not depend on \(\theta\). The effect of the recruitment law appears in the corrections to this trajectory as the epidemic declines toward low prevalence. These corrections determine how deeply infection falls after the first wave and therefore affect the subsequent probability of burnout.
 
@@ -87,17 +91,17 @@ The paper is organized as follows. Section~\ref{sec:model} introduces the genera
 \label{sec:model}
 \subsection{Model and parameter regime}
 
-\jd{We don't need $\delta$; just use $\gamma+\mu$ until you rescale.}
+
 We consider an SIR-type model with susceptible population \(S(t)\) and infectious population \(I(t)\):
 \begin{align}
 \frac{\dd S}{\dd t} &= g_\theta(S)-\beta\frac{SI}{K},\label{eq:dimensional-models}\\
-\frac{\dd I}{\dd t} &= \beta\frac{SI}{K}-\delta I.\label{eq:dimensional-modeli}
+\frac{\dd I}{\dd t} &= \beta\frac{SI}{K}-(\gamma+\mu)I.\label{eq:dimensional-modeli}
 \end{align}
-The recruitment function \(g_\theta\) is defined in \cref{eq:dimensional-recruitment}, \(\beta\) is the transmission coefficient, and \(\delta\) is the infectious removal rate. We assume that \(\beta\) is constant and does not depend on the total host population size. We introduce the dimensionless variables and parameters
+The recruitment function \(g_\theta\) is defined in \cref{eq:dimensional-recruitment}, \(\beta\) is the transmission coefficient, \(\gamma\) is the recovery rate, and \(\mu\) is the infectious death rate, so that \(\gamma+\mu\) is the total infectious removal rate. We assume that \(\beta\) is constant and does not depend on the total host population size. We introduce the dimensionless variables and parameters
 \[
 x=\frac{S}{K},\qquad y=\frac{I}{K},\qquad
-\tau=\delta t,\qquad \rhoeps=\frac{r}{\delta},\qquad
-\Rzero=\frac{\beta}{\delta}.
+\tau=(\gamma+\mu)t,\qquad \rhoeps=\frac{r}{\gamma+\mu},\qquad
+\Rzero=\frac{\beta}{\gamma+\mu}.
 \]
 The model then becomes
 \begin{align}
@@ -145,15 +149,21 @@ Ky\gg1,\qquad\text{or equivalently}\qquad y\gg K^{-1}.
 \label{eq:deterministic-count-condition}
 \end{equation}
 
-Within the boundary layer, we describe infection by a time-inhomogeneous birth--death process while retaining a deterministic susceptible recovery path. We neglect susceptible loss through infection when
+Within the boundary layer, we describe infection by a time-inhomogeneous birth--death process while retaining a deterministic susceptible recovery path. When \(y\ll y_*\), since \((1-x)x^{\theta-1}\) decreases with \(x\) for \(0\le\theta\le1\), we have
 \begin{equation}
-\Rzero xy\ll\rhoeps\hth(x).
+y\ll y_*=\frac{\rhoeps\hth(\xs)}{\Rzero\xs}
+\le\frac{\rhoeps\hth(x)}{\Rzero x},
+\qquad 0<x\le\xs.
+\label{eq:low-prevalence-scale-bound}
+\end{equation}
+Therefore,
+\begin{equation}
+\Rzero xy\ll\rhoeps\hth(x),
 \label{eq:low-prevalence-loss-condition}
 \end{equation}
-For this low-prevalence approximation, we use \(y\ll y_*\).
-\jd{Can this s.~be clarified?}
+so we can neglect susceptible loss through infection when approximating susceptible recovery up to the infectious trough.
 
-We choose a boundary-layer threshold \(\yin\) where both descriptions apply. It must therefore satisfy
+We choose a boundary-layer threshold \(\yin\) where both \cref{eq:deterministic-count-condition} and \cref{eq:low-prevalence-scale-bound} hold, so that both the deterministic and birth--death approximations apply. It must therefore satisfy
 \begin{equation}
 K^{-1}\ll\yin\ll y_*,
 \label{eq:matching-overlap}
@@ -173,7 +183,7 @@ Figure~\ref{fig:phaseplane-framework} illustrates the epidemic trajectory and it
 \centering
 \includegraphics[width=\textwidth]{validation/figures/paper/phaseplane_framework.pdf}
 \caption{
-	Phase-plane trajectories of the generalized SIR model on (a) linear and (b) logarithmic infectious-fraction scales. The boundary-layer threshold is \(\yin=\sqrt{y_*/K}\), as defined in \cref{eq:ybl}.\bb{If convenient, change the \Ro\ style in the figure to match MS; in particular, try the {\tt tikzDevice} package. We might not need the grid lines? (Given this paper is going to be read by a highly technical audience, maybe we don't even need the linear view (left panel)?)}
+	Phase-plane trajectories of the generalized SIR model on (a) linear and (b) logarithmic infectious-fraction scales. The boundary-layer threshold is \(\yin=\sqrt{y_*/K}\), as defined in \cref{eq:ybl}.
 }
 \label{fig:phaseplane-framework}
 \end{figure}
@@ -268,7 +278,7 @@ The singularity is therefore removable, and extending the right-hand side by con
 Y_1'(1)=-\frac1{\Rzero}.
 \label{eq:first-order-endpoint-value}
 \end{equation}
-\bb{maybe remind us that this is a derivative with respect to $x$ (susceptible density), and $x$ will decrease as we move away from the starting point, so this is a positive divergence in the trajectory with time?}
+Near the starting point \((1,0)\), \(x\) decreases with time, so this negative derivative corresponds to a positive divergence of the trajectory from the leading-order prediction. This is consistent with susceptible replenishment allowing the epidemic to sustain more infections during this period.
 
 \section{Singular matching near the post-epidemic state}
 \label{sec:matching}
@@ -421,7 +431,7 @@ Using \cref{eq:X0-near-xf,eq:X1asymp}, the ratio of the first-order correction t
 \qquad y\to0^+.
 \label{eq:outer-correction-ratio}
 \end{equation}
-For the first-order term to remain a correction to the leading displacement, this ratio must be small. As \(y\) decreases, the ratio grows, so the outer expansion no longer provides an ordered approximation near \(\xf\). We therefore construct a local approximation in this region.
+For the first-order term to remain a correction to the leading displacement, this ratio must be small. As \(y\) decreases, the ratio grows, so the outer expansion no longer provides an ordered approximation near \(\xf\). Near the minimum susceptible fraction, the trajectory turns from susceptible depletion to replenishment. We refer to the neighbourhood of this turn as the corner layer. This region is indicated in Figure~\ref{fig:phaseplane-framework}.
 Rewriting \cref{eq:phaseplane} with \(y\) as the independent variable gives
 \begin{equation}
 \frac{\dd x}{\dd y}=\frac{\rhoeps\hth(x)-\Rzero xy}{(\Rzero x-1)y}.
@@ -434,7 +444,6 @@ y=\rhoeps v,
 x=\xf+\rhoeps u_1(v)+O(\rhoeps^2).
 \label{eq:corner}
 \end{equation}
-These variables describe the corner layer near the turn in the susceptible trajectory, following Parsons and Earn \cite{ParsonsEarn2024} \bb{would it be possible to annotate this region in Figure 1 ... ?}.
 We now substitute \cref{eq:corner} into \cref{eq:inverse-phaseplane} to determine \(u_1(v)\). With \(\rhoeps\) held fixed, differentiation with respect to \(v\) gives
 \[
 \frac{\dd y}{\dd v}=\rhoeps,
@@ -537,13 +546,13 @@ x\approx\xf+\rhoeps aL+by.
 We now estimate the burnout probability starting from the state \((\xin,\yin)\) at entry into the boundary layer.
 
 \subsection{The birth--death process and Kendall's formula}
-We take \(\tau=0\) at entry into the boundary layer, with susceptible fraction \(\xin\) and \(m=K\yin\) infectious individuals. In the boundary layer, we neglect susceptible loss through infection, \(\Rzero xy\), relative to recruitment, \(\rhoeps\hth(x)\), as specified in \cref{eq:low-prevalence-loss-condition}. \bb{In general might be useful to note where we are following Parsons et al. (and where we are diverging) \ldots this part is following P\&E except for using a different expression for the demography, right?} We therefore approximate susceptible recovery by the solution of
+We take \(\tau=0\) at entry into the boundary layer, with susceptible fraction \(\xin\) and \(m=K\yin\) infectious individuals. In the boundary layer, we neglect susceptible loss through infection, \(\Rzero xy\), relative to recruitment, \(\rhoeps\hth(x)\), as specified in \cref{eq:low-prevalence-loss-condition}. We therefore approximate susceptible recovery by the solution of
 \begin{equation}
 \frac{\dd x}{\dd\tau}=\rhoeps\hth(x),\qquad x(0)=\xin.
 \label{eq:branching-background}
 \end{equation}
 Under this approximation, when there are \(n\) infectious individuals, new infections occur at total rate \(n\Rzero x(\tau)\), and removals occur at total rate \(n\). Both rates are proportional to \(n\), and the infection rate varies with time through the deterministic susceptible fraction \(x(\tau)\). The infectious population therefore follows a time-inhomogeneous linear birth--death process.
-For a time-inhomogeneous linear birth--death process with per-capita birth and removal rates \(b(\tau)\) and \(d(\tau)\), Kendall's formula \cite{Kendall1948} gives the eventual extinction probability starting from one individual as
+As in Parsons et al.\ \cite{ParsonsEtAl2024}, we also use Kendall's formula \cite{Kendall1948} to obtain the eventual extinction probability starting from one individual. For a time-inhomogeneous linear birth--death process with per-capita birth and removal rates \(b(\tau)\) and \(d(\tau)\), this probability is given by
 \begin{equation}
 q_1=\frac{\mathcal{I}}{1+\mathcal{I}},
 \label{eq:q1}
@@ -571,7 +580,7 @@ Using the susceptible recovery equation \cref{eq:branching-background} and the i
 \approx\frac{\Rzero x-1}{\rhoeps\hth(x)}.
 \label{eq:logy-versus-x}
 \end{equation}
-We define the \emph{action function} \bb{is it worth commenting on this name? I recall Todd explained where this comes from/connects to, but I've forgotten ...} \(\Ath(x)\) by
+We define \(\Ath(x)\) by
 \begin{equation}
 \Ath'(x)=\frac{1-\Rzero x}{\hth(x)}
 =\frac{1-\Rzero x}{(1-x)x^\theta}.
@@ -596,7 +605,7 @@ Equivalently,
 y(x)\approx y(z)\exp\!\left[-\frac{\Ath(x)-\Ath(z)}{\rhoeps}\right].
 \label{eq:y-action-propagation}
 \end{equation}
-Thus, the action difference determines the exponential change in infectious prevalence. From \cref{eq:actionprime}, this difference is
+Thus, \(\Ath(x)-\Ath(z)\) determines the exponential change in infectious prevalence. From \cref{eq:actionprime}, this difference is
 \begin{equation}
 \Ath(x)-\Ath(z)=\int_z^x\frac{1-\Rzero u}{(1-u)u^\theta}\dd u.
 \label{eq:actiondifference}
@@ -636,15 +645,15 @@ up to additive constants.
 
 \subsection{Burnout and persistence probabilities}
 In the birth--death approximation, the susceptible fraction \(x(\tau)\) is prescribed deterministically, and infectious individuals produce new infections and are removed independently at the per-capita rates in \cref{eq:branching-rates}. The \(m=K\yin\) infectious individuals present at boundary-layer entry therefore generate independent lineages. Burnout occurs if all these lineages become extinct, giving
-\bb{note that the 'est' subscript refers to establishment? (set up some TeX macros for these subscripts?)}
 \begin{equation}
-P_{\rm burn\mid est}\approx q_1^{\,m}
-=\left[\frac{\mathcal{I}(\xin)}{1+\mathcal{I}(\xin)}\right]^{K\yin}.
+P_{\burn\mid\est}\approx q_1^{\,m}
+=\left[\frac{\mathcal{I}(\xin)}{1+\mathcal{I}(\xin)}\right]^{K\yin},
 \label{eq:Pburn}
 \end{equation}
+where ``est denotes conditioning on epidemic establishment.
 The conditional persistence probability is therefore
 \begin{equation}
-P_{\rm persist\mid est}=1-P_{\rm burn\mid est}.
+P_{\persist\mid\est}=1-P_{\burn\mid\est}.
 \label{eq:Ppersistcond}
 \end{equation}
 We define
@@ -654,21 +663,21 @@ B:=K\yin\log\!\left(1+\frac{1}{\mathcal{I}(\xin)}\right).
 \end{equation}
 Then
 \[
--\log P_{\rm burn\mid est}\approx B,
+-\log P_{\burn\mid\est}\approx B,
 \qquad
-P_{\rm persist\mid est}\approx1-e^{-B}.
+P_{\persist\mid\est}\approx1-e^{-B}.
 \]
 
 The post-wave calculation is conditional on initial epidemic establishment. When \(\Rzero>1\), the early branching approximation gives the establishment probability for a single infectious host introduced into an otherwise susceptible population as \cite{Whittle1955}
 \begin{equation}
-p_{\rm est}\approx1-\frac{1}{\Rzero},
+p_{\est}\approx1-\frac{1}{\Rzero},
 \label{eq:pest}
 \end{equation}
 The unconditional persistence probability is therefore
 \begin{equation}
-P_{\rm persist,uncond}
-=p_{\rm est}P_{\rm persist\mid est}
-\approx\left(1-\frac{1}{\Rzero}\right)P_{\rm persist\mid est}.
+P_{\persist,\uncond}
+=p_{\est}P_{\persist\mid\est}
+\approx\left(1-\frac{1}{\Rzero}\right)P_{\persist\mid\est}.
 \label{eq:uncond}
 \end{equation}
 
@@ -778,7 +787,7 @@ The corrected approximation is therefore
 \left[1+\rhoeps c_L+O(\rhoeps^2)\right].
 \label{eq:LaplaceNext}
 \end{equation}
-For fixed \(\xin<\xs\), the action difference \(\Ath(\xs)-\Ath(\xin)\) is positive. Hence, \cref{eq:LaplaceI} shows that \(\mathcal{I}(\xin)\) grows exponentially as \(\rhoeps\to0^+\). Therefore, for sufficiently small \(\rhoeps\), \(\mathcal{I}(\xin)\gg1\), and
+For fixed \(\xin<\xs\), the difference \(\Ath(\xs)-\Ath(\xin)\) is positive. Hence, \cref{eq:LaplaceI} shows that \(\mathcal{I}(\xin)\) grows exponentially as \(\rhoeps\to0^+\). Therefore, for sufficiently small \(\rhoeps\), \(\mathcal{I}(\xin)\gg1\), and
 \begin{equation}
 \log\!\left(1+\frac1{\mathcal{I}(\xin)}\right)\sim\frac1{\mathcal{I}(\xin)}.
 \label{eq:large-I-log}
@@ -830,7 +839,7 @@ Under these conditions,
 \label{eq:BIaction}
 \end{equation}
 
-In particular, combining this approximation with the leading-order Laplace result \cref{eq:LaplaceB} gives a burnout estimate that is independent of the particular choice of \(\yin\) at leading order. To show this, we write
+In particular, combining the first-order entry relation \cref{eq:BIaction} with the leading-order Laplace result \cref{eq:LaplaceB} gives a burnout estimate that is independent of the particular choice of \(\yin\) at leading order. To show this, we write
 \begin{equation}
 \begin{aligned}
 \Ath(\xs)-\Ath(x_{\rm in}^{(1)})
@@ -868,7 +877,7 @@ B_{\BI}:=K\Cth\sqrt{\frac{\Rzero y_*}{2\pi}}\,e^{-\dAf/\rhoeps},
 \label{eq:BBI}
 \end{equation}
 \begin{equation}
-P_{\rm persist\mid est}^{\BI}:=1-e^{-B_{\BI}}.
+P_{\persist\mid\est}^{\BI}:=1-e^{-B_{\BI}}.
 \label{eq:PBI}
 \end{equation}
 
@@ -887,22 +896,18 @@ y_{\min}\approx\Cth e^{-\dAf/\rhoeps}.
 \section{Numerical validation and the effect of recruitment shape}
 \label{sec:numerics}
 
-\bb{I'm still not 100\% clear on first-order vs second-order vs BI. I probably just need to read this all again ... maybe we can have a little bit more of a road map for why we went to all the work of doing both approximations and then looked at everything with a BI approximation? Is this because the ordered approximations are more elegant/require less numerical computation? Or do the BI results really depend in some way on having derived the first-order results?}
-\bb{(after meeting with JD). I think I understand this a little bit better now. We still use the first-order approximation to get quantities like $x^*$, $y^*$, etc. --- we just don't pick an explicit value for the boundary layer $y$ in terms of these approximated quantities. Right? It would help to spell this out a bit more ...}
+The boundary-independent (BI) approximation is obtained by combining the first-order entry estimate with the Laplace approximation of Kendall's integral, which eliminates the explicit boundary-layer threshold at leading order. We also wondered whether a higher-order entry estimate would improve accuracy, so we derived a second-order correction in Appendix~\ref{app:second-order}. We compare three predictions: (i) the first-order entry estimate combined with numerical evaluation of Kendall's exact integral; (ii) the second-order entry estimate combined with numerical evaluation of Kendall's exact integral; and (iii) the BI approximation (Appendix~\ref{app:approximation-comparison}). This comparison shows that the BI approximation gives the best overall agreement with simulations on the comparison grid and covers a broader parameter range than the first- and second-order entry approximations. We therefore use it for the results below.
 
-We use the boundary-independent (BI) approximation for the results below because it gives the best overall agreement with simulations on the comparison grid and covers a broader parameter range than the first- and second-order entry approximations (Appendix~\ref{app:approximation-comparison}).
-
-We first compare the analytical predictions with stochastic simulations, then examine the sources of approximation error. Next, we investigate the effect of the recruitment law on persistence. To validate the predicted conditional persistence probabilities, we compared the boundary-layer-independent prediction \cref{eq:PBI} with adaptive tau-leap simulations \bb{ref? something general for adaptive tau-leaping algorithm, plus a reference (maybe elsewhere if you go into more technical details later?) to the R package: use \texttt{citation("adaptivetau")} to get the correct/preferred reference} of the full stochastic epidemic.
+We first compare the analytical predictions with stochastic simulations, then examine the sources of approximation error. Next, we investigate the effect of the recruitment law on persistence. To validate the predicted conditional persistence probabilities, we compared the boundary-layer-independent prediction \cref{eq:PBI} with adaptive tau-leap simulations \cite{CaoGillespiePetzold2007,adaptivetau} of the full stochastic epidemic.
 
 \subsection{Stochastic validation across transmission and population size}
 Figure~\ref{fig:main-persistence} shows the conditional persistence probability as a function of \(\Rzero\) at \(\rhoeps=0.01\), for \(10^6\leq K\leq10^9\).
-\bb{weren't we also looking at lower values of $K$ in previous iterations? They might be relevant for the plague metapop stuff \ldots this isn't really necessary, though, especially if there's nothing qualitatively new/interesting for lower $K$}
-The boundary-layer-independent approximation agrees closely with the stochastic simulation results over much of the tested range, but substantial discrepancies occur at high \(\Rzero\) for some combinations of \(\theta\) and \(K\). \bb{were there also low-$K$ deviations for lower $K$ values?}
+The boundary-layer-independent approximation agrees closely with the stochastic simulation results over much of the tested range, but substantial discrepancies occur at high \(\Rzero\) for some combinations of \(\theta\) and \(K\).
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{validation/figures/paper/main_persistence_validation.pdf}
-\caption{Conditional persistence after epidemic establishment at \(\rhoeps=0.01\). Curves show the boundary-layer-independent prediction \cref{eq:PBI}; points show stochastic simulation estimates, with vertical bars indicating 95\% Wilson intervals \bb{not sure average math-y readers will know what Wilson intervals are --- maybe say ``exact binomial confidence intervals''?}. The adaptive tau-leap scan used at least 10,000 attempted epidemics per parameter combination. \bb{maybe sparser y-axis ticks/grid-lines?}
+\caption{Conditional persistence after epidemic establishment at \(\rhoeps=0.01\). Curves show the boundary-layer-independent prediction \cref{eq:PBI}; points show stochastic simulation estimates, with vertical bars indicating 95\% exact binomial confidence intervals. The adaptive tau-leap scan used at least 10,000 attempted epidemics per parameter combination.
 }
 \label{fig:main-persistence}
 \end{figure}
@@ -920,8 +925,8 @@ Table~\ref{tab:high-R-discrepancy} illustrates this discrepancy at \(\rhoeps=0.0
 \toprule
 \(\Rzero\) & Established & Persisted
   & \begin{tabular}[b]{@{}c@{}}Extinct after\\ reaching \(S=0\)\end{tabular}
-  & \begin{tabular}[b]{@{}c@{}}\(P_{\rm persist\mid est}\)\\ (simulation)\end{tabular}
-  & \(P_{\rm persist\mid est}^{\BI}\) \\
+  & \begin{tabular}[b]{@{}c@{}}\(P_{\persist\mid\est}\)\\ (simulation)\end{tabular}
+  & \(P_{\persist\mid\est}^{\BI}\) \\
 \midrule
 32  & 9,675 & 9,675 & 0     & 1.00000 & 0.99999 \\
 64  & 9,839 & 9,808 & 31    & 0.99685 & 1.00000 \\
@@ -933,14 +938,9 @@ Table~\ref{tab:high-R-discrepancy} illustrates this discrepancy at \(\rhoeps=0.0
 \label{tab:high-R-discrepancy}
 \end{table}
 
-In the groups with larger discrepancies, a substantial fraction of established epidemic trajectories reached \(S=0\). Note that for \(\theta>0\), recruitment depends on the presence of susceptible hosts. Once susceptibles are depleted to zero, host replenishment stops and no further infections can occur, leading to extinction. But \bb{Because?} our approximation treats susceptible numbers deterministically and does not capture this route to extinction, so it can overestimate the persistence probability.
+In the groups with larger discrepancies, a substantial fraction of established epidemic trajectories reached \(S=0\). Note that for \(\theta>0\), recruitment depends on the presence of susceptible hosts. Once susceptibles are depleted to zero, host replenishment stops and no further infections can occur, leading to extinction. But our approximation treats susceptible numbers deterministically and does not capture this route to extinction, so it can overestimate the persistence probability. However, \(\theta=0\) differs qualitatively from \(\theta>0\): susceptible replenishment continues even at \(S=0\), so there is no approximation error due to this mechanism in this case. Note that the visible discrepancy at \(\theta=0\), \(K=10^9\), and \(\Rzero=2.5\) is small in absolute terms (\(0.00322\)) but is accentuated by the logit scale.
 
-\bb{\begin{itemize}
-  \item funny that we have problems for $\theta \approx 0$ (technically $\ll 1$) but not for $\theta=0$ --- I guess this means there's a weird limit? (i.e. very small $\theta$ is bad but if we go all the way to the $\theta=0$ limit we're OK because we implicitly have an infinite replenishment rate?) Possibly worth commenting on in slightly more detail?
-  \item have we explored/can we explain the visible discrepancy for $\theta=0$, $K=10^9$? (also some visible discrepancy for $\theta=0.5$, $K=10^9$, but weirdly not for the intermediate $\theta=0.25$ curve?
-  \end{itemize}
-  These explanations aren't essential, but would be nice.
-}
+
 
 % BEGIN deferred Section 7.2 content
 %
@@ -966,7 +966,7 @@ In the groups with larger discrepancies, a substantial fraction of established e
 % Numerical ODE entry combined with numerical evaluation of the unapproximated Kendall integral avoids both entry-series truncation and the interior-maximum Laplace reduction. It remains a deterministic/branching-process approximation to the stochastic epidemic, not an exact solution of that epidemic. Its use requires a descending ODE crossing of the chosen boundary-layer threshold and a valid deterministic-to-stochastic overlap; if these fail, this combination is not automatically a remedy.
 % The BI reduction additionally uses the small-remainder condition in \cref{eq:BI-log-condition}; these restrictions should be summarized here after they have been stated at the corresponding derivation steps.
 %
-% Additional exact Gillespie spot checks at \(\rhoeps=0.01\) show that increasing the population size improves agreement in some regimes but does not uniformly restore BI accuracy at high \(\Rzero\). Each parameter combination used 2,000 attempted epidemics, with conditional persistence estimated among epidemics that established. At \(\theta=0\) and \(\Rzero=128\), all established epidemics persisted for both \(K=10^5\) and \(10^6\), consistent with BI probabilities indistinguishable from one. At \(\theta=0.25\) and \(\Rzero=32\), increasing \(K\) from \(10^5\) to \(10^6\) changed the simulated conditional persistence probability from 0.441 to 1.000, compared with BI predictions of 0.672 and 0.999985. At \(\Rzero=64\), the corresponding simulated probabilities were 0 and 0.996, compared with BI predictions of 0.9994 and approximately one. At \(\Rzero=128\), however, the simulated probabilities were 0 and 0.128, whereas BI predicted probabilities approximately equal to one at both sizes. The 95\% Wilson interval for the last simulated estimate was \([0.114,0.143]\).
+% Additional exact Gillespie spot checks at \(\rhoeps=0.01\) show that increasing the population size improves agreement in some regimes but does not uniformly restore BI accuracy at high \(\Rzero\). Each parameter combination used 2,000 attempted epidemics, with conditional persistence estimated among epidemics that established. At \(\theta=0\) and \(\Rzero=128\), all established epidemics persisted for both \(K=10^5\) and \(10^6\), consistent with BI probabilities indistinguishable from one. At \(\theta=0.25\) and \(\Rzero=32\), increasing \(K\) from \(10^5\) to \(10^6\) changed the simulated conditional persistence probability from 0.441 to 1.000, compared with BI predictions of 0.672 and 0.999985. At \(\Rzero=64\), the corresponding simulated probabilities were 0 and 0.996, compared with BI predictions of 0.9994 and approximately one. At \(\Rzero=128\), however, the simulated probabilities were 0 and 0.128, whereas BI predicted probabilities approximately equal to one at both sizes. The 95\% exact binomial confidence interval for the last simulated estimate was \([0.114,0.143]\).
 %
 % These discrepancies identify an additional finite-population mechanism. Under the stochastic recruitment law used here, the susceptible recruitment rate is \(K\rhoeps(1-S/K)(S/K)^\theta\). For \(\theta>0\), this rate vanishes at \(S=0\); no susceptible hosts can then be replenished, and the remaining infectives eventually disappear. At \((\Rzero,\theta,K)=(128,0.25,10^6)\), 1,738 of the 1,992 established epidemics reached \(S=0\) and became extinct, while the remaining 254 persisted. In contrast, recruitment continues at \(S=0\) when \(\theta=0\). A large total population therefore does not by itself ensure that susceptibles remain numerous enough for a deterministic description throughout the first wave and trough. This source of error cannot be removed solely by improving the entry approximation or evaluating the Kendall integral without its Laplace reduction.
 %
@@ -977,7 +977,7 @@ In the groups with larger discrepancies, a substantial fraction of established e
 \subsection{Patterns of conditional persistence}
 Figure~\ref{fig:main-persistence} shows that increasing \(\theta\) decreases the conditional persistence probability when other parameters are fixed. Biologically, a larger \(\theta\) reduces susceptible replenishment after the epidemic, slowing susceptible recovery and making extinction more likely during the first trough. Within the range shown in Figure~\ref{fig:main-persistence}, persistence is non-monotonic in \(\Rzero\), first increasing, then decreasing, and subsequently recovering (the initial increase is more visible at \(K=10^6\); for larger \(K\), persistence is already close to one near \(\Rzero=1\), making this increase less noticeable). For \(\theta=0\), persistence recovers relatively early and approaches one as \(\Rzero\) increases. As \(\theta\) increases, this recovery occurs later and proceeds more slowly, or no recovery occurs within the plotted range. As \(\theta\) approaches one, persistence at high \(\Rzero\) is suppressed to nearly zero. This suggests that more transmissible pathogens are more sensitive to the form of susceptible replenishment.
 
-At higher \(\Rzero\), the simulated persistence probability declines again for some parameter combinations because the number of susceptibles may hit zero in some trajectories, whereas the BI prediction remains close to one (discussed above in Section~\ref{sec:approximation-errors}). However, biologically reasonable values of \(\Rzero\) for infectious diseases do not reach the large-\(\Rzero\) regime where our approximation breaks down \bb{ref for `realistic values of $\Rzero$'? maybe not necessary. There's probably a table in some Anderson \& May book/paper somewhere, or maybe a textbook like Rohani and Keeling \ldots}.
+At higher \(\Rzero\), the simulated persistence probability declines again for some parameter combinations because the number of susceptibles may hit zero in some trajectories, whereas the BI prediction remains close to one (discussed above in Section~\ref{sec:approximation-errors}). However, estimated values of \(\Rzero\) for many human and animal infections are substantially lower than the large-\(\Rzero\) values considered here \cite[Table~2.1]{KeelingRohani2008}.
 
 To examine conditional persistence across different recruitment rates, we plot its dependence on \(\Rzero\) and \(\rhoeps\) (Figure~\ref{fig:conditional-landscape}). Here, we focus only on biologically reasonable values of \(\Rzero\), showing \(\Rzero\le32\), where our approximation remains accurate. The figure shows that the effect of recruitment shape persists over a broader range of recruitment rates. In addition, Figure~\ref{fig:conditional-landscape} shows that increasing \(\rhoeps\) raises the conditional persistence probability. Biologically, faster susceptible replenishment allows infection to resume growth sooner, reducing the risk of extinction during the trough.
 
@@ -993,24 +993,19 @@ To examine conditional persistence across different recruitment rates, we plot i
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{validation/figures/paper/unconditional_persistence_validation.pdf}
-\caption{Unconditional persistence as a function of the basic reproduction number \(\Rzero\) at recruitment rate \(\rhoeps=0.01\), for different recruitment shapes \(\theta\) and carrying capacities \(K\). Colored curves show the boundary-layer-independent prediction including the establishment probability in \cref{eq:uncond}; points show stochastic simulation estimates, with vertical bars indicating 95\% Wilson intervals. The gray dashed line shows the predicted non-fizzle probability \(1-1/\Rzero\). The adaptive tau-leap scan used at least 10,000 attempted epidemics per parameter combination.}
+\caption{Unconditional persistence as a function of the basic reproduction number \(\Rzero\) at recruitment rate \(\rhoeps=0.01\), for different recruitment shapes \(\theta\) and carrying capacities \(K\). Colored curves show the boundary-layer-independent prediction including the establishment probability in \cref{eq:uncond}; points show stochastic simulation estimates, with vertical bars indicating 95\% exact binomial confidence intervals. The gray dashed line shows the predicted non-fizzle probability \(1-1/\Rzero\). The adaptive tau-leap scan used at least 10,000 attempted epidemics per parameter combination.}
 \label{fig:unconditional-validation}
 \end{figure}
 
 The unconditional persistence probability is the probability that an epidemic does not fizzle and survives the first trough. Figure~\ref{fig:unconditional-validation} compares the predicted unconditional persistence probability with stochastic simulation estimates, showing close agreement overall, but the high-\(\Rzero\) discrepancies discussed for conditional persistence in Section~\ref{sec:approximation-errors} remain present in unconditional persistence. Compared with conditional persistence, unconditional persistence is lower near \(\Rzero=1\), because most introduced epidemics fizzle before becoming established. In the cases shown, the unconditional persistence probability initially rises with \(\Rzero\) as establishment becomes more likely.
-\bb{notes:
-  \begin{itemize}
-  \item the small discrepancy between sims and approximation for $\theta=0$, $K=10^9$, intermediate \(\Rzero\) goes away here --- because it gets squashed out by the fizzle probability \ldots ?
-  \item interesting that the discrepancy between $\theta=0$ and $\theta=0.25$ gets larger as $K$ increases --- more evidence that $\theta=0$ is fundamentally a weird limit?
-  \end{itemize}
-}
+
 
 Figure~\ref{fig:unconditional-landscape} presents unconditional persistence across different values of \(\rhoeps\). As with conditional persistence, increasing \(\theta\) lowers the unconditional persistence probability, whereas increasing \(\rhoeps\) raises it.
 
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=\textwidth]{validation/figures/paper/unconditional_persistence_landscape.pdf}
-\caption{Boundary-layer-independent unconditional persistence as a function of the basic reproduction number \(\Rzero\) and recruitment rate \(\rhoeps\). Columns show recruitment shape \(\theta=0,0.25,0.5,0.75,1\), and rows show carrying capacity \(K=10^6\) and \(10^9\). Colors show probability on a logarithmic scale, with values at or below \(10^{-6}\) shown at the lower color limit. Grey dashed and solid lines mark local maxima and minima, respectively, with respect to \(\Rzero\). \bb{why are we using a different colour scale here from Figure~3? Is that intentional, to signal that we are computing a different kind of probability, or is it an oversight? (also, log rather than logit scale here)}}
+\caption{Boundary-layer-independent unconditional persistence as a function of the basic reproduction number \(\Rzero\) and recruitment rate \(\rhoeps\). Columns show recruitment shape \(\theta=0,0.25,0.5,0.75,1\), and rows show carrying capacity \(K=10^6\) and \(10^9\). Colors show probability on the same logit scale as Figure~\ref{fig:conditional-landscape}, with values at or below 0.001 and at or above 0.999 shown at the respective color limits. Grey dashed and solid lines mark local maxima and minima, respectively, with respect to \(\Rzero\).}
 \label{fig:unconditional-landscape}
 \end{figure}
 
@@ -1018,7 +1013,7 @@ We next consider how the dependence of unconditional persistence on \(\Rzero\) c
 
 Using the BI prediction in \cref{eq:uncond,eq:PBI}, differentiation with respect to \(\Rzero\) gives
 \begin{equation}
-\frac{\dd P_{\rm persist,uncond}^{\BI}}{\dd\Rzero}
+\frac{\dd P_{\persist,\uncond}^{\BI}}{\dd\Rzero}
 =e^{-B_{\BI}}\left[
 \left(1-\frac1{\Rzero}\right)\frac{\dd B_{\BI}}{\dd\Rzero}
 +\frac{e^{B_{\BI}}-1}{\Rzero^2}\right].
@@ -1034,7 +1029,7 @@ We locate the stationary points numerically and plot the resulting local maxima 
 
 For fixed \(\rhoeps\) and \(K\), increasing \(\theta\) shifts the local minimum toward larger \(\Rzero\), delaying the recovery of unconditional persistence. For sufficiently large \(\theta\), no recovery is visible within the plotted range.
 
-As \(\rhoeps\) increases, the local maximum shifts toward larger \(\Rzero\), while the local minimum shifts toward smaller \(\Rzero\), narrowing the interval over which unconditional persistence decreases. For some parameter combinations (e.g. $\theta=0$, $K=10^9$), this interval disappears at sufficiently large \(\rhoeps\), and unconditional persistence increases monotonically with \(\Rzero\) over the plotted range. \bb{in contrast to $\theta=1$, small $\rho$, where it \emph{decreases} monotonically with \(\Rzero\) ...}
+As \(\rhoeps\) increases, the local maximum shifts toward larger \(\Rzero\), while the local minimum shifts toward smaller \(\Rzero\), narrowing the interval over which unconditional persistence decreases. For some parameter combinations (e.g. $\theta=0$, $K=10^9$), this interval disappears at sufficiently large \(\rhoeps\), and unconditional persistence increases monotonically with \(\Rzero\) over the plotted range. Conversely, for \(\theta=1\) and small \(\rhoeps\), only the decreasing segment is visible within this range.
 
 % BEGIN deferred BI derivative and extremum classification
 % The dependence of unconditional persistence on \(\Rzero\) varies with \(\rhoeps\), \(\theta\), and \(K\). We next examine when this dependence is nonmonotonic and how the locations of its maxima and minima change with these parameters.
@@ -1087,9 +1082,9 @@ In the parameter ranges examined, increasing \(\theta\) reduces conditional pers
 
 Our results suggest that host populations with similar transmission and recruitment rates can differ in epidemic persistence because of differences in the density dependence of susceptible recruitment. When recruitment is more strongly reduced at low susceptible densities, infection is less likely to survive until susceptibles recover. This makes the form of susceptible recruitment important when assessing whether an epidemic can persist in an animal population.
 
-Our model and approximation have several limitations. The recruitment function \(\hth(x)\) is a simplified description of host population growth and does not explicitly capture all the demographic mechanisms operating in animal populations \bb{for example ... ?}.
+Our model and approximation have several limitations. The recruitment function \(\hth(x)\) is a simplified description of host population growth and does not explicitly capture all the demographic mechanisms operating in animal populations, such as age structure and seasonal breeding.
 
-The asymptotic analysis assumes slow susceptible recruitment, with \(\rhoeps\ll1\) and fixed \(\Rzero>1\). The asymptotic approximation to the first-wave epidemic trajectory assumes that the epidemic develops much faster than susceptibles are replenished. As \(\Rzero\) approaches one, infection grows more slowly, so susceptible replenishment may no longer be slow relative to epidemic growth. The approximation error may therefore increase. \bb{point out that this is reasonable for acute infectious diseases of humans, but less so for diseases of wildlife hosts with shorter lifespans ?}
+The asymptotic analysis assumes slow susceptible recruitment, with \(\rhoeps\ll1\) and fixed \(\Rzero>1\). The asymptotic approximation to the first-wave epidemic trajectory assumes that the epidemic develops much faster than susceptibles are replenished. This separation of timescales is reasonable for many acute human infections, but may be less pronounced in wildlife hosts with shorter lifespans and faster population turnover. As \(\Rzero\) approaches one, infection grows more slowly, so susceptible replenishment may no longer be slow relative to epidemic growth. The approximation error may therefore increase.
 % In addition, the deterministic description requires susceptible numbers to remain sufficiently large. Random fluctuations in susceptible numbers can increase the risk of extinction by depleting susceptibles to zero. In the stochastic model used here, recruitment vanishes at \(S=0\) for \(\theta>0\), preventing susceptible replenishment and leading to extinction of the remaining infection. Our approximation treats susceptible numbers deterministically and does not capture this route to extinction, so it can overestimate persistence when \(\Rzero\) is large.
 
 Our analysis only considers whether a single-strain epidemic would go extinct in a well-mixed population and does not account for other epidemic dynamics such as spatial heterogeneity, metapopulation dynamics, or competition between pathogen strains.
@@ -1573,7 +1568,7 @@ Among the approximations compared, BI gives the best overall agreement with stoc
 \centering
 \includegraphics[width=\textwidth]{validation/figures/paper/entry_approximation_comparison.pdf}
 \captionsetup{font=small}
-\caption{Comparison of the BI prediction with first- and second-order entry estimates combined with numerical evaluation of Kendall's integral at \(\rhoeps=0.01\) and \(1.03\le\Rzero\le6\). Rows show recruitment shape \(\theta\), and columns show carrying capacity \(K\). Black points and vertical bars show stochastic estimates of conditional persistence and their 95\% Wilson intervals. The full original grid of 280 simulation points is retained. Blue solid, gray dashed, and orange dot-dashed curves show the BI, first-order, and second-order predictions, respectively. First- and second-order curves are shown only where the deterministic trajectory crosses the boundary-layer threshold and the corresponding entry estimate lies between \(\xf\) and \(\xs\). \bb{maybe add a point at the beginning of the first- and second-order approximations (i.e. where the boundary layer isn't crossed/failure point), to emphasize this a little bit more?}
+\caption{Comparison of the BI prediction with first- and second-order entry estimates combined with numerical evaluation of Kendall's integral at \(\rhoeps=0.01\) and \(1.03\le\Rzero\le6\). Rows show recruitment shape \(\theta\), and columns show carrying capacity \(K\). Black points and vertical bars show stochastic estimates of conditional persistence and their 95\% exact binomial confidence intervals. The full original grid of 280 simulation points is retained. Blue solid, gray dashed, and orange dot-dashed curves show the BI, first-order, and second-order predictions, respectively. First- and second-order curves are shown only where the deterministic trajectory crosses the boundary-layer threshold and the corresponding entry estimate lies between \(\xf\) and \(\xs\). Colored filled points mark the first valid computed point of each first- and second-order curve.
 }
 \label{fig:entry-approximation-comparison}
 \end{figure}
@@ -1665,7 +1660,7 @@ Among the approximations compared, BI gives the best overall agreement with stoc
 % \[
 % B_{\BI}\sim2e^{-2}K\sqrt{\frac{\rhoeps}{2\pi}}\,\varepsilon^{5/2},
 % \qquad
-% P_{\rm persist,uncond}\sim2e^{-2}K\sqrt{\frac{\rhoeps}{2\pi}}\,\varepsilon^{7/2}.
+% P_{\persist,\uncond}\sim2e^{-2}K\sqrt{\frac{\rhoeps}{2\pi}}\,\varepsilon^{7/2}.
 % \]
 % Thus the BI curve starts at zero and initially increases. These are endpoint properties of the BI expression, whose finite-\(\rhoeps\) accuracy close to \(\Rzero=1\) remains nonuniform.
 %
@@ -1675,10 +1670,10 @@ Among the approximations compared, BI gives the best overall agreement with stoc
 % \sqrt{\frac{\rhoeps}{2\pi}}\,
 % \Rzero^{-(1+\theta)/2},
 % \qquad
-% P_{\rm persist,uncond}\sim B_{\BI}\to0.
+% P_{\persist,\uncond}\sim B_{\BI}\to0.
 % \label{eq:uncondLargeSublinear}
 % \end{equation}
-% In particular, the far-tail derivative is negative, not positive: dropping the \(\Cth\propto\Rzero^{-1}\) factor would give the wrong endpoint conclusion. For \(\theta=1\), \(\Cth\to e^{-1}\) but \(\dAf'=1-1/\Rzero+O(\Rzero^{-2})\), so \(\dAf=\Rzero-\log\Rzero+O(1)\) and \(B_{\BI}\to0\) exponentially. The \(\theta=1\) endpoint is thus qualitatively different in decay rate, but not in the limiting value \(P_{\rm persist,uncond}(\infty)=0\). Together with the near-threshold rise, both endpoint laws require at least one local maximum; a no-extremum or minimum-only global shape is excluded.
+% In particular, the far-tail derivative is negative, not positive: dropping the \(\Cth\propto\Rzero^{-1}\) factor would give the wrong endpoint conclusion. For \(\theta=1\), \(\Cth\to e^{-1}\) but \(\dAf'=1-1/\Rzero+O(\Rzero^{-2})\), so \(\dAf=\Rzero-\log\Rzero+O(1)\) and \(B_{\BI}\to0\) exponentially. The \(\theta=1\) endpoint is thus qualitatively different in decay rate, but not in the limiting value \(P_{\persist,\uncond}(\infty)=0\). Together with the near-threshold rise, both endpoint laws require at least one local maximum; a no-extremum or minimum-only global shape is excluded.
 %
 % For \cref{fig:unconditional-shape-map}, the analytical \(G/B\) condition was bracketed on a dense grid spanning \(1.001\leq\Rzero\leq300\), with each root refined and classified by the sign of \(G_{\Rzero}\). The \(\theta\)-grid reaches 0.975 before the separate endpoint \(\theta=1\); the tracked finite minimum remains below \(\Rzero=300\) on this grid. For \(\theta<1\), a further maximum was located by solving the large-\(\Rzero\) continuation obtained from \cref{eq:uncondLargeSublinear} and the corresponding action expansion. Thus zero finite-window roots correspond to one remote maximum, while a finite maximum--minimum sequence is followed by a remote second maximum. This tail continuation is essential for shape counting but can lie far beyond the regime of quantitative stochastic validation. No extra finite-window roots or minimum-only cases were found on the mapped grid.
 %
@@ -1729,35 +1724,10 @@ Among the approximations compared, BI gives the best overall agreement with stoc
 %
 % END deferred appendix
 
-\bb{best to do the bibliography via bib[la]tex, in the long run \ldots except for occasional weird journal-submission requirements}
+
 
 \clearpage
-\begin{thebibliography}{9}
-\bibitem{ParsonsEarn2024}
-T. L. Parsons and D. J. D. Earn,
-\newblock Uniform Asymptotic Approximations for the Phase Plane Trajectories of the SIR Model with Vital Dynamics,
-\newblock \emph{SIAM Journal on Applied Mathematics} 84(4), 1580--1608 (2024).
-
-\bibitem{ParsonsEtAl2024}
-T. L. Parsons, B. M. Bolker, J. Dushoff, and D. J. D. Earn,
-\newblock The probability of epidemic burnout in the stochastic SIR model with vital dynamics,
-\newblock \emph{Proceedings of the National Academy of Sciences} 121(5), e2313708120 (2024).
-\bibitem{Kendall1948}
-D. G. Kendall,
-\newblock On the generalized ``Birth-and-Death'' process,
-\newblock \emph{The Annals of Mathematical Statistics} 19(1), 1--15 (1948).
-\bibitem{Whittle1955}
-P. Whittle,
-\newblock The outcome of a stochastic epidemic---a note on Bailey's paper,
-\newblock \emph{Biometrika} 42(1--2), 116--122 (1955).
-\bibitem{BenderOrszag1978}
-C. M. Bender and S. A. Orszag,
-\newblock \emph{Advanced Mathematical Methods for Scientists and Engineers},
-\newblock McGraw-Hill, New York (1978).
-\bibitem{GilpinCaseAyala1976}
-M. E. Gilpin, T. J. Case, and F. J. Ayala,
-\newblock \(\theta\)-Selection,
-\newblock \emph{Mathematical Biosciences} 32(1--2), 131--139 (1976).
-\end{thebibliography}
+\bibliographystyle{unsrt}
+\bibliography{references}
 
 \end{document}

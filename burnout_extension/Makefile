@@ -15,14 +15,12 @@ paper: burnout_theta_paper.pdf
 ## used as they are.
 PAPER_FIGS := $(shell sed -n 's/^[^%]*\\includegraphics\(\[[^]]*\]\)\{0,1\}{\([^}]*\)}.*/\2/p' burnout_theta_paper.tex)
 
-## The bibliography is inline (thebibliography), so no BibTeX pass; rerun
-## pdflatex while it asks for it (cross-references, cleveref).
-burnout_theta_paper.pdf: burnout_theta_paper.tex $(PAPER_FIGS)
+## BibTeX manages the independent reference database; unsrt uses citation order.
+burnout_theta_paper.pdf: burnout_theta_paper.tex references.bib $(PAPER_FIGS)
 	pdflatex -interaction=nonstopmode -halt-on-error $<
-	@for i in 1 2 3; do \
-	  grep -q -E 'Rerun to get|Label\(s\) may have changed' $(<:.tex=.log) || break; \
-	  pdflatex -interaction=nonstopmode -halt-on-error $<; \
-	done
+	bibtex burnout_theta_paper
+	pdflatex -interaction=nonstopmode -halt-on-error $<
+	pdflatex -interaction=nonstopmode -halt-on-error $<
 
 ######################################################################
 ## Analytic persistence landscapes (no stochastic simulation needed).
@@ -60,7 +58,7 @@ $(PAPERFIG)/unconditional_persistence_landscape.pdf: validation/make_uncondition
     | $(PAPERFIG)/conditional_persistence_landscape.pdf
 	mkdir -p $(DATADIR)
 	$(call drop_stale_caches,$(COND_CACHE) $(EXT_CACHE))
-	Rscript validation/make_unconditional_landscape_figure.R
+	Rscript validation/make_unconditional_landscape_figure.R --tikz
 
 ######################################################################
 
@@ -86,3 +84,14 @@ $(DATADIR)/fig11_scan_analytic.csv: validation/plot_fig11_scan.R validation/R/sc
 	$(R) $<
 
 # looking for fig13_BI_conditional_stochastic_validation.pdf, eventually
+
+## Final figures with LaTeX typography. Requires tikzDevice and XeLaTeX;
+## TIKZ_XELATEX and TIKZ_TECTONIC can override the compiler paths.
+.PHONY: paper-tikz-figures
+paper-tikz-figures:
+	Rscript validation/plot_phaseplane_parsons_style.R
+	Rscript validation/make_paper_figures.R --fig1-only
+	Rscript validation/make_section7_figures.R --conditional-landscape-only --tikz
+	Rscript validation/make_unconditional_validation_figure.R
+	Rscript validation/make_unconditional_landscape_figure.R --tikz
+	Rscript validation/plot_entry_curve_comparison.R --plot-only --paper-export

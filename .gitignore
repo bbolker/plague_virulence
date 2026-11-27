@@ -696,3 +696,13 @@ cpdir/
 *.newfile
 *.newdiff
 *.blame
+
+# tikzDevice figure build products
+burnout_extension/validation/figures/paper/.tikz-metrics*
+burnout_extension/validation/figures/paper/*.log
+
+# Regenerable figure sources and local previews
+burnout_extension/validation/figures/paper/*.tex
+burnout_extension/validation/figures/paper/*_ras*.png
+burnout_extension/validation/figures/previews/
+burnout_extension/validation/proof/__pycache__/

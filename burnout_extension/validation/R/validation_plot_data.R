@@ -2,6 +2,28 @@
 # High-R counts are included only after the entire fixed-design scan completes.
 source('validation/R/extrema.R')
 
+# Recompute 95% Clopper--Pearson intervals from retained simulation counts.
+exact_binomial_intervals <- function(sim, conf.level=.95) {
+  bounds <- function(k,n) {
+    stopifnot(all(is.na(k) | is.na(n) | (k>=0 & k<=n)))
+    lo <- hi <- rep(NA_real_,length(k))
+    ok <- is.finite(k) & is.finite(n) & n>0
+    alpha <- 1-conf.level
+    lo[ok & k==0] <- 0
+    hi[ok & k==n] <- 1
+    j <- ok & k>0
+    lo[j] <- stats::qbeta(alpha/2,k[j],n[j]-k[j]+1)
+    j <- ok & k<n
+    hi[j] <- stats::qbeta(1-alpha/2,k[j]+1,n[j]-k[j])
+    list(low=lo,high=hi)
+  }
+  cond <- bounds(sim$persistent,sim$established)
+  uncond <- bounds(sim$persistent,sim$attempts)
+  sim[, `:=`(cond_low=cond$low,cond_high=cond$high,
+              uncond_low=uncond$low,uncond_high=uncond$high)]
+  sim
+}
+
 load_validation_plot_data <- function() {
   original <- 'validation/data/fig1_display_results.csv'
   if(!file.exists(original)) original <- 'validation/data/fig11_scan_results.csv'
@@ -29,6 +51,7 @@ load_validation_plot_data <- function() {
       extended <- TRUE
     }
   }
+  sim <- exact_binomial_intervals(sim)
   list(sim=sim,extended=extended,corrected=corrected,
        source=extension,Rmax=if(extended)128 else 6)
 }

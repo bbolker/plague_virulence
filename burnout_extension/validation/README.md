@@ -139,3 +139,40 @@ The CSV records trough depth, nullcline residual, boundary ratio, actual downwar
 entry coordinate, and first/second-order phase-plane trough approximations. The
 literal `c_log/log(K)` option need not lie below `y_star`; it is retained as a
 clearly labeled interpretation to expose, rather than hide, that ambiguity.
+
+### Final manuscript figure typography
+
+`make paper-tikz-figures` (from `burnout_extension/`) rebuilds the six figures
+currently included in the manuscript, using the existing simulation tables and
+analytical caches. It does not rerun stochastic simulations. Install the R package
+`tikzDevice` and provide XeLaTeX on PATH, or set `TIKZ_XELATEX` to its executable.
+Set `TIKZ_TECTONIC` to a Tectonic executable to use it for final PDF compilation;
+otherwise the same XeLaTeX compiler builds the PDFs.
+
+The two landscape figures retain Ben’s layout, font sizes, labels, and legend
+ordering, using the scripts’ `--tikz` backend. Their standalone sources are
+compiled to PDF automatically. For the three remaining validation/comparison figures, the shared exporter
+in `validation/R/paper_graphics.R` enlarges figure text,
+uses native LaTeX mathematical labels (including `\mathcal{R}_0`), and adds
+parameter meanings to axis and legend titles. It retains the existing colour
+scales and probability transformations. Heatmap colour fields are raster images;
+text, axes, and extremum curves remain vector graphics. Standalone `.tex` sources
+and associated `_ras*.png` assets are saved beside each PDF as ignored build
+products; keep them together when exporting a figure source. The manuscript continues to include PDFs, so readers do not need R or
+TikZ to compile the paper. The metric cache is an ignored local build product.
+
+Figure 1 is generated only by `plot_phaseplane_parsons_style.R`. It retains the
+original initial infection count (3), time range (0–240), full ODE trajectory. Stochastic sample paths and entry markers are omitted. It retains the original linear/logarithmic two-panel layout, with background
+grid lines removed.
+Temporary figure experiments and comparisons are kept outside the repository.
+
+Validation figures use 95% Clopper--Pearson exact binomial confidence intervals,
+recomputed from the stored `persistent`, `established`, and `attempts` counts.
+Conditional intervals use established epidemics as the denominator; unconditional
+intervals use all attempted epidemics. Cached historical interval columns are
+overridden when loading figure data; simulation trajectories are not rerun.
+
+The manuscript bibliography is maintained in `../references.bib` and processed
+with BibTeX using the numeric `unsrt` style (citation order). `make paper` runs
+the necessary LaTeX/BibTeX passes; Tectonic also processes this bibliography
+automatically. Only cited entries appear in the PDF.

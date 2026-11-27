@@ -31,12 +31,12 @@ Ignore += fadeout/output/occupancy_factorial_100y/data/
 
 ######################################################################
 
-Sources += $(wildcard burnout_extension/*.tex burnout_extension/*.md)
+Sources += $(wildcard burnout_extension/*.tex burnout_extension/*.md burnout_extension/*.bib)
 
 ## git rm --cached burnout_extension/burnout_theta_paper.pdf ##
 ## Current paper 2026 Nov 03 (Tue) Chapter 1
-burnout_extension/burnout_theta_paper.pdf: burnout_extension/burnout_theta_paper.tex
-	$(texThere)
+burnout_extension/burnout_theta_paper.pdf: burnout_extension/burnout_theta_paper.tex burnout_extension/references.bib
+	$(MAKE) -C burnout_extension paper
 
 burnout_extension/burnout_theta_theory_unified_en.pdf: burnout_extension/burnout_theta_theory_unified_en.tex
 	$(texThere)

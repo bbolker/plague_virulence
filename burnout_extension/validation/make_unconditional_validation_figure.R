@@ -17,7 +17,7 @@ theta_values <- seq(0, 1, by = .25)
 pal_theta <- c(`0` = '#0072B2', `0.25` = '#56B4E9', `0.5` = '#009E73',
                `0.75` = '#E69F00', `1` = '#D55E00')
 clip_prob <- function(x, eps = 1e-3) pmin(1 - eps, pmax(eps, x))
-prob_breaks <- c(.001, .01, .05, .25, .5, .75, .95, .99, .999)
+prob_breaks <- c(.001, .01, .5, .99, .999)
 theme_paper <- theme_bw(base_size = 10.5) +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_line(linewidth = .25, colour = 'grey88'),
@@ -87,7 +87,7 @@ fig1 <- ggplot() +
                      expand = expansion(mult = c(.015, .015))) +
   scale_colour_manual(values = pal_theta, name = expression(theta)) +
   labs(x = x_label_R0,
-       y = 'Unconditional persistence probability') +
+       y = 'Unconditional persistence probability (logit scale)') +
   guides(colour = guide_legend(override.aes = list(linewidth = .9, size = 2.2,
                                                  shape = 16))) + theme_paper +
   theme(axis.title.x = element_text(family = fig1_math_family))
@@ -103,3 +103,6 @@ fig1_file <- file.path(out_dir, 'unconditional_persistence_validation.pdf')
 fig1_tmp <- tempfile(pattern = '.fig1-', tmpdir = out_dir, fileext = '.pdf')
 ggsave(fig1_tmp, fig1, width = 7.15, height = 5.45, device = fig1_device)
 stopifnot(file.rename(fig1_tmp, fig1_file))
+
+source('validation/R/paper_graphics.R')
+paper_save_plot(fig1, 'unconditional_persistence_validation')

@@ -43,16 +43,11 @@ save_landscape <- function(p, name, width = 10.5, height = 4.65) {
   switch(fig_backend,
     tikz = {
       tex_file <- file.path(out_dir, paste0(name, '.tex'))
-      tikzDevice::tikz(tex_file, width = width, height = height)
+      source('validation/R/paper_graphics.R')
+      paper_tikz_open(tex_file, width, height, pointsize = 10)
       print(p + theme(axis.title.x = element_text(family = '')))
       dev.off()
-      ## tikzDevice refers to its raster PNGs by bare file name, and \pgfimage
-      ## ignores \graphicspath, so prefix the path relative to the directory
-      ## the paper is compiled from (the same one these scripts run from).
-      tex <- readLines(tex_file)
-      writeLines(gsub(paste0('{', name, '_ras'),
-                      paste0('{', out_dir, '/', name, '_ras'), tex, fixed = TRUE),
-                 tex_file)
+      paper_compile(tex_file)
     },
     quartz = {
       quartzFonts(STIX = quartzFont(c('STIXGeneral-Regular', 'STIXGeneral-Bold',
@@ -150,7 +145,7 @@ if (is.null(conditional)) {
 conditional[, `:=`(
   theta_label = factor(theta_lab(theta), levels = theta_lab(theta5)),
   K_label = factor(K_lab(K), levels = K_lab(c(1e6, 1e9))),
-  probability_display = pmax(1e-6, P_unconditional))]
+  probability_display = pmin(.999, pmax(.001, P_unconditional)))]
 land_dlogR <- min(diff(log(sort(unique(conditional$R0))-1)))
 land_dlogrho <- min(diff(log(sort(unique(conditional$rho)))))
 # The grid is evenly spaced in log(R0 - 1) and log(rho), so it is a regular
@@ -171,15 +166,13 @@ fig2 <- ggplot(conditional, aes(fill = probability_display)) +
                 labels = c('0.001', '0.002', '0.005', '0.01', '0.02', '0.05'),
                 expand = c(0, 0)) +
   scale_x_log10_shifted(breaks = c(1.1, 1.3, 2, 4, 10, 30), expand = c(0, 0)) +
-  scale_fill_viridis_c(option = 'C', limits = c(1e-6, 1),
-                       transform = scales::transform_log10(),
-                       breaks = c(1e-6, 1e-5, 1e-4, .001, .01, .1, 1),
-                       labels = if (use_tikz) {
-                         c('$\\le 10^{-6}$', sprintf('$10^{%d}$', -5:-1), '1')
-                       } else {
-                         expression('' <= 10^{-6}, 10^{-5}, 10^{-4}, 10^{-3}, 10^{-2}, 10^{-1}, 1)
-                       },
-                       name = 'Unconditional\npersistence\n(log scale)') +
+  scale_fill_viridis_c(option = 'D', limits = c(.001, .999),
+                       transform = scales::transform_logit(),
+                       breaks = c(.001, .01, .5, .99, .999),
+                       labels = c(if (use_tikz) '$\\le 0.001$' else '≤0.001',
+                                  '0.01', '0.5', '0.99',
+                                  if (use_tikz) '$\\ge 0.999$' else '≥0.999'),
+                       name = 'Unconditional\npersistence\n(logit scale)') +
   labs(x = landscape_xlab, y = landscape_ylab) + theme_paper +
   theme(axis.title.x = element_text(family = 'Cambria Math'),
         axis.title.y = element_text(angle = 0, vjust = .5),
